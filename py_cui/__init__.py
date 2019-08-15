@@ -12,7 +12,7 @@ import os
 import shutil
 
 
-# pycui uses the curses library. On windows this does not exist, but
+# py_cui uses the curses library. On windows this does not exist, but
 # there is a open source windows_curses module that adds curses support
 # for python on windows
 try:
@@ -21,13 +21,13 @@ except ImportError:
     import windows_curses as curses
 
 
-# pycui imports
-import pycui.cell as cell
-import pycui.grid as grid
-import pycui.statusbar as statusbar
+# py_cui imports
+import py_cui.cell as cell
+import py_cui.grid as grid
+import py_cui.statusbar as statusbar
 
 
-# Curses color configuration - rename to use with pycui
+# Curses color configuration - rename to use with py_cui
 RED     = curses.COLOR_RED
 BLACK   = curses.COLOR_BLACK
 WHITE   = curses.COLOR_WHITE
@@ -39,22 +39,22 @@ YELLOW  = curses.COLOR_YELLOW
 
 class PyCUI:
     """
-    Main user interface class for pycui. To create a user interface, you must first
+    Main user interface class for py_cui. To create a user interface, you must first
     create an instance of this class, and then add cells + widgets to it.
 
     Attributes
     ----------
     cursor_x, cursor_y : int
         absolute position of the cursor in the CUI
-    grid : pycui.grid.Grid
+    grid : py_cui.grid.Grid
         The main layout manager for the CUI
-    cells : list of pycui.cell.Cell
+    cells : list of py_cui.cell.Cell
         list of cells in the grid
-    title_bar : pycui.statusbar.StatusBar
+    title_bar : py_cui.statusbar.StatusBar
         a status bar object that gets drawn at the top of the CUI
-    status_bar : pycui.statusbar.StatusBar
+    status_bar : py_cui.statusbar.StatusBar
         a status bar object that gets drawn at the bottom of the CUI
-    keybindings : list of pycui.keybinding.KeyBinding
+    keybindings : list of py_cui.keybinding.KeyBinding
         list of keybindings to check against in the main CUI loop
     height, width : int
         height of the terminal in characters, width of terminal in characters

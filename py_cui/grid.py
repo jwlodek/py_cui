@@ -1,4 +1,4 @@
-import pycui.errors
+import py_cui.errors
 
 class Grid:
 
@@ -12,14 +12,14 @@ class Grid:
 
     def set_num_rows(self, num_rows):
         if (3 * num_rows) >= self.height:
-            raise pycui.errors.PyCUIOutOfBoundsError
+            raise py_cui.errors.PyCUIOutOfBoundsError
         self.num_rows = num_rows
         self.row_height = int(self.height / self.num_rows)
 
 
     def set_num_cols(self, num_columns):
         if (3 * num_columns) >= self.width:
-            raise pycui.errors.PyCUIOutOfBoundsError
+            raise py_cui.errors.PyCUIOutOfBoundsError
         self.num_columns = num_columns
         self.column_width = int(self.width / self.num_columns)
 
@@ -28,9 +28,9 @@ class Grid:
         self.height = height
         self.width = width
         if (3 * self.num_columns) >= self.width:
-            raise pycui.errors.PyCUIOutOfBoundsError
+            raise py_cui.errors.PyCUIOutOfBoundsError
 
         if (3 * self.num_rows) >= self.height:
-            raise pycui.errors.PyCUIOutOfBoundsError
+            raise py_cui.errors.PyCUIOutOfBoundsError
         self.row_height = int(self.height / self.num_rows)
         self.column_width = int(self.width / self.num_columns)
