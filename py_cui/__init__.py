@@ -25,16 +25,14 @@ except ImportError:
 import py_cui.cell as cell
 import py_cui.grid as grid
 import py_cui.statusbar as statusbar
+import py_cui.errors
 
-
-# Curses color configuration - rename to use with py_cui
-RED     = curses.COLOR_RED
-BLACK   = curses.COLOR_BLACK
-WHITE   = curses.COLOR_WHITE
-BLUE    = curses.COLOR_BLUE
-CYAN    = curses.COLOR_CYAN
-GREEN   = curses.COLOR_GREEN
-YELLOW  = curses.COLOR_YELLOW
+# Curses color configuration - curses colors automatically work as pairs, so it was easiest to
+# create these values as pairs of the bat to be selected. 
+# Format is FOREGROUND_ON_BACKGROUND
+WHITE_ON_BLACK      = 1
+BLACK_ON_GREEN      = 2
+BLACK_ON_WHITE      = 3
 
 
 class PyCUI:
@@ -79,22 +77,42 @@ class PyCUI:
         self.height = term_size.lines
         self.width = term_size.columns
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
-        self.cells = []
+        self.cells = {}
         self.title_bar = None
         self.status_bar = None
 
+        self.selected_cell = None
+
         self.keybindings = []
-        self.cells.append(cell.Cell('Test', self.grid, 0, 0))
-        self.cells[0].view_contents.append('Hello World')
+        #self.initialize_default_keybindings()
+        #self.cells['Test'] = cell.Cell('Test', self.grid, 0, 0)
+        #self.cells['Test'].view_lines.append('Hello World')
         self.exit_key = ord(exit_key)
+
+    
 
 
     def start(self):
 
         curses.wrapper(self.draw)
 
-    def add_status_bar(self, text, foreground_color=BLACK, background_color=WHITE):
-        self.status_bar = statusbar.StatusBar(text, )
+
+    def add_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 0, pady = 0):
+        new_cell = cell.Cell(title, self.grid, row, column, row_span=row_span, column_span=column_span, padx=padx, pady=pady)
+        self.cells[title] = new_cell
+        self.selected_cell = title
+
+
+    def add_item_to_cell(self, cell_title, item_text):
+        if cell_title not in self.cells.keys():
+            raise py_cui.errors.PyCUIMissingChildError("CUI does not contain cell {}".format(cell_title))
+        else:
+            self.cells[cell_title].view_lines.append(item_text)
+            #self.cells[cell_title].parse_buffer()
+
+
+    def add_status_bar(self, text, color=BLACK_ON_WHITE):
+        self.status_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
 
 
     def reset_cursor(self):
@@ -118,10 +136,9 @@ class PyCUI:
 
         # Start colors in curses
         curses.start_color()
-        curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        curses.init_pair(WHITE_ON_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        curses.init_pair(BLACK_ON_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        curses.init_pair(BLACK_ON_WHITE, curses.COLOR_BLACK, curses.COLOR_WHITE)
         stdscr.attron(curses.color_pair(4))
 
         # Loop where k is the last character pressed
@@ -130,6 +147,10 @@ class PyCUI:
             # Initialization
             stdscr.clear()
             height, width = stdscr.getmaxyx()
+            if self.status_bar is not None:
+                height = height - 1
+            elif self.title_bar is not None:
+                height = height - 1
             if height != self.height or width != self.width:
                 self.width = width
                 self.height = height
@@ -157,15 +178,15 @@ class PyCUI:
             #whstr = "Width: {}, Height: {}".format(width, height)
             #stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
-            for cell in self.cells:
-                self.draw_cell_contents(cell, stdscr)
+            for cell_key in self.cells.keys():
+                self.draw_cell_contents(self.cells[cell_key], stdscr)
 
 
             if self.status_bar is not None:
-                stdscr.attron(curses.color_pair(3))
-                stdscr.addstr(height-1, 0, self.status_bar.text)
-                stdscr.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
-                stdscr.attroff(curses.color_pair(3))
+                stdscr.attron(curses.color_pair(self.status_bar.color))
+                stdscr.addstr(height, 0, self.status_bar.text)
+                stdscr.addstr(height, len(self.status_bar.text), " " * (width - len(self.status_bar.text) - 1))
+                stdscr.attroff(curses.color_pair(self.status_bar.color))
 
             #stdscr.attron(curses.color_pair(3))
             #stdscr.addstr(height-1, 0, statusbarstr)

@@ -6,3 +6,6 @@ class PyCUIOutOfBoundsError(Exception):
 
 class PyCUIError(Exception):
     pass
+
+class PyCUIMissingParentError(Exception):
+    pass
