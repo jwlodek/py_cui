@@ -5,11 +5,10 @@ A python library for creating command line based user interfaces.
 @created:   12-Aug-2019
 """
 
-
 # Some python core library imports
 import sys
 import os
-import shutil
+import shutil       # We use shutil for getting the terminal dimensions
 
 
 # py_cui uses the curses library. On windows this does not exist, but
@@ -36,7 +35,8 @@ BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
 
 
-
+# PY_CUI directions. Used for mapping cells to each other. When a cell gets mapped as
+# attached, to another cell, these directions will link them together via the arrow keys
 LEFT    = 0
 RIGHT   = 1
 UP      = 2
@@ -94,30 +94,55 @@ class PyCUI:
         self.cell_gotos = {}
 
         self.keybindings = {}
-        #self.initialize_default_keybindings()
-        #self.cells['Test'] = cell.Cell('Test', self.grid, 0, 0)
-        #self.cells['Test'].view_lines.append('Hello World')
         self.exit_key = ord(exit_key)
 
 
     def set_selected_cell(self, cell_title):
+        """
+        Function that sets the selected cell for the CUI
+
+        Parameters
+        ----------
+        cell_title : str
+            the title of the cell
+        """
+
         if cell_title in self.cells.keys():
             self.selected_cell = cell_title
             self.cells[self.selected_cell].selected = True
 
 
     def start(self):
+        """ Function that starts the CUI """
 
         curses.wrapper(self.draw)
 
 
-    def add_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 0, pady = 0):
+    def add_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        """
+        Function that adds a new cell to the CUI grid
+
+        Parameters
+        ----------
+        title : str
+            cell title
+        row, column : int
+            row and column of cell in the grid
+        row_span, column_span : int
+            how many rows/columns will the cell take up
+        padx, pady : int
+            padding size in characters
+        """
+
         new_cell = cell.Cell(title, self.grid, row, column, row_span=row_span, column_span=column_span, padx=padx, pady=pady)
         self.cells[title] = new_cell
-        self.selected_cell = title
+        if self.selected_cell is None:
+            self.set_selected_cell(title)
 
 
     def reverse_direction(self, direction):
+        """ Function that takes a direction and finds its reverse """
+
         if direction == UP:
             return DOWN
         elif direction == DOWN:
@@ -129,6 +154,8 @@ class PyCUI:
 
 
     def add_goto_cell(self, from_cell_title, to_cell_title, direction):
+        """ Function that links cells accross a particular direction via the arrow keys """
+
         if from_cell_title not in self.cell_gotos.keys():
             self.cell_gotos[from_cell_title] = ['', '', '', '']
         if to_cell_title not in self.cell_gotos.keys():
@@ -139,6 +166,17 @@ class PyCUI:
         
 
     def add_item_to_cell(self, cell_title, item_text):
+        """
+        Adds an item to the cell.
+
+        Parameters
+        ----------
+        cell_title : str
+            The cell title
+        item_text : str
+            The text for the item
+        """
+
         if cell_title not in self.cells.keys():
             raise py_cui.errors.PyCUIMissingChildError("CUI does not contain cell {}".format(cell_title))
         else:
@@ -147,10 +185,19 @@ class PyCUI:
 
 
     def add_status_bar(self, text, color=BLACK_ON_WHITE):
+        """ Adds a status bar to the CUI """
+
         self.status_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
+
+    def add_title_bar(self, text, color=BLACK_ON_WHITE):
+        """ Adds a title bar to the CUI """
+
+        self.title_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
 
 
     def reset_cursor(self):
+        """ Function that resets cursor position """
+
         self.cursor_x = max(0, self.cursor_x)
         self.cursor_x = min(width-1, self.cursor_x)
 
@@ -159,18 +206,23 @@ class PyCUI:
 
 
     def draw_cell_contents(self, cell, stdscr):
+        """ Function that calls a cell's draw function """
+
         cell.draw(stdscr)
 
 
     def switch_cells(self, direction):
+        """ Function called to switch between cells """
+
         if self.selected_cell in self.cell_gotos.keys():
             if self.cell_gotos[self.selected_cell][direction] in self.cells.keys():
                 self.cells[self.selected_cell].selected = False
-                self.selected_cell = self.cell_gotos[self.selected_cell][direction]
-                self.cells[self.selected_cell].selected = True
+                self.set_selected_cell(self.cell_gotos[self.selected_cell][direction])
 
 
     def draw(self, stdscr):
+        """ Main CUI draw loop called by start() """
+
         key_pressed = 0
 
         # Clear and refresh the screen for a blank canvas
