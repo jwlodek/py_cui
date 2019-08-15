@@ -19,9 +19,9 @@ class Cell:
         self.column_span = column_span
         self.overlap_x = 0
         self.overlap_y = 0
-        if self.row == self.pycui_grid.num_rows - 1:
+        if self.row + self.row_span == self.pycui_grid.num_rows:
             self.overlap_y = self.pycui_grid.height % self.pycui_grid.num_rows
-        if self.column == self.pycui_grid.num_columns - 1:
+        if self.column + self.column_span == self.pycui_grid.num_columns - 1:
             self.overlap_x = self.pycui_grid.width % self.pycui_grid.num_columns
         self.padx = padx
         self.pady = pady
