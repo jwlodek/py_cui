@@ -27,12 +27,20 @@ import py_cui.grid as grid
 import py_cui.statusbar as statusbar
 import py_cui.errors
 
+
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
 # create these values as pairs of the bat to be selected. 
 # Format is FOREGROUND_ON_BACKGROUND
 WHITE_ON_BLACK      = 1
 BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
+
+
+
+LEFT    = 0
+RIGHT   = 1
+UP      = 2
+DOWN    = 3
 
 
 class PyCUI:
@@ -83,13 +91,19 @@ class PyCUI:
 
         self.selected_cell = None
 
-        self.keybindings = []
+        self.cell_gotos = {}
+
+        self.keybindings = {}
         #self.initialize_default_keybindings()
         #self.cells['Test'] = cell.Cell('Test', self.grid, 0, 0)
         #self.cells['Test'].view_lines.append('Hello World')
         self.exit_key = ord(exit_key)
 
-    
+
+    def set_selected_cell(self, cell_title):
+        if cell_title in self.cells.keys():
+            self.selected_cell = cell_title
+            self.cells[self.selected_cell].selected = True
 
 
     def start(self):
@@ -103,11 +117,32 @@ class PyCUI:
         self.selected_cell = title
 
 
+    def reverse_direction(self, direction):
+        if direction == UP:
+            return DOWN
+        elif direction == DOWN:
+            return UP
+        elif direction == LEFT:
+            return RIGHT
+        elif direction == RIGHT:
+            return LEFT
+
+
+    def add_goto_cell(self, from_cell_title, to_cell_title, direction):
+        if from_cell_title not in self.cell_gotos.keys():
+            self.cell_gotos[from_cell_title] = ['', '', '', '']
+        if to_cell_title not in self.cell_gotos.keys():
+            self.cell_gotos[to_cell_title] = ['', '', '', '']
+        self.cell_gotos[from_cell_title][direction] = to_cell_title
+        self.cell_gotos[to_cell_title][self.reverse_direction(direction)] = from_cell_title
+        
+        
+
     def add_item_to_cell(self, cell_title, item_text):
         if cell_title not in self.cells.keys():
             raise py_cui.errors.PyCUIMissingChildError("CUI does not contain cell {}".format(cell_title))
         else:
-            self.cells[cell_title].view_lines.append(item_text)
+            self.cells[cell_title].view_items.append(item_text)
             #self.cells[cell_title].parse_buffer()
 
 
@@ -125,6 +160,14 @@ class PyCUI:
 
     def draw_cell_contents(self, cell, stdscr):
         cell.draw(stdscr)
+
+
+    def switch_cells(self, direction):
+        if self.selected_cell in self.cell_gotos.keys():
+            if self.cell_gotos[self.selected_cell][direction] in self.cells.keys():
+                self.cells[self.selected_cell].selected = False
+                self.selected_cell = self.cell_gotos[self.selected_cell][direction]
+                self.cells[self.selected_cell].selected = True
 
 
     def draw(self, stdscr):
@@ -157,6 +200,23 @@ class PyCUI:
                 self.grid.update_grid_height_width(self.height, self.width)
 
 
+            if key_pressed == curses.KEY_PPAGE:
+                if self.selected_cell is not None and self.selected_cell in self.cells.keys():
+                    self.cells[self.selected_cell].scroll_up()
+            if key_pressed == curses.KEY_NPAGE:
+                if self.selected_cell is not None and self.selected_cell in self.cells.keys():
+                    self.cells[self.selected_cell].scroll_down()
+
+
+            if key_pressed == curses.KEY_UP:
+                self.switch_cells(UP)
+            if key_pressed == curses.KEY_DOWN:
+                self.switch_cells(DOWN)
+            if key_pressed == curses.KEY_LEFT:
+                self.switch_cells(LEFT)
+            if key_pressed == curses.KEY_RIGHT:
+                self.switch_cells(RIGHT)
+
             #self.reset_cursor()
 
 
@@ -178,8 +238,7 @@ class PyCUI:
             #whstr = "Width: {}, Height: {}".format(width, height)
             #stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
-            for cell_key in self.cells.keys():
-                self.draw_cell_contents(self.cells[cell_key], stdscr)
+
 
 
             if self.status_bar is not None:
@@ -187,6 +246,15 @@ class PyCUI:
                 stdscr.addstr(height, 0, self.status_bar.text)
                 stdscr.addstr(height, len(self.status_bar.text), " " * (width - len(self.status_bar.text) - 1))
                 stdscr.attroff(curses.color_pair(self.status_bar.color))
+
+            if self.title_bar is not None:
+                stdscr.attron(curses.color_pair(self.title_bar.color))
+                stdscr.addstr(height, 0, self.title_bar.text)
+                stdscr.addstr(height, len(self.title_bar.text), " " * (width - len(self.title_bar.text) - 1))
+                stdscr.attroff(curses.color_pair(self.title_bar.color))
+
+            for cell_key in self.cells.keys():
+                self.draw_cell_contents(self.cells[cell_key], stdscr)
 
             #stdscr.attron(curses.color_pair(3))
             #stdscr.addstr(height-1, 0, statusbarstr)
