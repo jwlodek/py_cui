@@ -1,9 +1,25 @@
-import sys, os, shutil
+"""
+A python library for creating command line based user interfaces.
 
+@author:    Jakub Wlodek
+@created:   12-Aug-2019
+"""
+
+
+# Some python core library imports
+import sys
+import os
+import shutil
+
+
+# pycui uses the curses library. On windows this does not exist, but
+# there is a open source windows_curses module that adds curses support
+# for python on windows
 try:
     import curses
 except ImportError:
     import windows_curses as curses
+
 
 # pycui imports
 import pycui.cell as cell
@@ -11,7 +27,7 @@ import pycui.grid as grid
 import pycui.statusbar as statusbar
 
 
-# Curses color configuration
+# Curses color configuration - rename to use with pycui
 RED     = curses.COLOR_RED
 BLACK   = curses.COLOR_BLACK
 WHITE   = curses.COLOR_WHITE
@@ -22,27 +38,58 @@ YELLOW  = curses.COLOR_YELLOW
 
 
 class PyCUI:
+    """
+    Main user interface class for pycui. To create a user interface, you must first
+    create an instance of this class, and then add cells + widgets to it.
 
-    def __init__(self, exit_key='q'):
+    Attributes
+    ----------
+    cursor_x, cursor_y : int
+        absolute position of the cursor in the CUI
+    grid : pycui.grid.Grid
+        The main layout manager for the CUI
+    cells : list of pycui.cell.Cell
+        list of cells in the grid
+    title_bar : pycui.statusbar.StatusBar
+        a status bar object that gets drawn at the top of the CUI
+    status_bar : pycui.statusbar.StatusBar
+        a status bar object that gets drawn at the bottom of the CUI
+    keybindings : list of pycui.keybinding.KeyBinding
+        list of keybindings to check against in the main CUI loop
+    height, width : int
+        height of the terminal in characters, width of terminal in characters
+    exit_key : key_code
+        a key code for a key that exits the CUI
+
+    Methods
+    -------
+    start()
+        starts the CUI once all of the widgets have been added. Note that you cannot
+        add more widgets once this has been run
+    add_status_bar(text : str, foreground_color : color, background_color : color)
+        function that adds a status bar widget to the CUI
+    """
+
+    def __init__(self, num_rows, num_cols, exit_key='q'):
 
         self.cursor_x = 0
         self.cursor_y = 0
         term_size = shutil.get_terminal_size()
-        self.grid = grid.Grid(3,3, term_size.lines, term_size.columns)
+
+        self.height = term_size.lines
+        self.width = term_size.columns
+        self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.cells = []
         self.title_bar = None
         self.status_bar = None
 
         self.keybindings = []
-        self.cells.append(cell.Cell('Test', self.grid, 1, 1, row_span=2))
+        self.cells.append(cell.Cell('Test', self.grid, 0, 0))
         self.cells[0].view_contents.append('Hello World')
-
-        self.height = 0
-        self.width = 0
         self.exit_key = ord(exit_key)
 
 
-    def pycui_start(self):
+    def start(self):
 
         curses.wrapper(self.draw)
 
@@ -59,19 +106,7 @@ class PyCUI:
 
 
     def draw_cell_contents(self, cell, stdscr):
-        start_x, start_y = cell.get_absolute_position()
-        width, height = cell.get_absolute_dims()
-        stdscr.attron(curses.color_pair(4))
-        stdscr.addstr(start_y, width, '+--{}{}+'.format(cell.title, '-' * (width - 4 -len(cell.title))))
-        counter = 1
-        for line in cell.view_contents:
-            stdscr.addstr(start_y + counter, width, '| {}{}|'.format(line, ' ' * (width-3-len(line))))
-            counter = counter + 1
-        while counter < height - 1:
-            stdscr.addstr(start_y + counter, width, '|{}|'.format(' ' *(width-2)))
-            counter = counter + 1
-        stdscr.addstr(start_y + height - 1, width, '+{}+'.format('-'*(width-2)))
-        stdscr.attroff(curses.color_pair(3))
+        cell.draw(stdscr)
 
 
     def draw(self, stdscr):
@@ -87,13 +122,18 @@ class PyCUI:
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_BLACK)
+        stdscr.attron(curses.color_pair(4))
 
         # Loop where k is the last character pressed
         while key_pressed != self.exit_key:
 
             # Initialization
             stdscr.clear()
-            self.height, self.width = stdscr.getmaxyx()
+            height, width = stdscr.getmaxyx()
+            if height != self.height or width != self.width:
+                self.width = width
+                self.height = height
+                self.grid.update_grid_height_width(self.height, self.width)
 
 
             #self.reset_cursor()

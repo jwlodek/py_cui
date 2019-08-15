@@ -27,10 +27,10 @@ class Grid:
     def update_grid_height_width(self, height, width):
         self.height = height
         self.width = width
-        if (3 * num_columns) >= self.width:
+        if (3 * self.num_columns) >= self.width:
             raise pycui.errors.PyCUIOutOfBoundsError
 
-        if (3 * num_rows) >= self.height:
+        if (3 * self.num_rows) >= self.height:
             raise pycui.errors.PyCUIOutOfBoundsError
-        self.row_height = self.height / self.num_rows
-        self.column_width = self.width / self.num_columns
+        self.row_height = int(self.height / self.num_rows)
+        self.column_width = int(self.width / self.num_columns)

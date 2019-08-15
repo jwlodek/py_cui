@@ -1,5 +1,11 @@
 
 
+class ViewItem:
+
+    def __init__(self, text, size_x, size_y):
+        self.text = text
+        self.size_x = size_x
+        self.size_y = size_y
 
 
 class Cell:
@@ -36,3 +42,16 @@ class Cell:
         return width, height
 
 
+    def draw(self, stdscr):
+        start_x, start_y = self.get_absolute_position()
+        width, height = self.get_absolute_dims()
+
+        stdscr.addstr(start_y, width, '+--{}{}+'.format(self.title, '-' * (width - 4 -len(self.title))))
+        counter = 1
+        for line in self.view_contents:
+            stdscr.addstr(start_y + counter, width, '| {}{}|'.format(line, ' ' * (width-3-len(line))))
+            counter = counter + 1
+        while counter < height - 1:
+            stdscr.addstr(start_y + counter, width, '|{}|'.format(' ' *(width-2)))
+            counter = counter + 1
+        stdscr.addstr(start_y + height - 1, width, '+{}+'.format('-'*(width-2)))
