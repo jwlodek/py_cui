@@ -102,7 +102,7 @@ class Label(Widget):
         stdscr.attroff(curses.color_pair(self.color))
 
 
-class ScrollCell(Widget):
+class ScrollMenu(Widget):
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
@@ -315,3 +315,7 @@ class Button(Widget):
             stdscr.attroff(curses.color_pair(self.selected_color))
         stdscr.addstr(start_y + height - self.pady, start_x + self.padx, '+-{}-+'.format('-' * (width - 4 - self.padx)))
         stdscr.attroff(curses.color_pair(self.color))
+
+
+class ScrollTextBlock(Widget):
+    pass

@@ -124,19 +124,21 @@ class PyCUI:
             self.selected_widget = widget_id
 
 
-    def add_scroll_cell(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """ Function that adds a new cell to the CUI grid """
 
-        new_cell = widgets.ScrollCell(id, title, self.grid, row, column, row_span, column_span, padx, pady)
-        self.widgets[id] = new_cell
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_scroll_menu = widgets.ScrollMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_scroll_menu
         if self.selected_widget is None:
             self.set_selected_widget(id)
-        return new_cell
+        return new_scroll_menu
 
 
-    def add_text_box(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
         """ Function that adds a new text box to the CUI grid """
 
+        id = 'Widget{}'.format(len(self.widgets.keys()))
         new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
         self.widgets[id] = new_text_box
         if self.selected_widget is None:
@@ -144,17 +146,19 @@ class PyCUI:
         return new_text_box
 
 
-    def add_label(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """ Function that adds a new label to the CUI grid """
 
+        id = 'Widget{}'.format(len(self.widgets.keys()))
         new_label = widgets.Label(id, title, self.grid, row, column, row_span, column_span, padx, pady)
         self.widgets[id] = new_label
         return new_label
 
 
-    def add_button(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
+    def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
         """ Function that adds a new button to the CUI grid """
 
+        id = 'Widget{}'.format(len(self.widgets.keys()))
         new_button = widgets.Button(id, title, self.grid, row, column, row_span, column_span, padx, pady, command)
         self.widgets[id] = new_button
         if self.selected_widget is None:
