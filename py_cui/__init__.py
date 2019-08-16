@@ -23,6 +23,7 @@ import py_cui.grid as grid
 import py_cui.statusbar as statusbar
 import py_cui.errors
 import py_cui.widgets as widgets
+import py_cui.keybinding as keys
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -35,10 +36,10 @@ BLACK_ON_WHITE      = 3
 
 # PY_CUI directions. Used for mapping cells to each other. When a cell gets mapped as
 # attached, to another cell, these directions will link them together via the arrow keys
-LEFT    = 0
-RIGHT   = 1
-UP      = 2
-DOWN    = 3
+LEFT_INDEX    = 0
+RIGHT_INDEX   = 1
+UP_INDEX      = 2
+DOWN_INDEX    = 3
 
 
 class PyCUI:
@@ -76,6 +77,7 @@ class PyCUI:
 
     def __init__(self, num_rows, num_cols, exit_key='q'):
 
+        self.title = 'PyCUI Window'
         self.cursor_x = 0
         self.cursor_y = 0
         term_size = shutil.get_terminal_size()
@@ -85,9 +87,13 @@ class PyCUI:
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.widgets = {}
         self.title_bar = None
-        self.status_bar = None
+        #self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
+        self.init_status_bar_text = 'Press - q - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'
+        self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
 
         self.selected_widget = None
+        self.in_focused_mode = False
+        self.is_popup_showing = False
 
         self.widget_gotos = {}
 
@@ -107,7 +113,6 @@ class PyCUI:
 
         if widget_title in self.widgets.keys():
             self.selected_widget = widget_title
-            self.widgets[self.selected_widget].selected = True
 
 
     def start(self):
@@ -140,12 +145,16 @@ class PyCUI:
         return new_cell
 
 
-    def add_text_box(self):
-        pass
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+        new_text_box = widgets.TextBox(title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        self.widgets[title] = new_text_box
+        if self.selected_widget is None:
+            self.set_selected_widget(title)
+        return new_text_box
 
 
-    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-        new_label = widgets.Label(title, self.grid, row, column, row_span, column_span, padx, pady)
+    def add_label(self, title, text, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        new_label = widgets.Label(title, text, self.grid, row, column, row_span, column_span, padx, pady)
         self.widgets[title] = new_label
         return new_label
 
@@ -153,14 +162,14 @@ class PyCUI:
     def reverse_direction(self, direction):
         """ Function that takes a direction and finds its reverse """
 
-        if direction == UP:
-            return DOWN
-        elif direction == DOWN:
-            return UP
-        elif direction == LEFT:
-            return RIGHT
-        elif direction == RIGHT:
-            return LEFT
+        if direction == UP_INDEX:
+            return DOWN_INDEX
+        elif direction == DOWN_INDEX:
+            return UP_INDEX
+        elif direction == LEFT_INDEX:
+            return RIGHT_INDEX
+        elif direction == RIGHT_INDEX:
+            return LEFT_INDEX
 
 
     def add_goto_widget(self, from_widget_title, to_widget_title, direction):
@@ -177,17 +186,6 @@ class PyCUI:
             self.widget_gotos[to_widget_title] = ['', '', '', '']
         self.widget_gotos[from_widget_title][direction] = to_widget_title
         self.widget_gotos[to_widget_title][self.reverse_direction(direction)] = from_widget_title
-
-
-    def add_status_bar(self, text, color=BLACK_ON_WHITE):
-        """ Adds a status bar to the CUI """
-
-        self.status_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
-
-    def add_title_bar(self, text, color=BLACK_ON_WHITE):
-        """ Adds a title bar to the CUI """
-
-        self.title_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
 
 
     def draw_widget(self, widget, stdscr):
@@ -222,37 +220,53 @@ class PyCUI:
         stdscr.attron(curses.color_pair(4))
 
         # Loop where k is the last character pressed
-        while key_pressed != self.exit_key:
+        while key_pressed != self.exit_key or self.in_focused_mode:
 
-            # Initialization
+
+
+            # Initialization and size adjustment
             stdscr.clear()
+            # find height width, adjust if status/title bar added.
             height, width = stdscr.getmaxyx()
             if self.status_bar is not None:
                 height = height - 1
             elif self.title_bar is not None:
                 height = height - 1
+                self.grid.has_title_bar = True
+            # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
             if height != self.height or width != self.width:
                 self.width = width
                 self.height = height
                 self.grid.update_grid_height_width(self.height, self.width)
 
+            # Handle keypresses
 
-            if key_pressed == curses.KEY_PPAGE:
-                if self.selected_widget is not None and self.selected_widget in self.widgets.keys():
-                    self.widgets[self.selected_widget].scroll_up()
-            if key_pressed == curses.KEY_NPAGE:
-                if self.selected_widget is not None and self.selected_widget in self.widgets.keys():
-                    self.widgets[self.selected_widget].scroll_down()
+            # If we are in focus mode, the widget has all of the control of the keyboard except
+            # for the escape key, which exits focus mode.
+            if self.in_focused_mode:
+                if key_pressed == 27:
+                    self.status_bar.set_text(self.init_status_bar_text)
+                    self.in_focused_mode = False
+                    self.widgets[self.selected_widget].selected = False
+                else:
+                    # widget handles remaining keys
+                    self.widgets[self.selected_widget].handle_key_press(key_pressed)
 
+            else:
+                if key_pressed == 10 and self.selected_widget is not None:
+                    self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
+                    self.in_focused_mode = True
+                    self.widgets[self.selected_widget].selected = True
 
-            if key_pressed == curses.KEY_UP:
-                self.switch_widgets(UP)
-            if key_pressed == curses.KEY_DOWN:
-                self.switch_widgets(DOWN)
-            if key_pressed == curses.KEY_LEFT:
-                self.switch_widgets(LEFT)
-            if key_pressed == curses.KEY_RIGHT:
-                self.switch_widgets(RIGHT)
+                # If not in focus mode, use the arrow keys to move around the selectable widgets.
+                if key_pressed == curses.KEY_UP:
+                    self.switch_widgets(UP_INDEX)
+                if key_pressed == curses.KEY_DOWN:
+                    self.switch_widgets(DOWN_INDEX)
+                if key_pressed == curses.KEY_LEFT:
+                    self.switch_widgets(LEFT_INDEX)
+                if key_pressed == curses.KEY_RIGHT:
+                    self.switch_widgets(RIGHT_INDEX)
 
             #self.reset_cursor()
 
@@ -275,8 +289,7 @@ class PyCUI:
             #whstr = "Width: {}, Height: {}".format(width, height)
             #stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
-
-
+            # Draw status/title bar, and all widgets. Selected widget will be bolded.
 
             if self.status_bar is not None:
                 stdscr.attron(curses.color_pair(self.status_bar.color))
@@ -286,12 +299,17 @@ class PyCUI:
 
             if self.title_bar is not None:
                 stdscr.attron(curses.color_pair(self.title_bar.color))
-                stdscr.addstr(height, 0, self.title_bar.text)
-                stdscr.addstr(height, len(self.title_bar.text), " " * (width - len(self.title_bar.text) - 1))
+                stdscr.addstr(0, 0, " " * (width - len(self.title_bar.text) - 1))
                 stdscr.attroff(curses.color_pair(self.title_bar.color))
 
             for widget_key in self.widgets.keys():
-                self.draw_widget(self.widgets[widget_key], stdscr)
+                if widget_key != self.selected_widget:
+                    self.draw_widget(self.widgets[widget_key], stdscr)
+
+            # We draw the selected widget last to support cursor location.
+            stdscr.attron(curses.A_BOLD)
+            self.draw_widget(self.widgets[self.selected_widget], stdscr)
+            stdscr.attroff(curses.A_BOLD)
 
             #stdscr.attron(curses.color_pair(3))
             #stdscr.addstr(height-1, 0, statusbarstr)
