@@ -238,15 +238,19 @@ class TextBox(Widget):
 
     def handle_key_press(self, key_pressed):
         super().handle_key_press(key_pressed)
-        if key_pressed == curses.KEY_LEFT and self.cursor_x > self.cursor_max_left:
-            self.cursor_x = self.cursor_x - 1
+        width, height = self.get_absolute_dims()
+        if key_pressed == curses.KEY_LEFT and self.cursor_text_pos > 0:
+            if self.cursor_x > self.cursor_max_left:
+                self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
-        elif key_pressed == curses.KEY_RIGHT and self.cursor_x < self.cursor_max_right and self.cursor_text_pos < len(self.text):
-            self.cursor_x = self.cursor_x + 1
+        elif key_pressed == curses.KEY_RIGHT and self.cursor_text_pos < len(self.text):
+            if self.cursor_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos = self.cursor_text_pos + 1
         elif key_pressed == curses.KEY_BACKSPACE and self.cursor_text_pos > 0:
             self.set_text(self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:])
-            self.cursor_x = self.cursor_x - 1
+            if len(self.text) <= width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
         elif key_pressed == curses.KEY_HOME:
             loc_x, loc_y = self.get_absolute_position()
@@ -259,7 +263,8 @@ class TextBox(Widget):
         
         elif key_pressed > 31 and key_pressed < 128:
             self.set_text(self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:])
-            self.cursor_x = self.cursor_x + 1
+            if len(self.text) <= width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
@@ -269,7 +274,14 @@ class TextBox(Widget):
         stdscr.attron(curses.color_pair(self.color))
         stdscr.addstr(self.cursor_y - 2, start_x + self.padx, '{}'.format(self.title))
         stdscr.addstr(self.cursor_y - 1, start_x + self.padx, '+-{}-+'.format('-' * (width - 4 - self.padx)))
-        stdscr.addstr(self.cursor_y, start_x + self.padx, '| {}{} |'.format(self.text, ' ' * (width - 4 - self.padx - len(self.text))))
+        render_text = self.text
+        if len(self.text) > width - 2 * self.padx - 4:
+            end = len(self.text) - (width - 2 * self.padx - 4)
+            if self.cursor_text_pos < end:
+                render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (width - 2 * self.padx - 4)]
+            else:
+                render_text = self.text[end:]
+        stdscr.addstr(self.cursor_y, start_x + self.padx, '| {}{} |'.format(render_text, ' ' * (width - 4 - self.padx - len(self.text))))
         stdscr.addstr(self.cursor_y + 1, start_x + self.padx, '+-{}-+'.format('-' * (width - 4 - self.padx)))
         if self.selected:
             stdscr.move(self.cursor_y, self.cursor_x)
