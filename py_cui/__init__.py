@@ -14,10 +14,7 @@ import shutil       # We use shutil for getting the terminal dimensions
 # py_cui uses the curses library. On windows this does not exist, but
 # there is a open source windows_curses module that adds curses support
 # for python on windows
-try:
-    import curses
-except ImportError:
-    import windows_curses as curses
+import curses
 
 
 # py_cui imports
@@ -25,6 +22,7 @@ import py_cui.cell as cell
 import py_cui.grid as grid
 import py_cui.statusbar as statusbar
 import py_cui.errors
+import py_cui.widgets as widgets
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -85,19 +83,19 @@ class PyCUI:
         self.height = term_size.lines
         self.width = term_size.columns
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
-        self.cells = {}
+        self.widgets = {}
         self.title_bar = None
         self.status_bar = None
 
-        self.selected_cell = None
+        self.selected_widget = None
 
-        self.cell_gotos = {}
+        self.widget_gotos = {}
 
         self.keybindings = {}
         self.exit_key = ord(exit_key)
 
 
-    def set_selected_cell(self, cell_title):
+    def set_selected_widget(self, widget_title):
         """
         Function that sets the selected cell for the CUI
 
@@ -107,9 +105,9 @@ class PyCUI:
             the title of the cell
         """
 
-        if cell_title in self.cells.keys():
-            self.selected_cell = cell_title
-            self.cells[self.selected_cell].selected = True
+        if widget_title in self.widgets.keys():
+            self.selected_widget = widget_title
+            self.widgets[self.selected_widget].selected = True
 
 
     def start(self):
@@ -118,7 +116,7 @@ class PyCUI:
         curses.wrapper(self.draw)
 
 
-    def add_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_scroll_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """
         Function that adds a new cell to the CUI grid
 
@@ -134,10 +132,22 @@ class PyCUI:
             padding size in characters
         """
 
-        new_cell = cell.Cell(title, self.grid, row, column, row_span=row_span, column_span=column_span, padx=padx, pady=pady)
-        self.cells[title] = new_cell
-        if self.selected_cell is None:
-            self.set_selected_cell(title)
+
+        new_cell = widgets.ScrollCell(title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[title] = new_cell
+        if self.selected_widget is None:
+            self.set_selected_widget(title)
+        return new_cell
+
+
+    def add_text_box(self):
+        pass
+
+
+    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        new_label = widgets.Label(title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[title] = new_label
+        return new_label
 
 
     def reverse_direction(self, direction):
@@ -153,35 +163,20 @@ class PyCUI:
             return LEFT
 
 
-    def add_goto_cell(self, from_cell_title, to_cell_title, direction):
+    def add_goto_widget(self, from_widget_title, to_widget_title, direction):
         """ Function that links cells accross a particular direction via the arrow keys """
 
-        if from_cell_title not in self.cell_gotos.keys():
-            self.cell_gotos[from_cell_title] = ['', '', '', '']
-        if to_cell_title not in self.cell_gotos.keys():
-            self.cell_gotos[to_cell_title] = ['', '', '', '']
-        self.cell_gotos[from_cell_title][direction] = to_cell_title
-        self.cell_gotos[to_cell_title][self.reverse_direction(direction)] = from_cell_title
-        
-        
+        if from_widget_title not in self.widgets.keys() or to_widget_title not in self.widgets.keys():
+            raise py_cui.errors.PyCUIMissingChildError("One or more of the selected widgets couldn't be found.")
+        #if not self.widgets[from_widget_title].is_selectable or not self.widgets[to_widget_title].is_selectable:
+        #    raise py_cui.errors.PyCUIError("One or more of the widgets is not selectable.")
 
-    def add_item_to_cell(self, cell_title, item_text):
-        """
-        Adds an item to the cell.
-
-        Parameters
-        ----------
-        cell_title : str
-            The cell title
-        item_text : str
-            The text for the item
-        """
-
-        if cell_title not in self.cells.keys():
-            raise py_cui.errors.PyCUIMissingChildError("CUI does not contain cell {}".format(cell_title))
-        else:
-            self.cells[cell_title].view_items.append(item_text)
-            #self.cells[cell_title].parse_buffer()
+        if from_widget_title not in self.widget_gotos.keys():
+            self.widget_gotos[from_widget_title] = ['', '', '', '']
+        if to_widget_title not in self.widget_gotos.keys():
+            self.widget_gotos[to_widget_title] = ['', '', '', '']
+        self.widget_gotos[from_widget_title][direction] = to_widget_title
+        self.widget_gotos[to_widget_title][self.reverse_direction(direction)] = from_widget_title
 
 
     def add_status_bar(self, text, color=BLACK_ON_WHITE):
@@ -195,29 +190,19 @@ class PyCUI:
         self.title_bar = statusbar.StatusBar(text, BLACK_ON_WHITE)
 
 
-    def reset_cursor(self):
-        """ Function that resets cursor position """
+    def draw_widget(self, widget, stdscr):
+        """ Function that calls a widget's draw function """
 
-        self.cursor_x = max(0, self.cursor_x)
-        self.cursor_x = min(width-1, self.cursor_x)
-
-        self.cursor_y = max(0, self.cursor_y)
-        self.cursor_y = min(height-1, self.cursor_y)
+        widget.draw(stdscr)
 
 
-    def draw_cell_contents(self, cell, stdscr):
-        """ Function that calls a cell's draw function """
+    def switch_widgets(self, direction):
+        """ Function called to switch between widgets """
 
-        cell.draw(stdscr)
-
-
-    def switch_cells(self, direction):
-        """ Function called to switch between cells """
-
-        if self.selected_cell in self.cell_gotos.keys():
-            if self.cell_gotos[self.selected_cell][direction] in self.cells.keys():
-                self.cells[self.selected_cell].selected = False
-                self.set_selected_cell(self.cell_gotos[self.selected_cell][direction])
+        if self.selected_widget in self.widget_gotos.keys():
+            if self.widget_gotos[self.selected_widget][direction] in self.widgets.keys():
+                self.widgets[self.selected_widget].selected = False
+                self.set_selected_widget(self.widget_gotos[self.selected_widget][direction])
 
 
     def draw(self, stdscr):
@@ -253,21 +238,21 @@ class PyCUI:
 
 
             if key_pressed == curses.KEY_PPAGE:
-                if self.selected_cell is not None and self.selected_cell in self.cells.keys():
-                    self.cells[self.selected_cell].scroll_up()
+                if self.selected_widget is not None and self.selected_widget in self.widgets.keys():
+                    self.widgets[self.selected_widget].scroll_up()
             if key_pressed == curses.KEY_NPAGE:
-                if self.selected_cell is not None and self.selected_cell in self.cells.keys():
-                    self.cells[self.selected_cell].scroll_down()
+                if self.selected_widget is not None and self.selected_widget in self.widgets.keys():
+                    self.widgets[self.selected_widget].scroll_down()
 
 
             if key_pressed == curses.KEY_UP:
-                self.switch_cells(UP)
+                self.switch_widgets(UP)
             if key_pressed == curses.KEY_DOWN:
-                self.switch_cells(DOWN)
+                self.switch_widgets(DOWN)
             if key_pressed == curses.KEY_LEFT:
-                self.switch_cells(LEFT)
+                self.switch_widgets(LEFT)
             if key_pressed == curses.KEY_RIGHT:
-                self.switch_cells(RIGHT)
+                self.switch_widgets(RIGHT)
 
             #self.reset_cursor()
 
@@ -305,8 +290,8 @@ class PyCUI:
                 stdscr.addstr(height, len(self.title_bar.text), " " * (width - len(self.title_bar.text) - 1))
                 stdscr.attroff(curses.color_pair(self.title_bar.color))
 
-            for cell_key in self.cells.keys():
-                self.draw_cell_contents(self.cells[cell_key], stdscr)
+            for widget_key in self.widgets.keys():
+                self.draw_widget(self.widgets[widget_key], stdscr)
 
             #stdscr.attron(curses.color_pair(3))
             #stdscr.addstr(height-1, 0, statusbarstr)

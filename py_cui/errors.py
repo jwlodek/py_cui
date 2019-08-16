@@ -9,3 +9,6 @@ class PyCUIError(Exception):
 
 class PyCUIMissingParentError(Exception):
     pass
+
+class PyCUIMissingChildError(Exception):
+    pass
