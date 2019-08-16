@@ -235,3 +235,43 @@ class TextBox(Widget):
         if self.selected:
             stdscr.move(self.cursor_y, self.cursor_x)
         stdscr.attroff(curses.color_pair(self.color))
+
+
+class Button(Widget):
+
+    def __init__(self, title, text, grid, row, column, row_span, column_span, padx, pady, command):
+        super().__init__(title, grid, row, column, row_span, column_span, padx, pady)
+        self.text = text
+        self.command = command
+
+
+    def get_help_text(self):
+        return 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
+
+
+    def handle_key_press(self, key_pressed):
+        if key_pressed == 10:
+            self.selected_color = py_cui.WHITE_ON_RED
+            if self.command is not None:
+                ret = self.command()
+            self.selected_color = py_cui.BLACK_ON_GREEN
+            return ret
+
+
+    def draw(self, stdscr):
+        stdscr.attron(curses.color_pair(self.color))
+        start_x, start_y = self.get_absolute_position()
+        width, height = self.get_absolute_dims()
+        target_y = start_y + int(height / 2)
+        stdscr.addstr(start_y + self.pady, start_x + self.padx, '+-{}-+'.format('-' * (width - 4 - self.padx)))
+        if self.selected:
+            stdscr.attron(curses.color_pair(self.selected_color))
+        for i in range(start_y + self.pady + 1, target_y):
+            stdscr.addstr(i, start_x + self.padx, '|{}|'.format(' ' * (width - 2 - self.padx)))
+        stdscr.addstr(target_y, start_x + self.padx, '|{}|'.format(self.title.center(width - self.padx - 2, ' ')))
+        for i in range(target_y + 1, start_y + height - self.pady):
+            stdscr.addstr(i, start_x + self.padx, '|{}|'.format(' ' * (width - 2 - self.padx)))
+        if self.selected:
+            stdscr.attroff(curses.color_pair(self.selected_color))
+        stdscr.addstr(start_y + height - self.pady, start_x + self.padx, '+-{}-+'.format('-' * (width - 4 - self.padx)))
+        stdscr.attroff(curses.color_pair(self.color))

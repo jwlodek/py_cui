@@ -32,7 +32,7 @@ import py_cui.keybinding as keys
 WHITE_ON_BLACK      = 1
 BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
-
+WHITE_ON_RED        = 4
 
 # PY_CUI directions. Used for mapping cells to each other. When a cell gets mapped as
 # attached, to another cell, these directions will link them together via the arrow keys
@@ -159,6 +159,13 @@ class PyCUI:
         return new_label
 
 
+    def add_button(self, title, text, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
+        new_button = widgets.Button(title, text, self.grid, row, column, row_span, column_span, padx, pady, command)
+        self.widgets[title] = new_button
+        if self.selected_widget is None:
+            self.set_selected_widget(title)
+        return new_button
+
     def reverse_direction(self, direction):
         """ Function that takes a direction and finds its reverse """
 
@@ -217,7 +224,7 @@ class PyCUI:
         curses.init_pair(WHITE_ON_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
         curses.init_pair(BLACK_ON_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(BLACK_ON_WHITE, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        stdscr.attron(curses.color_pair(4))
+        curses.init_pair(WHITE_ON_RED,   curses.COLOR_WHITE, curses.COLOR_RED)
 
         # Loop where k is the last character pressed
         while key_pressed != self.exit_key or self.in_focused_mode:
