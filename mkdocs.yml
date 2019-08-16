@@ -1,0 +1,8 @@
+site_name: py_cui Documentation
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Functions: functions.md
+  - Examples: examples.md
+  - About: about.md
+theme: readthedocs
