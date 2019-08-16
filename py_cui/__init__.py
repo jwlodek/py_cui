@@ -18,7 +18,6 @@ import curses
 
 
 # py_cui imports
-import py_cui.cell as cell
 import py_cui.grid as grid
 import py_cui.statusbar as statusbar
 import py_cui.errors

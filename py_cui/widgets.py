@@ -1,3 +1,12 @@
+"""
+File contatining all widget classes for py_cui. Widgets are the basic
+building blocks of a user interface made with py_cui
+
+@author:    Jakub Wlodek
+@created:   12-Aug-2019
+"""
+
+
 import curses
 import py_cui
 import py_cui.errors

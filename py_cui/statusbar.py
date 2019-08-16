@@ -1,3 +1,9 @@
+"""
+File containing class for the status bar
+
+@author:    Jakub Wlodek
+@created:   12-Aug-2019
+"""
 
 
 class StatusBar:

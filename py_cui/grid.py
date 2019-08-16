@@ -1,3 +1,12 @@
+"""
+File containing the Grid Class. The grid is currently the only
+supported layout manager for py_cui
+
+@author:    Jakub Wlodek
+@created:   12-Aug-2019
+"""
+
+
 import py_cui.errors
 
 class Grid:
