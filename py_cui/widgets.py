@@ -30,7 +30,11 @@ class Widget:
         self.selected_color = py_cui.BLACK_ON_GREEN
         self.selected = False
         self.is_selectable = selectable
+        self.key_commands = {}
 
+
+    def add_key_command(self, key, command):
+        self.key_commands[ord(key)] = command
 
     def set_standard_color(self, color):
         self.color = color
@@ -53,7 +57,7 @@ class Widget:
         return width, height
 
     def is_row_col_inside(self, row, col):
-        if abs(row - self.row) < self.row_span and abs(col - self.column) < self.column_span:
+        if self.row <= row and row <= (self.row + self.row_span - 1) and self.column <= col and col <= (self.column_span + self.column - 1):
             return True
         else:
             return False
@@ -63,7 +67,9 @@ class Widget:
 
 
     def handle_key_press(self, key_pressed):
-        pass
+        if key_pressed in self.key_commands.keys():
+            temp = self.key_commands[key_pressed]
+            temp()
 
 
     def draw(self, stdscr):
@@ -74,9 +80,6 @@ class Label(Widget):
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
-
-    def draw_with_border(self, stdscr):
-        pass
 
     def draw(self, stdscr):
         stdscr.attron(curses.color_pair(self.color))
@@ -159,6 +162,7 @@ class ScrollCell(Widget):
 
 
     def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
         if key_pressed == curses.KEY_UP:
             self.scroll_up()
         if key_pressed == curses.KEY_DOWN:
@@ -216,8 +220,15 @@ class TextBox(Widget):
     def get_help_text(self):
         return 'Focus mode on TextBox. Press Esc to exit focus mode.'
 
+    def clear(self):
+        loc_x, loc_y = self.get_absolute_position()
+        self.cursor_x = loc_x + self.padx + 2
+        self.cursor_text_pos = 0
+        self.text = ''
+
 
     def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
         if key_pressed == curses.KEY_LEFT and self.cursor_x > self.cursor_max_left:
             self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
@@ -269,6 +280,7 @@ class Button(Widget):
 
 
     def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
         if key_pressed == 10:
             self.selected_color = py_cui.WHITE_ON_RED
             if self.command is not None:

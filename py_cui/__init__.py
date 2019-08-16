@@ -105,6 +105,12 @@ class PyCUI:
         self.exit_key = ord(exit_key)
 
 
+    def start(self):
+        """ Function that starts the CUI """
+
+        curses.wrapper(self.draw)
+
+
     def set_selected_widget(self, widget_id):
         """
         Function that sets the selected cell for the CUI
@@ -119,28 +125,8 @@ class PyCUI:
             self.selected_widget = widget_id
 
 
-    def start(self):
-        """ Function that starts the CUI """
-
-        curses.wrapper(self.draw)
-
-
     def add_scroll_cell(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-        """
-        Function that adds a new cell to the CUI grid
-
-        Parameters
-        ----------
-        title : str
-            cell title
-        row, column : int
-            row and column of cell in the grid
-        row_span, column_span : int
-            how many rows/columns will the cell take up
-        padx, pady : int
-            padding size in characters
-        """
-
+        """ Function that adds a new cell to the CUI grid """
 
         new_cell = widgets.ScrollCell(id, title, self.grid, row, column, row_span, column_span, padx, pady)
         self.widgets[id] = new_cell
@@ -150,6 +136,8 @@ class PyCUI:
 
 
     def add_text_box(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+        """ Function that adds a new text box to the CUI grid """
+
         new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
         self.widgets[id] = new_text_box
         if self.selected_widget is None:
@@ -158,32 +146,26 @@ class PyCUI:
 
 
     def add_label(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        """ Function that adds a new label to the CUI grid """
+
         new_label = widgets.Label(id, title, self.grid, row, column, row_span, column_span, padx, pady)
         self.widgets[id] = new_label
         return new_label
 
 
     def add_button(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
+        """ Function that adds a new button to the CUI grid """
+
         new_button = widgets.Button(id, title, self.grid, row, column, row_span, column_span, padx, pady, command)
         self.widgets[id] = new_button
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_button
 
-    def reverse_direction(self, direction):
-        """ Function that takes a direction and finds its reverse """
-
-        if direction == UP_INDEX:
-            return DOWN_INDEX
-        elif direction == DOWN_INDEX:
-            return UP_INDEX
-        elif direction == LEFT_INDEX:
-            return RIGHT_INDEX
-        elif direction == RIGHT_INDEX:
-            return LEFT_INDEX
-
 
     def check_if_neighbor_exists(self, row, column, row_span, col_span, direction):
+        """ Function that checks if widget has neighbor in specified cell. Used for navigating CUI """
+
         target_row = row
         target_col = column
         if direction == curses.KEY_DOWN:
@@ -202,6 +184,8 @@ class PyCUI:
                     return widget_id
             return None
 
+    # Popup functions. Used to display messages, warnings, and errors to the user. Are dismissed with enter, escape, or space
+    # Currently no support for input of any kind through popups.
 
     def show_message_popup(self, title, text):
 
@@ -223,18 +207,14 @@ class PyCUI:
         self.lose_focus()
         self.popup = None
 
+
     def lose_focus(self):
+        """ Function that forces py_cui out of focus mode. After pop is called, focus is lost """
+
         if self.in_focused_mode:
             self.in_focused_mode = False
             self.status_bar.set_text(self.init_status_bar_text)
             self.widgets[self.selected_widget].selected = False
-
-
-    def process_long_action(self, title, text, command):
-
-        self.processing_thread = threading.Thread(target=command)
-        color=CYAN_ON_BLACK
-        self.popup = py_cui.popups.MessagePopup(self, title, text, color, is_loading=True)
 
 
     def draw_widget(self, widget, stdscr):
@@ -243,23 +223,8 @@ class PyCUI:
         widget.draw(stdscr)
 
 
-    def switch_widgets(self, direction):
-        """ Function called to switch between widgets """
-
-        if self.selected_widget in self.widget_gotos.keys():
-            if self.widget_gotos[self.selected_widget][direction] in self.widgets.keys():
-                self.widgets[self.selected_widget].selected = False
-                self.set_selected_widget(self.widget_gotos[self.selected_widget][direction])
-
-
-    def draw(self, stdscr):
-        """ Main CUI draw loop called by start() """
-
-        key_pressed = 0
-
-        # Clear and refresh the screen for a blank canvas
-        stdscr.clear()
-        stdscr.refresh()
+    def initialize_colors(self):
+        """ Function for initialzing curses colors """
 
         # Start colors in curses
         curses.start_color()
@@ -271,7 +236,19 @@ class PyCUI:
         curses.init_pair(RED_ON_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
         curses.init_pair(CYAN_ON_BLACK, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
-        # Loop where k is the last character pressed
+
+    def draw(self, stdscr):
+        """ Main CUI draw loop called by start() """
+
+        key_pressed = 0
+
+        # Clear and refresh the screen for a blank canvas
+        stdscr.clear()
+        stdscr.refresh()
+
+        self.initialize_colors()
+
+        # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
 
             # Initialization and size adjustment
@@ -313,9 +290,6 @@ class PyCUI:
                     else:
                         self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
 
-
-
-
                 # If not in focus mode, use the arrow keys to move around the selectable widgets.
                 neighbor = None
                 if key_pressed == curses.KEY_UP or key_pressed == curses.KEY_DOWN or key_pressed == curses.KEY_LEFT or key_pressed == curses.KEY_RIGHT:
@@ -347,7 +321,7 @@ class PyCUI:
                 if widget_key != self.selected_widget:
                     self.draw_widget(self.widgets[widget_key], stdscr)
 
-            # We draw the selected widget last to support cursor location.
+            # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
             stdscr.attron(curses.A_BOLD)
             self.draw_widget(self.widgets[self.selected_widget], stdscr)
             stdscr.attroff(curses.A_BOLD)

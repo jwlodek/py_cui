@@ -17,10 +17,19 @@ class SimpleTodoList:
 
         self.mark_in_progress = self.master.add_button('Button3', 'Mark in Progress', 7, 0, column_span=2, command=self.mark_as_in_progress)
         self.mark_in_progress = self.master.add_button('Button4', 'Mark As Done', 7, 2, column_span=2, command=self.mark_as_done)
-        self.remove_todo = self.master.add_button('Button2', 'Remove TODO Item', 6, 1, pady = 1)
+        self.remove_todo = self.master.add_button('Button2', 'Remove TODO Item', 6, 1, pady = 1, command=self.remove_item)
         self.new_todo_add = self.master.add_button('Button1', 'Add TODO Item', 6, 0, command=self.add_item, pady =1)
         self.save_todo_button = self.master.add_button('Button5', 'Save', 7, 4, column_span=2, command=self.save_todo_file)
+
+        self.new_todo_textbox.add_key_command('\n', self.push_and_reset)
+        self.todo_scroll_cell.add_key_command('\n', self.mark_as_in_progress)
+        self.in_progress_scroll_cell.add_key_command('\n', self.mark_as_done)
         self.read_todo_file()
+
+
+    def push_and_reset(self):
+        self.add_item()
+        self.new_todo_textbox.clear()
 
 
     def read_todo_file(self):
@@ -55,7 +64,7 @@ class SimpleTodoList:
 
     def add_item(self):
 
-        self.todo_scroll_cell.add_item(self.new_todo_textbox.get())
+        self.todo_scroll_cell.add_item('{}'.format(self.new_todo_textbox.get()))
 
     def remove_item(self):
         self.todo_scroll_cell.remove_selected_item()
