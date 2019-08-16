@@ -9,7 +9,7 @@ A python library for creating command line based user interfaces.
 import sys
 import os
 import shutil       # We use shutil for getting the terminal dimensions
-
+import threading
 
 # py_cui uses the curses library. On windows this does not exist, but
 # there is a open source windows_curses module that adds curses support
@@ -24,6 +24,7 @@ import py_cui.statusbar as statusbar
 import py_cui.errors
 import py_cui.widgets as widgets
 import py_cui.keybinding as keys
+import py_cui.popups
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -33,6 +34,9 @@ WHITE_ON_BLACK      = 1
 BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
 WHITE_ON_RED        = 4
+YELLOW_ON_BLACK     = 5
+RED_ON_BLACK        = 6
+CYAN_ON_BLACK       = 7
 
 # PY_CUI directions. Used for mapping cells to each other. When a cell gets mapped as
 # attached, to another cell, these directions will link them together via the arrow keys
@@ -75,9 +79,10 @@ class PyCUI:
         function that adds a status bar widget to the CUI
     """
 
-    def __init__(self, num_rows, num_cols, exit_key='q'):
+    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key='q'):
 
         self.title = 'PyCUI Window'
+        os.environ.setdefault('ESCDELAY', '25')
         self.cursor_x = 0
         self.cursor_y = 0
         term_size = shutil.get_terminal_size()
@@ -93,15 +98,14 @@ class PyCUI:
 
         self.selected_widget = None
         self.in_focused_mode = False
-        self.is_popup_showing = False
-
-        self.widget_gotos = {}
+        self.popup = None
+        self.auto_focus_buttons = auto_focus_buttons
 
         self.keybindings = {}
         self.exit_key = ord(exit_key)
 
 
-    def set_selected_widget(self, widget_title):
+    def set_selected_widget(self, widget_id):
         """
         Function that sets the selected cell for the CUI
 
@@ -111,8 +115,8 @@ class PyCUI:
             the title of the cell
         """
 
-        if widget_title in self.widgets.keys():
-            self.selected_widget = widget_title
+        if widget_id in self.widgets.keys():
+            self.selected_widget = widget_id
 
 
     def start(self):
@@ -121,7 +125,7 @@ class PyCUI:
         curses.wrapper(self.draw)
 
 
-    def add_scroll_cell(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_scroll_cell(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """
         Function that adds a new cell to the CUI grid
 
@@ -138,32 +142,32 @@ class PyCUI:
         """
 
 
-        new_cell = widgets.ScrollCell(title, self.grid, row, column, row_span, column_span, padx, pady)
-        self.widgets[title] = new_cell
+        new_cell = widgets.ScrollCell(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_cell
         if self.selected_widget is None:
-            self.set_selected_widget(title)
+            self.set_selected_widget(id)
         return new_cell
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
-        new_text_box = widgets.TextBox(title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
-        self.widgets[title] = new_text_box
+    def add_text_box(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        self.widgets[id] = new_text_box
         if self.selected_widget is None:
-            self.set_selected_widget(title)
+            self.set_selected_widget(id)
         return new_text_box
 
 
-    def add_label(self, title, text, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-        new_label = widgets.Label(title, text, self.grid, row, column, row_span, column_span, padx, pady)
-        self.widgets[title] = new_label
+    def add_label(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        new_label = widgets.Label(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_label
         return new_label
 
 
-    def add_button(self, title, text, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
-        new_button = widgets.Button(title, text, self.grid, row, column, row_span, column_span, padx, pady, command)
-        self.widgets[title] = new_button
+    def add_button(self, id, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
+        new_button = widgets.Button(id, title, self.grid, row, column, row_span, column_span, padx, pady, command)
+        self.widgets[id] = new_button
         if self.selected_widget is None:
-            self.set_selected_widget(title)
+            self.set_selected_widget(id)
         return new_button
 
     def reverse_direction(self, direction):
@@ -179,20 +183,58 @@ class PyCUI:
             return LEFT_INDEX
 
 
-    def add_goto_widget(self, from_widget_title, to_widget_title, direction):
-        """ Function that links cells accross a particular direction via the arrow keys """
+    def check_if_neighbor_exists(self, row, column, row_span, col_span, direction):
+        target_row = row
+        target_col = column
+        if direction == curses.KEY_DOWN:
+            target_row = target_row + row_span
+        elif direction == curses.KEY_UP:
+            target_row = target_row - 1
+        elif direction == curses.KEY_LEFT:
+            target_col = target_col - 1
+        elif direction == curses.KEY_RIGHT:
+            target_col = target_col + col_span
+        if target_row < 0 or target_col < 0 or target_row >= self.grid.num_rows or target_col >= self.grid.num_columns:
+            return None
+        else:
+            for widget_id in self.widgets:
+                if self.widgets[widget_id].is_row_col_inside(target_row, target_col):
+                    return widget_id
+            return None
 
-        if from_widget_title not in self.widgets.keys() or to_widget_title not in self.widgets.keys():
-            raise py_cui.errors.PyCUIMissingChildError("One or more of the selected widgets couldn't be found.")
-        #if not self.widgets[from_widget_title].is_selectable or not self.widgets[to_widget_title].is_selectable:
-        #    raise py_cui.errors.PyCUIError("One or more of the widgets is not selectable.")
 
-        if from_widget_title not in self.widget_gotos.keys():
-            self.widget_gotos[from_widget_title] = ['', '', '', '']
-        if to_widget_title not in self.widget_gotos.keys():
-            self.widget_gotos[to_widget_title] = ['', '', '', '']
-        self.widget_gotos[from_widget_title][direction] = to_widget_title
-        self.widget_gotos[to_widget_title][self.reverse_direction(direction)] = from_widget_title
+    def show_message_popup(self, title, text):
+
+        color=WHITE_ON_BLACK
+        self.popup = py_cui.popups.MessagePopup(self, title, text, color)
+
+    def show_warning_popup(self, title, text):
+
+        color=YELLOW_ON_BLACK
+        self.popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color)
+
+    def show_error_popup(self, title, text):
+
+        color=RED_ON_BLACK
+        self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color)
+
+    def close_popup(self):
+        self.popup_ret = self.popup.ret_val
+        self.lose_focus()
+        self.popup = None
+
+    def lose_focus(self):
+        if self.in_focused_mode:
+            self.in_focused_mode = False
+            self.status_bar.set_text(self.init_status_bar_text)
+            self.widgets[self.selected_widget].selected = False
+
+
+    def process_long_action(self, title, text, command):
+
+        self.processing_thread = threading.Thread(target=command)
+        color=CYAN_ON_BLACK
+        self.popup = py_cui.popups.MessagePopup(self, title, text, color, is_loading=True)
 
 
     def draw_widget(self, widget, stdscr):
@@ -225,11 +267,12 @@ class PyCUI:
         curses.init_pair(BLACK_ON_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(BLACK_ON_WHITE, curses.COLOR_BLACK, curses.COLOR_WHITE)
         curses.init_pair(WHITE_ON_RED,   curses.COLOR_WHITE, curses.COLOR_RED)
+        curses.init_pair(YELLOW_ON_BLACK, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(RED_ON_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(CYAN_ON_BLACK, curses.COLOR_CYAN, curses.COLOR_BLACK)
 
         # Loop where k is the last character pressed
-        while key_pressed != self.exit_key or self.in_focused_mode:
-
-
+        while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
 
             # Initialization and size adjustment
             stdscr.clear()
@@ -250,7 +293,7 @@ class PyCUI:
 
             # If we are in focus mode, the widget has all of the control of the keyboard except
             # for the escape key, which exits focus mode.
-            if self.in_focused_mode:
+            if self.in_focused_mode and self.popup is None:
                 if key_pressed == 27:
                     self.status_bar.set_text(self.init_status_bar_text)
                     self.in_focused_mode = False
@@ -259,42 +302,33 @@ class PyCUI:
                     # widget handles remaining keys
                     self.widgets[self.selected_widget].handle_key_press(key_pressed)
 
-            else:
+            elif self.popup is None:
                 if key_pressed == 10 and self.selected_widget is not None:
-                    self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
                     self.in_focused_mode = True
                     self.widgets[self.selected_widget].selected = True
+                    if self.auto_focus_buttons and isinstance(self.widgets[self.selected_widget], widgets.Button):
+                        self.in_focused_mode = False
+                        self.widgets[self.selected_widget].selected = False
+                        self.widgets[self.selected_widget].command()
+                    else:
+                        self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
+
+
+
 
                 # If not in focus mode, use the arrow keys to move around the selectable widgets.
-                if key_pressed == curses.KEY_UP:
-                    self.switch_widgets(UP_INDEX)
-                if key_pressed == curses.KEY_DOWN:
-                    self.switch_widgets(DOWN_INDEX)
-                if key_pressed == curses.KEY_LEFT:
-                    self.switch_widgets(LEFT_INDEX)
-                if key_pressed == curses.KEY_RIGHT:
-                    self.switch_widgets(RIGHT_INDEX)
-
-            #self.reset_cursor()
+                neighbor = None
+                if key_pressed == curses.KEY_UP or key_pressed == curses.KEY_DOWN or key_pressed == curses.KEY_LEFT or key_pressed == curses.KEY_RIGHT:
+                    selected = self.widgets[self.selected_widget]
+                    neighbor = self.check_if_neighbor_exists(selected.row, selected.column, selected.row_span, selected.column_span, key_pressed)
+                if neighbor is not None:
+                    self.widgets[self.selected_widget].selected = False
+                    self.set_selected_widget(neighbor)
 
 
-            # Declaration of strings
-            #title = "Curses example"[:width-1]
-            #subtitle = "Written by Clay McLeod"[:width-1]
-            #keystr = "Last key pressed: {}".format(k)[:width-1]
-            #statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(cursor_x, cursor_y)
-            #if k == 0:
-            #    keystr = "No key press detected..."[:width-1]
-
-            # Centering calculations
-            #start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
-            #start_x_subtitle = int((width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-            #start_x_keystr = int((width // 2) - (len(keystr) // 2) - len(keystr) % 2)
-            #start_y = int((height // 2) - 2)
-
-            # Rendering some text
-            #whstr = "Width: {}, Height: {}".format(width, height)
-            #stdscr.addstr(0, 0, whstr, curses.color_pair(1))
+            # if we have a popup, that takes key control from bot
+            elif self.popup is not None:
+                self.popup.handle_key_press(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
 
@@ -318,27 +352,8 @@ class PyCUI:
             self.draw_widget(self.widgets[self.selected_widget], stdscr)
             stdscr.attroff(curses.A_BOLD)
 
-            #stdscr.attron(curses.color_pair(3))
-            #stdscr.addstr(height-1, 0, statusbarstr)
-            #stdscr.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
-            #stdscr.attroff(curses.color_pair(3))
-
-            # Turning on attributes for title
-            #stdscr.attron(curses.color_pair(2))
-            #stdscr.attron(curses.A_BOLD)
-
-            # Rendering title
-            #stdscr.addstr(start_y, start_x_title, title)
-
-            # Turning off attributes for title
-            #stdscr.attroff(curses.color_pair(2))
-            #stdscr.attroff(curses.A_BOLD)
-
-            # Print rest of text
-            #stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-            #stdscr.addstr(start_y + 3, (width // 2) - 2, '-' * 4)
-            #stdscr.addstr(start_y + 5, start_x_keystr, keystr)
-            #stdscr.move(cursor_y, cursor_x)
+            if self.popup is not None:
+                self.popup.draw(stdscr)
 
             # Refresh the screen
             stdscr.refresh()

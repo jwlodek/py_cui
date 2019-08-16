@@ -6,9 +6,10 @@ import py_cui.errors
 class Widget:
     """ Top Level Widget Class """
 
-    def __init__(self, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add cell to NoneType")
+        self.id = id
         self.title = title
         self.grid = grid
         if (self.grid.num_columns < column + column_span) or (self.grid.num_rows < row + row_span):
@@ -51,6 +52,12 @@ class Widget:
         height = self.grid.row_height * self.row_span + self.overlap_y
         return width, height
 
+    def is_row_col_inside(self, row, col):
+        if abs(row - self.row) < self.row_span and abs(col - self.column) < self.column_span:
+            return True
+        else:
+            return False
+
     def get_help_text(self):
         return 'No help text available.'
 
@@ -65,9 +72,8 @@ class Widget:
 
 class Label(Widget):
 
-    def __init__(self, title, text, grid, row, column, row_span, column_span, padx, pady):
-        super().__init__(title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
-        self.text = text
+    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
 
     def draw_with_border(self, stdscr):
         pass
@@ -86,8 +92,8 @@ class Label(Widget):
 
 class ScrollCell(Widget):
 
-    def __init__(self, title, grid, row, column, row_span, column_span, padx, pady):
-        super().__init__(title, grid, row, column, row_span, column_span, padx, pady)
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.top_view = 0
         self.selected_item = 0
         self.all_lines = []
@@ -113,7 +119,7 @@ class ScrollCell(Widget):
             if self.selected_item > self.top_view + height - (2 * self.pady) - 3:
                 self.top_view = self.top_view + 1
 
-    def add_item_to_scroll_cell(self, item_text):
+    def add_item(self, item_text):
         """
         Adds an item to the cell.
 
@@ -127,6 +133,19 @@ class ScrollCell(Widget):
 
         self.view_items.append(item_text)
 
+
+    def add_item_list(self, item_list):
+        for item in item_list:
+            self.add_item(item)
+
+
+    def remove_selected_item(self):
+        del self.view_items[self.selected_item]
+        if self.selected_item > len(self.view_items):
+            self.selected_item = self.selected_item - 1
+
+    def get_item_list(self):
+        return self.view_items
 
     def get(self):
         
@@ -175,8 +194,8 @@ class ScrollCell(Widget):
 
 class TextBox(Widget):
 
-    def __init__(self, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
-        super().__init__(title, grid, row, column, row_span, column_span, padx, pady)
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.text = initial_text
         width, height = self.get_absolute_dims()
         loc_x, loc_y = self.get_absolute_position()
@@ -239,10 +258,10 @@ class TextBox(Widget):
 
 class Button(Widget):
 
-    def __init__(self, title, text, grid, row, column, row_span, column_span, padx, pady, command):
-        super().__init__(title, grid, row, column, row_span, column_span, padx, pady)
-        self.text = text
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.command = command
+        self.color = py_cui.CYAN_ON_BLACK
 
 
     def get_help_text(self):
