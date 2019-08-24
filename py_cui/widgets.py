@@ -42,6 +42,7 @@ class Widget:
         self.selected_color = py_cui.BLACK_ON_GREEN
         self.selected = False
         self.is_selectable = selectable
+        self.help_text = 'No help text available.'
         self.key_commands = {}
 
 
@@ -73,7 +74,10 @@ class Widget:
     def assign_renderer(self, renderer):
         """ Function that assigns a renderer object to the widget """
 
-        self.renderer = renderer
+        if isinstance(renderer, py_cui.renderer.Renderer):
+            self.renderer = renderer
+        else:
+            raise py_cui.errors.PyCUIError('Invalid renderer, must be of type py_cui.renderer.Renderer')
 
 
     def get_absolute_position(self):
@@ -105,7 +109,7 @@ class Widget:
     def get_help_text(self):
         """ Returns help text """
 
-        return 'No help text available.'
+        return self.help_text
 
 
     def handle_key_press(self, key_pressed):
@@ -150,6 +154,7 @@ class ScrollMenu(Widget):
         self.view_lines = []
         self.all_items = []
         self.view_items = []
+        self.help_text = 'Focus mode on ScrollCell. Use up/down to scroll, Enter to trigger command, Esc to exit.'
 
 
     def scroll_up(self):
@@ -230,10 +235,6 @@ class ScrollMenu(Widget):
         return None
 
 
-    def get_help_text(self):
-        return 'Focus mode on ScrollCell. Use up/down to scroll, Enter to trigger command, Esc to exit.'
-
-
     def handle_key_press(self, key_pressed):
         """ Override base class function. UP_ARROW scrolls up, DOWN_ARROW scrolls down """
 
@@ -279,6 +280,7 @@ class TextBox(Widget):
         self.cursor_max_left = self.cursor_x
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.cursor_y = self.start_y + int(self.height / 2) + 1
+        self.help_text = 'Focus mode on TextBox. Press Esc to exit focus mode.'
 
     def set_text(self, text):
         self.text = text
@@ -286,10 +288,6 @@ class TextBox(Widget):
 
     def get(self):
         return self.text
-
-
-    def get_help_text(self):
-        return 'Focus mode on TextBox. Press Esc to exit focus mode.'
 
     def clear(self):
         self.cursor_x = self.start_x + self.padx + 2
@@ -356,10 +354,7 @@ class Button(Widget):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.command = command
         self.color = py_cui.MAGENTA_ON_BLACK
-
-
-    def get_help_text(self):
-        return 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
+        self.help_text = 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
 
 
     def handle_key_press(self, key_pressed):
@@ -372,23 +367,19 @@ class Button(Widget):
             return ret
 
 
-    def draw(self, stdscr):
-        stdscr.attron(curses.color_pair(self.color))
-        self.start_x, self.start_y = self.get_absolute_position()
-        self.width, self.height = self.get_absolute_dims()
-        target_y = self.start_y + int(self.height / 2)
-        stdscr.addstr(self.start_y + self.pady, self.start_x + self.padx, '+-{}-+'.format('-' * (self.width - 4 - self.padx)))
+    def draw(self):
+
+        super().draw()
+        self.renderer.set_color_mode(self.color)
+        self.renderer.draw_border(self, with_title=False)
+        button_text_y_pos = self.start_y + int(self.height / 2)
         if self.selected:
-            stdscr.attron(curses.color_pair(self.selected_color))
-        for i in range(self.start_y + self.pady + 1, target_y):
-            stdscr.addstr(i, self.start_x + self.padx, '|{}|'.format(' ' * (self.width - 2 - self.padx)))
-        stdscr.addstr(target_y, self.start_x + self.padx, '|{}|'.format(self.title.center(self.width - self.padx - 2, ' ')))
-        for i in range(target_y + 1, self.start_y + self.height - self.pady):
-            stdscr.addstr(i, self.start_x + self.padx, '|{}|'.format(' ' * (self.width - 2 - self.padx)))
+            self.renderer.set_color_mode(self.selected_color)
+        self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True)
         if self.selected:
-            stdscr.attroff(curses.color_pair(self.selected_color))
-        stdscr.addstr(self.start_y + self.height - self.pady, self.start_x + self.padx, '+-{}-+'.format('-' * (self.width - 4 - self.padx)))
-        stdscr.attroff(curses.color_pair(self.color))
+            self.renderer.unset_color_mode(self.selected_color)
+        self.renderer.unset_color_mode(self.color)
+        self.renderer.reset_cursor(self)
 
 
 class ScrollTextBlock(Widget):

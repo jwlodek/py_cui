@@ -179,6 +179,14 @@ class PyCUI:
         return new_button
 
 
+    def set_widget_focus_text(self, widget, text):
+
+        if widget is not None and text is not None and isinstance(widget, py_cui.widgets.Widget):
+            widget.help_text = text
+        else:
+            raise py_cui.errors.PyCUIError('Cannot set focus text of non-widget object.')
+
+
     # CUI status functions. Used to switch between widgets, set the mode, and 
     # identify neighbors for overview mode
 
@@ -295,33 +303,37 @@ class PyCUI:
 
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
+        selected_widget = self.widgets[self.selected_widget]
+
         if self.in_focused_mode and self.popup is None:
             if key_pressed == keys.KEY_ESCAPE:
                 self.status_bar.set_text(self.init_status_bar_text)
                 self.in_focused_mode = False
-                self.widgets[self.selected_widget].selected = False
+                selected_widget.selected = False
             else:
                 # widget handles remaining keys
-                self.widgets[self.selected_widget].handle_key_press(key_pressed)
+                selected_widget.handle_key_press(key_pressed)
         # Otherwise, barring a popup, we are in overview mode, meaning that arrows move between widgets, and Enter focuses
         elif self.popup is None:
-            if key_pressed == keys.KEY_ENTER and self.selected_widget is not None:
+            if key_pressed == keys.KEY_ENTER and self.selected_widget is not None and selected_widget.is_selectable:
                 self.in_focused_mode = True
-                self.widgets[self.selected_widget].selected = True
-                if self.auto_focus_buttons and isinstance(self.widgets[self.selected_widget], widgets.Button):
+                selected_widget.selected = True
+                # If autofocus buttons is selected, we automatically 
+                if self.auto_focus_buttons and isinstance(selected_widget, widgets.Button):
                     self.in_focused_mode = False
-                    self.widgets[self.selected_widget].selected = False
-                    self.widgets[self.selected_widget].command()
+                    selected_widget.selected = False
+                    if selected_widget.command is not None:
+                        selected_widget.command()
                 else:
-                    self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
+                    self.status_bar.set_text(selected_widget.get_help_text())
 
             # If not in focus mode, use the arrow keys to move around the selectable widgets.
             neighbor = None
             if key_pressed == keys.KEY_UP_ARROW or key_pressed == keys.KEY_DOWN_ARROW or key_pressed == keys.KEY_LEFT_ARROW or key_pressed == keys.KEY_RIGHT_ARROW:
-                selected = self.widgets[self.selected_widget]
+                selected = selected_widget
                 neighbor = self.check_if_neighbor_exists(selected.row, selected.column, selected.row_span, selected.column_span, key_pressed)
             if neighbor is not None:
-                self.widgets[self.selected_widget].selected = False
+                selected_widget.selected = False
                 self.set_selected_widget(neighbor)
 
         # if we have a popup, that takes key control from bot

@@ -67,9 +67,9 @@ class Renderer:
 
     def draw_text(self, widget, line, y, centered = False, bordered = True):
         if centered and bordered:
-            render_text = '|{}|'.format(line.center(widget.width - (2 * widget.padx) - 2, ' '))
+            render_text = '|{}|'.format(line.center(widget.width - widget.padx - 2, ' '))
         elif centered and not bordered:
-            render_text = '{}'.format(line.center(widget.width - (2 * widget.padx), ' '))
+            render_text = '{}'.format(line.center(widget.width - widget.padx, ' '))
         elif not centered and bordered:
             render_text = '| {}{}|'.format(line, ' ' * (widget.width-3 - widget.padx - len(line)))
         else:
