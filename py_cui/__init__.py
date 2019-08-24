@@ -20,6 +20,7 @@ import curses
 # py_cui imports
 import py_cui.grid as grid
 import py_cui.statusbar as statusbar
+import py_cui.renderer as renderer
 import py_cui.errors
 import py_cui.widgets as widgets
 import py_cui.keybinding as keys
@@ -36,13 +37,7 @@ WHITE_ON_RED        = 4
 YELLOW_ON_BLACK     = 5
 RED_ON_BLACK        = 6
 CYAN_ON_BLACK       = 7
-
-# PY_CUI directions. Used for mapping cells to each other. When a cell gets mapped as
-# attached, to another cell, these directions will link them together via the arrow keys
-LEFT_INDEX    = 0
-RIGHT_INDEX   = 1
-UP_INDEX      = 2
-DOWN_INDEX    = 3
+MAGENTA_ON_BLACK    = 8
 
 
 class PyCUI:
@@ -78,7 +73,7 @@ class PyCUI:
         function that adds a status bar widget to the CUI
     """
 
-    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key='q'):
+    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=keys.KEY_Q_LOWER):
 
         self.title = 'PyCUI Window'
         os.environ.setdefault('ESCDELAY', '25')
@@ -89,10 +84,11 @@ class PyCUI:
         self.height = term_size.lines
         self.width = term_size.columns
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
+        self.renderer = None
         self.widgets = {}
         self.title_bar = None
         #self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
-        self.init_status_bar_text = 'Press - q - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'
+        self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
         self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
 
         self.selected_widget = None
@@ -101,7 +97,11 @@ class PyCUI:
         self.auto_focus_buttons = auto_focus_buttons
 
         self.keybindings = {}
-        self.exit_key = ord(exit_key)
+        self.exit_key = exit_key
+
+
+    # Initialization functions
+    # Used to initialzie CUI and its features
 
 
     def start(self):
@@ -110,19 +110,32 @@ class PyCUI:
         curses.wrapper(self.draw)
 
 
-    def set_selected_widget(self, widget_id):
-        """
-        Function that sets the selected cell for the CUI
 
-        Parameters
-        ----------
-        cell_title : str
-            the title of the cell
-        """
+    def initialize_colors(self):
+        """ Function for initialzing curses colors """
 
-        if widget_id in self.widgets.keys():
-            self.selected_widget = widget_id
+        # Start colors in curses
+        curses.start_color()
+        curses.init_pair(WHITE_ON_BLACK,    curses.COLOR_WHITE,     curses.COLOR_BLACK)
+        curses.init_pair(BLACK_ON_GREEN,    curses.COLOR_BLACK,     curses.COLOR_GREEN)
+        curses.init_pair(BLACK_ON_WHITE,    curses.COLOR_BLACK,     curses.COLOR_WHITE)
+        curses.init_pair(WHITE_ON_RED,      curses.COLOR_WHITE,     curses.COLOR_RED)
+        curses.init_pair(YELLOW_ON_BLACK,   curses.COLOR_YELLOW,    curses.COLOR_BLACK)
+        curses.init_pair(RED_ON_BLACK,      curses.COLOR_RED,       curses.COLOR_BLACK)
+        curses.init_pair(CYAN_ON_BLACK,     curses.COLOR_CYAN,      curses.COLOR_BLACK)
+        curses.init_pair(MAGENTA_ON_BLACK,  curses.COLOR_MAGENTA,   curses.COLOR_BLACK)
 
+
+    def initialize_widget_renderer(self, stdscr):
+        """ Function that creates the renderer object that will draw each widget """
+
+        self.renderer = renderer.Renderer(self, stdscr)
+        for widget_id in self.widgets.keys():
+            self.widgets[widget_id].assign_renderer(self.renderer)
+
+
+    # Widget add functions. Each of these adds a particular type of widget to the grid
+    # in a specified location.
 
     def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """ Function that adds a new cell to the CUI grid """
@@ -166,18 +179,22 @@ class PyCUI:
         return new_button
 
 
+    # CUI status functions. Used to switch between widgets, set the mode, and 
+    # identify neighbors for overview mode
+
+
     def check_if_neighbor_exists(self, row, column, row_span, col_span, direction):
         """ Function that checks if widget has neighbor in specified cell. Used for navigating CUI """
 
         target_row = row
         target_col = column
-        if direction == curses.KEY_DOWN:
+        if direction == keys.KEY_DOWN_ARROW:
             target_row = target_row + row_span
-        elif direction == curses.KEY_UP:
+        elif direction == keys.KEY_UP_ARROW:
             target_row = target_row - 1
-        elif direction == curses.KEY_LEFT:
+        elif direction == keys.KEY_LEFT_ARROW:
             target_col = target_col - 1
-        elif direction == curses.KEY_RIGHT:
+        elif direction == keys.KEY_RIGHT_ARROW:
             target_col = target_col + col_span
         if target_row < 0 or target_col < 0 or target_row >= self.grid.num_rows or target_col >= self.grid.num_columns:
             return None
@@ -186,6 +203,30 @@ class PyCUI:
                 if self.widgets[widget_id].is_row_col_inside(target_row, target_col):
                     return widget_id
             return None
+
+
+    def set_selected_widget(self, widget_id):
+        """
+        Function that sets the selected cell for the CUI
+
+        Parameters
+        ----------
+        cell_title : str
+            the title of the cell
+        """
+
+        if widget_id in self.widgets.keys():
+            self.selected_widget = widget_id
+
+
+    def lose_focus(self):
+        """ Function that forces py_cui out of focus mode. After pop is called, focus is lost """
+
+        if self.in_focused_mode:
+            self.in_focused_mode = False
+            self.status_bar.set_text(self.init_status_bar_text)
+            self.widgets[self.selected_widget].selected = False
+
 
     # Popup functions. Used to display messages, warnings, and errors to the user. Are dismissed with enter, escape, or space
     # Currently no support for input of any kind through popups.
@@ -211,33 +252,81 @@ class PyCUI:
         self.popup = None
 
 
-    def lose_focus(self):
-        """ Function that forces py_cui out of focus mode. After pop is called, focus is lost """
+    # Draw Functions. Function for drawing widgets, status bars, and popups
 
-        if self.in_focused_mode:
-            self.in_focused_mode = False
-            self.status_bar.set_text(self.init_status_bar_text)
-            self.widgets[self.selected_widget].selected = False
-
-
-    def draw_widget(self, widget, stdscr):
+    def draw_widget(self, widget):
         """ Function that calls a widget's draw function """
 
-        widget.draw(stdscr)
+        widget.draw()
 
 
-    def initialize_colors(self):
-        """ Function for initialzing curses colors """
+    def draw_widgets(self, stdscr):
+        """ Function that draws all of the widgets to the screen """
 
-        # Start colors in curses
-        curses.start_color()
-        curses.init_pair(WHITE_ON_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(BLACK_ON_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
-        curses.init_pair(BLACK_ON_WHITE, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        curses.init_pair(WHITE_ON_RED,   curses.COLOR_WHITE, curses.COLOR_RED)
-        curses.init_pair(YELLOW_ON_BLACK, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(RED_ON_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(CYAN_ON_BLACK, curses.COLOR_CYAN, curses.COLOR_BLACK)
+        for widget_key in self.widgets.keys():
+            if widget_key != self.selected_widget:
+                self.draw_widget(self.widgets[widget_key])
+
+        # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
+        if self.selected_widget is not None:
+            stdscr.attron(curses.A_BOLD)
+            self.draw_widget(self.widgets[self.selected_widget])
+            stdscr.attroff(curses.A_BOLD)
+
+
+    def draw_status_bars(self, stdscr, height, width):
+        """ Draws status bar and title bar """
+
+        if self.status_bar is not None:
+            stdscr.attron(curses.color_pair(self.status_bar.color))
+            stdscr.addstr(height, 0, self.status_bar.text)
+            stdscr.addstr(height, len(self.status_bar.text), " " * (width - len(self.status_bar.text) - 1))
+            stdscr.attroff(curses.color_pair(self.status_bar.color))
+
+        if self.title_bar is not None:
+            stdscr.attron(curses.color_pair(self.title_bar.color))
+            stdscr.addstr(0, 0, " " * (width - len(self.title_bar.text) - 1))
+            stdscr.attroff(curses.color_pair(self.title_bar.color))
+
+
+
+    def handle_key_presses(self, key_pressed):
+        """ Function that handles all main loop key presses. """
+
+        # If we are in focus mode, the widget has all of the control of the keyboard except
+        # for the escape key, which exits focus mode.
+        if self.in_focused_mode and self.popup is None:
+            if key_pressed == keys.KEY_ESCAPE:
+                self.status_bar.set_text(self.init_status_bar_text)
+                self.in_focused_mode = False
+                self.widgets[self.selected_widget].selected = False
+            else:
+                # widget handles remaining keys
+                self.widgets[self.selected_widget].handle_key_press(key_pressed)
+        # Otherwise, barring a popup, we are in overview mode, meaning that arrows move between widgets, and Enter focuses
+        elif self.popup is None:
+            if key_pressed == keys.KEY_ENTER and self.selected_widget is not None:
+                self.in_focused_mode = True
+                self.widgets[self.selected_widget].selected = True
+                if self.auto_focus_buttons and isinstance(self.widgets[self.selected_widget], widgets.Button):
+                    self.in_focused_mode = False
+                    self.widgets[self.selected_widget].selected = False
+                    self.widgets[self.selected_widget].command()
+                else:
+                    self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
+
+            # If not in focus mode, use the arrow keys to move around the selectable widgets.
+            neighbor = None
+            if key_pressed == keys.KEY_UP_ARROW or key_pressed == keys.KEY_DOWN_ARROW or key_pressed == keys.KEY_LEFT_ARROW or key_pressed == keys.KEY_RIGHT_ARROW:
+                selected = self.widgets[self.selected_widget]
+                neighbor = self.check_if_neighbor_exists(selected.row, selected.column, selected.row_span, selected.column_span, key_pressed)
+            if neighbor is not None:
+                self.widgets[self.selected_widget].selected = False
+                self.set_selected_widget(neighbor)
+
+        # if we have a popup, that takes key control from bot
+        elif self.popup is not None:
+            self.popup.handle_key_press(key_pressed)
 
 
     def draw(self, stdscr):
@@ -250,6 +339,7 @@ class PyCUI:
         stdscr.refresh()
 
         self.initialize_colors()
+        self.initialize_widget_renderer(stdscr)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
@@ -270,65 +360,13 @@ class PyCUI:
                 self.grid.update_grid_height_width(self.height, self.width)
 
             # Handle keypresses
-
-            # If we are in focus mode, the widget has all of the control of the keyboard except
-            # for the escape key, which exits focus mode.
-            if self.in_focused_mode and self.popup is None:
-                if key_pressed == 27:
-                    self.status_bar.set_text(self.init_status_bar_text)
-                    self.in_focused_mode = False
-                    self.widgets[self.selected_widget].selected = False
-                else:
-                    # widget handles remaining keys
-                    self.widgets[self.selected_widget].handle_key_press(key_pressed)
-
-            elif self.popup is None:
-                if key_pressed == 10 and self.selected_widget is not None:
-                    self.in_focused_mode = True
-                    self.widgets[self.selected_widget].selected = True
-                    if self.auto_focus_buttons and isinstance(self.widgets[self.selected_widget], widgets.Button):
-                        self.in_focused_mode = False
-                        self.widgets[self.selected_widget].selected = False
-                        self.widgets[self.selected_widget].command()
-                    else:
-                        self.status_bar.set_text(self.widgets[self.selected_widget].get_help_text())
-
-                # If not in focus mode, use the arrow keys to move around the selectable widgets.
-                neighbor = None
-                if key_pressed == curses.KEY_UP or key_pressed == curses.KEY_DOWN or key_pressed == curses.KEY_LEFT or key_pressed == curses.KEY_RIGHT:
-                    selected = self.widgets[self.selected_widget]
-                    neighbor = self.check_if_neighbor_exists(selected.row, selected.column, selected.row_span, selected.column_span, key_pressed)
-                if neighbor is not None:
-                    self.widgets[self.selected_widget].selected = False
-                    self.set_selected_widget(neighbor)
-
-
-            # if we have a popup, that takes key control from bot
-            elif self.popup is not None:
-                self.popup.handle_key_press(key_pressed)
+            self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
+            self.draw_status_bars(stdscr, height, width)
+            self.draw_widgets(stdscr)
 
-            if self.status_bar is not None:
-                stdscr.attron(curses.color_pair(self.status_bar.color))
-                stdscr.addstr(height, 0, self.status_bar.text)
-                stdscr.addstr(height, len(self.status_bar.text), " " * (width - len(self.status_bar.text) - 1))
-                stdscr.attroff(curses.color_pair(self.status_bar.color))
-
-            if self.title_bar is not None:
-                stdscr.attron(curses.color_pair(self.title_bar.color))
-                stdscr.addstr(0, 0, " " * (width - len(self.title_bar.text) - 1))
-                stdscr.attroff(curses.color_pair(self.title_bar.color))
-
-            for widget_key in self.widgets.keys():
-                if widget_key != self.selected_widget:
-                    self.draw_widget(self.widgets[widget_key], stdscr)
-
-            # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
-            stdscr.attron(curses.A_BOLD)
-            self.draw_widget(self.widgets[self.selected_widget], stdscr)
-            stdscr.attroff(curses.A_BOLD)
-
+            # draw the popup if required
             if self.popup is not None:
                 self.popup.draw(stdscr)
 
