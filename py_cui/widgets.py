@@ -116,7 +116,7 @@ class Widget:
             command()
 
 
-    def draw(self, stdscr):
+    def draw(self):
         """ Base class draw class that checks if renderer is valid """
 
         if self.renderer is None:
@@ -133,6 +133,7 @@ class Label(Widget):
     def draw(self):
         """ Override base draw class. Center text and draw it """
 
+        super().draw()
         self.renderer.set_color_mode(self.color)
         target_y = self.start_y + int(self.height / 2)
         self.renderer.draw_text(self, self.title, target_y, centered=True, bordered=False)
@@ -243,11 +244,12 @@ class ScrollMenu(Widget):
             self.scroll_down()
 
 
-    def draw(self, stdscr):
+    def draw(self):
         """ Overrides base class draw function """
 
-        stdscr.attron(curses.color_pair(self.color))
-        self.draw_border_top(stdscr)
+        super().draw()
+        self.renderer.set_color_mode(self.color)
+        self.renderer.draw_border(self)
         counter = self.pady + 1
         line_counter = 0
         for line in self.view_items:
@@ -255,19 +257,16 @@ class ScrollMenu(Widget):
                 line_counter = line_counter + 1
             else:
                 if line_counter == self.selected_item:
-                    stdscr.attron(curses.color_pair(self.selected_color))
+                    self.renderer.set_color_mode(self.selected_color)
                 if counter >= self.height - self.pady - 1:
                     break
-                
+                self.renderer.draw_text(self, line, counter)
                 counter = counter + 1
                 if line_counter == self.selected_item:
-                    stdscr.attroff(curses.color_pair(self.selected_color))
+                    self.renderer.unset_color_mode(self.selected_color)
                 line_counter = line_counter + 1
-        while counter < self.height - self.pady - 1:
-            self.draw_blank_row(stdscr, self.start_y + counter)
-            counter = counter + 1
-        self.draw_border_bottom(stdscr)
-        stdscr.attroff(curses.color_pair(self.color))
+        self.renderer.unset_color_mode(self.color)
+        self.renderer.reset_cursor(self)
 
 
 class TextBox(Widget):
@@ -329,10 +328,12 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def draw(self, stdscr):
-        stdscr.attron(curses.color_pair(self.color))
-        stdscr.addstr(self.cursor_y - 2, self.start_x + self.padx, '{}'.format(self.title))
-        stdscr.addstr(self.cursor_y - 1, self.start_x + self.padx, '+-{}-+'.format('-' * (self.width - 4 - self.padx)))
+    def draw(self):
+        super().draw()
+
+        self.renderer.set_color_mode(self.color)
+        self.renderer.draw_text(self, self.title, self.cursor_y - 2, bordered=False)
+        self.renderer.draw_border(self, fill=False, with_title=False)
         render_text = self.text
         if len(self.text) > self.width - 2 * self.padx - 4:
             end = len(self.text) - (self.width - 2 * self.padx - 4)
@@ -340,11 +341,13 @@ class TextBox(Widget):
                 render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
             else:
                 render_text = self.text[end:]
-        stdscr.addstr(self.cursor_y, self.start_x + self.padx, '| {}{} |'.format(render_text, ' ' * (self.width - 4 - self.padx - len(self.text))))
-        stdscr.addstr(self.cursor_y + 1, self.start_x + self.padx, '+-{}-+'.format('-' * (self.width - 4 - self.padx)))
+        self.renderer.draw_text(self, render_text, self.cursor_y)
+
         if self.selected:
-            stdscr.move(self.cursor_y, self.cursor_x)
-        stdscr.attroff(curses.color_pair(self.color))
+            self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
+        else:
+            self.renderer.reset_cursor(self, fill=False)
+        self.renderer.unset_color_mode(self.color)
 
 
 class Button(Widget):
