@@ -18,6 +18,7 @@ def get_char_from_ascii(key_num):
 
 KEY_ENTER       = get_ascii_from_char('\n')
 KEY_ESCAPE      = 27
+KEY_SPACE       = get_ascii_from_char(' ')
 KEY_UP_ARROW    = curses.KEY_UP
 KEY_DOWN_ARROW  = curses.KEY_DOWN
 KEY_LEFT_ARROW  = curses.KEY_LEFT

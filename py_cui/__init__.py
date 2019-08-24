@@ -203,6 +203,7 @@ class PyCUI:
 
 
     def set_widget_focus_text(self, widget, text):
+        """ Function that sets the text of the status bar on focus for a particular widget """
 
         if widget is not None and text is not None and isinstance(widget, py_cui.widgets.Widget):
             widget.help_text = text

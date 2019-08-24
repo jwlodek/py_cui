@@ -46,6 +46,12 @@ class Widget:
         self.key_commands = {}
 
 
+    def set_focus_text(self, text):
+        """ Function that sets the text of the status bar on focus for a particular widget """
+
+        self.help_text = text
+
+
     def add_key_command(self, key, command):
         """
         Maps a keycode to a function that will be executed when in focus mode
@@ -129,7 +135,7 @@ class Widget:
 
 
 class Label(Widget):
-    """ The most basic subclass of Widget. Simply displays one row of text """
+    """ The most basic subclass of Widget. Simply displays one centered row of text """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
@@ -324,45 +330,58 @@ class TextBox(Widget):
     def get(self):
         return self.text
 
+
     def clear(self):
         self.cursor_x = self.start_x + self.padx + 2
         self.cursor_text_pos = 0
         self.text = ''
 
 
+    def move_left(self):
+        if self.cursor_x > self.cursor_max_left:
+            self.cursor_x = self.cursor_x - 1
+        self.cursor_text_pos = self.cursor_text_pos - 1
+
+    def move_right(self):
+        if self.cursor_x < self.cursor_max_right:
+            self.cursor_x = self.cursor_x + 1
+        self.cursor_text_pos = self.cursor_text_pos + 1
+
+    def insert_char(self, key_pressed):
+        self.set_text(self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:])
+        if len(self.text) <= self.width - 2 * self.padx - 4:
+            self.cursor_x = self.cursor_x + 1
+        self.cursor_text_pos = self.cursor_text_pos + 1
+
+    def jump_to_start(self):
+        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_text_pos = 0
+
+    def jump_to_end(self):
+        self.cursor_text_pos = len(self.text)
+        self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
+    
+    def erase_char(self):
+        self.set_text(self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:])
+        if len(self.text) <= self.width - 2 * self.padx - 4:
+            self.cursor_x = self.cursor_x - 1
+        self.cursor_text_pos = self.cursor_text_pos - 1
+
+
     def handle_key_press(self, key_pressed):
         super().handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW and self.cursor_text_pos > 0:
-            if self.cursor_x > self.cursor_max_left:
-                self.cursor_x = self.cursor_x - 1
-            self.cursor_text_pos = self.cursor_text_pos - 1
-
+            self.move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW and self.cursor_text_pos < len(self.text):
-            if self.cursor_x < self.cursor_max_right:
-                self.cursor_x = self.cursor_x + 1
-            self.cursor_text_pos = self.cursor_text_pos + 1
-
+            self.move_right()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos > 0:
-            self.set_text(self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:])
-            if len(self.text) <= self.width - 2 * self.padx - 4:
-                self.cursor_x = self.cursor_x - 1
-            self.cursor_text_pos = self.cursor_text_pos - 1
-
+            self.erase_char()
         elif key_pressed == py_cui.keys.KEY_HOME:
-            loc_x, loc_y = self.get_absolute_position()
-            self.cursor_x = loc_x + self.padx + 2
-            self.cursor_text_pos = 0
-
+            self.jump_to_start()
         elif key_pressed == py_cui.keys.KEY_END:
-            self.cursor_text_pos = len(self.text)
-            loc_x, loc_y = self.get_absolute_position()
-            self.cursor_x = loc_x + self.padx + 2 + self.cursor_text_pos
-        
+            self.jump_to_end()
         elif key_pressed > 31 and key_pressed < 128:
-            self.set_text(self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:])
-            if len(self.text) <= self.width - 2 * self.padx - 4:
-                self.cursor_x = self.cursor_x + 1
-            self.cursor_text_pos = self.cursor_text_pos + 1
+            self.insert_char(key_pressed)
 
 
     def draw(self):

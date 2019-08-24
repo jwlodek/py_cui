@@ -131,6 +131,7 @@ class SimpleTodoList:
 
 
 # Create the CUI, pass it to the wrapper object, and start it
-root = py_cui.PyCUI(9, 7)
+root = py_cui.PyCUI(8, 6)
+root.set_title('CUI TODO List')
 s = SimpleTodoList(root)
 root.start()
