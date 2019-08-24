@@ -17,7 +17,7 @@ class Widget:
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         if grid is None:
-            raise py_cui.errors.PyCUIMissingParentError("Cannot add cell to NoneType")
+            raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
         self.id = id
         self.title = title
         self.grid = grid
@@ -33,7 +33,7 @@ class Widget:
         if self.row + self.row_span == self.grid.num_rows:
             self.overlap_y = self.grid.height % self.grid.num_rows
         if self.column + self.column_span == self.grid.num_columns:
-            self.overlap_x = self.grid.width % self.grid.num_columns
+            self.overlap_x = self.grid.width % self.grid.num_columns - 1
         self.padx = padx
         self.pady = pady
         self.start_x, self.start_y = self.get_absolute_position()
@@ -84,7 +84,8 @@ class Widget:
         """ Gets the absolute position of the widget in characters """
 
         x_pos = self.column * self.grid.column_width
-        y_pos = self.row * self.grid.row_height
+        # Always add one to the y_pos, because we have a title bar
+        y_pos = self.row * self.grid.row_height + 2
         return x_pos, y_pos
 
 
@@ -204,7 +205,7 @@ class ScrollMenu(Widget):
         """ Function that removes the selected item from the scroll menu. """
 
         del self.view_items[self.selected_item]
-        if self.selected_item > len(self.view_items):
+        if self.selected_item >= len(self.view_items):
             self.selected_item = self.selected_item - 1
 
 
@@ -261,13 +262,47 @@ class ScrollMenu(Widget):
                     self.renderer.set_color_mode(self.selected_color)
                 if counter >= self.height - self.pady - 1:
                     break
-                self.renderer.draw_text(self, line, counter)
+                self.renderer.draw_text(self, line, self.start_y + counter)
                 counter = counter + 1
                 if line_counter == self.selected_item:
                     self.renderer.unset_color_mode(self.selected_color)
                 line_counter = line_counter + 1
         self.renderer.unset_color_mode(self.color)
         self.renderer.reset_cursor(self)
+
+
+class CheckBoxMenu(ScrollMenu):
+    
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
+
+        self.selected_item_list = []
+
+        self.help_text = 'Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.'
+
+    def add_item(self, item_text):
+        item_text = '[ ] - ' + item_text
+        super().add_item(item_text)
+
+    def add_item_list(self, item_list):
+        for item in item_list:
+            self.add_item(item)
+
+    def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
+        if key_pressed == py_cui.keys.KEY_ENTER:
+            if super().get() in self.selected_item_list:
+                self.selected_item_list.remove(super().get())
+                self.view_items[self.selected_item] = '[ ] - ' + self.view_items[self.selected_item][6:]
+            else:
+                self.view_items[self.selected_item] = '[X] - ' + self.view_items[self.selected_item][6:]
+                self.selected_item_list.append(self.view_items[self.selected_item])
+
+    def get(self):
+        ret = []
+        for item in self.selected_item_list:
+            ret.append(item[6:])
+        return ret
 
 
 class TextBox(Widget):
@@ -301,19 +336,23 @@ class TextBox(Widget):
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
+
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW and self.cursor_text_pos < len(self.text):
             if self.cursor_x < self.cursor_max_right:
                 self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos = self.cursor_text_pos + 1
-        elif key_pressed == 8 and self.cursor_text_pos > 0:
+
+        elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos > 0:
             self.set_text(self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:])
             if len(self.text) <= self.width - 2 * self.padx - 4:
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
+
         elif key_pressed == py_cui.keys.KEY_HOME:
             loc_x, loc_y = self.get_absolute_position()
             self.cursor_x = loc_x + self.padx + 2
             self.cursor_text_pos = 0
+
         elif key_pressed == py_cui.keys.KEY_END:
             self.cursor_text_pos = len(self.text)
             loc_x, loc_y = self.get_absolute_position()
@@ -370,17 +409,138 @@ class Button(Widget):
     def draw(self):
 
         super().draw()
-        self.renderer.set_color_mode(self.color)
-        self.renderer.draw_border(self, with_title=False)
-        button_text_y_pos = self.start_y + int(self.height / 2)
         if self.selected:
             self.renderer.set_color_mode(self.selected_color)
+        else:
+            self.renderer.set_color_mode(self.color)
+        self.renderer.draw_border(self, with_title=False)
+        button_text_y_pos = self.start_y + int(self.height / 2)
         self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True)
+        self.renderer.reset_cursor(self)
         if self.selected:
             self.renderer.unset_color_mode(self.selected_color)
-        self.renderer.unset_color_mode(self.color)
-        self.renderer.reset_cursor(self)
+        else:
+            self.renderer.unset_color_mode(self.color)
 
 
 class ScrollTextBlock(Widget):
-    pass
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
+        self.text_lines = initial_text.splitlines()
+        self.cursor_y = self.start_y + 1
+        self.cursor_x = self.start_x + padx + 2
+        self.viewport_y_start = 0
+        self.cursor_text_pos_x = 0
+        self.cursor_text_pos_y = 0
+        self.cursor_max_up = self.cursor_y
+        self.cursor_max_down = self.start_y + self.height - pady -1
+        self.cursor_max_left = self.cursor_x
+        self.cursor_max_right = self.start_x + self.width - padx - 1
+        self.help_text = 'Focus mode on TextBlock. Press Esc to exit focus mode.'
+
+
+    def set_text(self, text):
+        self.text_lines = text.splitlines()
+
+
+    def set_text_line(self, text):
+        self.text_lines[self.cursor_text_pos_y] = text
+
+    def get(self):
+        text = ''
+        for line in self.text_lines:
+            text = '{}{}\n'.format(text, line)
+        return text
+
+    def clear(self):
+        self.cursor_x = self.cursor_max_left
+        self.cursor_y = self.cursor_max_up
+        self.cursor_text_pos_x = 0
+        self.cursor_text_pos_y = 0
+        self.text_lines = []
+
+
+    def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
+        current_line = self.text_lines[self.cursor_text_pos_y]
+
+        if key_pressed == py_cui.keys.KEY_LEFT_ARROW and self.cursor_text_pos_x > 0:
+            if self.cursor_x > self.cursor_max_left:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos_x = self.cursor_text_pos_x - 1
+
+        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW and self.cursor_text_pos_x < len(current_line):
+            if self.cursor_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_x + 1
+            self.cursor_text_pos_x = self.cursor_text_pos_x + 1
+
+        elif key_pressed == py_cui.keys.KEY_UP_ARROW and self.cursor_text_pos_y > 0:
+            if self.cursor_y > self.cursor_max_up:
+                self.cursor_y = self.cursor_y - 1
+            self.cursor_text_pos_y = self.cursor_text_pos_y - 1
+            if self.cursor_text_pos_x > len(self.text_lines[self.cursor_text_pos_y]):
+                self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y]) - 1
+            if self.cursor_text_pos_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_text_pos_x
+    
+        elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self.cursor_text_pos_y < len(self.text_lines):
+            if self.cursor_y < self.cursor_max_down:
+                self.cursor_y = self.cursor_y + 1
+            else:
+                self.viewport_y_start = self.viewport_y_start + 1
+            self.cursor_text_pos_y = self.cursor_text_pos_y + 1
+            if self.cursor_text_pos_x > len(self.text_lines[self.cursor_text_pos_y]):
+                self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y]) - 1
+            if self.cursor_text_pos_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_text_pos_x
+
+        elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos_x > 0:
+            self.set_text_line(current_line[:self.cursor_text_pos_x - 1] + current_line[self.cursor_text_pos_x:])
+            if len(current_line) <= self.width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos_x = self.cursor_text_pos_x - 1
+        
+        elif key_pressed == py_cui.keys.KEY_ENTER:
+            current_line = self.text_lines[self.cursor_text_pos_y]
+            new_line_1 = current_line[:self.cursor_text_pos_x]
+            new_line_2 = current_line[self.cursor_text_pos_x:]
+            self.text_lines[self.cursor_text_pos_y] = new_line_1
+            self.text_lines.insert(self.cursor_text_pos_y + 1, new_line_2)
+            self.cursor_text_pos_y = self.cursor_text_pos_y + 1
+            self.cursor_text_pos_x = 0
+            self.cursor_x = self.cursor_max_left
+
+        elif key_pressed == py_cui.keys.KEY_HOME:
+            loc_x, _ = self.get_absolute_position()
+            self.cursor_x = self.cursor_max_left
+            self.cursor_text_pos_x = 0
+
+        elif key_pressed == py_cui.keys.KEY_END:
+            self.cursor_text_pos_x = len(current_line)
+            loc_x, _ = self.get_absolute_position()
+            self.cursor_x = loc_x + self.padx + 2 + self.cursor_text_pos_x
+        
+        elif key_pressed > 31 and key_pressed < 128:
+            self.set_text_line(current_line[:self.cursor_text_pos_x] + chr(key_pressed) + current_line[self.cursor_text_pos_x:])
+            if len(current_line) <= self.width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x + 1
+            self.cursor_text_pos_x = self.cursor_text_pos_x + 1
+
+
+    def draw(self):
+        super().draw()
+
+        self.renderer.set_color_mode(self.color)
+        self.renderer.draw_border(self)
+        counter = self.cursor_max_up
+        for line_counter in range(self.viewport_y_start, self.viewport_y_start + self.height - 2):
+            if line_counter == len(self.text_lines):
+                break
+            render_text = self.text_lines[line_counter]
+            self.renderer.draw_text(self, render_text, counter)
+            counter = counter + 1
+        if self.selected:
+            self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
+        else:
+            self.renderer.reset_cursor(self, fill=False)
+        self.renderer.unset_color_mode(self.color)

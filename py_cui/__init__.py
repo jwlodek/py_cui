@@ -83,13 +83,13 @@ class PyCUI:
 
         self.height = term_size.lines
         self.width = term_size.columns
+        self.height = self.height - 4
+        self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
+        self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
+        self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.renderer = None
         self.widgets = {}
-        self.title_bar = None
-        #self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
-        self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
-        self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
 
         self.selected_widget = None
         self.in_focused_mode = False
@@ -109,7 +109,8 @@ class PyCUI:
 
         curses.wrapper(self.draw)
 
-
+    def set_title(self, title):
+        self.title = title
 
     def initialize_colors(self):
         """ Function for initialzing curses colors """
@@ -148,6 +149,17 @@ class PyCUI:
         return new_scroll_menu
 
 
+    def add_checkbox_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        """ Function that adds a new cell to the CUI grid """
+
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_checkbox_menu = widgets.CheckBoxMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_checkbox_menu
+        if self.selected_widget is None:
+            self.set_selected_widget(id)
+        return new_checkbox_menu
+
+
     def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
         """ Function that adds a new text box to the CUI grid """
 
@@ -157,6 +169,17 @@ class PyCUI:
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_text_box
+
+
+    def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+        """ Function that adds a new text box to the CUI grid """
+
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_text_block = widgets.ScrollTextBlock(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        self.widgets[id] = new_text_block
+        if self.selected_widget is None:
+            self.set_selected_widget(id)
+        return new_text_block
 
 
     def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
@@ -287,13 +310,13 @@ class PyCUI:
 
         if self.status_bar is not None:
             stdscr.attron(curses.color_pair(self.status_bar.color))
-            stdscr.addstr(height, 0, self.status_bar.text)
-            stdscr.addstr(height, len(self.status_bar.text), " " * (width - len(self.status_bar.text) - 1))
+            stdscr.addstr(height + 3, 0, self.status_bar.text)
+            stdscr.addstr(height + 3, len(self.status_bar.text), " " * (width - len(self.status_bar.text)-1))
             stdscr.attroff(curses.color_pair(self.status_bar.color))
 
         if self.title_bar is not None:
             stdscr.attron(curses.color_pair(self.title_bar.color))
-            stdscr.addstr(0, 0, " " * (width - len(self.title_bar.text) - 1))
+            stdscr.addstr(0, 0, '{}'.format(self.title.center(width, ' ')))
             stdscr.attroff(curses.color_pair(self.title_bar.color))
 
 
@@ -360,11 +383,7 @@ class PyCUI:
             stdscr.clear()
             # find height width, adjust if status/title bar added.
             height, width = stdscr.getmaxyx()
-            if self.status_bar is not None:
-                height = height - 1
-            elif self.title_bar is not None:
-                height = height - 1
-                self.grid.has_title_bar = True
+            height = height - 4
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
             if height != self.height or width != self.width:
                 self.width = width
