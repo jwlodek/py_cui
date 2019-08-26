@@ -5,6 +5,7 @@ File containing constants and helper functions for dealing with keys
 @created:   12-Aug-2019
 """
 
+from sys import platform
 import curses
 
 def get_ascii_from_char(char):
@@ -17,10 +18,23 @@ def get_char_from_ascii(key_num):
 
 KEY_ENTER       = get_ascii_from_char('\n')
 KEY_ESCAPE      = 27
+KEY_SPACE       = get_ascii_from_char(' ')
 KEY_UP_ARROW    = curses.KEY_UP
 KEY_DOWN_ARROW  = curses.KEY_DOWN
 KEY_LEFT_ARROW  = curses.KEY_LEFT
 KEY_RIGHT_ARROW = curses.KEY_RIGHT
+KEY_PAGE_UP     = curses.KEY_PPAGE
+KEY_PAGE_DOWN   = curses.KEY_NPAGE
+KEY_F1          = curses.KEY_F1
+KEY_F2          = curses.KEY_F2
+KEY_F3          = curses.KEY_F3
+KEY_F4          = curses.KEY_F4
+KEY_F5          = curses.KEY_F5
+KEY_F6          = curses.KEY_F6
+KEY_F7          = curses.KEY_F7
+KEY_F8          = curses.KEY_F8
+KEY_HOME        = curses.KEY_HOME
+KEY_END         = curses.KEY_END
 KEY_A_LOWER     = get_ascii_from_char('a')
 KEY_B_LOWER     = get_ascii_from_char('b')
 KEY_C_LOWER     = get_ascii_from_char('c')
@@ -73,6 +87,11 @@ KEY_W_UPPER     = get_ascii_from_char('W')
 KEY_X_UPPER     = get_ascii_from_char('X')
 KEY_Y_UPPER     = get_ascii_from_char('Y')
 KEY_Z_UPPER     = get_ascii_from_char('Z')
-KEY_BACKSPACE   = curses.KEY_BACKSPACE
+
+# Pressing backspace returns 8 on windows?
+if platform == 'win32':
+    KEY_BACKSPACE   = 8
+else:
+    KEY_BACKSPACE   = curses.KEY_BACKSPACE
 
 

@@ -7,7 +7,6 @@ File containing classes for all popups used by py_cui
 
 # required library imports
 import curses
-import time
 import py_cui
 import py_cui.errors
 

@@ -15,24 +15,24 @@ class SimpleTodoList:
         self.master = master
 
         # The scrolled list cells that will contain our tasks in each of the three categories
-        self.todo_scroll_cell = self.master.add_scroll_menu('TODO', 0, 0, row_span=5, column_span=2)
-        self.in_progress_scroll_cell = self.master.add_scroll_menu('In Progress', 0, 2, row_span=7, column_span=2)
-        self.done_scroll_cell = self.master.add_scroll_menu('Done', 0, 4, row_span=7, column_span=2)
+        self.todo_scroll_cell =         self.master.add_scroll_menu('TODO',         0, 0, row_span=5, column_span=2)
+        self.in_progress_scroll_cell =  self.master.add_scroll_menu('In Progress',  0, 2, row_span=7, column_span=2)
+        self.done_scroll_cell =         self.master.add_scroll_menu('Done',         0, 4, row_span=7, column_span=2)
 
         # Textbox for entering new items
         self.new_todo_textbox = self.master.add_text_box('TODO Item', 5, 0, column_span=2)
 
         # buttons for rest of control
-        self.mark_in_progress = self.master.add_button('Mark in Progress', 7, 0, column_span=2, command=self.mark_as_in_progress)
-        self.mark_in_progress = self.master.add_button('Mark As Done', 7, 2, column_span=2, command=self.mark_as_done)
-        self.remove_todo = self.master.add_button('Remove TODO Item', 6, 1, pady = 1, command=self.remove_item)
-        self.new_todo_add = self.master.add_button('Add TODO Item', 6, 0, command=self.add_item, pady =1)
-        self.save_todo_button = self.master.add_button('Save', 7, 4, column_span=2, command=self.save_todo_file)
+        self.mark_in_progress = self.master.add_button('Mark in Progress', 7, 0, column_span=2,    command=self.mark_as_in_progress)
+        self.mark_in_progress = self.master.add_button('Mark As Done',     7, 2, column_span=2,    command=self.mark_as_done)
+        self.remove_todo =      self.master.add_button('Remove TODO Item', 6, 1, pady = 1,         command=self.remove_item)
+        self.new_todo_add =     self.master.add_button('Add TODO Item',    6, 0, pady =1,          command=self.add_item)
+        self.save_todo_button = self.master.add_button('Save',             7, 4, column_span=2,    command=self.save_todo_file)
 
         # add some custom keybindings
-        self.new_todo_textbox.add_key_command('\n', self.push_and_reset)
-        self.todo_scroll_cell.add_key_command('\n', self.mark_as_in_progress)
-        self.in_progress_scroll_cell.add_key_command('\n', self.mark_as_done)
+        self.new_todo_textbox.add_key_command(          py_cui.keys.KEY_ENTER, self.push_and_reset)
+        self.todo_scroll_cell.add_key_command(          py_cui.keys.KEY_ENTER, self.mark_as_in_progress)
+        self.in_progress_scroll_cell.add_key_command(   py_cui.keys.KEY_ENTER, self.mark_as_done)
         self.read_todo_file()
 
 
@@ -73,7 +73,7 @@ class SimpleTodoList:
         self.todo_scroll_cell.add_item_list(todo)
         self.in_progress_scroll_cell.add_item_list(in_progress)
         self.done_scroll_cell.add_item_list(done)
-            
+
 
     def add_item(self):
         """ Add a todo item """
@@ -103,7 +103,7 @@ class SimpleTodoList:
 
         done = self.in_progress_scroll_cell.get()
         if done is None:
-            self.master.show_error_popup('No Item', 'There is no item in the list to mark as in done')
+            self.master.show_error_popup('No Item', 'There is no item in the list to mark as done')
             return
         self.in_progress_scroll_cell.remove_selected_item()
         self.done_scroll_cell.add_item(done)
@@ -131,6 +131,7 @@ class SimpleTodoList:
 
 
 # Create the CUI, pass it to the wrapper object, and start it
-root = py_cui.PyCUI(9, 7)
+root = py_cui.PyCUI(8, 6)
+root.set_title('CUI TODO List')
 s = SimpleTodoList(root)
 root.start()

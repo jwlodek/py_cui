@@ -18,7 +18,6 @@ class Grid:
         self.width = width
         self.row_height = int(self.height / self.num_rows)
         self.column_width = int(self.width / self.num_columns)
-        self.has_title_bar = False
 
     def set_num_rows(self, num_rows):
         if (3 * num_rows) >= self.height:
