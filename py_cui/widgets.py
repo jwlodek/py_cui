@@ -326,18 +326,17 @@ class TextBox(Widget):
 
     def set_text(self, text):
         self.text = text
-        if len(self.text) < self.cursor_text_pos:
+        if self.cursor_text_pos > len(self.text):
             diff = self.cursor_text_pos - len(self.text)
             self.cursor_text_pos = len(self.text)
             self.cursor_x = self.cursor_x - diff
-
 
     def get(self):
         return self.text
 
 
     def clear(self):
-        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_x = self.cursor_max_left
         self.cursor_text_pos = 0
         self.text = ''
 
@@ -355,8 +354,8 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
     def insert_char(self, key_pressed):
-        self.set_text(self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:])
-        if len(self.text) <= self.width - 2 * self.padx - 4:
+        self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
+        if len(self.text) < self.viewport_width:
             self.cursor_x = self.cursor_x + 1
         self.cursor_text_pos = self.cursor_text_pos + 1
 
@@ -369,10 +368,12 @@ class TextBox(Widget):
         self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
     
     def erase_char(self):
-        self.set_text(self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:])
-        if len(self.text) <= self.width - 2 * self.padx - 4:
-            self.cursor_x = self.cursor_x - 1
-        self.cursor_text_pos = self.cursor_text_pos - 1
+        if self.cursor_text_pos > 0:
+            self.text = self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:]
+            if len(self.text) < self.width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos = self.cursor_text_pos - 1
+
 
 
     def handle_key_press(self, key_pressed):
@@ -381,7 +382,7 @@ class TextBox(Widget):
             self.move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos > 0:
+        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
             self.erase_char()
         elif key_pressed == py_cui.keys.KEY_HOME:
             self.jump_to_start()
@@ -493,19 +494,29 @@ class ScrollTextBlock(Widget):
         self.text_lines.append('')
 
 
-    def handle_key_press(self, key_pressed):
-        super().handle_key_press(key_pressed)
-        current_line = self.text_lines[self.cursor_text_pos_y]
-
-        if key_pressed == py_cui.keys.KEY_LEFT_ARROW and self.cursor_text_pos_x > 0:
+    def move_left(self):
+        if self.cursor_text_pos_x > 0:
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
-        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW and self.cursor_text_pos_x < len(current_line):
+    def move_right(self):
+        if self.cursor_text_pos_x < len(current_line):
             if self.cursor_x < self.cursor_max_right:
                 self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos_x = self.cursor_text_pos_x + 1
+
+
+    def handle_key_press(self, key_pressed):
+        super().handle_key_press(key_pressed)
+        current_line = self.text_lines[self.cursor_text_pos_y]
+
+        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
+            self.move_left()
+
+        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
+            self.move_right()
+
 
         elif key_pressed == py_cui.keys.KEY_UP_ARROW and self.cursor_text_pos_y > 0:
             if self.cursor_y > self.cursor_max_up:
