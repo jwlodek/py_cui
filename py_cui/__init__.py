@@ -149,11 +149,11 @@ class PyCUI:
         return new_scroll_menu
 
 
-    def add_checkbox_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-        """ Function that adds a new cell to the CUI grid """
+    def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
+        """ Function that adds a new checkbox menu to the CUI grid """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_checkbox_menu = widgets.CheckBoxMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        new_checkbox_menu = widgets.CheckBoxMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady, checked_char)
         self.widgets[id] = new_checkbox_menu
         if self.selected_widget is None:
             self.set_selected_widget(id)

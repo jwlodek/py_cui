@@ -279,11 +279,11 @@ class ScrollMenu(Widget):
 
 class CheckBoxMenu(ScrollMenu):
     
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, checked_char):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
 
         self.selected_item_list = []
-
+        self.checked_char = checked_char
         self.help_text = 'Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.'
 
     def add_item(self, item_text):
@@ -301,7 +301,7 @@ class CheckBoxMenu(ScrollMenu):
                 self.selected_item_list.remove(super().get())
                 self.view_items[self.selected_item] = '[ ] - ' + self.view_items[self.selected_item][6:]
             else:
-                self.view_items[self.selected_item] = '[X] - ' + self.view_items[self.selected_item][6:]
+                self.view_items[self.selected_item] = '[{}] - '.format(self.checked_char) + self.view_items[self.selected_item][6:]
                 self.selected_item_list.append(self.view_items[self.selected_item])
 
     def get(self):
@@ -322,9 +322,14 @@ class TextBox(Widget):
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.cursor_y = self.start_y + int(self.height / 2) + 1
         self.help_text = 'Focus mode on TextBox. Press Esc to exit focus mode.'
+        self.viewport_width = self.cursor_max_right - self.cursor_max_left
 
     def set_text(self, text):
         self.text = text
+        if len(self.text) < self.cursor_text_pos:
+            diff = self.cursor_text_pos - len(self.text)
+            self.cursor_text_pos = len(self.text)
+            self.cursor_x = self.cursor_x - diff
 
 
     def get(self):
@@ -338,14 +343,16 @@ class TextBox(Widget):
 
 
     def move_left(self):
-        if self.cursor_x > self.cursor_max_left:
-            self.cursor_x = self.cursor_x - 1
-        self.cursor_text_pos = self.cursor_text_pos - 1
+        if  self.cursor_text_pos > 0:
+            if self.cursor_x > self.cursor_max_left:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos = self.cursor_text_pos - 1
 
     def move_right(self):
-        if self.cursor_x < self.cursor_max_right:
-            self.cursor_x = self.cursor_x + 1
-        self.cursor_text_pos = self.cursor_text_pos + 1
+        if self.cursor_text_pos < len(self.text):
+            if self.cursor_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_x + 1
+            self.cursor_text_pos = self.cursor_text_pos + 1
 
     def insert_char(self, key_pressed):
         self.set_text(self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:])
@@ -370,9 +377,9 @@ class TextBox(Widget):
 
     def handle_key_press(self, key_pressed):
         super().handle_key_press(key_pressed)
-        if key_pressed == py_cui.keys.KEY_LEFT_ARROW and self.cursor_text_pos > 0:
+        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self.move_left()
-        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW and self.cursor_text_pos < len(self.text):
+        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.move_right()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos > 0:
             self.erase_char()
