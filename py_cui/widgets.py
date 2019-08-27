@@ -474,6 +474,9 @@ class ScrollTextBlock(Widget):
             self.text_lines.append('')
         self.cursor_text_pos_y = 0
         self.cursor_y = self.cursor_max_up
+        self.viewport_y_start = 0
+        self.cursor_x = self.cursor_max_left
+        self.cursor_text_pos_x = 0
 
 
     def set_text_line(self, text):
@@ -494,13 +497,13 @@ class ScrollTextBlock(Widget):
         self.text_lines.append('')
 
 
-    def move_left(self):
+    def move_left(self, current_line):
         if self.cursor_text_pos_x > 0:
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
-    def move_right(self):
+    def move_right(self, current_line):
         if self.cursor_text_pos_x < len(current_line):
             if self.cursor_x < self.cursor_max_right:
                 self.cursor_x = self.cursor_x + 1
@@ -512,15 +515,17 @@ class ScrollTextBlock(Widget):
         current_line = self.text_lines[self.cursor_text_pos_y]
 
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left()
+            self.move_left(current_line)
 
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right()
+            self.move_right(current_line)
 
 
         elif key_pressed == py_cui.keys.KEY_UP_ARROW and self.cursor_text_pos_y > 0:
             if self.cursor_y > self.cursor_max_up:
                 self.cursor_y = self.cursor_y - 1
+            elif self.viewport_y_start > 0:
+                self.viewport_y_start = self.viewport_y_start - 1
             self.cursor_text_pos_y = self.cursor_text_pos_y - 1
             if self.cursor_text_pos_x > len(self.text_lines[self.cursor_text_pos_y]):
                 temp = len(self.text_lines[self.cursor_text_pos_y])
@@ -530,7 +535,7 @@ class ScrollTextBlock(Widget):
         elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self.cursor_text_pos_y < len(self.text_lines) - 1:
             if self.cursor_y < self.cursor_max_down:
                 self.cursor_y = self.cursor_y + 1
-            else:
+            elif self.viewport_y_start + self.height - 2 < len(self.text_lines):
                 self.viewport_y_start = self.viewport_y_start + 1
             self.cursor_text_pos_y = self.cursor_text_pos_y + 1
             if self.cursor_text_pos_x > len(self.text_lines[self.cursor_text_pos_y]):
@@ -539,19 +544,22 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE and self.cursor_text_pos_x > 0:
-            if current_line == '':
+        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+            if self.cursor_text_pos_x == 0:
+                self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y - 1])
+                self.text_lines[self.cursor_text_pos_y - 1] = self.text_lines[self.cursor_text_pos_y - 1] + self.text_lines[self.cursor_text_pos_y]
                 self.text_lines = self.text_lines[:self.cursor_text_pos_y] + self.text_lines[self.cursor_text_pos_y + 1:]
                 self.cursor_text_pos_y = self.cursor_text_pos_y - 1
                 self.cursor_y = self.cursor_y - 1
-                self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y]) - 1
+                
                 self.cursor_x = self.cursor_max_left + self.cursor_text_pos_x
-            else:
+            elif self.cursor_text_pos_x > 0:
                 self.set_text_line(current_line[:self.cursor_text_pos_x - 1] + current_line[self.cursor_text_pos_x:])
                 if len(current_line) <= self.width - 2 * self.padx - 4:
                     self.cursor_x = self.cursor_x - 1
                 self.cursor_text_pos_x = self.cursor_text_pos_x - 1
-        
+
+
         elif key_pressed == py_cui.keys.KEY_ENTER:
             current_line = self.text_lines[self.cursor_text_pos_y]
             new_line_1 = current_line[:self.cursor_text_pos_x]
