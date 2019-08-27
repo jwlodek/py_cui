@@ -1,3 +1,10 @@
+"""
+The most basic possible use case for py_cui
+
+@author:    Jakub Wlodek
+@created:   12-Aug-2019
+"""
+
 # Import the lib
 import py_cui
 

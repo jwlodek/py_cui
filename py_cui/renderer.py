@@ -64,14 +64,25 @@ class Renderer:
 
         self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - widget.padx)))
 
-
-    def draw_text(self, widget, line, y, centered = False, bordered = True):
-        if centered and bordered:
-            render_text = '|{}|'.format(line.center(widget.width - widget.padx - 2, ' '))
-        elif centered and not bordered:
-            render_text = '{}'.format(line.center(widget.width - widget.padx, ' '))
-        elif not centered and bordered:
-            render_text = '| {}{}|'.format(line, ' ' * (widget.width-3 - widget.padx - len(line)))
+    def get_render_text(self, widget, line, bordered, start_pos):
+        render_text_length = widget.width - (2 * widget.padx)
+        if bordered:
+            render_text_length = render_text_length - 4
+        if len(line) - start_pos < render_text_length:
+            render_text = line[start_pos:]
         else:
-            render_text = '{}{}'.format(line, ' ' * (widget.width - widget.padx -len(line)))
+            render_text = line[start_pos:start_pos + render_text_length]
+        return render_text
+
+
+    def draw_text(self, widget, line, y, centered = False, bordered = True, start_pos = 0):
+        render_text = self.get_render_text(widget, line, bordered, start_pos)
+        if centered and bordered:
+            render_text = '|{}|'.format(render_text.center(widget.width - widget.padx - 2, ' '))
+        elif centered and not bordered:
+            render_text = '{}'.format(render_text.center(widget.width - widget.padx, ' '))
+        elif not centered and bordered:
+            render_text = '| {}{}|'.format(render_text, ' ' * (widget.width-3 - widget.padx - len(render_text)))
+        else:
+            render_text = '{}{}'.format(render_text, ' ' * (widget.width - widget.padx -len(render_text)))
         self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
