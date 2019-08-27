@@ -1,6 +1,8 @@
 """
 File containing class for the status bar
 
+TODO: File can probably be abstracted away - probably doesn't need a class
+
 @author:    Jakub Wlodek
 @created:   12-Aug-2019
 """

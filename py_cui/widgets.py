@@ -1,6 +1,17 @@
 """
-File contatining all widget classes for py_cui. Widgets are the basic
-building blocks of a user interface made with py_cui
+File contatining all core widget classes for py_cui. Widgets are the basic
+building blocks of a user interface made with py_cui. This file contains classes for:
+
+* Base Widget class
+* Label
+* Scroll Menu
+* Checkbox Menu
+* Button
+* TextBox
+* Text Block
+
+Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
+file and extending the base Widget class, or if appropriate one of the other core widgets.
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019
@@ -13,7 +24,7 @@ import py_cui.errors
 
 
 class Widget:
-    """ Top Level Widget Class """
+    """ Top Level Widget Base Class """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         if grid is None:
@@ -72,13 +83,15 @@ class Widget:
 
         self.color = color
 
+
     def set_selected_color(self, color):
         """ Sets the selected color for the widget """
 
         self.selected_color = color
 
+
     def assign_renderer(self, renderer):
-        """ Function that assigns a renderer object to the widget """
+        """ Function that assigns a renderer object to the widget (Meant for internal usage only) """
 
         if isinstance(renderer, py_cui.renderer.Renderer):
             self.renderer = renderer
@@ -90,7 +103,7 @@ class Widget:
         """ Gets the absolute position of the widget in characters """
 
         x_pos = self.column * self.grid.column_width
-        # Always add one to the y_pos, because we have a title bar
+        # Always add two to the y_pos, because we have a title bar + a pad row
         y_pos = self.row * self.grid.row_height + 2
         return x_pos, y_pos
 
@@ -111,6 +124,14 @@ class Widget:
         else:
             return False
 
+
+    def update_height_width(self):
+        """ Function that refreshes position and dimensons on resize """
+
+        self.start_x, self.start_y = self.get_absolute_position()
+        self.width, self.height = self.get_absolute_dims()
+
+
     # BELOW FUNCTIONS SHOULD BE OVERWRITTEN BY SUB-CLASSES
 
     def get_help_text(self):
@@ -120,7 +141,11 @@ class Widget:
 
 
     def handle_key_press(self, key_pressed):
-        """ Base class function that handles all assigned key presses """
+        """
+        Base class function that handles all assigned key presses.
+        When overwriting this function, make sure to add a super().handle_key_press(key_pressed) call,
+        as this is required for user defined key command support
+        """
 
         if key_pressed in self.key_commands.keys():
             command = self.key_commands[key_pressed]
@@ -128,7 +153,7 @@ class Widget:
 
 
     def draw(self):
-        """ Base class draw class that checks if renderer is valid """
+        """ Base class draw class that checks if renderer is valid. Should be called with super().draw() in overrides """
 
         if self.renderer is None:
             return
@@ -152,6 +177,7 @@ class Label(Widget):
 
 
 class ScrollMenu(Widget):
+    """ A scroll menu widget. Allows for creating a scrollable list of items of which one is selectable. Analogous to a RadioButton """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
@@ -163,13 +189,18 @@ class ScrollMenu(Widget):
         self.view_items = []
         self.help_text = 'Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.'
 
+
     def clear(self):
+        """ Clears all items from the Scroll Menu """
+
         self.view_items = []
         self.selected_item = 0
         self.top_view = 0
 
 
     def scroll_up(self):
+        """ Function that scrolls the view up in the scroll menu """
+
         if self.selected:
             if self.top_view > 0:
                 self.top_view = self.top_view - 1
@@ -178,6 +209,8 @@ class ScrollMenu(Widget):
 
 
     def scroll_down(self):
+        """ Function that scrolls the view down in the scroll menu """
+
         if self.selected:
             if self.selected_item < len(self.view_items) - 1:
                 self.selected_item = self.selected_item + 1
@@ -232,9 +265,10 @@ class ScrollMenu(Widget):
 
         return self.view_items
 
+
     def get(self):
         """
-        Function that gets the selected item from the list
+        Function that gets the selected item from the scroll menu
 
         Returns
         -------
@@ -283,6 +317,8 @@ class ScrollMenu(Widget):
 
 
 class CheckBoxMenu(ScrollMenu):
+    """ Extension of ScrollMenu that allows for multiple items to be selected at once. """
+
     
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, checked_char):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
@@ -292,20 +328,31 @@ class CheckBoxMenu(ScrollMenu):
         self.help_text = 'Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.'
 
     def add_item(self, item_text):
+        """ Adds item to Checkbox """
+
         item_text = '[ ] - ' + item_text
         super().add_item(item_text)
 
+
     def add_item_list(self, item_list):
+        """ Adds list of items to the checkbox """
+
         for item in item_list:
             self.add_item(item)
 
+
     def get(self):
+        """ Gets list of selected items from the checkbox """
+
         ret = []
         for item in self.selected_item_list:
             ret.append(item[6:])
         return ret
 
+
     def handle_key_press(self, key_pressed):
+        """ Override of key presses. First, run the superclass function, scrolling should still work. Adds Enter command to toggle selection """
+
         super().handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             if super().get() in self.selected_item_list:
@@ -316,7 +363,50 @@ class CheckBoxMenu(ScrollMenu):
                 self.selected_item_list.append(self.view_items[self.selected_item])
 
 
+
+class Button(Widget):
+    """ Basic button widget. Allows for running a command function on Enter """
+
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
+        self.command = command
+        self.color = py_cui.MAGENTA_ON_BLACK
+        self.help_text = 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
+
+
+    def handle_key_press(self, key_pressed):
+        """ Override of base class, adds ENTER listener that runs the button's command """
+
+        super().handle_key_press(key_pressed)
+        if key_pressed == py_cui.keys.KEY_ENTER:
+            self.selected_color = py_cui.WHITE_ON_RED
+            if self.command is not None:
+                ret = self.command()
+            self.selected_color = py_cui.BLACK_ON_GREEN
+            return ret
+
+
+    def draw(self):
+        """ Override of base class draw function """
+
+        super().draw()
+        if self.selected:
+            self.renderer.set_color_mode(self.selected_color)
+        else:
+            self.renderer.set_color_mode(self.color)
+        self.renderer.draw_border(self, with_title=False)
+        button_text_y_pos = self.start_y + int(self.height / 2)
+        self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True)
+        self.renderer.reset_cursor(self)
+        if self.selected:
+            self.renderer.unset_color_mode(self.selected_color)
+        else:
+            self.renderer.unset_color_mode(self.color)
+
+
+
 class TextBox(Widget):
+    """ Widget for entering small single lines of text """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
@@ -330,6 +420,8 @@ class TextBox(Widget):
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
 
     def set_text(self, text):
+        """ Sets the value of the text. Overwrites existing text """
+
         self.text = text
         if self.cursor_text_pos > len(self.text):
             diff = self.cursor_text_pos - len(self.text)
@@ -337,42 +429,60 @@ class TextBox(Widget):
             self.cursor_x = self.cursor_x - diff
 
     def get(self):
+        """ Gets value of the text in the textbox """
+
         return self.text
 
 
     def clear(self):
+        """ Clears the text in the textbox """
+
         self.cursor_x = self.cursor_max_left
         self.cursor_text_pos = 0
         self.text = ''
 
 
     def move_left(self):
+        """ Shifts the cursor the the left. Internal use only """
+
         if  self.cursor_text_pos > 0:
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
 
+
     def move_right(self):
+        """ Shifts the cursor the the right. Internal use only """
         if self.cursor_text_pos < len(self.text):
             if self.cursor_x < self.cursor_max_right:
                 self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos = self.cursor_text_pos + 1
 
     def insert_char(self, key_pressed):
+        """ Inserts char at cursor position. Internal use only """
         self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
         if len(self.text) < self.viewport_width:
             self.cursor_x = self.cursor_x + 1
         self.cursor_text_pos = self.cursor_text_pos + 1
 
+
     def jump_to_start(self):
+        """ Jumps to the start of the textbox """
+
         self.cursor_x = self.start_x + self.padx + 2
         self.cursor_text_pos = 0
 
+
     def jump_to_end(self):
+        """ Jumps to the end to the textbox """
+
         self.cursor_text_pos = len(self.text)
         self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
-    
+
+
     def erase_char(self):
+        """ Erases character at textbox cursor """
+
         if self.cursor_text_pos > 0:
             self.text = self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:]
             if len(self.text) < self.width - 2 * self.padx - 4:
@@ -382,6 +492,8 @@ class TextBox(Widget):
 
 
     def handle_key_press(self, key_pressed):
+        """ Override of base handle key press function """
+
         super().handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self.move_left()
@@ -398,6 +510,8 @@ class TextBox(Widget):
 
 
     def draw(self):
+        """ Override of base draw function """
+        
         super().draw()
 
         self.renderer.set_color_mode(self.color)
@@ -419,43 +533,9 @@ class TextBox(Widget):
         self.renderer.unset_color_mode(self.color)
 
 
-class Button(Widget):
-
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
-        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
-        self.command = command
-        self.color = py_cui.MAGENTA_ON_BLACK
-        self.help_text = 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
-
-
-    def handle_key_press(self, key_pressed):
-        super().handle_key_press(key_pressed)
-        if key_pressed == 10:
-            self.selected_color = py_cui.WHITE_ON_RED
-            if self.command is not None:
-                ret = self.command()
-            self.selected_color = py_cui.BLACK_ON_GREEN
-            return ret
-
-
-    def draw(self):
-
-        super().draw()
-        if self.selected:
-            self.renderer.set_color_mode(self.selected_color)
-        else:
-            self.renderer.set_color_mode(self.color)
-        self.renderer.draw_border(self, with_title=False)
-        button_text_y_pos = self.start_y + int(self.height / 2)
-        self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True)
-        self.renderer.reset_cursor(self)
-        if self.selected:
-            self.renderer.unset_color_mode(self.selected_color)
-        else:
-            self.renderer.unset_color_mode(self.color)
-
-
 class ScrollTextBlock(Widget):
+    """ Widget for editing large multi-line blocks of text """
+
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.text_lines = initial_text.splitlines()
@@ -476,6 +556,8 @@ class ScrollTextBlock(Widget):
 
 
     def get(self):
+        """ Gets all of the text in the textblock and returns it """
+
         text = ''
         for line in self.text_lines:
             text = '{}{}\n'.format(text, line)
@@ -552,6 +634,8 @@ class ScrollTextBlock(Widget):
 
 
     def move_up(self, current_line):
+        """ Function that moves the cursor/text position one location up """
+
         if self.cursor_text_pos_y > 0:
             if self.cursor_y > self.cursor_max_up:
                 self.cursor_y = self.cursor_y - 1
@@ -565,6 +649,8 @@ class ScrollTextBlock(Widget):
 
 
     def move_down(self, current_line):
+        """ Function that moves the cursor/text position one location down """
+
         if self.cursor_text_pos_y < len(self.text_lines) - 1:
             if self.cursor_y < self.cursor_max_down:
                 self.cursor_y = self.cursor_y + 1
@@ -578,6 +664,8 @@ class ScrollTextBlock(Widget):
 
 
     def handle_newline(self, current_line):
+        """ Function that handles recieving newline characters in the text """
+
         current_line = self.text_lines[self.cursor_text_pos_y]
         new_line_1 = current_line[:self.cursor_text_pos_x]
         new_line_2 = current_line[self.cursor_text_pos_x:]
@@ -591,7 +679,10 @@ class ScrollTextBlock(Widget):
         elif self.viewport_y_start + self.height - 2 < len(self.text_lines):
             self.viewport_y_start = self.viewport_y_start + 1
 
+
     def handle_backspace(self, current_line):
+        """ Function that handles recieving backspace characters in the text """
+
         if self.cursor_text_pos_x == 0:
             self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y - 1])
             self.text_lines[self.cursor_text_pos_y - 1] = self.text_lines[self.cursor_text_pos_y - 1] + self.text_lines[self.cursor_text_pos_y]
@@ -608,12 +699,18 @@ class ScrollTextBlock(Widget):
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
+
     def handle_home(self, current_line):
+        """ Function that handles recieving a home keypress """
+
         self.cursor_x = self.cursor_max_left
         self.cursor_text_pos_x = 0
         self.viewport_x_start = 0
 
+
     def handle_end(self, current_line):
+        """ Function that handles recieving an end keypress """
+
         self.cursor_text_pos_x = len(current_line)
         if len(current_line) > self.viewport_width:
             self.cursor_x = self.cursor_max_right
@@ -621,7 +718,10 @@ class ScrollTextBlock(Widget):
         else:
             self.cursor_x = self.cursor_max_left + len(current_line)
 
+
     def handle_delete(self, current_line):
+        """ Function that handles recieving a delete keypress """
+
         if self.cursor_text_pos_x == len(current_line) and self.cursor_text_pos_y < len(self.text_lines):
             self.text_lines[self.cursor_text_pos_y] = self.text_lines[self.cursor_text_pos_y] + self.text_lines[self.cursor_text_pos_y + 1]
             self.text_lines = self.text_lines[:self.cursor_text_pos_y+1] + self.text_lines[self.cursor_text_pos_y + 2:]
@@ -630,6 +730,8 @@ class ScrollTextBlock(Widget):
 
 
     def insert_char(self, current_line, key_pressed):
+        """ Function that handles recieving a character """
+
         self.set_text_line(current_line[:self.cursor_text_pos_x] + chr(key_pressed) + current_line[self.cursor_text_pos_x:])
         if len(current_line) <= self.width - 2 * self.padx - 4:
             self.cursor_x = self.cursor_x + 1
@@ -639,6 +741,8 @@ class ScrollTextBlock(Widget):
 
 
     def handle_key_press(self, key_pressed):
+        """ Override of base class handle key press function """
+
         super().handle_key_press(key_pressed)
 
         # The current line on which the user's cursor is located
@@ -670,6 +774,8 @@ class ScrollTextBlock(Widget):
 
 
     def draw(self):
+        """ Override of base class draw function """
+
         super().draw()
 
         self.renderer.set_color_mode(self.color)

@@ -30,6 +30,7 @@ import py_cui.popups
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
 # create these values as pairs of the bat to be selected. 
 # Format is FOREGROUND_ON_BACKGROUND
+# TODO add more color options
 WHITE_ON_BLACK      = 1
 BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
@@ -252,7 +253,7 @@ class PyCUI:
 
 
     def lose_focus(self):
-        """ Function that forces py_cui out of focus mode. After pop is called, focus is lost """
+        """ Function that forces py_cui out of focus mode. After popup is called, focus is lost """
 
         if self.in_focused_mode:
             self.in_focused_mode = False
@@ -264,21 +265,27 @@ class PyCUI:
     # Currently no support for input of any kind through popups.
 
     def show_message_popup(self, title, text):
+        """ Shows a message popup """
 
         color=WHITE_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, title, text, color)
 
     def show_warning_popup(self, title, text):
+        """ Shows a warning popup """
 
         color=YELLOW_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color)
 
     def show_error_popup(self, title, text):
+        """ Shows an error popup """
 
         color=RED_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color)
 
+
     def close_popup(self):
+        """ Closes the popup, and resets focus """
+
         self.popup_ret = self.popup.ret_val
         self.lose_focus()
         self.popup = None
@@ -286,23 +293,18 @@ class PyCUI:
 
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
-    def draw_widget(self, widget):
-        """ Function that calls a widget's draw function """
-
-        widget.draw()
-
 
     def draw_widgets(self, stdscr):
         """ Function that draws all of the widgets to the screen """
 
         for widget_key in self.widgets.keys():
             if widget_key != self.selected_widget:
-                self.draw_widget(self.widgets[widget_key])
+                self.widgets[widget_key].draw()
 
         # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
         if self.selected_widget is not None:
             stdscr.attron(curses.A_BOLD)
-            self.draw_widget(self.widgets[self.selected_widget])
+            self.widgets[self.selected_widget].draw()
             stdscr.attroff(curses.A_BOLD)
 
 
@@ -325,10 +327,11 @@ class PyCUI:
     def handle_key_presses(self, key_pressed):
         """ Function that handles all main loop key presses. """
 
-        # If we are in focus mode, the widget has all of the control of the keyboard except
-        # for the escape key, which exits focus mode.
+        # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
         selected_widget = self.widgets[self.selected_widget]
 
+        # If we are in focus mode, the widget has all of the control of the keyboard except
+        # for the escape key, which exits focus mode.
         if self.in_focused_mode and self.popup is None:
             if key_pressed == keys.KEY_ESCAPE:
                 self.status_bar.set_text(self.init_status_bar_text)
@@ -337,12 +340,13 @@ class PyCUI:
             else:
                 # widget handles remaining keys
                 selected_widget.handle_key_press(key_pressed)
-        # Otherwise, barring a popup, we are in overview mode, meaning that arrows move between widgets, and Enter focuses
+
+        # Otherwise, barring a popup, we are in overview mode, meaning that arrow keys move between widgets, and Enter key starts focus mode
         elif self.popup is None:
             if key_pressed == keys.KEY_ENTER and self.selected_widget is not None and selected_widget.is_selectable:
                 self.in_focused_mode = True
                 selected_widget.selected = True
-                # If autofocus buttons is selected, we automatically 
+                # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
                 if self.auto_focus_buttons and isinstance(selected_widget, widgets.Button):
                     self.in_focused_mode = False
                     selected_widget.selected = False
@@ -354,13 +358,12 @@ class PyCUI:
             # If not in focus mode, use the arrow keys to move around the selectable widgets.
             neighbor = None
             if key_pressed == keys.KEY_UP_ARROW or key_pressed == keys.KEY_DOWN_ARROW or key_pressed == keys.KEY_LEFT_ARROW or key_pressed == keys.KEY_RIGHT_ARROW:
-                selected = selected_widget
-                neighbor = self.check_if_neighbor_exists(selected.row, selected.column, selected.row_span, selected.column_span, key_pressed)
+                neighbor = self.check_if_neighbor_exists(selected_widget.row, selected_widget.column, selected_widget.row_span, selected_widget.column_span, key_pressed)
             if neighbor is not None:
                 selected_widget.selected = False
                 self.set_selected_widget(neighbor)
 
-        # if we have a popup, that takes key control from bot
+        # if we have a popup, that takes key control from both overview and focus mode
         elif self.popup is not None:
             self.popup.handle_key_press(key_pressed)
 
@@ -374,6 +377,7 @@ class PyCUI:
         stdscr.clear()
         stdscr.refresh()
 
+        # Initialization functions. Generates colors and renderer
         self.initialize_colors()
         self.initialize_widget_renderer(stdscr)
 
@@ -382,7 +386,7 @@ class PyCUI:
 
             # Initialization and size adjustment
             stdscr.clear()
-            # find height width, adjust if status/title bar added.
+            # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
             height, width = stdscr.getmaxyx()
             height = height - 4
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
@@ -390,6 +394,8 @@ class PyCUI:
                 self.width = width
                 self.height = height
                 self.grid.update_grid_height_width(self.height, self.width)
+                for widget_id in self.widgets.keys():
+                    self.widgets[widget_id].update_height_width()
 
             # Handle keypresses
             self.handle_key_presses(key_pressed)

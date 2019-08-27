@@ -100,8 +100,10 @@ class MessagePopup(Popup):
 # Below popups require some form of blocking + return,
 # which I cannot yet figure out. TODO
 #
+# UNIMPLEMENTED
+#
 ###########################################################
-
+"""
 class YesNoPopup(Popup):
     def __init__(self, root, title, text, height, width, color):
         super().__init__(root, title, text, height, width, color)
@@ -132,3 +134,4 @@ class YesNoPopup(Popup):
         stdscr.addstr(self.stop_y, self.start_x, '+-{}-+'.format('-' * (width - 4)))
         stdscr.attroff(curses.color_pair(self.color))
         stdscr.attroff(curses.A_BOLD)
+"""

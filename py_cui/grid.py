@@ -20,6 +20,8 @@ class Grid:
         self.column_width = int(self.width / self.num_columns)
 
     def set_num_rows(self, num_rows):
+        """ Sets the grid row size """
+
         if (3 * num_rows) >= self.height:
             raise py_cui.errors.PyCUIOutOfBoundsError
         self.num_rows = num_rows
@@ -27,6 +29,8 @@ class Grid:
 
 
     def set_num_cols(self, num_columns):
+        """ Sets the grid column size """
+
         if (3 * num_columns) >= self.width:
             raise py_cui.errors.PyCUIOutOfBoundsError
         self.num_columns = num_columns
@@ -34,6 +38,8 @@ class Grid:
 
 
     def update_grid_height_width(self, height, width):
+        """ Update grid height and width. Allows for on-the-fly size editing """
+
         self.height = height
         self.width = width
         if (3 * self.num_columns) >= self.width:

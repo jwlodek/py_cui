@@ -8,6 +8,8 @@ File containing constants and helper functions for dealing with keys
 from sys import platform
 import curses
 
+# Some simple helper functions
+
 def get_ascii_from_char(char):
     return ord(char)
 
@@ -16,6 +18,7 @@ def get_char_from_ascii(key_num):
     return chr(key_num)
 
 
+# Supported py_cui keys
 KEY_ENTER       = get_ascii_from_char('\n')
 KEY_ESCAPE      = 27
 KEY_SPACE       = get_ascii_from_char(' ')
