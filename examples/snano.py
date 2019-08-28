@@ -94,10 +94,10 @@ class SuperNano:
     def delete_selected_file(self):
         if self.edit_text_block.title != 'Open file':
             try:
-                self.os.remove(filename(edit_text_block.title))
-                self.edit_text_block.set_text('')
+                os.remove(os.path.join(self.dir, self.edit_text_block.title))
+                self.edit_text_block.clear()
                 self.edit_text_block.title = 'Open file'
-                file_menu.remove_selected_item()
+                self.file_menu.remove_selected_item()
             except OSError:
                 self.root.show_error_popup('OS Error', 'Operation could not be completed due to an OS error.')
         else:

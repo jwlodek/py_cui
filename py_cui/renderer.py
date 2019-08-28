@@ -46,12 +46,14 @@ class Renderer:
         
         if fill:
             cursor_y = widget.start_y + widget.height - widget.pady - 1
-            cursor_x = widget.start_x + widget.width - widget.padx #+ 1
+            cursor_x = widget.start_x + widget.width - widget.padx + 1
         else:
             cursor_y = widget.start_y + int(widget.height / 2) + 2
             cursor_x = widget.start_x + widget.width - widget.padx + 1
-
-        self.stdscr.move(cursor_y, cursor_x)
+        try:
+            self.stdscr.move(cursor_y, cursor_x)
+        except:
+            self.stdscr.move(0,0)
 
 
     def draw_cursor(self, cursor_y, cursor_x):

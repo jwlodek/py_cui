@@ -342,11 +342,22 @@ class PyCUI:
             stdscr.attroff(curses.color_pair(self.title_bar.color))
 
 
+    def display_window_size_warning(self, stdscr):
+            try:
+                stdscr.clear()
+                stdscr.attron(curses.color_pair(RED_ON_BLACK))
+                stdscr.addstr(0, 0, 'Error displaying CUI...')
+                stdscr.addstr(1, 0, 'Window may be too small!')
+                stdscr.attroff(curses.color_pair(RED_ON_BLACK))
+            except:
+                pass
 
     def handle_key_presses(self, key_pressed):
         """ Function that handles all main loop key presses. """
 
         # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
+        if self.selected_widget is None:
+            return
         selected_widget = self.widgets[self.selected_widget]
 
         # If we are in focus mode, the widget has all of the control of the keyboard except
@@ -409,25 +420,34 @@ class PyCUI:
             height, width = stdscr.getmaxyx()
             height = height - 4
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
-#            if height != self.height or width != self.width:
-            self.width = width
-            self.height = height
-            self.grid.update_grid_height_width(self.height, self.width)
-            for widget_id in self.widgets.keys():
-               self.widgets[widget_id].update_height_width()
+            #if height != self.height or width != self.width:
+
+            # Resize the grid and the widgets if there was a resize operation
+            if key_pressed == curses.KEY_RESIZE:
+                try:
+                    self.width = width
+                    self.height = height
+                    self.grid.update_grid_height_width(self.height, self.width)
+                    for widget_id in self.widgets.keys():
+                        self.widgets[widget_id].update_height_width()
+                except:
+                    self.display_window_size_warning(stdscr)
 
             # Handle keypresses
             self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            self.draw_status_bars(stdscr, height, width)
-            self.draw_widgets(stdscr)
+            try:
+                self.draw_status_bars(stdscr, height, width)
+                self.draw_widgets(stdscr)
+            except:
+                self.display_window_size_warning(stdscr)
 
-            # draw the popup if required
+                # draw the popup if required
             if self.popup is not None:
                 self.popup.draw(stdscr)
 
-            # Refresh the screen
+                # Refresh the screen
             stdscr.refresh()
 
             # Wait for next input

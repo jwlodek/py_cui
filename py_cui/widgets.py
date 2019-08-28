@@ -125,14 +125,19 @@ class Widget:
             return False
 
 
+    # BELOW FUNCTIONS SHOULD BE OVERWRITTEN BY SUB-CLASSES
+
+
     def update_height_width(self):
-        """ Function that refreshes position and dimensons on resize """
+        """ Function that refreshes position and dimensons on resize. If necessary, make sure required widget attributes updated here as well."""
 
         self.start_x, self.start_y = self.get_absolute_position()
         self.width, self.height = self.get_absolute_dims()
+        if self.row + self.row_span == self.grid.num_rows:
+            self.overlap_y = self.grid.height % self.grid.num_rows
+        if self.column + self.column_span == self.grid.num_columns:
+            self.overlap_x = self.grid.width % self.grid.num_columns - 1
 
-
-    # BELOW FUNCTIONS SHOULD BE OVERWRITTEN BY SUB-CLASSES
 
     def get_help_text(self):
         """ Returns help text """
@@ -248,6 +253,8 @@ class ScrollMenu(Widget):
     def remove_selected_item(self):
         """ Function that removes the selected item from the scroll menu. """
 
+        if len(self.view_items) == 0:
+            return
         del self.view_items[self.selected_item]
         if self.selected_item >= len(self.view_items):
             self.selected_item = self.selected_item - 1
@@ -276,7 +283,7 @@ class ScrollMenu(Widget):
             selected item, or None if there are no items in the menu
         """
         
-        if self.selected_item < len(self.view_items):
+        if len(self.view_items) > 0:
             return self.view_items[self.selected_item]
         return None
 
@@ -419,6 +426,19 @@ class TextBox(Widget):
         self.help_text = 'Focus mode on TextBox. Press Esc to exit focus mode.'
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
 
+
+    def update_height_width(self):
+        """ Need to update all cursor positions on resize """
+
+        super().update_height_width()
+        self.cursor_y = self.start_y + int(self.height / 2) + 1
+        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_text_pos = 0
+        self.cursor_max_right = self.start_x + self.width - self.padx - 1
+        self.cursor_max_left = self.cursor_x
+        self.viewport_width = self.cursor_max_right - self.cursor_max_left
+
+
     def set_text(self, text):
         """ Sets the value of the text. Overwrites existing text """
 
@@ -553,6 +573,22 @@ class ScrollTextBlock(Widget):
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
         self.help_text = 'Focus mode on TextBlock. Press Esc to exit focus mode.'
+
+
+    def update_height_width(self):
+
+        super().update_height_width()
+        self.viewport_y_start = 0
+        self.viewport_x_start = 0
+        self.cursor_text_pos_x = 0
+        self.cursor_text_pos_y = 0
+        self.cursor_y = self.start_y + 1
+        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_max_up = self.cursor_y
+        self.cursor_max_down = self.start_y + self.height - self.pady - 2
+        self.cursor_max_left = self.cursor_x
+        self.cursor_max_right = self.start_x + self.width - self.padx - 1
+        self.viewport_width = self.cursor_max_right - self.cursor_max_left
 
 
     def get(self):
