@@ -40,6 +40,23 @@ RED_ON_BLACK        = 6
 CYAN_ON_BLACK       = 7
 MAGENTA_ON_BLACK    = 8
 
+def fit_text(width, text, center=False):
+    """ Helper function to fit text within a given width """
+    if width < 5:
+        return '.' * width
+    if len(text) >= width:
+        return text[:width-5] + '...'
+    else:
+        total_num_spaces = (width - len(text) - 1)
+        if center:
+            left_spaces = int(total_num_spaces/2)
+            right_spaces = int(total_num_spaces/2)
+            if(total_num_spaces % 2 == 1):
+                right_spaces = right_spaces+1
+            return ' ' * left_spaces + text + ' ' * right_spaces
+        else:
+            return text + ' ' * total_num_spaces
+
 
 class PyCUI:
     """
@@ -313,13 +330,15 @@ class PyCUI:
 
         if self.status_bar is not None:
             stdscr.attron(curses.color_pair(self.status_bar.color))
-            stdscr.addstr(height + 3, 0, self.status_bar.text)
-            stdscr.addstr(height + 3, len(self.status_bar.text), " " * (width - len(self.status_bar.text)-1))
+            #stdscr.addstr(height + 3, 0, self.status_bar.text)
+            #stdscr.addstr(height + 3, len(self.status_bar.text), " " * (width - len(self.status_bar.text)-1))
+            stdscr.addstr(height + 3, 0, fit_text(width, self.status_bar.text))
             stdscr.attroff(curses.color_pair(self.status_bar.color))
 
         if self.title_bar is not None:
             stdscr.attron(curses.color_pair(self.title_bar.color))
-            stdscr.addstr(0, 0, '{}'.format(self.title.center(width, ' ')))
+            #stdscr.addstr(0, 0, '{}'.format(self.title.center(width, ' ')))
+            stdscr.addstr(0, 0, fit_text(width, self.title, center=True))
             stdscr.attroff(curses.color_pair(self.title_bar.color))
 
 
@@ -390,12 +409,12 @@ class PyCUI:
             height, width = stdscr.getmaxyx()
             height = height - 4
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
-            if height != self.height or width != self.width:
-                self.width = width
-                self.height = height
-                self.grid.update_grid_height_width(self.height, self.width)
-                for widget_id in self.widgets.keys():
-                    self.widgets[widget_id].update_height_width()
+#            if height != self.height or width != self.width:
+            self.width = width
+            self.height = height
+            self.grid.update_grid_height_width(self.height, self.width)
+            for widget_id in self.widgets.keys():
+               self.widgets[widget_id].update_height_width()
 
             # Handle keypresses
             self.handle_key_presses(key_pressed)
