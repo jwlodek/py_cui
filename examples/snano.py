@@ -46,15 +46,18 @@ class SuperNano:
         elif not os.path.isdir(target):
             self.root.show_error_popup('Not a Dir', 'ERROR - {} is not a directory'.format(target))
             return
+        target = os.path.abspath(target)
+        self.new_dir_box.set_text(target)
         self.dir = target
+
         files = []
-        files.append('__DIR__ ..')
+        files.append('<DIR> ..')
         dir_contents = os.listdir(self.dir)
         for elem in dir_contents:
             if os.path.isfile(os.path.join(self.dir, elem)):
                 files.append(elem)
             else:
-                files.append('__DIR__ ' + elem)
+                files.append('<DIR> ' + elem)
 
         self.file_menu.clear()
         self.file_menu.add_item_list(files)
@@ -70,15 +73,18 @@ class SuperNano:
 
     def open_file_dir(self):
         filename = self.file_menu.get()
-        if filename.startswith('__DIR__'):
-            self.new_dir_box.set_text(os.path.join(self.dir, filename[8:]))
+        if filename.startswith('<DIR>'):
+            self.new_dir_box.set_text(os.path.join(self.dir, filename[6:]))
             self.open_new_directory()
         else:
-            fp = open(os.path.join(self.dir, filename), 'r')
-            text = fp.read()
-            fp.close()
-            self.edit_text_block.set_text(text)
-            self.edit_text_block.title = filename
+            try:
+                fp = open(os.path.join(self.dir, filename), 'r')
+                text = fp.read()
+                fp.close()
+                self.edit_text_block.set_text(text)
+                self.edit_text_block.title = filename
+            except:
+                self.root.show_warning_popup('Not a text file', 'The selected file could not be opened - not a text file')
 
 
     def save_opened_file(self):

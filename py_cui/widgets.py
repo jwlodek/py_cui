@@ -719,7 +719,7 @@ class ScrollTextBlock(Widget):
     def handle_backspace(self, current_line):
         """ Function that handles recieving backspace characters in the text """
 
-        if self.cursor_text_pos_x == 0:
+        if self.cursor_text_pos_x == 0 and self.cursor_text_pos_y != 0:
             self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y - 1])
             self.text_lines[self.cursor_text_pos_y - 1] = self.text_lines[self.cursor_text_pos_y - 1] + self.text_lines[self.cursor_text_pos_y]
             self.text_lines = self.text_lines[:self.cursor_text_pos_y] + self.text_lines[self.cursor_text_pos_y + 1:]
