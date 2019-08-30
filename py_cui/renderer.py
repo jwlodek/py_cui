@@ -130,79 +130,45 @@ class Renderer:
         return render_text_fragments
 
 
-    def fix_assorted_fragments(self, assorted_fragments):
-        out = []
-        for fragment in assorted_fragments:
-            out.append([fragment[0], fragment[1]])
-        return out
+    def fix_fragment_list(self, widget, assorted_fragments_list, render_text):
+        output = []
+        current_loc = 0
+        for i in range(0, len(assorted_fragments_list[0])):
+            for j in range(0, len(assorted_fragments_list)):
+                if assorted_fragments_list[j][i][1] != widget.color:
+                    output.append(assorted_fragments_list[j][i])
+            if len(output) != (i + 1):
+                output.append(assorted_fragments_list[j][i])
+        return output
 
 
     def generate_text_color_fragments(self, widget, line, render_text):
-        text_fragments = []
-        assorted_fragments = []
+        text_fragments_list = []
         for color_rule in self.color_rules:
             # Full line color rules take precendence
             if color_rule.match_type == 'line':
                 if color_rule.check_match(line):
-                    del text_fragments[:]
-                    text_fragments.append([render_text, color_rule.color])
-                    break
-            elif color_rule.match_type == 'regex':
-                fragments = color_rule.generate_fragments_regex(render_text)
-                assorted_fragments = assorted_fragments + fragments
-            elif color_rule.match_type == 'region':
+                    text_fragments = [[render_text, color_rule.color]]
+                    return text_fragments
+        
+        for color_rule in self.color_rules:
+            if color_rule.match_type == 'regex':
+                text_fragments_list.append(color_rule.generate_fragments_regex(widget, render_text))
+
+        if len(text_fragments_list) > 0:
+            return self.fix_fragment_list(widget, text_fragments_list, render_text)
+
+        for color_rule in self.color_rules:
+            if color_rule.match_type == 'region':
                 if color_rule.check_match(render_text):
-                    assorted_fragments = color_rule.split_text_on_region(widget, render_text)
+                    return color_rule.split_text_on_region(widget, render_text) 
 
-        # This call fixes any overlapping fragments in the list of assorted fragments.
-        text_fragments = self.fix_assorted_fragments(assorted_fragments)
-
-        if len(text_fragments) == 0:
+        if len(text_fragments_list) == 0:
+            text_fragments = []
             text_fragments.append([render_text, widget.color])
 
         return text_fragments
 
-    """
-    def get_portions_single_split(self, render_text_portions):
-        if self.color_rules[regex][2] == 'line':
-            render_text_portions.append([render_text, self.color_rules[regex][1]])
-            break
-        elif self.color_rules[regex][2] == 'regex':
-            render_text_portions.append([render_text[:len(regex)], self.color_rules[regex][1]])
-            render_text_portions.append([render_text[len(regex):], widget.color])
-            break
-        elif self.color_rules[regex][2].startswith('region'):
-            region = self.color_rules[regex][3]
-            if region[0] != 0:
-                render_text_portions.append([render_text[:region[0]], widget.color])   
-            render_text_portions.append([render_text[region[0]:region[1]], self.color_rules[regex][1]])
-            render_text_portions.append([render_text[region[1]:], widget.color])
-            break
-    """
-    """
-    def get_render_text_colored(self, widget, line, bordered, start_pos):
-
-        render_text = self.get_render_text(widget, line, bordered, start_pos)
-        render_text_portions = []
-        for regex in self.self.color_rules.keys():
-            if self.color_rules[regex][0] == 'startswith':
-                if line.startswith(regex):
-            elif self.color_rules[regex][0] == 'notstartswith':
-                if not line.startswith(regex):
-
-            elif self.color_rules[regex][0] == 'endswith':
-
-            elif self.color_rules[regex][0] == 'notendswith':
-
-            elif self.color_rules[regex][0] == 'contains':
-
-            else:
-                break
-        if len(render_text_portions) == 0:
-            render_text_portions.append([render_text, widget.color])
-
-        return render_text_portions
-        """
 
     def draw_text(self, widget, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
         """
@@ -246,16 +212,6 @@ class Renderer:
 
             if text_elem[1] != widget.color:
                 self.unset_color_mode(text_elem[1])
-        """
-        if centered and bordered:
-            render_padding = '{}'.format(render_text.center(widget.width - widget.padx - 2, ' '))
-        elif centered and not bordered:
-            render_text = '{}'.format(render_text.center(widget.width - widget.padx, ' '))
-        elif not centered and bordered:
-            render_text = '{}{}|'.format(render_text, ' ' * (widget.width-3 - widget.padx - len(render_text)))
-        else:
-            render_text = '{}{}'.format(render_text, ' ' * (widget.width - widget.padx -len(render_text)))
-        self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
-        """
+
         if bordered:
             self.stdscr.addstr(y, widget.start_x + widget.width - widget.padx, '|')

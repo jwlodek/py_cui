@@ -70,14 +70,29 @@ class ColorRule:
         return False
 
 
+    def generate_fragments_regex(self, widget, render_text):
+        fragments = []
+        temp = render_text.split(' ')
+        for i in range(0,len(temp)):
+            word = temp[i]
+            if word in self.regex_list:
+                fragments.append([word, self.color])
+            else:
+                fragments.append([word, widget.color])
+            if i < (len(temp) - 1):
+                fragments.append([' ', widget.color])
+
+        return fragments
+
     def split_text_on_region(self, widget, render_text):
 
         fragments = []
         if self.region[0] != 0:
-            fragments.append([render_text[0:self.region[0], widget.color, [0, self.region[0]]]])
-        fragments.append([render_text[self.region[0]:self.region[1]], self.color, self.region])
-        fragments.append([render_text[self.region[1]:], widget.color, [self.region[1], len(render_text)]])
+            fragments.append([render_text[0:self.region[0]], widget.color])
+        fragments.append([render_text[self.region[0]:self.region[1]], self.color])
+        fragments.append([render_text[self.region[1]:], widget.color])
         return fragments
+
 
 # THE FUNCTIONS BELOW GET LISTS OF COLOR RULES TO APPLY LANGUAGE SYNTAX HIGHLIGHTING
 # FOR py_cui TEXT. RUN widget.add_color_rules(py_cui.colors.get_LANGUAGE_highlighting_rules())
@@ -85,10 +100,11 @@ class ColorRule:
 
 def get_python_highlighting_rules():
     color_rules = []
-    python_keywords = ['def', 'import', 'if', 'for', 'as', 'else', 'elif', 'return', 'for', 'in', 'and', 'or']
+    python_keywords = ['class', 'pass', 'raise', 'def', 'import', 'if', 'for', 'as', 'else', 'elif', 'return', 'for', 'in', 'and', 'or', ]
     python_constants = ['True', 'False', 'None']
-    python_strings = ['".*"', "'.*'"]
+    #python_strings = ['".*"', "'.*'"]
     color_rules.append(ColorRule(python_keywords, py_cui.CYAN_ON_BLACK, 'contains', 'regex', None, False))
     color_rules.append(ColorRule(python_constants, py_cui.MAGENTA_ON_BLACK, 'contains', 'regex', None, False))
     color_rules.append(ColorRule(['#'], py_cui.RED_ON_BLACK, 'startswith', 'line', None, False))
-    color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
+    #color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
+    return color_rules
