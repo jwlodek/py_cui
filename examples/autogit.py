@@ -45,8 +45,8 @@ class AutoGitCUI:
         self.diff_text_block.add_text_color_rule(['commit'], py_cui.YELLOW_ON_BLACK, 'startswith')
 
         #self.tag_textbox = self.root.add_text_box('New Tag', 9, 5, column_span=3)
-        self.new_branch_textbox = self.root.add_text_box('New Branch', 8, 0, column_span=3)
-        self.commit_message_box = self.root.add_text_box('Commit Message', 8, 3, column_span=5)
+        self.new_branch_textbox = self.root.add_text_box('New Branch', 8, 0, column_span=2)
+        self.commit_message_box = self.root.add_text_box('Commit Message', 8, 2, column_span=6)
 
 
         self.refresh_button = self.root.add_button('Refresh', 7, 0, command=self.refresh_git_status)
