@@ -20,6 +20,7 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 import curses
 import py_cui
+import py_cui.colors
 import py_cui.errors
 
 
@@ -55,6 +56,7 @@ class Widget:
         self.is_selectable = selectable
         self.help_text = 'No help text available.'
         self.key_commands = {}
+        self.text_color_rules = []
 
 
     def set_focus_text(self, text):
@@ -76,6 +78,26 @@ class Widget:
         """
 
         self.key_commands[key] = command
+
+
+    def add_text_color_rule(self, regex_list, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
+        """
+        Forces renderer to draw text using given color if text_condition_function returns True
+
+        Parameters
+        ----------
+        rule_type : string
+            A supported color rule type
+        regex : str
+            A string to check against the line for a given rule type
+        color : int
+            a supported py_cui color value
+        match_entire_line : bool
+            if true, if regex fits rule type, entire line will be colored. If false, only matching text
+        """
+
+        self.text_color_rules.append(py_cui.colors.ColorRule(regex_list, color, rule_type, match_type, region, include_whitespace))
+
 
 
     def set_standard_color(self, color):
@@ -162,6 +184,8 @@ class Widget:
 
         if self.renderer is None:
             return
+        else:
+            self.renderer.set_color_rules(self.text_color_rules)
 
 
 class Label(Widget):
@@ -355,6 +379,12 @@ class CheckBoxMenu(ScrollMenu):
         for item in self.selected_item_list:
             ret.append(item[6:])
         return ret
+
+
+    def mark_item_as_checked(self, text):
+        """ Function that marks an item as selected """
+
+        self.selected_item_list.append(text)
 
 
     def handle_key_press(self, key_pressed):
