@@ -29,6 +29,12 @@ class ColorRule:
         self.regex_list = self.regex_list + regex_list
 
 
+    def check_end_block(self, line):
+        temp = line.strip()
+        for regex in self.regex_list:
+            if temp.endswith(regex):
+                return True
+        return False
 
 
     def match_starts_with(self, line):
@@ -70,6 +76,16 @@ class ColorRule:
         return False
 
 
+    def check_single_line(self, line):
+        temp = line
+        if not self.include_whitespace:
+            temp = temp.strip()
+        for regex in self.regex_list:
+            if temp.startswith(regex) and temp.endswith(regex):
+                return True
+        return False
+
+
     def generate_fragments_regex(self, widget, render_text):
         fragments = []
         temp = render_text.split(' ')
@@ -106,5 +122,6 @@ def get_python_highlighting_rules():
     color_rules.append(ColorRule(python_keywords, py_cui.CYAN_ON_BLACK, 'contains', 'regex', None, False))
     color_rules.append(ColorRule(python_constants, py_cui.MAGENTA_ON_BLACK, 'contains', 'regex', None, False))
     color_rules.append(ColorRule(['#'], py_cui.RED_ON_BLACK, 'startswith', 'line', None, False))
+    color_rules.append(ColorRule(['"""'], py_cui.GREEN_ON_BLACK, 'block', 'block', None, False))
     #color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
     return color_rules

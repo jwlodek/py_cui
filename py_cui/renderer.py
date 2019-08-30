@@ -21,7 +21,8 @@ class Renderer:
     def __init__(self, root, stdscr):
         self.root = root
         self.stdscr = stdscr
-        self.color_rules = {}
+        self.color_rules = []
+        self.block_color_rule = None
 
 
     def set_color_rules(self, color_rules):
@@ -144,6 +145,28 @@ class Renderer:
 
     def generate_text_color_fragments(self, widget, line, render_text):
         text_fragments_list = []
+
+        for color_rule in self.color_rules:
+            # Block colorations are the most powerful.
+            if color_rule.match_type == 'block':
+                if color_rule.check_single_line(line):
+                    text_fragments = [[render_text, color_rule.color]]
+                    return text_fragments
+                elif color_rule.check_match(line) and self.block_color_rule is None:
+                    self.block_color_rule = color_rule
+                    text_fragments = [[render_text, self.block_color_rule.color]]
+                    return text_fragments
+                elif self.block_color_rule is not None:
+                    if self.block_color_rule.check_end_block(line):
+                        text_fragments = [[render_text, self.block_color_rule.color]]
+                        self.block_color_rule = None
+                        return text_fragments
+                
+
+        if self.block_color_rule is not None:
+            text_fragments = [[render_text, self.block_color_rule.color]]
+            return text_fragments
+
         for color_rule in self.color_rules:
             # Full line color rules take precendence
             if color_rule.match_type == 'line':
