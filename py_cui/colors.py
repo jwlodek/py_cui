@@ -57,18 +57,27 @@ class ColorRule:
             for regex in self.regex_list:
                 if temp.startswith(regex):
                     return False
-                return True
+            return True
         elif self.rule_type == 'notendswith':
             for regex in self.regex_list:
                 if temp.startswith(regex):
                     return False
-                return True
+            return True
         elif self.rule_type == 'contains':
             for regex in self.regex_list:
                 if regex in temp:
                     return True
         return False
 
+
+    def split_text_on_region(self, widget, render_text):
+
+        fragments = []
+        if self.region[0] != 0:
+            fragments.append([render_text[0:self.region[0], widget.color, [0, self.region[0]]]])
+        fragments.append([render_text[self.region[0]:self.region[1]], self.color, self.region])
+        fragments.append([render_text[self.region[1]:], widget.color, [self.region[1], len(render_text)]])
+        return fragments
 
 # THE FUNCTIONS BELOW GET LISTS OF COLOR RULES TO APPLY LANGUAGE SYNTAX HIGHLIGHTING
 # FOR py_cui TEXT. RUN widget.add_color_rules(py_cui.colors.get_LANGUAGE_highlighting_rules())

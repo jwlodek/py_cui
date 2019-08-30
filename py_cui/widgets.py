@@ -334,14 +334,13 @@ class ScrollMenu(Widget):
             if line_counter < self.top_view:
                 line_counter = line_counter + 1
             else:
-                if line_counter == self.selected_item:
-                    self.renderer.set_color_mode(self.selected_color)
                 if counter >= self.height - self.pady - 1:
                     break
-                self.renderer.draw_text(self, line, self.start_y + counter)
-                counter = counter + 1
                 if line_counter == self.selected_item:
-                    self.renderer.unset_color_mode(self.selected_color)
+                    self.renderer.draw_text(self, line, self.start_y + counter, selected=True)
+                else:
+                    self.renderer.draw_text(self, line, self.start_y + counter)
+                counter = counter + 1
                 line_counter = line_counter + 1
         self.renderer.unset_color_mode(self.color)
         self.renderer.reset_cursor(self)

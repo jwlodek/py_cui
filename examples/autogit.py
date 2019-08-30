@@ -34,6 +34,8 @@ class AutoGitCUI:
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
         self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=4, column_span=2)
         self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
+        self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
+        self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
         self.branch_menu = self.root.add_scroll_menu('Git Branches', 4, 0, row_span=3, column_span=2, pady=1)
 
@@ -107,7 +109,7 @@ class AutoGitCUI:
         if len(message) == 0:
             self.root.show_error_popup('Invalid Commit Message', 'Please enter a commit message')
             return
-        proc = Popen(['git', 'commit', '-m', '"{}"'.format(message)])
+        proc = Popen(['git', 'commit', '-m', message])
         out, err = proc.communicate()
         res = proc.returncode
         if res != 0:

@@ -130,8 +130,16 @@ class Renderer:
         return render_text_fragments
 
 
+    def fix_assorted_fragments(self, assorted_fragments):
+        out = []
+        for fragment in assorted_fragments:
+            out.append([fragment[0], fragment[1]])
+        return out
+
+
     def generate_text_color_fragments(self, widget, line, render_text):
         text_fragments = []
+        assorted_fragments = []
         for color_rule in self.color_rules:
             # Full line color rules take precendence
             if color_rule.match_type == 'line':
@@ -139,7 +147,15 @@ class Renderer:
                     del text_fragments[:]
                     text_fragments.append([render_text, color_rule.color])
                     break
+            elif color_rule.match_type == 'regex':
+                fragments = color_rule.generate_fragments_regex(render_text)
+                assorted_fragments = assorted_fragments + fragments
+            elif color_rule.match_type == 'region':
+                if color_rule.check_match(render_text):
+                    assorted_fragments = color_rule.split_text_on_region(widget, render_text)
 
+        # This call fixes any overlapping fragments in the list of assorted fragments.
+        text_fragments = self.fix_assorted_fragments(assorted_fragments)
 
         if len(text_fragments) == 0:
             text_fragments.append([render_text, widget.color])
@@ -188,7 +204,7 @@ class Renderer:
         return render_text_portions
         """
 
-    def draw_text(self, widget, line, y, centered = False, bordered = True, start_pos = 0):
+    def draw_text(self, widget, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
         """
         Function that draws widget text.
 
@@ -219,8 +235,14 @@ class Renderer:
             if text_elem[1] != widget.color:
                 self.set_color_mode(text_elem[1])
 
+            if selected:
+                self.set_color_mode(widget.selected_color)
+
             self.stdscr.addstr(y, current_start_x, text_elem[0])
             current_start_x = current_start_x + len(text_elem[0])
+
+            if selected:
+                self.unset_color_mode(widget.selected_color)
 
             if text_elem[1] != widget.color:
                 self.unset_color_mode(text_elem[1])
