@@ -80,14 +80,21 @@ class MessagePopup(Popup):
         stdscr.attron(curses.color_pair(self.color))
         target_y = int(self.stop_y - self.start_y / 2)
         width = self.stop_x - self.start_x
+        render_text = self.text
+        if len(render_text) > (self.stop_x - self.start_x - 4):
+            render_text = render_text[:(self.stop_x - self.start_x - 7)] + '...'
+
+        render_title = self.title
+        if len(render_title)> (self.stop_x - self.start_x - 4):
+            render_title = render_title[:(self.stop_x - self.start_x - 7)] + '...'
 
         stdscr.attron(curses.A_BOLD)
         stdscr.addstr(self.start_y, self.start_x, '+-{}-+'.format('-' * (width - 4 )))
         for i in range(self.start_y + 1, target_y - 2):
             stdscr.addstr(i, self.start_x, '|{}|'.format(' ' * (width - 2)))
-        stdscr.addstr(target_y - 2, self.start_x, '|{}|'.format(self.title.center(width - 2, ' ')))
+        stdscr.addstr(target_y - 2, self.start_x, '|{}|'.format(render_title.center(width - 2, ' ')))
         stdscr.addstr(target_y - 1, self.start_x, '|{}|'.format(' ' * (width - 2)))
-        stdscr.addstr(target_y, self.start_x, '|{}|'.format(self.text.center(width - 2, ' ')))
+        stdscr.addstr(target_y, self.start_x, '|{}|'.format(render_text.center(width - 2, ' ')))
         for i in range(target_y + 1, self.stop_y):
             stdscr.addstr(i, self.start_x, '|{}|'.format(' ' * (width - 2)))
         stdscr.addstr(self.stop_y, self.start_x, '+-{}-+'.format('-' * (width - 4)))
