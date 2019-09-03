@@ -133,13 +133,13 @@ class Widget:
     def get_absolute_dims(self):
         """ Gets the absolute dimensions of the widget in characters """
 
-        self.width = self.grid.column_width * self.column_span
-        self.height = self.grid.row_height * self.row_span
+        width = self.grid.column_width * self.column_span
+        height = self.grid.row_height * self.row_span
         if self.grid.offset_y < self.row:
-            self.height = self.height + 1
+            height = height + 1
         if self.grid.offset_x < self.column:
-            self.width = self.width + 1
-        return self.width, self.height
+            width = width + 1
+        return width, height
 
 
     def is_row_col_inside(self, row, col):
@@ -159,10 +159,6 @@ class Widget:
 
         self.start_x, self.start_y = self.get_absolute_position()
         self.width, self.height = self.get_absolute_dims()
-        if self.row + self.row_span == self.grid.num_rows:
-            self.overlap_y = self.grid.height % self.grid.num_rows
-        if self.column + self.column_span == self.grid.num_columns:
-            self.overlap_x = self.grid.width % self.grid.num_columns - 1
 
 
     def get_help_text(self):
