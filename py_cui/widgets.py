@@ -855,5 +855,5 @@ class ScrollTextBlock(Widget):
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
         else:
-            self.renderer.reset_cursor(self, fill=False)
+            self.renderer.reset_cursor(self)
         self.renderer.unset_color_mode(self.color)

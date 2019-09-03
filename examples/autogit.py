@@ -32,12 +32,12 @@ class AutoGitCUI:
 
         self.dir = os.path.abspath(self.dir)
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
-        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=4, column_span=2)
+        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=3, column_span=2)
         self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
-        self.branch_menu = self.root.add_scroll_menu('Git Branches', 4, 0, row_span=3, column_span=2, pady=1)
+        self.branch_menu = self.root.add_scroll_menu('Git Branches', 3, 0, row_span=3, column_span=2, pady=1)
 
         self.refresh_git_status()
 
@@ -51,6 +51,8 @@ class AutoGitCUI:
         self.commit_message_box = self.root.add_text_box('Commit Message', 8, 2, column_span=6)
 
 
+        self.add_all_button = self.root.add_button('Add All', 6, 0, command=self.add_all)
+        self.open_editor_button = self.root.add_button('Open Editor', 6, 1, command=self.open_editor)
         self.refresh_button = self.root.add_button('Refresh', 7, 0, command=self.refresh_git_status)
         self.log_button = self.root.add_button('Git Log', 7, 1, command=self.show_log)
         
@@ -76,6 +78,20 @@ class AutoGitCUI:
             self.root.show_warning_popup('Git Failed', 'Unable to reset file, please check git installation')
     """
 
+    def add_all(self):
+        try:
+            proc = Popen(['git', 'add', '-A'], stdout=PIPE, stderr=PIPE)
+            out, err = proc.communicate()
+            self.refresh_git_status(preserve_selected=True)
+        except:
+            self.root.show_warning_popup('Git Failed', 'Unable to reset file, please check git installation')
+
+
+    def open_editor(self):
+        try:
+            proc = Popen(['code', '.'], stdout=PIPE, stderr=PIPE)
+        except:
+            self.root.show_warning_popup('Open Failed', 'Please install VSCode')
 
     def show_log(self):
         proc = Popen(['git', '--no-pager', 'log'], stdout=PIPE, stderr=PIPE)

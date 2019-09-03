@@ -110,6 +110,7 @@ class ColorRule:
         return fragments
 
 
+
 # THE FUNCTIONS BELOW GET LISTS OF COLOR RULES TO APPLY LANGUAGE SYNTAX HIGHLIGHTING
 # FOR py_cui TEXT. RUN widget.add_color_rules(py_cui.colors.get_LANGUAGE_highlighting_rules())
 # To get lanuage syntax highlighting.
