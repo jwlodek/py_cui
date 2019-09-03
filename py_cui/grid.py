@@ -16,6 +16,8 @@ class Grid:
         self.num_columns = num_columns
         self.height = height
         self.width = width
+        self.offset_y = self.height % self.num_rows
+        self.offset_x = self.width % self.num_columns
         self.row_height = int(self.height / self.num_rows)
         self.column_width = int(self.width / self.num_columns)
 
@@ -49,3 +51,5 @@ class Grid:
             raise py_cui.errors.PyCUIOutOfBoundsError
         self.row_height = int(self.height / self.num_rows)
         self.column_width = int(self.width / self.num_columns)
+        self.offset_y = self.height % self.num_rows
+        self.offset_x = self.width % self.num_columns

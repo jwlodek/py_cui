@@ -40,12 +40,12 @@ class Widget:
         self.row = row
         self.row_span = row_span
         self.column_span = column_span
-        self.overlap_x = 0
-        self.overlap_y = 0
-        if self.row + self.row_span == self.grid.num_rows:
-            self.overlap_y = self.grid.height % self.grid.num_rows
-        if self.column + self.column_span == self.grid.num_columns:
-            self.overlap_x = self.grid.width % self.grid.num_columns - 1
+        #self.overlap_x = 0
+        #self.overlap_y = 0
+        #if self.row + self.row_span == self.grid.num_rows:
+        #    self.overlap_y = self.grid.height % self.grid.num_rows
+        #if self.column + self.column_span == self.grid.num_columns:
+        #    self.overlap_x = self.grid.width % self.grid.num_columns - 1
         self.padx = padx
         self.pady = pady
         self.start_x, self.start_y = self.get_absolute_position()
@@ -133,8 +133,12 @@ class Widget:
     def get_absolute_dims(self):
         """ Gets the absolute dimensions of the widget in characters """
 
-        self.width = self.grid.column_width * self.column_span + self.overlap_x
-        self.height = self.grid.row_height * self.row_span + self.overlap_y
+        self.width = self.grid.column_width * self.column_span
+        self.height = self.grid.row_height * self.row_span
+        if self.grid.offset_y < self.row:
+            self.height = self.height + 1
+        if self.grid.offset_x < self.column:
+            self.width = self.width + 1
         return self.width, self.height
 
 
