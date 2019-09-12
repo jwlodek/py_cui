@@ -3,3 +3,8 @@ __pycache__/
 tester*
 TODO*
 .vscode/
+*tester.py
+build/
+*.egg-info
+files.txt
+dist/

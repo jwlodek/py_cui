@@ -39,6 +39,9 @@ YELLOW_ON_BLACK     = 5
 RED_ON_BLACK        = 6
 CYAN_ON_BLACK       = 7
 MAGENTA_ON_BLACK    = 8
+GREEN_ON_BLACK      = 9
+BLUE_ON_BLACK       = 10
+
 
 def fit_text(width, text, center=False):
     """ Helper function to fit text within a given width """
@@ -143,6 +146,8 @@ class PyCUI:
         curses.init_pair(RED_ON_BLACK,      curses.COLOR_RED,       curses.COLOR_BLACK)
         curses.init_pair(CYAN_ON_BLACK,     curses.COLOR_CYAN,      curses.COLOR_BLACK)
         curses.init_pair(MAGENTA_ON_BLACK,  curses.COLOR_MAGENTA,   curses.COLOR_BLACK)
+        curses.init_pair(GREEN_ON_BLACK,    curses.COLOR_GREEN,     curses.COLOR_BLACK)
+        curses.init_pair(BLUE_ON_BLACK,     curses.COLOR_BLUE,      curses.COLOR_BLACK)
 
 
     def initialize_widget_renderer(self, stdscr):
@@ -437,11 +442,14 @@ class PyCUI:
             self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            try:
-                self.draw_status_bars(stdscr, height, width)
-                self.draw_widgets(stdscr)
-            except:
-                self.display_window_size_warning(stdscr)
+            #try:
+            #    self.draw_status_bars(stdscr, height, width)
+            #    self.draw_widgets(stdscr)
+            #except:
+            #    self.display_window_size_warning(stdscr)
+
+            self.draw_status_bars(stdscr, height, width)
+            self.draw_widgets(stdscr)
 
                 # draw the popup if required
             if self.popup is not None:

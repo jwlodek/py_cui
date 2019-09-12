@@ -6,6 +6,9 @@ File containing the py_cui renderer. It is used to draw all of the onscreen widg
 """
 
 import curses
+import py_cui
+import py_cui.colors
+
 
 class Renderer:
     """
@@ -18,7 +21,12 @@ class Renderer:
     def __init__(self, root, stdscr):
         self.root = root
         self.stdscr = stdscr
+        self.color_rules = []
+        self.block_color_rule = None
 
+
+    def set_color_rules(self, color_rules):
+        self.color_rules = color_rules
 
     def set_color_mode(self, color_mode):
         """ Sets the output color mode """
@@ -106,20 +114,86 @@ class Renderer:
         self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - widget.padx)))
 
 
-    def get_render_text(self, widget, line, bordered, start_pos):
-        """ Internal function taht computes the scope of the text that should be drawn """
+    def get_render_text(self, widget, line, centered, bordered, start_pos):
+        """ Internal function that computes the scope of the text that should be drawn """
 
         render_text_length = widget.width - (2 * widget.padx)
         if bordered:
             render_text_length = render_text_length - 4
         if len(line) - start_pos < render_text_length:
-            render_text = line[start_pos:]
+            if centered:
+                render_text = '{}'.format(line[start_pos:].center(render_text_length, ' '))
+            else:
+                render_text = '{}{}'.format(line[start_pos:], ' ' * (render_text_length - len(line[start_pos:])))
         else:
             render_text = line[start_pos:start_pos + render_text_length]
-        return render_text
+        render_text_fragments = self.generate_text_color_fragments(widget, line, render_text)
+        return render_text_fragments
 
 
-    def draw_text(self, widget, line, y, centered = False, bordered = True, start_pos = 0):
+    def fix_fragment_list(self, widget, assorted_fragments_list, render_text):
+        output = []
+        current_loc = 0
+        for i in range(0, len(assorted_fragments_list[0])):
+            for j in range(0, len(assorted_fragments_list)):
+                if assorted_fragments_list[j][i][1] != widget.color:
+                    output.append(assorted_fragments_list[j][i])
+            if len(output) != (i + 1):
+                output.append(assorted_fragments_list[j][i])
+        return output
+
+
+    def generate_text_color_fragments(self, widget, line, render_text):
+        text_fragments_list = []
+
+        for color_rule in self.color_rules:
+            # Block colorations are the most powerful.
+            if color_rule.match_type == 'block':
+                if color_rule.check_single_line(line):
+                    text_fragments = [[render_text, color_rule.color]]
+                    return text_fragments
+                elif color_rule.check_match(line) and self.block_color_rule is None:
+                    self.block_color_rule = color_rule
+                    text_fragments = [[render_text, self.block_color_rule.color]]
+                    return text_fragments
+                elif self.block_color_rule is not None:
+                    if self.block_color_rule.check_end_block(line):
+                        text_fragments = [[render_text, self.block_color_rule.color]]
+                        self.block_color_rule = None
+                        return text_fragments
+                
+
+        if self.block_color_rule is not None:
+            text_fragments = [[render_text, self.block_color_rule.color]]
+            return text_fragments
+
+        for color_rule in self.color_rules:
+            # Full line color rules take precendence
+            if color_rule.match_type == 'line':
+                if color_rule.check_match(line):
+                    text_fragments = [[render_text, color_rule.color]]
+                    return text_fragments
+        
+        for color_rule in self.color_rules:
+            if color_rule.match_type == 'regex':
+                text_fragments_list.append(color_rule.generate_fragments_regex(widget, render_text))
+
+        if len(text_fragments_list) > 0:
+            return self.fix_fragment_list(widget, text_fragments_list, render_text)
+
+        for color_rule in self.color_rules:
+            if color_rule.match_type == 'region':
+                if color_rule.check_match(render_text):
+                    return color_rule.split_text_on_region(widget, render_text) 
+
+        if len(text_fragments_list) == 0:
+            text_fragments = []
+            text_fragments.append([render_text, widget.color])
+
+        return text_fragments
+
+
+    def draw_text(self, widget, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
         """
         Function that draws widget text.
 
@@ -139,13 +213,28 @@ class Renderer:
             position to start rendering the text from.
         """
 
-        render_text = self.get_render_text(widget, line, bordered, start_pos)
-        if centered and bordered:
-            render_text = '|{}|'.format(render_text.center(widget.width - widget.padx - 2, ' '))
-        elif centered and not bordered:
-            render_text = '{}'.format(render_text.center(widget.width - widget.padx, ' '))
-        elif not centered and bordered:
-            render_text = '| {}{}|'.format(render_text, ' ' * (widget.width-3 - widget.padx - len(render_text)))
-        else:
-            render_text = '{}{}'.format(render_text, ' ' * (widget.width - widget.padx -len(render_text)))
-        self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
+        render_text = self.get_render_text(widget, line, centered, bordered, start_pos)
+        current_start_x = widget.start_x + widget.padx
+        if bordered:
+            self.stdscr.addstr(y, widget.start_x + widget.padx, '|')
+            current_start_x = current_start_x + 2
+
+        # Each text elem is a list with [text, color]
+        for text_elem in render_text:
+            if text_elem[1] != widget.color:
+                self.set_color_mode(text_elem[1])
+
+            if selected:
+                self.set_color_mode(widget.selected_color)
+
+            self.stdscr.addstr(y, current_start_x, text_elem[0])
+            current_start_x = current_start_x + len(text_elem[0])
+
+            if selected:
+                self.unset_color_mode(widget.selected_color)
+
+            if text_elem[1] != widget.color:
+                self.unset_color_mode(text_elem[1])
+
+        if bordered:
+            self.stdscr.addstr(y, widget.start_x + widget.width - widget.padx, '|')

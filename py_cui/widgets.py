@@ -20,6 +20,7 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 import curses
 import py_cui
+import py_cui.colors
 import py_cui.errors
 
 
@@ -39,12 +40,12 @@ class Widget:
         self.row = row
         self.row_span = row_span
         self.column_span = column_span
-        self.overlap_x = 0
-        self.overlap_y = 0
-        if self.row + self.row_span == self.grid.num_rows:
-            self.overlap_y = self.grid.height % self.grid.num_rows
-        if self.column + self.column_span == self.grid.num_columns:
-            self.overlap_x = self.grid.width % self.grid.num_columns - 1
+        #self.overlap_x = 0
+        #self.overlap_y = 0
+        #if self.row + self.row_span == self.grid.num_rows:
+        #    self.overlap_y = self.grid.height % self.grid.num_rows
+        #if self.column + self.column_span == self.grid.num_columns:
+        #    self.overlap_x = self.grid.width % self.grid.num_columns - 1
         self.padx = padx
         self.pady = pady
         self.start_x, self.start_y = self.get_absolute_position()
@@ -55,6 +56,7 @@ class Widget:
         self.is_selectable = selectable
         self.help_text = 'No help text available.'
         self.key_commands = {}
+        self.text_color_rules = []
 
 
     def set_focus_text(self, text):
@@ -76,6 +78,26 @@ class Widget:
         """
 
         self.key_commands[key] = command
+
+
+    def add_text_color_rule(self, regex_list, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
+        """
+        Forces renderer to draw text using given color if text_condition_function returns True
+
+        Parameters
+        ----------
+        rule_type : string
+            A supported color rule type
+        regex : str
+            A string to check against the line for a given rule type
+        color : int
+            a supported py_cui color value
+        match_entire_line : bool
+            if true, if regex fits rule type, entire line will be colored. If false, only matching text
+        """
+
+        self.text_color_rules.append(py_cui.colors.ColorRule(regex_list, color, rule_type, match_type, region, include_whitespace))
+
 
 
     def set_standard_color(self, color):
@@ -102,18 +124,33 @@ class Widget:
     def get_absolute_position(self):
         """ Gets the absolute position of the widget in characters """
 
-        x_pos = self.column * self.grid.column_width
+        x_adjust = self.column
+        y_adjust = self.row
+        if self.column > self.grid.offset_x:
+            x_adjust = self.grid.offset_x
+        if self.row > self.grid.offset_y:
+            y_adjust = self.grid.offset_y
+
+        x_pos = self.column * self.grid.column_width + x_adjust
         # Always add two to the y_pos, because we have a title bar + a pad row
-        y_pos = self.row * self.grid.row_height + 2
+        y_pos = self.row * self.grid.row_height + 2 + y_adjust
         return x_pos, y_pos
 
 
     def get_absolute_dims(self):
         """ Gets the absolute dimensions of the widget in characters """
 
-        self.width = self.grid.column_width * self.column_span + self.overlap_x
-        self.height = self.grid.row_height * self.row_span + self.overlap_y
-        return self.width, self.height
+        width = self.grid.column_width * self.column_span
+        height = self.grid.row_height * self.row_span
+        counter = self.row
+        while counter < self.grid.offset_y and (counter - self.row) < self.row_span:
+            height = height + 1
+            counter = counter + 1
+        counter = self.column
+        while counter < self.grid.offset_x and (counter - self.column) < self.column_span:
+            width = width + 1
+            counter = counter + 1
+        return width, height
 
 
     def is_row_col_inside(self, row, col):
@@ -133,10 +170,6 @@ class Widget:
 
         self.start_x, self.start_y = self.get_absolute_position()
         self.width, self.height = self.get_absolute_dims()
-        if self.row + self.row_span == self.grid.num_rows:
-            self.overlap_y = self.grid.height % self.grid.num_rows
-        if self.column + self.column_span == self.grid.num_columns:
-            self.overlap_x = self.grid.width % self.grid.num_columns - 1
 
 
     def get_help_text(self):
@@ -162,6 +195,8 @@ class Widget:
 
         if self.renderer is None:
             return
+        else:
+            self.renderer.set_color_rules(self.text_color_rules)
 
 
 class Label(Widget):
@@ -310,14 +345,13 @@ class ScrollMenu(Widget):
             if line_counter < self.top_view:
                 line_counter = line_counter + 1
             else:
-                if line_counter == self.selected_item:
-                    self.renderer.set_color_mode(self.selected_color)
                 if counter >= self.height - self.pady - 1:
                     break
-                self.renderer.draw_text(self, line, self.start_y + counter)
-                counter = counter + 1
                 if line_counter == self.selected_item:
-                    self.renderer.unset_color_mode(self.selected_color)
+                    self.renderer.draw_text(self, line, self.start_y + counter, selected=True)
+                else:
+                    self.renderer.draw_text(self, line, self.start_y + counter)
+                counter = counter + 1
                 line_counter = line_counter + 1
         self.renderer.unset_color_mode(self.color)
         self.renderer.reset_cursor(self)
@@ -355,6 +389,12 @@ class CheckBoxMenu(ScrollMenu):
         for item in self.selected_item_list:
             ret.append(item[6:])
         return ret
+
+
+    def mark_item_as_checked(self, text):
+        """ Function that marks an item as selected """
+
+        self.selected_item_list.append(text)
 
 
     def handle_key_press(self, key_pressed):
@@ -826,5 +866,5 @@ class ScrollTextBlock(Widget):
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
         else:
-            self.renderer.reset_cursor(self, fill=False)
+            self.renderer.reset_cursor(self)
         self.renderer.unset_color_mode(self.color)

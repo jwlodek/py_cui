@@ -10,7 +10,7 @@ Example of using py_cui to create a simple text editor for editing All files in 
 import py_cui
 import os
 import argparse
-
+import py_cui.colors
 
 __version__ = '0.0.1'
 
@@ -33,6 +33,7 @@ class SuperNano:
 
 
         self.edit_text_block = self.root.add_text_block('Open file', 0, 2, row_span=7, column_span=6)
+
         self.new_dir_box.add_key_command(py_cui.keys.KEY_ENTER, self.open_new_directory)
         self.new_file_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.add_new_file)
 
@@ -78,6 +79,10 @@ class SuperNano:
             self.open_new_directory()
         else:
             try:
+                if filename.endswith('.py'):
+                    self.edit_text_block.text_color_rules = py_cui.colors.get_python_highlighting_rules()
+                else:
+                    self.edit_text_block.text_color_rules = []
                 fp = open(os.path.join(self.dir, filename), 'r')
                 text = fp.read()
                 fp.close()
