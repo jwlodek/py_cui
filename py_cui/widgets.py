@@ -124,9 +124,16 @@ class Widget:
     def get_absolute_position(self):
         """ Gets the absolute position of the widget in characters """
 
-        x_pos = self.column * self.grid.column_width
+        x_adjust = self.column
+        y_adjust = self.row
+        if self.column > self.grid.offset_x:
+            x_adjust = self.grid.offset_x
+        if self.row > self.grid.offset_y:
+            y_adjust = self.grid.offset_y
+
+        x_pos = self.column * self.grid.column_width + x_adjust
         # Always add two to the y_pos, because we have a title bar + a pad row
-        y_pos = self.row * self.grid.row_height + 2
+        y_pos = self.row * self.grid.row_height + 2 + y_adjust
         return x_pos, y_pos
 
 
@@ -135,10 +142,14 @@ class Widget:
 
         width = self.grid.column_width * self.column_span
         height = self.grid.row_height * self.row_span
-        if self.grid.offset_y < self.row:
+        counter = self.row
+        while counter < self.grid.offset_y and (counter - self.row) < self.row_span:
             height = height + 1
-        if self.grid.offset_x < self.column:
+            counter = counter + 1
+        counter = self.column
+        while counter < self.grid.offset_x and (counter - self.column) < self.column_span:
             width = width + 1
+            counter = counter + 1
         return width, height
 
 
