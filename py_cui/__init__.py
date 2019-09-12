@@ -105,7 +105,6 @@ class PyCUI:
         self.height = term_size.lines
         self.width = term_size.columns
         self.height = self.height - 4
-        self.width = self.width - 1
         self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
         self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
         self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
@@ -439,7 +438,7 @@ class PyCUI:
             # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
             height, width = stdscr.getmaxyx()
             height = height - 4
-            width = width - 1
+            width = width
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
             #if height != self.height or width != self.width:
 

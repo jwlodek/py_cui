@@ -54,10 +54,10 @@ class Renderer:
         
         if fill:
             cursor_y = widget.start_y + widget.height - widget.pady - 1
-            cursor_x = widget.start_x + widget.width - widget.padx + 1
+            cursor_x = widget.start_x + widget.width - 2*widget.padx + 1
         else:
             cursor_y = widget.start_y + int(widget.height / 2) + 2
-            cursor_x = widget.start_x + widget.width - widget.padx + 1
+            cursor_x = widget.start_x + widget.width - 2*widget.padx + 1
         try:
             self.stdscr.move(cursor_y, cursor_x)
         except:
@@ -99,19 +99,19 @@ class Renderer:
         """ Internal function for drawing top of border """
 
         if not with_title or (len(widget.title) + 4 >= widget.width - 2 * widget.padx):
-            self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - widget.padx)))
+            self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
         else:
-            self.stdscr.addstr(y, widget.start_x + widget.padx, '+--{}{}+'.format(widget.title, '-' * (widget.width - 4 - widget.padx - len(widget.title))))
+            self.stdscr.addstr(y, widget.start_x + widget.padx, '+--{}{}+'.format(widget.title, '-' * (widget.width - 4 - 2*widget.padx - len(widget.title))))
 
     def draw_border_bottom(self, widget, y):
         """ Internal function for drawing bottom of border """
 
-        self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - widget.padx)))
+        self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
 
     def draw_blank_row(self, widget, y):
         """ Internal function for drawing a blank row """
 
-        self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - widget.padx)))
+        self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - 2*widget.padx)))
 
 
     def get_render_text(self, widget, line, centered, bordered, start_pos):
@@ -237,4 +237,4 @@ class Renderer:
                 self.unset_color_mode(text_elem[1])
 
         if bordered:
-            self.stdscr.addstr(y, widget.start_x + widget.width - widget.padx, '|')
+            self.stdscr.addstr(y, widget.start_x + widget.width - 2 * widget.padx, '|')
