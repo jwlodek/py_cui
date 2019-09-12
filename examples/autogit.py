@@ -32,12 +32,17 @@ class AutoGitCUI:
 
         self.dir = os.path.abspath(self.dir)
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
-        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=3, column_span=2)
+        self.root.add_key_binding(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
+        self.root.add_key_binding(py_cui.keys.KEY_L_LOWER, self.show_log)
+        self.root.add_key_binding(py_cui.keys.KEY_A_LOWER, self.add_all)
+        self.root.add_key_binding(py_cui.keys.KEY_E_LOWER, self.open_editor)
+        self.root.set_status_bar_text('q - Quit | r - Refresh | a - Add All | l - Git Log | e - Open Editor')
+        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=5, column_span=2)
         self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
-        self.branch_menu = self.root.add_scroll_menu('Git Branches', 3, 0, row_span=3, column_span=2, pady=1)
+        self.branch_menu = self.root.add_scroll_menu('Git Branches', 5, 0, row_span=3, column_span=2, pady=1)
 
         self.refresh_git_status()
 
@@ -49,12 +54,6 @@ class AutoGitCUI:
         #self.tag_textbox = self.root.add_text_box('New Tag', 9, 5, column_span=3)
         self.new_branch_textbox = self.root.add_text_box('New Branch', 8, 0, column_span=2)
         self.commit_message_box = self.root.add_text_box('Commit Message', 8, 2, column_span=6)
-
-
-        self.add_all_button = self.root.add_button('Add All', 6, 0, command=self.add_all)
-        self.open_editor_button = self.root.add_button('Open Editor', 6, 1, command=self.open_editor)
-        self.refresh_button = self.root.add_button('Refresh', 7, 0, command=self.refresh_git_status)
-        self.log_button = self.root.add_button('Git Log', 7, 1, command=self.show_log)
         
 
         self.add_files_menu.add_key_command(py_cui.keys.KEY_ENTER, self.add_revert_file)
