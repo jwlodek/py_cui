@@ -8,6 +8,7 @@ A python library for creating command line based user interfaces.
 # Some python core library imports
 import sys
 import os
+import time
 import shutil       # We use shutil for getting the terminal dimensions
 import threading
 
@@ -116,6 +117,8 @@ class PyCUI:
         self.in_focused_mode = False
         self.popup = None
         self.auto_focus_buttons = auto_focus_buttons
+
+        self.loading = False
 
         self.keybindings = {}
         self.exit_key = exit_key
@@ -322,16 +325,39 @@ class PyCUI:
         self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color)
 
 
-    def show_yes_no_popup(self, title, text, command):
+    def show_yes_no_popup(self, title, command):
 
         color=WHITE_ON_BLACK
         self.popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command)
 
 
+    def show_loading_icon_popup(self, title, message):
+    
+        color = WHITE_ON_BLACK
+        self.loading = True
+        self.popup = py_cui.popups.LoadingPopup(self, title, message, color)
+
+
+    def show_loading_bar_popup(self, title, num_items):
+        color = WHITE_ON_BLACK
+        self.loading = True
+        self.popup = py_cui.popups.LoadingBarPopup(self, title, num_items, color)
+
+
+    def increment_loading_bar(self):
+        if self.popup is not None:
+            if isinstance(self.popup, py_cui.popups.LoadingBarPopup):
+                self.popup.completed_items = self.popup.completed_items + 1
+
+
+    def stop_loading_popup(self):
+        self.loading = False
+        self.close_popup()
+
+
     def close_popup(self):
         """ Closes the popup, and resets focus """
 
-        self.popup_ret = self.popup.ret_val
         self.lose_focus()
         self.popup = None
 
@@ -370,12 +396,12 @@ class PyCUI:
             stdscr.attroff(curses.color_pair(self.title_bar.color))
 
 
-    def display_window_size_warning(self, stdscr):
+    def display_window_warning(self, stdscr, error_info):
             try:
                 stdscr.clear()
                 stdscr.attron(curses.color_pair(RED_ON_BLACK))
-                stdscr.addstr(0, 0, 'Error displaying CUI...')
-                stdscr.addstr(1, 0, 'Window may be too small!')
+                stdscr.addstr(0, 0, 'Error displaying CUI!!!')
+                stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
                 stdscr.attroff(curses.color_pair(RED_ON_BLACK))
             except:
                 pass
@@ -463,28 +489,32 @@ class PyCUI:
                     self.grid.update_grid_height_width(self.height, self.width)
                     for widget_id in self.widgets.keys():
                         self.widgets[widget_id].update_height_width()
-                except:
-                    self.display_window_size_warning(stdscr)
+                except Exception as e:
+                    self.display_window_warning(stdscr, str(e))
 
             # Handle keypresses
             self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            #try:
-            #    self.draw_status_bars(stdscr, height, width)
-            #    self.draw_widgets(stdscr)
-            #except:
-            #    self.display_window_size_warning(stdscr)
-
-            self.draw_status_bars(stdscr, height, width)
-            self.draw_widgets(stdscr)
-
+            try:
+                self.draw_status_bars(stdscr, height, width)
+                self.draw_widgets(stdscr)
                 # draw the popup if required
-            if self.popup is not None:
-                self.popup.draw(stdscr)
+                if self.popup is not None:
+                    self.popup.draw(stdscr)
+            except Exception as e:
+                self.display_window_warning(stdscr, str(e))
 
-                # Refresh the screen
+            #self.draw_status_bars(stdscr, height, width)
+            #self.draw_widgets(stdscr)
+
+            # Refresh the screen
             stdscr.refresh()
 
             # Wait for next input
-            key_pressed = stdscr.getch()
+            if self.loading:
+                time.sleep(0.25)
+                # Need to reset key_pressed, because otherwise the previously pressed key will be used.
+                key_pressed = py_cui.keys.KEY_ESCAPE
+            else:
+                key_pressed = stdscr.getch()

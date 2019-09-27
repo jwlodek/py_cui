@@ -43,15 +43,18 @@ class AutoGitCUI:
         self.root.set_status_bar_text('Quit - q | Refresh - r | Add all - a | Git log - l | Open Editor - e | Pull Branch - f | Push Branch - p')
 
         # Create the add files menu. Add color rules to color first characters based on git status
-        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=3, column_span=2)
+        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=2, column_span=2)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
         # Remotes menu
-        self.git_remotes_menu =self.root.add_scroll_menu('Git Remotes', 3, 0, row_span=2, column_span=2, pady=1)
+        self.git_remotes_menu =self.root.add_scroll_menu('Git Remotes', 2, 0, row_span=2, column_span=2)
 
         # Branches menu
-        self.branch_menu = self.root.add_scroll_menu('Git Branches', 5, 0, row_span=2, column_span=2, pady=1)
+        self.branch_menu = self.root.add_scroll_menu('Git Branches', 4, 0, row_span=2, column_span=2)
+
+        # Commits menu
+        self.git_commits_menu = self.root.add_scroll_menu('Recent Commits', 6, 0, row_span=2, column_span=2)
 
         # Initialize the menus with current repo git info
         self.refresh_git_status()
@@ -61,7 +64,8 @@ class AutoGitCUI:
         self.diff_text_block.add_text_color_rule(['+'], py_cui.GREEN_ON_BLACK, 'startswith')
         self.diff_text_block.add_text_color_rule(['-'], py_cui.RED_ON_BLACK, 'startswith')
         self.diff_text_block.add_text_color_rule(['commit'], py_cui.YELLOW_ON_BLACK, 'startswith')
-
+        self.diff_text_block.add_text_color_rule(['Copyright'], py_cui.CYAN_ON_BLACK, 'startswith')
+        self.diff_text_block.set_text(self.get_logo())
         
         # Textboxes for new branches and commits
         self.new_branch_textbox = self.root.add_text_box('New Branch', 8, 0, column_span=2)
@@ -75,6 +79,10 @@ class AutoGitCUI:
         # Enter will show remote info
         self.git_remotes_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_remote_info)
 
+        # Enter will show commit diff
+        self.git_commits_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_git_commit_diff)
+        self.git_commits_menu.add_text_color_rule([' '], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,7], include_whitespace=True)
+
         # Enter will checkout 
         self.branch_menu.add_key_command(py_cui.keys.KEY_ENTER, self.checkout_branch)
         self.branch_menu.add_key_command(py_cui.keys.KEY_SPACE, self.show_log)
@@ -84,18 +92,33 @@ class AutoGitCUI:
         self.commit_message_box.add_key_command(py_cui.keys.KEY_ENTER, self.ask_to_commit)
 
 
-    """
-    def create_new_tag(self):
-        tagname = self.tag_textbox.get()
+    def get_logo(self):
+        logo =         "         _    _ _______ ____   _____ _____ _______\n" 
+        logo = logo +  "    /\\  | |  | |__   __/ __ \\ / ____|_   _|__   __|\n"
+        logo = logo +  "   /  \\ | |  | |  | | | |  | | |  __  | |    | |   \n"
+        logo = logo +  "  / /\\ \\| |  | |  | | | |  | | | |_ | | |    | |   \n"
+        logo = logo +  " / ____ \\ |__| |  | | | |__| | |__| |_| |_   | |   \n"
+        logo = logo +  "/_/    \\_\\____/   |_|  \\____/ \\_____|_____|  |_|   \n\n\n"
+        logo = logo + "Powered by the py_cui Python Command Line UI Library:\n\n"
+        logo = logo + "https://github.com/jwlodek/py_cui\n\n"
+        logo = logo + "Documentation available online here: \n\n"
+        logo = logo + "Video utorial available here:\n\n"
+        logo = logo + "Tutorial building CUI interfaces with py_cui here: \n\n"
+        logo = logo + "Star me on Github!\n\n"
+        logo = logo + "Copyright (c) 2019 Jakub Wlodek\n\n"
+        return logo
+                                                  
+
+    def show_git_commit_diff(self):
         try:
-            proc = Popen(['git', 'tag', tagname], stdout=PIPE, stderr=PIPE)
+            commit_val = self.git_commits_menu.get()[:7]
+            proc = Popen(['git', 'diff', commit_val], stdout=PIPE, stderr=PIPE)
             out, err = proc.communicate()
-            res = proc.returncode
-            if res != 0:
-                self.root.show_error_popup('Tag Failed', '{}'.format(err))
+            out = out.decode()
+            self.diff_text_block.title = 'Git Diff for {}'.format(commit_val)
+            self.diff_text_block.set_text(out)
         except:
-            self.root.show_warning_popup('Git Failed', 'Unable to reset file, please check git installation')
-    """
+            self.root.show_warning_popup('Git Failed', 'Unable to read commit diff information')
 
     def add_all(self):
         try:
@@ -116,7 +139,6 @@ class AutoGitCUI:
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Error', 'Unable to open git remote info, please check git installation')
-
 
 
     def open_editor(self):
@@ -157,7 +179,8 @@ class AutoGitCUI:
 
 
     def ask_to_commit(self):
-        self.root.show_yes_no_popup('Would you like to commit?', 'Commit?', self.commit_changes)
+        self.root.show_yes_no_popup('Would you like to commit?', self.commit_changes)
+
 
     def commit_changes(self, commit):
         if(commit):
@@ -174,6 +197,8 @@ class AutoGitCUI:
             self.refresh_git_status(preserve_selected=True)
             self.commit_message_box.clear()
             self.root.show_message_popup('Success', 'Commited: {}'.format(message))
+        else:
+            self.root.show_message_popup('Cancelled', 'Commit Operation cancelled')
 
 
     def checkout_branch(self):
@@ -225,12 +250,16 @@ class AutoGitCUI:
     def refresh_git_status(self, preserve_selected=False):
 
         try:
-            selected_branch = self.branch_menu.selected_item
             proc = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE)
             out, err = proc.communicate()
             out = out.decode().splitlines()
             self.branch_menu.clear()
             self.branch_menu.add_item_list(out)
+            selected_branch = 0
+            for branch in self.branch_menu.get_item_list():
+                if branch.startswith('*'):
+                    break
+                selected_branch = selected_branch + 1
 
             remote = self.git_remotes_menu.selected_item
             proc = Popen(['git', 'remote'], stdout=PIPE, stderr=PIPE)
@@ -238,6 +267,12 @@ class AutoGitCUI:
             out = out.decode().splitlines()
             self.git_remotes_menu.clear()
             self.git_remotes_menu.add_item_list(out)
+
+            proc = Popen(['git', '--no-pager', 'log', self.branch_menu.get()[2:], '--oneline'], stdout=PIPE, stderr=PIPE)
+            out, err = proc.communicate()
+            out = out.decode().splitlines()
+            self.git_commits_menu.clear()
+            self.git_commits_menu.add_item_list(out)
 
             selected_file = self.add_files_menu.selected_item
             proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
