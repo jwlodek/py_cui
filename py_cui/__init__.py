@@ -121,6 +121,8 @@ class PyCUI:
         self.exit_key = exit_key
 
 
+
+
     # Initialization functions
     # Used to initialzie CUI and its features
 
@@ -130,12 +132,15 @@ class PyCUI:
 
         curses.wrapper(self.draw)
 
+
     def set_title(self, title):
         self.title = title
+
 
     def set_status_bar_text(self, text):
         self.init_status_bar_text = text
         self.status_bar.set_text(text)
+
 
     def initialize_colors(self):
         """ Function for initialzing curses colors """
@@ -302,17 +307,25 @@ class PyCUI:
         color=WHITE_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, title, text, color)
 
+
     def show_warning_popup(self, title, text):
         """ Shows a warning popup """
 
         color=YELLOW_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color)
 
+
     def show_error_popup(self, title, text):
         """ Shows an error popup """
 
         color=RED_ON_BLACK
         self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color)
+
+
+    def show_yes_no_popup(self, title, text, command):
+
+        color=WHITE_ON_BLACK
+        self.popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command)
 
 
     def close_popup(self):

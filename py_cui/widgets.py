@@ -443,7 +443,7 @@ class Button(Widget):
             self.renderer.set_color_mode(self.color)
         self.renderer.draw_border(self, with_title=False)
         button_text_y_pos = self.start_y + int(self.height / 2)
-        self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True)
+        self.renderer.draw_text(self, self.title, button_text_y_pos, centered=True, selected=self.selected)
         self.renderer.reset_cursor(self)
         if self.selected:
             self.renderer.unset_color_mode(self.selected_color)
@@ -584,7 +584,7 @@ class TextBox(Widget):
                 render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
             else:
                 render_text = self.text[end:]
-        self.renderer.draw_text(self, render_text, self.cursor_y)
+        self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
 
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
@@ -861,7 +861,7 @@ class ScrollTextBlock(Widget):
             if line_counter == len(self.text_lines):
                 break
             render_text = self.text_lines[line_counter]
-            self.renderer.draw_text(self, render_text, counter, start_pos=self.viewport_x_start)
+            self.renderer.draw_text(self, render_text, counter, start_pos=self.viewport_x_start, selected=self.selected)
             counter = counter + 1
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)

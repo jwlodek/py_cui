@@ -110,18 +110,24 @@ class MessagePopup(Popup):
 # UNIMPLEMENTED
 #
 ###########################################################
-"""
+
+
+
 class YesNoPopup(Popup):
-    def __init__(self, root, title, text, height, width, color):
-        super().__init__(root, title, text, height, width, color)
+    def __init__(self, root, title, text, color, command):
+        super().__init__(root, title, text, color)
+        self.command = command
 
     def handle_key_press(self, key_pressed):
-        if key_pressed == ord('Y') or key_pressed == ord('y'):
+        if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
             self.ret_val = True
-            self.root.close_popup()
-        elif key_pressed == ord('N') or key_pressed == ord('n'):
+        elif key_pressed == py_cui.keys.KEY_N_UPPER or key_pressed == py_cui.keys.KEY_N_LOWER:
             self.ret_val = False
-            self.root.close_popup()
+
+        if self.command is not None:
+            self.command(self.ret_val)
+
+        self.root.close_popup()
 
 
     def draw(self, stdscr):
@@ -141,4 +147,3 @@ class YesNoPopup(Popup):
         stdscr.addstr(self.stop_y, self.start_x, '+-{}-+'.format('-' * (width - 4)))
         stdscr.attroff(curses.color_pair(self.color))
         stdscr.attroff(curses.A_BOLD)
-"""
