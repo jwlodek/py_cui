@@ -82,6 +82,9 @@ class Renderer:
             flag that tells whether or not to draw widget title
         """
 
+        if widget.selected:
+            self.stdscr.attron(curses.A_BOLD)
+
         if fill:
             border_y_start = widget.start_y + widget.pady
             border_y_stop = widget.start_y + widget.height - widget.pady - 1
@@ -93,6 +96,9 @@ class Renderer:
         for i in range(border_y_start + 1, border_y_stop):
             self.draw_blank_row(widget, i)
         self.draw_border_bottom(widget, border_y_stop)
+
+        if widget.selected:
+            self.stdscr.attroff(curses.A_BOLD)
 
 
     def draw_border_top(self, widget, y, with_title):
@@ -215,9 +221,15 @@ class Renderer:
 
         render_text = self.get_render_text(widget, line, centered, bordered, start_pos)
         current_start_x = widget.start_x + widget.padx
+        if widget.selected:
+            self.stdscr.attron(curses.A_BOLD)
+
         if bordered:
             self.stdscr.addstr(y, widget.start_x + widget.padx, '|')
             current_start_x = current_start_x + 2
+
+        if widget.selected:
+            self.stdscr.attroff(curses.A_BOLD)
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
@@ -225,16 +237,24 @@ class Renderer:
                 self.set_color_mode(text_elem[1])
 
             if selected:
-                self.set_color_mode(widget.selected_color)
+                #self.set_color_mode(widget.selected_color)
+                self.stdscr.attron(curses.A_BOLD)
 
             self.stdscr.addstr(y, current_start_x, text_elem[0])
             current_start_x = current_start_x + len(text_elem[0])
 
             if selected:
-                self.unset_color_mode(widget.selected_color)
+                #self.unset_color_mode(widget.selected_color)
+                self.stdscr.attroff(curses.A_BOLD)
 
             if text_elem[1] != widget.color:
                 self.unset_color_mode(text_elem[1])
 
+        if widget.selected:
+            self.stdscr.attron(curses.A_BOLD)
+
         if bordered:
             self.stdscr.addstr(y, widget.start_x + widget.width - 2 * widget.padx, '|')
+
+        if widget.selected:
+            self.stdscr.attroff(curses.A_BOLD)

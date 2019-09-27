@@ -335,9 +335,9 @@ class PyCUI:
 
         # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
         if self.selected_widget is not None:
-            stdscr.attron(curses.A_BOLD)
+            #stdscr.attron(curses.A_BOLD)
             self.widgets[self.selected_widget].draw()
-            stdscr.attroff(curses.A_BOLD)
+            #stdscr.attroff(curses.A_BOLD)
 
 
     def draw_status_bars(self, stdscr, height, width):

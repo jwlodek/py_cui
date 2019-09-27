@@ -17,9 +17,11 @@ __version__ = '0.0.1'
 
 class AutoGitCUI:
 
-    def __init__(self, root, dir):
+    def __init__(self, root, dir, user, passwd):
         self.root = root
         self.dir = dir
+        self.user = user
+        self.passwd = passwd
         os.chdir(self.dir)
         proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
         while proc.returncode is None:
@@ -32,36 +34,55 @@ class AutoGitCUI:
 
         self.dir = os.path.abspath(self.dir)
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
+
+        # Keybindings when in overview mode, and set info bar
         self.root.add_key_binding(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
         self.root.add_key_binding(py_cui.keys.KEY_L_LOWER, self.show_log)
         self.root.add_key_binding(py_cui.keys.KEY_A_LOWER, self.add_all)
         self.root.add_key_binding(py_cui.keys.KEY_E_LOWER, self.open_editor)
-        self.root.set_status_bar_text('q - Quit | r - Refresh | a - Add All | l - Git Log | e - Open Editor')
-        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=5, column_span=2)
-        self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
+        self.root.add_key_binding(py_cui.keys.KEY_F_LOWER, self.fetch_branch)
+        self.root.add_key_binding(py_cui.keys.KEY_P_LOWER, self.push_branch)
+        self.root.set_status_bar_text('Quit - q | Refresh - r | Add all - a | Git log - l | Open Editor - e | Pull Branch - f | Push Branch - p')
+
+        # Create the add files menu. Add color rules to color first characters based on git status
+        self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=3, column_span=2)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
+        # Remotes menu
+        self.remotes_menu =self.root.add_scroll_menu('Git Remotes', 3, 0, rowspan=2, column_span=2, pady=1)
+
+        # Branches menu
         self.branch_menu = self.root.add_scroll_menu('Git Branches', 5, 0, row_span=3, column_span=2, pady=1)
 
+        # Initialize the menus with current repo git info
         self.refresh_git_status()
 
+        # Our text block for statuses etc.
         self.diff_text_block = self.root.add_text_block('Git Info', 0, 2, row_span=8, column_span=6)
         self.diff_text_block.add_text_color_rule(['+'], py_cui.GREEN_ON_BLACK, 'startswith')
         self.diff_text_block.add_text_color_rule(['-'], py_cui.RED_ON_BLACK, 'startswith')
         self.diff_text_block.add_text_color_rule(['commit'], py_cui.YELLOW_ON_BLACK, 'startswith')
 
-        #self.tag_textbox = self.root.add_text_box('New Tag', 9, 5, column_span=3)
+        
+        # Textboxes for new branches and commits
         self.new_branch_textbox = self.root.add_text_box('New Branch', 8, 0, column_span=2)
         self.commit_message_box = self.root.add_text_box('Commit Message', 8, 2, column_span=6)
-        
 
+        # Key commands for our file menus. Enter will git add, Space will show diff
         self.add_files_menu.add_key_command(py_cui.keys.KEY_ENTER, self.add_revert_file)
         self.add_files_menu.add_key_command(py_cui.keys.KEY_SPACE, self.open_git_diff)
+        self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
+
+        # Enter will show remote info
+        self.git_remotes_menu.add_key_command(py_cui.KEY_ENTER, self.show_remote_info)
+
+        # Enter will checkout 
         self.branch_menu.add_key_command(py_cui.keys.KEY_ENTER, self.checkout_branch)
+
+        # Add commands for committing and branch checkout.
         self.new_branch_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.create_new_branch)
         self.commit_message_box.add_key_command(py_cui.keys.KEY_ENTER, self.commit_changes)
-        #self.tag_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.create_new_tag)
 
 
     """
@@ -191,21 +212,37 @@ class AutoGitCUI:
             self.branch_menu.clear()
             self.branch_menu.add_item_list(out)
 
+            remote = self.git_remotes_menu.selected_item
+            proc = Popen(['git', 'remote'], stdout=PIPE, stderr=PIPE)
+            out, err = proc.communicate()
+            out = out.decode().splitlines()
+            self.git_remotes_menu.clear()
+            self.git_remotes_menu.add_item_list(out)
+
             selected_file = self.add_files_menu.selected_item
             proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
             out, err = proc.communicate()
             out = out.decode().splitlines()
             self.add_files_menu.clear()
             self.add_files_menu.add_item_list(out)
+
             if preserve_selected:
                 if len(self.branch_menu.get_item_list()) > selected_branch:
                     self.branch_menu.selected_item = selected_branch
+                if len(self.git_remotes_menu.get_item_list()) > remote:
+                    self.git_remotes_menu.selected_item = remote
                 if len(self.add_files_menu.get_item_list()) > selected_file:
                     self.add_files_menu.selected_item = selected_file
 
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to get git status, please check git installation')
 
+
+    def fetch_branch(self):
+
+
+    def push_branch(self):
+        
 
 
 def parse_args():
