@@ -81,7 +81,7 @@ class AutoGitCUI:
 
         # Add commands for committing and branch checkout.
         self.new_branch_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.create_new_branch)
-        self.commit_message_box.add_key_command(py_cui.keys.KEY_ENTER, self.commit_changes)
+        self.commit_message_box.add_key_command(py_cui.keys.KEY_ENTER, self.ask_to_commit)
 
 
     """
