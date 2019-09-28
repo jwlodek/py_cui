@@ -8,7 +8,7 @@ def test_move_right():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     text_box.move_right()
     assert text_box.cursor_text_pos == 1
-    assert text_box.cursor_x == 14
+    assert text_box.cursor_x == 13
 
 
 def test_move_left_side():
@@ -25,15 +25,15 @@ def test_clear():
     text_box.clear()
     assert text_box.get() == ''
     assert text_box.cursor_text_pos == 0
-    assert text_box.cursor_x == 13
+    assert text_box.cursor_x == 12
 
 def test_get_initial():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     assert text_box.cursor_text_pos == 0
-    assert text_box.cursor_x == 13
+    assert text_box.cursor_x == 12
     assert text_box.get() == 'Hello World'
-    assert text_box.cursor_max_left == 13
-    assert text_box.cursor_max_right == 28
+    assert text_box.cursor_max_left == 12
+    assert text_box.cursor_max_right == 27
 
 
 
@@ -71,7 +71,7 @@ def test_jump_to_start():
     text_box.jump_to_start()
     assert text_box.get() == 'Hello World'
     assert text_box.cursor_text_pos == 0
-    assert text_box.cursor_x == 13
+    assert text_box.cursor_x == 12
 
 
 def test_jump_to_end():
@@ -86,13 +86,13 @@ def test_move_right_overflow():
     for i in range(0, 20):
         text_box.move_right()
     assert text_box.cursor_text_pos == 14
-    assert text_box.cursor_x == text_box.cursor_max_left + 7
+    assert text_box.cursor_x == text_box.cursor_max_left + 5
 
 def test_move_left_overflow():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     text_box.move_left()
     assert text_box.cursor_text_pos == 0
-    assert text_box.cursor_x == 13
+    assert text_box.cursor_x == 12
 
 def test_set_text():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')

@@ -6,7 +6,7 @@
 
 A **py**thon library for creating **c**ommand line **u**ser **i**nterfaces.
 
-### What is it and why is it?
+### What is py_cui?
 
 `py_cui` is a python library meant to simplify writing command line user interfaces in python. It relies on the `curses` module, which is traditionally a unix-specific python module, however, I was able to use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
 
@@ -14,13 +14,32 @@ The main advantage `py_cui` has over traditional command line user interfaces is
 
 If you would like to contribute, feel free to make an issue or pull request after reading through the `CONTRIBUTING.md` file.
 
+### Installation
+
+You may install `py_cui` via pip:
+```
+pip install py_cui
+```
+Make sure to run as root/sudo as required.
+
+If you would like to use `py_cui` directly from source, clone this repository with:
+```
+git clone https://github.com/jwlodek/py_cui
+```
+Then build/install with `pip`:
+```
+cd py_cui
+pip install .
+```
+If you would like to try it out without installing, first make sure that `curses` is installed (`windows-curses` if on windows), and then copy one of the example files into the top directory. You may then simply run it with `python3`.
+
 ### PyCUI Examples
 
 Below are some screenshots from examples written with py_cui. Source code is available for both in the `examples` directory.
 
 **Todo List**
 <p align="center">
-    <img src="docs/assets/todo_demo.png">
+    <img src="docs/assets/demo_todo.png">
 </p>
 
 **Autogit - a command line interface for managing git repositories**
@@ -64,25 +83,6 @@ When in focus mode, you enter into a particular widget (For example a text box.)
 **Popup Mode**
 
 Popup mode simply displays a popup over the rest of the UI. Each popup type behaves slightly differently. For example, you may exit an info popup mode by pressing `Space`, `Enter`, or `Escape`, while a loading popup will remain onscreen until whatever operation is being run is terminated.
-
-### Installation
-
-You may install `py_cui` via pip:
-```
-pip install py_cui
-```
-Make sure to run as root/sudo as required.
-
-If you would like to use `py_cui` directly from source, clone this repository with:
-```
-git clone https://github.com/jwlodek/py_cui
-```
-Then build/install with `pip`:
-```
-cd py_cui
-pip install .
-```
-If you would like to try it out without installing, first make sure that `curses` is installed (`windows-curses` if on windows), and then copy one of the example files into the top directory. You may then simply run it with `python3`.
 
 ### Unit Tests
 
