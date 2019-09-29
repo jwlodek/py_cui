@@ -63,20 +63,6 @@ class Popup:
     def draw(self, stdscr):
         """ Must be implemented by subclass """
 
-        pass
-
-
-class MessagePopup(Popup):
-
-    def __init__(self, root, title, text, color):
-        super().__init__(root, title, text, color)
-        
-
-    def handle_key_press(self, key_pressed):
-        if (key_pressed == 10 or key_pressed == 32 or key_pressed == 27):
-            self.root.close_popup()
-
-    def draw(self, stdscr):
         stdscr.attron(curses.color_pair(self.color))
         target_y = int(self.stop_y - self.start_y / 2)
         width = self.stop_x - self.start_x
@@ -102,6 +88,20 @@ class MessagePopup(Popup):
         stdscr.attroff(curses.A_BOLD)
 
 
+class MessagePopup(Popup):
+
+    def __init__(self, root, title, text, color):
+        super().__init__(root, title, text, color)
+        
+
+    def handle_key_press(self, key_pressed):
+        if (key_pressed == 10 or key_pressed == 32 or key_pressed == 27):
+            self.root.close_popup()
+
+    def draw(self, stdscr):
+        super().draw(stdscr)
+
+
 ###########################################################
 #
 # Below popups require some form of blocking + return,
@@ -110,35 +110,71 @@ class MessagePopup(Popup):
 # UNIMPLEMENTED
 #
 ###########################################################
-"""
+
+
+
 class YesNoPopup(Popup):
-    def __init__(self, root, title, text, height, width, color):
-        super().__init__(root, title, text, height, width, color)
+
+    def __init__(self, root, title, text, color, command):
+        super().__init__(root, title, text, color)
+        self.command = command
 
     def handle_key_press(self, key_pressed):
-        if key_pressed == ord('Y') or key_pressed == ord('y'):
+        valid_pressed = False
+        if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
             self.ret_val = True
-            self.root.close_popup()
-        elif key_pressed == ord('N') or key_pressed == ord('n'):
+            valid_pressed = True
+        elif key_pressed == py_cui.keys.KEY_N_UPPER or key_pressed == py_cui.keys.KEY_N_LOWER:
             self.ret_val = False
+            valid_pressed = True
+
+        if valid_pressed:
             self.root.close_popup()
+            if self.command is not None:
+                self.command(self.ret_val)
+            else:
+                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
 
     def draw(self, stdscr):
-        stdscr.attron(curses.color_pair(self.color))
-        target_y = int(self.stop_y - self.start_y / 2)
-        width = self.stop_x - self.start_x
+        super().draw(stdscr)
 
-        stdscr.attron(curses.A_BOLD)
-        stdscr.addstr(self.start_y, self.start_x, '+-{}-+'.format('-' * (width - 4 )))
-        for i in range(self.start_y + 1, target_y - 2):
-            stdscr.addstr(i, self.start_x, '|{}|'.format(' ' * (width - 2)))
-        stdscr.addstr(target_y - 2, self.start_x, '|{}|'.format(self.title.center(width - 2, ' ')))
-        stdscr.addstr(target_y - 1, self.start_x, '|{}|'.format(' ' * (width - 2)))
-        stdscr.addstr(target_y, self.start_x, '|{}|'.format(self.text.center(width - 2, ' ')))
-        for i in range(target_y + 1, self.stop_y):
-            stdscr.addstr(i, self.start_x, '|{}|'.format(' ' * (width - 2)))
-        stdscr.addstr(self.stop_y, self.start_x, '+-{}-+'.format('-' * (width - 4)))
-        stdscr.attroff(curses.color_pair(self.color))
-        stdscr.attroff(curses.A_BOLD)
-"""
+
+
+class TextBoxPopup(Popup):
+    pass
+
+
+class MenuPopup(Popup):
+    pass
+
+
+class LoadingIconPopup(Popup):
+    def __init__(self, root, title, message, color):
+        super().__init__(root, title, '{} ... \\'.format(message), color)
+        self.loading_icons = ['\\', '|', '/', '-']
+        self.icon_counter = 0
+        self.message = message
+
+    def draw(self, stdscr):
+        self.text = '{} ... {}'.format(self.message, self.loading_icons[self.icon_counter])
+        self.icon_counter = self.icon_counter + 1
+        if self.icon_counter == len(self.loading_icons):
+            self.icon_counter = 0
+        super().draw(stdscr)
+
+
+class LoadingBarPopup(Popup):
+    def __init__(self, root, title, num_items, color):
+        super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color)
+        self.loading_icons = ['\\', '|', '/', '-']
+        self.icon_counter = 0
+        self.num_items = num_items
+        self.completed_items = 0
+
+    def draw(self, stdscr):
+        if self.completed_items == self.num_items:
+            self.root.stop_loading_popup()
+
+        self.text = '{}{} ({}/{})'.format('#' * self.completed_items, '-' * (self.num_items - self.completed_items), self.completed_items, self.num_items)
+        super().draw(stdscr)

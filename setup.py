@@ -1,8 +1,12 @@
 import setuptools
-
+from sys import platform
 
 with open('README.md', 'r') as readme_fp:
     long_description = readme_fp.read()
+
+required_libraries = []
+if sys == 'win32':
+    required_libraries.append('windows-curses')
 
 
 setuptools.setup(
@@ -14,9 +18,10 @@ setuptools.setup(
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
     packages=['py_cui'],
+    install_requires=required_libraries,
     url='https://github.com/jwlodek/py_cui',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         
         'Programming Language :: Python :: 3.2',
