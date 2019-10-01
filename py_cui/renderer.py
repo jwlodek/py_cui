@@ -25,6 +25,12 @@ class Renderer:
         self.block_color_rule = None
 
 
+    def set_bold(self):
+        self.stdscr.attron(curses.A_BOLD)
+
+    def unset_bold(self):
+        self.stdscr.attroff(curses.A_BOLD)
+
     def set_color_rules(self, color_rules):
         self.color_rules = color_rules
 

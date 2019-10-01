@@ -223,9 +223,6 @@ class ScrollMenu(Widget):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.top_view = 0
         self.selected_item = 0
-        self.all_lines = []
-        self.view_lines = []
-        self.all_items = []
         self.view_items = []
         self.help_text = 'Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.'
 
