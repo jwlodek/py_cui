@@ -119,9 +119,12 @@ class PyCUI:
         self.auto_focus_buttons = auto_focus_buttons
 
         self.loading = False
+        self.stopped = True
 
         self.keybindings = {}
         self.exit_key = exit_key
+
+        self.on_stop = None
 
 
 
@@ -133,7 +136,12 @@ class PyCUI:
     def start(self):
         """ Function that starts the CUI """
 
+        self.stopped = False
         curses.wrapper(self.draw)
+
+    def stop(self, callback = None):
+        self.stopped = True
+        self.on_stop = callback
 
 
     def set_title(self, title):
@@ -470,7 +478,7 @@ class PyCUI:
         self.initialize_widget_renderer(stdscr)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
-        while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
+        while not self.stopped or (key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None):
 
             # Initialization and size adjustment
             stdscr.clear()
@@ -480,7 +488,6 @@ class PyCUI:
             width = width
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
             #if height != self.height or width != self.width:
-
             # Resize the grid and the widgets if there was a resize operation
             if key_pressed == curses.KEY_RESIZE:
                 try:
@@ -505,9 +512,6 @@ class PyCUI:
             except Exception as e:
                 self.display_window_warning(stdscr, str(e))
 
-            #self.draw_status_bars(stdscr, height, width)
-            #self.draw_widgets(stdscr)
-
             # Refresh the screen
             stdscr.refresh()
 
@@ -516,5 +520,13 @@ class PyCUI:
                 time.sleep(0.25)
                 # Need to reset key_pressed, because otherwise the previously pressed key will be used.
                 key_pressed = py_cui.keys.KEY_ESCAPE
+            elif self.stopped:
+                key_pressed = self.exit_key
             else:
                 key_pressed = stdscr.getch()
+
+        stdscr.clear()
+        stdscr.refresh()
+        curses.endwin()
+        if self.on_stop is not None:
+            self.on_stop()
