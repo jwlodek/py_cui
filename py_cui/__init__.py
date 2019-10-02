@@ -411,6 +411,8 @@ class PyCUI:
                 stdscr.addstr(0, 0, 'Error displaying CUI!!!')
                 stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
                 stdscr.attroff(curses.color_pair(RED_ON_BLACK))
+            except KeyboardInterrupt:
+                exit()
             except:
                 pass
 
@@ -478,7 +480,10 @@ class PyCUI:
         self.initialize_widget_renderer(stdscr)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
-        while not self.stopped or (key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None):
+        while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
+
+            if self.stopped:
+                break
 
             # Initialization and size adjustment
             stdscr.clear()
