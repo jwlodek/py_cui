@@ -5,7 +5,7 @@ with open('README.md', 'r') as readme_fp:
     long_description = readme_fp.read()
 
 required_libraries = []
-if sys == 'win32':
+if platform == 'win32':
     required_libraries.append('windows-curses')
 
 

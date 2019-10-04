@@ -254,6 +254,15 @@ class PyCUI:
         return new_label
 
 
+    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        """ Function that adds a new label to the CUI grid """
+
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_label = widgets.BlockLabel(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_label
+        return new_label
+
+
     def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
         """ Function that adds a new button to the CUI grid """
 
@@ -373,7 +382,7 @@ class PyCUI:
         self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer)
     
     
-    def show_menu_popup(self, title, menu_items, command):
+    def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
         """
         Shows a yes/no popup.
         
@@ -381,7 +390,7 @@ class PyCUI:
         """
 
         color=WHITE_ON_BLACK
-        self.popup = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self.renderer)
+        self.popup = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self.renderer, run_command_if_none)
 
 
     def show_loading_icon_popup(self, title, message):

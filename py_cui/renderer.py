@@ -34,6 +34,7 @@ class Renderer:
     def set_color_rules(self, color_rules):
         self.color_rules = color_rules
 
+
     def set_color_mode(self, color_mode):
         """ Sets the output color mode """
 

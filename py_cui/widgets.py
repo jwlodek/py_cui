@@ -216,6 +216,28 @@ class Label(Widget):
         self.renderer.unset_color_mode(self.color)
 
 
+class BlockLabel(Widget):
+    """ A Variation of the label widget that renders a block of text """
+
+    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
+        self.lines = title.splitlines()
+
+
+    def draw(self):
+        """ Override base draw class. Center text and draw it """
+
+        super().draw()
+        self.renderer.set_color_mode(self.color)
+        counter = self.start_y
+        for line in self.lines:
+            if counter == self.start_y + self.height - self.pady:
+                break
+            self.renderer.draw_text(self, line, counter, centered=True, bordered=False)
+            counter = counter + 1
+        self.renderer.unset_color_mode(self.color)
+
+
 class ScrollMenu(Widget):
     """ A scroll menu widget. Allows for creating a scrollable list of items of which one is selectable. Analogous to a RadioButton """
 

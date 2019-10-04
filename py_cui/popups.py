@@ -67,17 +67,7 @@ class Popup:
         """ Must be implemented by subclass """
         self.renderer.set_color_mode(self.color)
         target_y = int(self.stop_y - self.start_y / 2)
-        """
-        width = self.stop_x - self.start_x
-        render_text = self.text
-        if len(render_text) > (self.stop_x - self.start_x - 4):
-            render_text = render_text[:(self.stop_x - self.start_x - 7)] + '...'
-
-        render_title = self.title
-        if len(render_title)> (self.stop_x - self.start_x - 4):
-            render_title = render_title[:(self.stop_x - self.start_x - 7)] + '...'
-
-        """
+        self.renderer.set_color_rules([])
         self.renderer.set_bold()
         self.renderer.draw_border(self, with_title=False)
         self.renderer.draw_text(self, self.title, target_y - 2, centered=True)
@@ -260,6 +250,7 @@ class TextBoxPopup(Popup):
         self.renderer.set_color_mode(self.color)
         self.renderer.draw_text(self, self.title, self.cursor_y - 2, bordered=False)
         self.renderer.draw_border(self, fill=False, with_title=False)
+        self.renderer.set_color_rules([])
         render_text = self.text
         if len(self.text) > self.width - 2 * self.padx - 4:
             end = len(self.text) - (self.width - 2 * self.padx - 4)
@@ -279,12 +270,13 @@ class TextBoxPopup(Popup):
 class MenuPopup(Popup):
     """ A scroll menu widget. Allows for creating a scrollable list of items of which one is selectable. Analogous to a RadioButton """
 
-    def __init__(self, root, items, title, command, color, renderer):
+    def __init__(self, root, items, title, color, command, renderer, run_command_if_none):
         super().__init__(root, title, '', color, renderer)
         self.top_view = 0
         self.selected_item = 0
         self.view_items = items
         self.command = command
+        self.run_command_if_none = run_command_if_none
 
 
     def scroll_up(self):
@@ -329,13 +321,17 @@ class MenuPopup(Popup):
         if key_pressed == py_cui.keys.KEY_ENTER:
             self.ret_val = self.get()
             valid_pressed = True
+        elif key_pressed == py_cui.keys.KEY_ESCAPE:
+            self.ret_val = None
+            valid_pressed = True
 
         if valid_pressed:
             self.root.close_popup()
             if self.command is not None:
-                self.command(self.ret_val)
+                if self.ret_val is not None or self.run_command_if_none:
+                    self.command(self.ret_val)
             else:
-                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
+                self.root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
         
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self.scroll_up()
@@ -343,11 +339,12 @@ class MenuPopup(Popup):
             self.scroll_down()
 
 
-    def draw(self):
+    def draw(self, stdscr):
         """ Overrides base class draw function """
 
         self.renderer.set_color_mode(self.color)
         self.renderer.draw_border(self)
+        self.renderer.set_color_rules([])
         counter = self.pady + 1
         line_counter = 0
         for line in self.view_items:
