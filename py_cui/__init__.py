@@ -150,7 +150,6 @@ class PyCUI:
         self.keybindings = {}
         self.exit_key = exit_key
 
-<<<<<<< HEAD
         self.on_stop = None
 
 
@@ -159,12 +158,10 @@ class PyCUI:
     # Initialization functions
     # Used to initialzie CUI and its features
 
-=======
     # ----------------------------------------------#
     # Initialization functions                      #
     # Used to initialzie CUI and its features       #
     # ----------------------------------------------#
->>>>>>> feature-improve-popups
 
     def start(self):
         """ Function that starts the CUI """
@@ -479,7 +476,6 @@ class PyCUI:
 
 
     def display_window_warning(self, stdscr, error_info):
-<<<<<<< HEAD
             try:
                 stdscr.clear()
                 stdscr.attron(curses.color_pair(RED_ON_BLACK))
@@ -490,20 +486,6 @@ class PyCUI:
                 exit()
             except:
                 pass
-=======
-        """ When window is being resized, fractional window sizes may cause crashes. This function is used
-        as a wrapper to avoid these """
-
-        try:
-            stdscr.clear()
-            stdscr.attron(curses.color_pair(RED_ON_BLACK))
-            stdscr.addstr(0, 0, 'Error displaying CUI!!!')
-            stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
-            stdscr.attroff(curses.color_pair(RED_ON_BLACK))
-        except:
-            pass
-
->>>>>>> feature-improve-popups
 
     def handle_key_presses(self, key_pressed):
         """ Function that handles all main loop key presses. """
@@ -581,11 +563,6 @@ class PyCUI:
             height = height - 4
             width = width
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
-<<<<<<< HEAD
-            #if height != self.height or width != self.width:
-=======
-
->>>>>>> feature-improve-popups
             # Resize the grid and the widgets if there was a resize operation
             if key_pressed == curses.KEY_RESIZE:
                 try:
@@ -618,13 +595,9 @@ class PyCUI:
                 # When loading, refresh screen every quarter second
                 time.sleep(0.25)
                 # Need to reset key_pressed, because otherwise the previously pressed key will be used.
-<<<<<<< HEAD
                 key_pressed = py_cui.keys.KEY_ESCAPE
             elif self.stopped:
                 key_pressed = self.exit_key
-=======
-                key_pressed = 0
->>>>>>> feature-improve-popups
             else:
                 key_pressed = stdscr.getch()
 

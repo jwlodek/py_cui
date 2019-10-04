@@ -2,7 +2,13 @@ site_name: py_cui Documentation
 nav:
   - Home: index.md
   - Installation: install.md
+  - Usage: usage.md
   - Functions: functions.md
+  - Widgets: widgets.md
+  - Popups: popups.md
+  - Keys: keybindings.md
+  - Writing a PyCUI step-by-step: writing.md
+  - For py_cui developers: developers.md
   - Examples: examples.md
   - About: about.md
 theme: readthedocs
