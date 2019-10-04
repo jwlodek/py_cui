@@ -40,6 +40,7 @@ class AutoGitCUI:
         self.root.add_key_binding(py_cui.keys.KEY_E_LOWER, self.open_editor)
         self.root.add_key_binding(py_cui.keys.KEY_F_LOWER, self.fetch_branch)
         self.root.add_key_binding(py_cui.keys.KEY_P_LOWER, self.push_branch)
+        self.root.add_key_binding(py_cui.keys.KEY_M_LOWER, self.show_menu)
         self.root.set_status_bar_text('Quit - q | Refresh - r | Add all - a | Git log - l | Open Editor - e | Pull Branch - f | Push Branch - p')
 
         # Create the add files menu. Add color rules to color first characters based on git status
@@ -107,7 +108,16 @@ class AutoGitCUI:
         logo = logo + "Star me on Github!\n\n"
         logo = logo + "Copyright (c) 2019 Jakub Wlodek\n\n"
         return logo
-                                                  
+
+
+    def process_menu_option(self, option):
+
+        self.root.set_title(option)
+
+
+    def show_menu(self):
+        option_list = ['Add all', 'Push', 'Pull', 'Stash', 'Pop Stash', 'Set Editor']
+        self.root.show_menu_popup('Autogit Menu', option_list, self.process_menu_option)
 
     def show_git_commit_diff(self):
         try:

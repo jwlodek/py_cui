@@ -10,10 +10,11 @@ import sys
 import os
 import time
 import shutil       # We use shutil for getting the terminal dimensions
-import threading
+import threading    # Threading isn't currently used, may be removed
+
 
 # py_cui uses the curses library. On windows this does not exist, but
-# there is a open source windows_curses module that adds curses support
+# there is a open source windows-curses module that adds curses support
 # for python on windows
 import curses
 
@@ -45,7 +46,24 @@ BLUE_ON_BLACK       = 10
 
 
 def fit_text(width, text, center=False):
-    """ Helper function to fit text within a given width """
+    """
+    Helper function to fit text within a given width. Used to fix issue with status/title bar text
+    being too long and crashing the CUI
+
+    Parameters
+    ----------
+    width : int
+        width of window in characters
+    text : str
+        input text
+    center : Boolean
+        flag to center text
+
+    Returns
+    -------
+    text fixed depending on width
+    """
+
     if width < 5:
         return '.' * width
     if len(text) >= width:
@@ -98,6 +116,7 @@ class PyCUI:
     def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=keys.KEY_Q_LOWER):
 
         self.title = 'PyCUI Window'
+        # When this is not set, the escape character delay is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
         self.cursor_x = 0
         self.cursor_y = 0
@@ -106,24 +125,32 @@ class PyCUI:
         self.height = term_size.lines
         self.width = term_size.columns
         self.height = self.height - 4
+
+        # Add status and title bar
         self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
         self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
         self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
+
+        # Initialize grid, renderer, and widget dict
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.renderer = None
         self.widgets = {}
 
+        # Variables for determining selected widget/focus mode
         self.selected_widget = None
         self.in_focused_mode = False
         self.popup = None
         self.auto_focus_buttons = auto_focus_buttons
 
+        # CUI blocks when loading popup is open
         self.loading = False
         self.stopped = True
 
+        # Top level keybindings. Exit key is 'q' by default
         self.keybindings = {}
         self.exit_key = exit_key
 
+<<<<<<< HEAD
         self.on_stop = None
 
 
@@ -132,6 +159,12 @@ class PyCUI:
     # Initialization functions
     # Used to initialzie CUI and its features
 
+=======
+    # ----------------------------------------------#
+    # Initialization functions                      #
+    # Used to initialzie CUI and its features       #
+    # ----------------------------------------------#
+>>>>>>> feature-improve-popups
 
     def start(self):
         """ Function that starts the CUI """
@@ -145,16 +178,20 @@ class PyCUI:
 
 
     def set_title(self, title):
+        """ Sets the title bar text """
+
         self.title = title
 
 
     def set_status_bar_text(self, text):
+        """ Sets the status bar text when in overview mode """
+
         self.init_status_bar_text = text
         self.status_bar.set_text(text)
 
 
     def initialize_colors(self):
-        """ Function for initialzing curses colors """
+        """ Function for initialzing curses colors. Called when CUI is first created."""
 
         # Start colors in curses
         curses.start_color()
@@ -182,7 +219,7 @@ class PyCUI:
     # in a specified location.
 
     def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-        """ Function that adds a new cell to the CUI grid """
+        """ Function that adds a new scroll menu to the CUI grid """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
         new_scroll_menu = widgets.ScrollMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
@@ -234,6 +271,15 @@ class PyCUI:
         return new_label
 
 
+    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+        """ Function that adds a new label to the CUI grid """
+
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_label = widgets.BlockLabel(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        self.widgets[id] = new_label
+        return new_label
+
+
     def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
         """ Function that adds a new button to the CUI grid """
 
@@ -246,7 +292,7 @@ class PyCUI:
 
 
     def set_widget_focus_text(self, widget, text):
-        """ Function that sets the text of the status bar on focus for a particular widget """
+        """ Function that sets the text of the status bar when in focus mode for a particular widget """
 
         if widget is not None and text is not None and isinstance(widget, py_cui.widgets.Widget):
             widget.help_text = text
@@ -256,7 +302,6 @@ class PyCUI:
 
     # CUI status functions. Used to switch between widgets, set the mode, and 
     # identify neighbors for overview mode
-
 
     def check_if_neighbor_exists(self, row, column, row_span, col_span, direction):
         """ Function that checks if widget has neighbor in specified cell. Used for navigating CUI """
@@ -309,56 +354,89 @@ class PyCUI:
         self.keybindings[key] = command
 
 
-    # Popup functions. Used to display messages, warnings, and errors to the user. Are dismissed with enter, escape, or space
-    # Currently no support for input of any kind through popups.
+    # Popup functions. Used to display messages, warnings, and errors to the user.
 
     def show_message_popup(self, title, text):
         """ Shows a message popup """
 
         color=WHITE_ON_BLACK
-        self.popup = py_cui.popups.MessagePopup(self, title, text, color)
+        self.popup = py_cui.popups.MessagePopup(self, title, text, color, self.renderer)
 
 
     def show_warning_popup(self, title, text):
         """ Shows a warning popup """
 
         color=YELLOW_ON_BLACK
-        self.popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color)
+        self.popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color, self.renderer)
 
 
     def show_error_popup(self, title, text):
         """ Shows an error popup """
 
         color=RED_ON_BLACK
-        self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color)
+        self.popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color, self.renderer)
 
 
     def show_yes_no_popup(self, title, command):
+        """
+        Shows a yes/no popup.
+        
+        The 'command' parameter must be a function with a single boolean parameter
+        """
 
         color=WHITE_ON_BLACK
-        self.popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command)
+        self.popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command, self.renderer)
+
+
+    def show_text_box_popup(self, title, command):
+        """
+        Shows a yes/no popup.
+        
+        The 'command' parameter must be a function with a single boolean parameter
+        """
+
+        color=WHITE_ON_BLACK
+        self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer)
+    
+    
+    def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
+        """
+        Shows a yes/no popup.
+        
+        The 'command' parameter must be a function with a single boolean parameter
+        """
+
+        color=WHITE_ON_BLACK
+        self.popup = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self.renderer, run_command_if_none)
 
 
     def show_loading_icon_popup(self, title, message):
+        """ Shows a loading icon popup """
     
         color = WHITE_ON_BLACK
         self.loading = True
-        self.popup = py_cui.popups.LoadingPopup(self, title, message, color)
+        self.popup = py_cui.popups.LoadingIconPopup(self, title, message, color, self.renderer)
 
 
     def show_loading_bar_popup(self, title, num_items):
+        """ Shows loading bar popup. Use 'increment_loading_bar' to show progress """
+
         color = WHITE_ON_BLACK
         self.loading = True
-        self.popup = py_cui.popups.LoadingBarPopup(self, title, num_items, color)
+        self.popup = py_cui.popups.LoadingBarPopup(self, title, num_items, color, self.renderer)
 
 
     def increment_loading_bar(self):
+        """ Increments progress bar if loading bar popup is open """
+
         if self.popup is not None:
             if isinstance(self.popup, py_cui.popups.LoadingBarPopup):
                 self.popup.completed_items = self.popup.completed_items + 1
 
 
     def stop_loading_popup(self):
+        """ Leaves loading state, and closes popup. Must be called by user """
+
         self.loading = False
         self.close_popup()
 
@@ -372,7 +450,6 @@ class PyCUI:
 
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
-
     def draw_widgets(self, stdscr):
         """ Function that draws all of the widgets to the screen """
 
@@ -380,7 +457,7 @@ class PyCUI:
             if widget_key != self.selected_widget:
                 self.widgets[widget_key].draw()
 
-        # We draw the selected widget last to support cursor location. It is also bolded so the user knows which widget is selected.
+        # We draw the selected widget last to support cursor location.
         if self.selected_widget is not None:
             #stdscr.attron(curses.A_BOLD)
             self.widgets[self.selected_widget].draw()
@@ -392,19 +469,17 @@ class PyCUI:
 
         if self.status_bar is not None:
             stdscr.attron(curses.color_pair(self.status_bar.color))
-            #stdscr.addstr(height + 3, 0, self.status_bar.text)
-            #stdscr.addstr(height + 3, len(self.status_bar.text), " " * (width - len(self.status_bar.text)-1))
             stdscr.addstr(height + 3, 0, fit_text(width, self.status_bar.text))
             stdscr.attroff(curses.color_pair(self.status_bar.color))
 
         if self.title_bar is not None:
             stdscr.attron(curses.color_pair(self.title_bar.color))
-            #stdscr.addstr(0, 0, '{}'.format(self.title.center(width, ' ')))
             stdscr.addstr(0, 0, fit_text(width, self.title, center=True))
             stdscr.attroff(curses.color_pair(self.title_bar.color))
 
 
     def display_window_warning(self, stdscr, error_info):
+<<<<<<< HEAD
             try:
                 stdscr.clear()
                 stdscr.attron(curses.color_pair(RED_ON_BLACK))
@@ -415,6 +490,20 @@ class PyCUI:
                 exit()
             except:
                 pass
+=======
+        """ When window is being resized, fractional window sizes may cause crashes. This function is used
+        as a wrapper to avoid these """
+
+        try:
+            stdscr.clear()
+            stdscr.attron(curses.color_pair(RED_ON_BLACK))
+            stdscr.addstr(0, 0, 'Error displaying CUI!!!')
+            stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
+            stdscr.attroff(curses.color_pair(RED_ON_BLACK))
+        except:
+            pass
+
+>>>>>>> feature-improve-popups
 
     def handle_key_presses(self, key_pressed):
         """ Function that handles all main loop key presses. """
@@ -492,7 +581,11 @@ class PyCUI:
             height = height - 4
             width = width
             # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
+<<<<<<< HEAD
             #if height != self.height or width != self.width:
+=======
+
+>>>>>>> feature-improve-popups
             # Resize the grid and the widgets if there was a resize operation
             if key_pressed == curses.KEY_RESIZE:
                 try:
@@ -522,11 +615,16 @@ class PyCUI:
 
             # Wait for next input
             if self.loading:
+                # When loading, refresh screen every quarter second
                 time.sleep(0.25)
                 # Need to reset key_pressed, because otherwise the previously pressed key will be used.
+<<<<<<< HEAD
                 key_pressed = py_cui.keys.KEY_ESCAPE
             elif self.stopped:
                 key_pressed = self.exit_key
+=======
+                key_pressed = 0
+>>>>>>> feature-improve-popups
             else:
                 key_pressed = stdscr.getch()
 

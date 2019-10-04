@@ -22,6 +22,8 @@ class PopupExample:
         self.show_yes_no_popup  = self.master.add_button('Show Yes No Popup',  1, 0, command=self.show_yes_no)
         self.show_loading_icon_popup = self.master.add_button('Show Loading Icon Popup', 2, 0, command=self.show_loading_icon)
         self.show_loading_bar_popup = self.master.add_button('Show Loading Bar Popup', 0,1, command = self.show_loading_bar)
+        self.show_text_box_popup = self.master.add_button('Show Text Box Popup', 1,1, command = self.show_text_box)
+        self.show_menu_popup = self.master.add_button('Show Scroll Menu Popup', 2,1, command = self.show_menu_popup_fun)
 
         # Button that demonstrates how to perform a stop operation
         self.test_stop_cui_button = self.master.add_button('Stop CUI', 1,1, command = self.stop_cui)
@@ -54,6 +56,28 @@ class PopupExample:
         # For the yes/no popup, the 'command' parameter must take a function that requires a single boolean parameter
         self.master.show_yes_no_popup('Are you sure you want to quit?', self.quit_cui)
 
+    def show_text_box(self):
+        self.master.show_text_box_popup('Please enter a new window title', self.reset_title)
+
+    def change_button_color(self, new_color):
+        color = py_cui.WHITE_ON_BLACK
+        if new_color == "RED":
+            color = py_cui.RED_ON_BLACK
+        elif new_color == "CYAN":
+            color = py_cui.CYAN_ON_BLACK
+        elif new_color == "MAGENTA":
+            color = py_cui.MAGENTA_ON_BLACK
+        for key in self.master.widgets.keys():
+            if isinstance(self.master.widgets[key], py_cui.widgets.Button):
+                self.master.widgets[key].color = color
+
+    def show_menu_popup_fun(self):
+        menu_choices = ['RED', 'CYAN', 'MAGENTA']
+        self.master.show_menu_popup('Please select a new button color', menu_choices, self.change_button_color)
+
+    def reset_title(self, new_title):
+        self.master.title = new_title
+
 
     def quit_cui(self, to_quit):
         # THis is the function given to the yes no popup. The to_quit parameter will be true if y is pressed, or False if n is pressed
@@ -77,7 +101,7 @@ class PopupExample:
     def show_loading_bar(self):
         """ Function that shows the usage for spawning a loading bar popup """
 
-        self.master.show_loading_bar_popup('Incrementing a counter...', 20)
+        self.master.show_loading_bar_popup('Incrementing a counter...', 100)
         operation_thread = threading.Thread(target=self.long_operation)
         operation_thread.start()
 
@@ -86,8 +110,8 @@ class PopupExample:
         """ A simple function that demonstrates a long callback operation performed while loading popup is open """
 
         counter = 0
-        for i in range(0, 20):
-            time.sleep(0.3)
+        for i in range(0, 100):
+            time.sleep(0.1)
             counter= counter +1
             self.master.status_bar.set_text(str(counter))
             # When using a bar indicator, we will increment the completed counter
