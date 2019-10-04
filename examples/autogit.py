@@ -45,8 +45,10 @@ class AutoGitCUI:
 
         # Create the add files menu. Add color rules to color first characters based on git status
         self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=2, column_span=2)
-        self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
-        self.add_files_menu.add_text_color_rule([' ', '?'], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
+        self.add_files_menu.add_text_color_rule(' ', py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
+        self.add_files_menu.add_text_color_rule('?', py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
+        self.add_files_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
+        self.add_files_menu.add_text_color_rule('?', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
 
         # Remotes menu
         self.git_remotes_menu =self.root.add_scroll_menu('Git Remotes', 2, 0, row_span=2, column_span=2)
@@ -62,10 +64,11 @@ class AutoGitCUI:
 
         # Our text block for statuses etc.
         self.diff_text_block = self.root.add_text_block('Git Info', 0, 2, row_span=8, column_span=6)
-        self.diff_text_block.add_text_color_rule(['+'], py_cui.GREEN_ON_BLACK, 'startswith')
-        self.diff_text_block.add_text_color_rule(['-'], py_cui.RED_ON_BLACK, 'startswith')
-        self.diff_text_block.add_text_color_rule(['commit'], py_cui.YELLOW_ON_BLACK, 'startswith')
-        self.diff_text_block.add_text_color_rule(['Copyright'], py_cui.CYAN_ON_BLACK, 'startswith')
+        self.diff_text_block.add_text_color_rule('+', py_cui.GREEN_ON_BLACK, 'startswith')
+        self.diff_text_block.add_text_color_rule('-', py_cui.RED_ON_BLACK, 'startswith')
+        self.diff_text_block.add_text_color_rule('commit', py_cui.YELLOW_ON_BLACK, 'startswith')
+        self.diff_text_block.add_text_color_rule('Copyright', py_cui.CYAN_ON_BLACK, 'startswith')
+        self.diff_text_block.add_text_color_rule('@.*@', py_cui.CYAN_ON_BLACK, 'contains', match_type='regex')
         self.diff_text_block.set_text(self.get_logo())
         
         # Textboxes for new branches and commits
@@ -82,7 +85,7 @@ class AutoGitCUI:
 
         # Enter will show commit diff
         self.git_commits_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_git_commit_diff)
-        self.git_commits_menu.add_text_color_rule([' '], py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,7], include_whitespace=True)
+        self.git_commits_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,7], include_whitespace=True)
 
         # Enter will checkout 
         self.branch_menu.add_key_command(py_cui.keys.KEY_ENTER, self.checkout_branch)

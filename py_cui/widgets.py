@@ -4,6 +4,7 @@ building blocks of a user interface made with py_cui. This file contains classes
 
 * Base Widget class
 * Label
+* Block Label
 * Scroll Menu
 * Checkbox Menu
 * Button
@@ -80,7 +81,7 @@ class Widget:
         self.key_commands[key] = command
 
 
-    def add_text_color_rule(self, regex_list, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
+    def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
         """
         Forces renderer to draw text using given color if text_condition_function returns True
 
@@ -96,7 +97,7 @@ class Widget:
             if true, if regex fits rule type, entire line will be colored. If false, only matching text
         """
 
-        self.text_color_rules.append(py_cui.colors.ColorRule(regex_list, color, rule_type, match_type, region, include_whitespace))
+        self.text_color_rules.append(py_cui.colors.ColorRule(regex, color, rule_type, match_type, region, include_whitespace))
 
 
 

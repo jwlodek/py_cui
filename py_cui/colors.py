@@ -5,6 +5,8 @@ File containing all error types for py_cui
 @created:   12-Aug-2019
 """
 
+# TODO - these are currently not very intuitive or efficient
+
 
 import py_cui
 import re
@@ -12,93 +14,52 @@ import re
 
 class ColorRule:
 
-    def __init__(self, regex_list, color, rule_type, match_type, region, include_whitespace):
-        self.regex_list = regex_list
+    def __init__(self, regex, color, rule_type, match_type, region, include_whitespace):
+        self.regex = regex
         self.color = color
         self.rule_type = rule_type
         self.match_type = match_type
         self.region = region
         self.include_whitespace = include_whitespace
 
-
-    def add_regex(self, regex):
-        self.regex_list.append(regex)
-
-
-    def add_regex_list(self, regex_list):
-        self.regex_list = self.regex_list + regex_list
-
-
-    def check_end_block(self, line):
-        temp = line.strip()
-        for regex in self.regex_list:
-            if temp.endswith(regex):
-                return True
-        return False
-
-
-    def match_starts_with(self, line):
-        color_region_list = []
-        temp = line
-        if not self.include_whitespace:
-            temp = temp.strip()
-        for regex in self.regex_list:
-            if temp.startswith(regex):
-                color_region_list.append([self.color])
-
-
     def check_match(self, line):
         temp = line
         if not self.include_whitespace:
             temp = temp.strip()
         if self.rule_type == 'startswith':
-            for regex in self.regex_list:
-                if temp.startswith(regex):
-                    return True
+            if temp.startswith(self.regex):
+                return True
         elif self.rule_type == 'endswith':
-            for regex in self.regex_list:
-                if temp.endswith(regex):
-                    return True
+            if temp.endswith(self.regex):
+                return True
         elif self.rule_type == 'notstartswith':
-            for regex in self.regex_list:
-                if temp.startswith(regex):
-                    return False
+            if temp.startswith(self.regex):
+                return False
             return True
         elif self.rule_type == 'notendswith':
-            for regex in self.regex_list:
-                if temp.startswith(regex):
-                    return False
+            if temp.endswith(self.regex):
+                return False
             return True
         elif self.rule_type == 'contains':
-            for regex in self.regex_list:
-                if regex in temp:
-                    return True
-        return False
-
-
-    def check_single_line(self, line):
-        temp = line
-        if not self.include_whitespace:
-            temp = temp.strip()
-        for regex in self.regex_list:
-            if temp.startswith(regex) and temp.endswith(regex):
+            if re.search(self.regex, line) is not None:
                 return True
         return False
 
 
     def generate_fragments_regex(self, widget, render_text):
         fragments = []
-        temp = render_text.split(' ')
-        for i in range(0,len(temp)):
-            word = temp[i]
-            if word in self.regex_list:
-                fragments.append([word, self.color])
-            else:
-                fragments.append([word, widget.color])
-            if i < (len(temp) - 1):
-                fragments.append([' ', widget.color])
+        matches = re.findall(self.regex, render_text)
+        current_render_text = render_text
+        for match in matches:
+            temp = current_render_text.split(match, 1)
+            if len(temp) == 2:
+                fragments.append([temp[0], widget.color])
+                fragments.append([match, self.color])
+                current_render_text = temp[1]
+        fragments.append([current_render_text, widget.color])
 
         return fragments
+
 
     def split_text_on_region(self, widget, render_text):
 
@@ -115,14 +76,16 @@ class ColorRule:
 # FOR py_cui TEXT. RUN widget.add_color_rules(py_cui.colors.get_LANGUAGE_highlighting_rules())
 # To get lanuage syntax highlighting.
 
-def get_python_highlighting_rules():
-    color_rules = []
-    python_keywords = ['class', 'pass', 'raise', 'def', 'import', 'if', 'for', 'as', 'else', 'elif', 'return', 'for', 'in', 'and', 'or', ]
-    python_constants = ['True', 'False', 'None']
-    #python_strings = ['".*"', "'.*'"]
-    color_rules.append(ColorRule(python_keywords, py_cui.CYAN_ON_BLACK, 'contains', 'regex', None, False))
-    color_rules.append(ColorRule(python_constants, py_cui.MAGENTA_ON_BLACK, 'contains', 'regex', None, False))
-    color_rules.append(ColorRule(['#'], py_cui.RED_ON_BLACK, 'startswith', 'line', None, False))
-    color_rules.append(ColorRule(['"""'], py_cui.GREEN_ON_BLACK, 'block', 'block', None, False))
-    #color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
-    return color_rules
+# DO NOT WORK YET
+
+#def get_python_highlighting_rules():
+#    color_rules = []
+#    python_keywords = ['class', 'pass', 'raise', 'def', 'import', 'if', 'for', 'as', 'else', 'elif', 'return', 'for', 'in', 'and', 'or', ]
+#    python_constants = ['True', 'False', 'None']
+#    #python_strings = ['".*"', "'.*'"]
+#    color_rules.append(ColorRule(python_keywords, py_cui.CYAN_ON_BLACK, 'contains', 'regex', None, False))
+#    color_rules.append(ColorRule(python_constants, py_cui.MAGENTA_ON_BLACK, 'contains', 'regex', None, False))
+#    color_rules.append(ColorRule(['#'], py_cui.RED_ON_BLACK, 'startswith', 'line', None, False))
+#    color_rules.append(ColorRule(['"""'], py_cui.GREEN_ON_BLACK, 'block', 'block', None, False))
+#    #color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
+#    return color_rules

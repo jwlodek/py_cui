@@ -22,7 +22,7 @@ class Renderer:
         self.root = root
         self.stdscr = stdscr
         self.color_rules = []
-        self.block_color_rule = None
+        #self.block_color_rule = None
 
 
     def set_bold(self):
@@ -159,6 +159,7 @@ class Renderer:
     def generate_text_color_fragments(self, widget, line, render_text):
         text_fragments_list = []
 
+        """
         for color_rule in self.color_rules:
             # Block colorations are the most powerful.
             if color_rule.match_type == 'block':
@@ -179,6 +180,7 @@ class Renderer:
         if self.block_color_rule is not None:
             text_fragments = [[render_text, self.block_color_rule.color]]
             return text_fragments
+        """
 
         for color_rule in self.color_rules:
             # Full line color rules take precendence
@@ -189,10 +191,8 @@ class Renderer:
         
         for color_rule in self.color_rules:
             if color_rule.match_type == 'regex':
-                text_fragments_list.append(color_rule.generate_fragments_regex(widget, render_text))
-
-        if len(text_fragments_list) > 0:
-            return self.fix_fragment_list(widget, text_fragments_list, render_text)
+                if color_rule.check_match(line):
+                    return color_rule.generate_fragments_regex(widget, render_text)
 
         for color_rule in self.color_rules:
             if color_rule.match_type == 'region':
@@ -244,14 +244,12 @@ class Renderer:
                 self.set_color_mode(text_elem[1])
 
             if selected:
-                #self.set_color_mode(widget.selected_color)
                 self.stdscr.attron(curses.A_BOLD)
 
             self.stdscr.addstr(y, current_start_x, text_elem[0])
             current_start_x = current_start_x + len(text_elem[0])
 
             if selected:
-                #self.unset_color_mode(widget.selected_color)
                 self.stdscr.attroff(curses.A_BOLD)
 
             if text_elem[1] != widget.color:
