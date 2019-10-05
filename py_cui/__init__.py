@@ -135,6 +135,7 @@ class PyCUI:
         # Initialize grid, renderer, and widget dict
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.renderer = None
+        self.stdscr = None
         self.widgets = {}
 
         # Variables for determining selected widget/focus mode
@@ -176,7 +177,8 @@ class PyCUI:
             width = term_size.columns
             height = height - 4
             self.refresh_height_width(height, width)
-            self.initialize_widget_renderer(self.stdscr)
+            self.initialize_widget_renderer()
+            self.selected_widget = new_widget_set.selected_widget
         else:
             raise TypeError("Argument must be of type py_cui.widget_set.WidgetSet")
 
@@ -230,10 +232,10 @@ class PyCUI:
         curses.init_pair(BLUE_ON_BLACK,     curses.COLOR_BLUE,      curses.COLOR_BLACK)
 
 
-    def initialize_widget_renderer(self, stdscr):
+    def initialize_widget_renderer(self):
         """ Function that creates the renderer object that will draw each widget """
 
-        self.renderer = renderer.Renderer(self, stdscr)
+        self.renderer = renderer.Renderer(self, self.stdscr)
         for widget_id in self.widgets.keys():
             self.widgets[widget_id].assign_renderer(self.renderer)
 
@@ -582,7 +584,7 @@ class PyCUI:
 
         # Initialization functions. Generates colors and renderer
         self.initialize_colors()
-        self.initialize_widget_renderer(stdscr)
+        self.initialize_widget_renderer()
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:
