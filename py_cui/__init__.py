@@ -25,6 +25,7 @@ import py_cui.statusbar as statusbar
 import py_cui.renderer as renderer
 import py_cui.errors
 import py_cui.widgets as widgets
+import py_cui.widget_set as widget_set
 import py_cui.keybinding as keys
 import py_cui.popups
 
@@ -153,6 +154,31 @@ class PyCUI:
         self.on_stop = None
 
 
+    def get_widget_set(self):
+        """ Gets widget set object from current widgets. """
+
+        new_widget_set = widget_set.WidgetSet(self.grid.num_rows, self.grid.num_columns)
+        new_widget_set.grid = self.grid
+        new_widget_set.widgets = self.widgets
+        new_widget_set.keybindings = self.keybindings
+        return new_widget_set
+
+
+    def apply_widget_set(self, new_widget_set):
+        """ Function that can be used to replace all widgets in a py_cui with those of a different widget set """
+
+        if isinstance(new_widget_set, widget_set.WidgetSet):
+            self.widgets = new_widget_set.widgets
+            self.grid = new_widget_set.grid
+            self.keybindings = new_widget_set.keybindings
+            term_size = shutil.get_terminal_size()
+            height = term_size.lines
+            width = term_size.columns
+            height = height - 4
+            self.refresh_height_width(height, width)
+            self.initialize_widget_renderer(self.stdscr)
+        else:
+            raise TypeError("Argument must be of type py_cui.widget_set.WidgetSet")
 
 
     # Initialization functions
@@ -345,7 +371,7 @@ class PyCUI:
             self.widgets[self.selected_widget].selected = False
 
 
-    def add_key_binding(self, key, command):
+    def add_key_command(self, key, command):
         """ Function that adds a keybinding to the CUI when in overview mode """
 
         self.keybindings[key] = command
@@ -445,6 +471,13 @@ class PyCUI:
         self.popup = None
 
 
+    def refresh_height_width(self, height, width):
+        self.width = width
+        self.height = height
+        self.grid.update_grid_height_width(self.height, self.width)
+        for widget_id in self.widgets.keys():
+            self.widgets[widget_id].update_height_width()
+
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
     def draw_widgets(self, stdscr):
@@ -540,6 +573,7 @@ class PyCUI:
     def draw(self, stdscr):
         """ Main CUI draw loop called by start() """
 
+        self.stdscr = stdscr
         key_pressed = 0
 
         # Clear and refresh the screen for a blank canvas
@@ -566,11 +600,7 @@ class PyCUI:
             # Resize the grid and the widgets if there was a resize operation
             if key_pressed == curses.KEY_RESIZE:
                 try:
-                    self.width = width
-                    self.height = height
-                    self.grid.update_grid_height_width(self.height, self.width)
-                    for widget_id in self.widgets.keys():
-                        self.widgets[widget_id].update_height_width()
+                    self.refresh_height_width(height, width)
                 except Exception as e:
                     self.display_window_warning(stdscr, str(e))
 

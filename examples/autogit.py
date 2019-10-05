@@ -34,13 +34,13 @@ class AutoGitCUI:
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
 
         # Keybindings when in overview mode, and set info bar
-        self.root.add_key_binding(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
-        self.root.add_key_binding(py_cui.keys.KEY_L_LOWER, self.show_log)
-        self.root.add_key_binding(py_cui.keys.KEY_A_LOWER, self.add_all)
-        self.root.add_key_binding(py_cui.keys.KEY_E_LOWER, self.open_editor)
-        self.root.add_key_binding(py_cui.keys.KEY_F_LOWER, self.fetch_branch)
-        self.root.add_key_binding(py_cui.keys.KEY_P_LOWER, self.push_branch)
-        self.root.add_key_binding(py_cui.keys.KEY_M_LOWER, self.show_menu)
+        self.root.add_key_command(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
+        self.root.add_key_command(py_cui.keys.KEY_L_LOWER, self.show_log)
+        self.root.add_key_command(py_cui.keys.KEY_A_LOWER, self.add_all)
+        self.root.add_key_command(py_cui.keys.KEY_E_LOWER, self.open_editor)
+        self.root.add_key_command(py_cui.keys.KEY_F_LOWER, self.fetch_branch)
+        self.root.add_key_command(py_cui.keys.KEY_P_LOWER, self.push_branch)
+        self.root.add_key_command(py_cui.keys.KEY_M_LOWER, self.show_menu)
         self.root.set_status_bar_text('Quit - q | Refresh - r | Add all - a | Git log - l | Open Editor - e | Pull Branch - f | Push Branch - p')
 
         # Create the add files menu. Add color rules to color first characters based on git status

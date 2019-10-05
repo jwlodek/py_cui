@@ -23,7 +23,7 @@ def clear_text_field():
     text_field.clear()
 
 # Add the key binding to the PyCUI object itself for overview mode.
-root.add_key_binding(py_cui.keys.KEY_C_LOWER, clear_text_field)
+root.add_key_command(py_cui.keys.KEY_C_LOWER, clear_text_field)
 
 # Start the CUI
 root.start()
