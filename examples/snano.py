@@ -79,10 +79,7 @@ class SuperNano:
             self.open_new_directory()
         else:
             try:
-                if filename.endswith('.py'):
-                    self.edit_text_block.text_color_rules = py_cui.colors.get_python_highlighting_rules()
-                else:
-                    self.edit_text_block.text_color_rules = []
+                self.edit_text_block.text_color_rules = []
                 fp = open(os.path.join(self.dir, filename), 'r')
                 text = fp.read()
                 fp.close()

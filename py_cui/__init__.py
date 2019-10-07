@@ -169,6 +169,7 @@ class PyCUI:
         """ Function that can be used to replace all widgets in a py_cui with those of a different widget set """
 
         if isinstance(new_widget_set, widget_set.WidgetSet):
+            self.lose_focus()
             self.widgets = new_widget_set.widgets
             self.grid = new_widget_set.grid
             self.keybindings = new_widget_set.keybindings
