@@ -152,6 +152,7 @@ class PyCUI:
         self.keybindings = {}
         self.exit_key = exit_key
 
+        # Callback to fire when CUI is stopped.
         self.on_stop = None
 
 
@@ -198,7 +199,10 @@ class PyCUI:
         self.stopped = False
         curses.wrapper(self.draw)
 
+
     def stop(self, callback = None):
+        """ Function that stops the CUI, and fires the callback function. Callback must be a no arg method """
+
         self.stopped = True
         self.on_stop = callback
 
@@ -315,15 +319,6 @@ class PyCUI:
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_button
-
-
-    def set_widget_focus_text(self, widget, text):
-        """ Function that sets the text of the status bar when in focus mode for a particular widget """
-
-        if widget is not None and text is not None and isinstance(widget, py_cui.widgets.Widget):
-            widget.help_text = text
-        else:
-            raise py_cui.errors.PyCUIError('Cannot set focus text of non-widget object.')
 
 
     # CUI status functions. Used to switch between widgets, set the mode, and 
@@ -461,7 +456,7 @@ class PyCUI:
 
 
     def stop_loading_popup(self):
-        """ Leaves loading state, and closes popup. Must be called by user """
+        """ Leaves loading state, and closes popup. Must be called by user to escape loading. """
 
         self.loading = False
         self.close_popup()
@@ -475,6 +470,8 @@ class PyCUI:
 
 
     def refresh_height_width(self, height, width):
+        """ Function that updates the height and width of the CUI based on terminal window size """
+
         self.width = width
         self.height = height
         self.grid.update_grid_height_width(self.height, self.width)
@@ -483,7 +480,7 @@ class PyCUI:
 
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
-    def draw_widgets(self, stdscr):
+    def draw_widgets(self):
         """ Function that draws all of the widgets to the screen """
 
         for widget_key in self.widgets.keys():
@@ -512,16 +509,19 @@ class PyCUI:
 
 
     def display_window_warning(self, stdscr, error_info):
-            try:
-                stdscr.clear()
-                stdscr.attron(curses.color_pair(RED_ON_BLACK))
-                stdscr.addstr(0, 0, 'Error displaying CUI!!!')
-                stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
-                stdscr.attroff(curses.color_pair(RED_ON_BLACK))
-            except KeyboardInterrupt:
-                exit()
-            except:
-                pass
+        """ Function that prints some basic error info if there is an error with the CUI """
+
+        try:
+            stdscr.clear()
+            stdscr.attron(curses.color_pair(RED_ON_BLACK))
+            stdscr.addstr(0, 0, 'Error displaying CUI!!!')
+            stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
+            stdscr.attroff(curses.color_pair(RED_ON_BLACK))
+        except KeyboardInterrupt:
+            exit()
+        except:
+            pass
+
 
     def handle_key_presses(self, key_pressed):
         """ Function that handles all main loop key presses. """
@@ -613,10 +613,10 @@ class PyCUI:
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
             try:
                 self.draw_status_bars(stdscr, height, width)
-                self.draw_widgets(stdscr)
+                self.draw_widgets()
                 # draw the popup if required
                 if self.popup is not None:
-                    self.popup.draw(stdscr)
+                    self.popup.draw()
             except Exception as e:
                 self.display_window_warning(stdscr, str(e))
 

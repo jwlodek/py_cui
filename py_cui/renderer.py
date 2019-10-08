@@ -22,16 +22,21 @@ class Renderer:
         self.root = root
         self.stdscr = stdscr
         self.color_rules = []
-        #self.block_color_rule = None
 
 
     def set_bold(self):
+        """ Sets bold draw mode """
+
         self.stdscr.attron(curses.A_BOLD)
 
     def unset_bold(self):
+        """ Unsets bold draw mode """
+
         self.stdscr.attroff(curses.A_BOLD)
 
     def set_color_rules(self, color_rules):
+        """ Sets current color rules """
+
         self.color_rules = color_rules
 
 
@@ -116,10 +121,12 @@ class Renderer:
         else:
             self.stdscr.addstr(y, widget.start_x + widget.padx, '+--{}{}+'.format(widget.title, '-' * (widget.width - 4 - 2*widget.padx - len(widget.title))))
 
+
     def draw_border_bottom(self, widget, y):
         """ Internal function for drawing bottom of border """
 
         self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
+
 
     def draw_blank_row(self, widget, y):
         """ Internal function for drawing a blank row """
@@ -144,66 +151,18 @@ class Renderer:
         return render_text_fragments
 
 
-    def fix_fragment_list(self, widget, assorted_fragments_list, render_text):
-        output = []
-        current_loc = 0
-        for i in range(0, len(assorted_fragments_list[0])):
-            for j in range(0, len(assorted_fragments_list)):
-                if assorted_fragments_list[j][i][1] != widget.color:
-                    output.append(assorted_fragments_list[j][i])
-            if len(output) != (i + 1):
-                output.append(assorted_fragments_list[j][i])
-        return output
-
-
     def generate_text_color_fragments(self, widget, line, render_text):
+        """ Function that applies color rules to text, dividing them if match is found """
+
         text_fragments_list = []
 
-        """
+        fragments = [[render_text, widget.color]]
         for color_rule in self.color_rules:
-            # Block colorations are the most powerful.
-            if color_rule.match_type == 'block':
-                if color_rule.check_single_line(line):
-                    text_fragments = [[render_text, color_rule.color]]
-                    return text_fragments
-                elif color_rule.check_match(line) and self.block_color_rule is None:
-                    self.block_color_rule = color_rule
-                    text_fragments = [[render_text, self.block_color_rule.color]]
-                    return text_fragments
-                elif self.block_color_rule is not None:
-                    if self.block_color_rule.check_end_block(line):
-                        text_fragments = [[render_text, self.block_color_rule.color]]
-                        self.block_color_rule = None
-                        return text_fragments
-                
+            fragments, match = color_rule.generate_fragments(widget, line, render_text)
+            if match:
+                return fragments
 
-        if self.block_color_rule is not None:
-            text_fragments = [[render_text, self.block_color_rule.color]]
-            return text_fragments
-        """
-
-        for color_rule in self.color_rules:
-            # Full line color rules take precendence
-            if color_rule.match_type == 'line':
-                if color_rule.check_match(line):
-                    text_fragments = [[render_text, color_rule.color]]
-                    return text_fragments
-        
-        for color_rule in self.color_rules:
-            if color_rule.match_type == 'regex':
-                if color_rule.check_match(line):
-                    return color_rule.generate_fragments_regex(widget, render_text)
-
-        for color_rule in self.color_rules:
-            if color_rule.match_type == 'region':
-                if color_rule.check_match(render_text):
-                    return color_rule.split_text_on_region(widget, render_text) 
-
-        if len(text_fragments_list) == 0:
-            text_fragments = []
-            text_fragments.append([render_text, widget.color])
-
-        return text_fragments
+        return fragments
 
 
     def draw_text(self, widget, line, y, centered = False, bordered = True, selected = False, start_pos = 0):

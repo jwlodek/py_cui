@@ -20,6 +20,7 @@ def get_char_from_ascii(key_num):
 
 # Supported py_cui keys
 KEY_ENTER       = get_ascii_from_char('\n')
+# Escape character is ascii #27
 KEY_ESCAPE      = 27
 KEY_SPACE       = get_ascii_from_char(' ')
 KEY_DELETE      = curses.KEY_DC

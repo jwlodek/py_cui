@@ -5,8 +5,6 @@ File containing all error types for py_cui
 @created:   12-Aug-2019
 """
 
-# TODO - these are currently not very intuitive or efficient
-
 
 import py_cui
 import re
@@ -20,9 +18,17 @@ class ColorRule:
         self.rule_type = rule_type
         self.match_type = match_type
         self.region = region
+        if self.region is not None:
+            if self.region[0] > self.region[1]:
+                temp = region[0]
+                self.region[0] = self.region[1]
+                self.region[1] = temp
         self.include_whitespace = include_whitespace
 
+
     def check_match(self, line):
+        """ Checks if the color rule matches a line """
+
         temp = line
         if not self.include_whitespace:
             temp = temp.strip()
@@ -47,6 +53,8 @@ class ColorRule:
 
 
     def generate_fragments_regex(self, widget, render_text):
+        """ Splits text into fragments based on regular expression """
+
         fragments = []
         matches = re.findall(self.regex, render_text)
         current_render_text = render_text
@@ -62,8 +70,11 @@ class ColorRule:
 
 
     def split_text_on_region(self, widget, render_text):
+        """ Splits text into fragments based on region """
 
         fragments = []
+        if self.region is None or len(render_text) < self.region[1]:
+            return [[render_text, widget.color]]
         if self.region[0] != 0:
             fragments.append([render_text[0:self.region[0]], widget.color])
         fragments.append([render_text[self.region[0]:self.region[1]], self.color])
@@ -71,21 +82,16 @@ class ColorRule:
         return fragments
 
 
+    def generate_fragments(self, widget, line, render_text):
 
-# THE FUNCTIONS BELOW GET LISTS OF COLOR RULES TO APPLY LANGUAGE SYNTAX HIGHLIGHTING
-# FOR py_cui TEXT. RUN widget.add_color_rules(py_cui.colors.get_LANGUAGE_highlighting_rules())
-# To get lanuage syntax highlighting.
+        match = self.check_match(line)
+        if match:
 
-# DO NOT WORK YET
-
-#def get_python_highlighting_rules():
-#    color_rules = []
-#    python_keywords = ['class', 'pass', 'raise', 'def', 'import', 'if', 'for', 'as', 'else', 'elif', 'return', 'for', 'in', 'and', 'or', ]
-#    python_constants = ['True', 'False', 'None']
-#    #python_strings = ['".*"', "'.*'"]
-#    color_rules.append(ColorRule(python_keywords, py_cui.CYAN_ON_BLACK, 'contains', 'regex', None, False))
-#    color_rules.append(ColorRule(python_constants, py_cui.MAGENTA_ON_BLACK, 'contains', 'regex', None, False))
-#    color_rules.append(ColorRule(['#'], py_cui.RED_ON_BLACK, 'startswith', 'line', None, False))
-#    color_rules.append(ColorRule(['"""'], py_cui.GREEN_ON_BLACK, 'block', 'block', None, False))
-#    #color_rules.append(ColorRule(python_strings, py_cui.GREEN_ON_BLACK, 'contains', 'line', None, False))
-#    return color_rules
+            if self.match_type == 'line':
+                return [[render_text, self.color]], True
+            elif self.match_type == 'regex':
+                return self.generate_fragments_regex(widget, render_text), True
+            elif self.match_type == 'region':
+                return self.split_text_on_region(widget, render_text), True
+    
+        return [[render_text, widget.color]], False

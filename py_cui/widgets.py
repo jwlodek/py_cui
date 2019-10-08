@@ -41,12 +41,6 @@ class Widget:
         self.row = row
         self.row_span = row_span
         self.column_span = column_span
-        #self.overlap_x = 0
-        #self.overlap_y = 0
-        #if self.row + self.row_span == self.grid.num_rows:
-        #    self.overlap_y = self.grid.height % self.grid.num_rows
-        #if self.column + self.column_span == self.grid.num_columns:
-        #    self.overlap_x = self.grid.width % self.grid.num_columns - 1
         self.padx = padx
         self.pady = pady
         self.start_x, self.start_y = self.get_absolute_position()
@@ -680,6 +674,10 @@ class ScrollTextBlock(Widget):
         self.text_lines = []
         self.text_lines.append('')
 
+    def get_current_line(self):
+        """ Returns the line on which the cursor currently resides """
+
+        return self.text_lines[self.cursor_text_pos_y]
 
 
     def set_text(self, text):
@@ -708,8 +706,10 @@ class ScrollTextBlock(Widget):
         self.text_lines[self.cursor_text_pos_y] = text
 
 
-    def move_left(self, current_line):
+    def move_left(self):
         """ Function that moves the cursor/text position one location to the left """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_x > 0:
             if self.cursor_x > self.cursor_max_left:
@@ -718,8 +718,10 @@ class ScrollTextBlock(Widget):
                 self.viewport_x_start = self.viewport_x_start - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
-    def move_right(self, current_line):
+    def move_right(self):
         """ Function that moves the cursor/text position one location to the right """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_x < len(current_line):
             if self.cursor_x < self.cursor_max_right:
@@ -729,8 +731,10 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x + 1
 
 
-    def move_up(self, current_line):
+    def move_up(self):
         """ Function that moves the cursor/text position one location up """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_y > 0:
             if self.cursor_y > self.cursor_max_up:
@@ -744,8 +748,10 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def move_down(self, current_line):
+    def move_down(self):
         """ Function that moves the cursor/text position one location down """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_y < len(self.text_lines) - 1:
             if self.cursor_y < self.cursor_max_down:
@@ -759,10 +765,11 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def handle_newline(self, current_line):
+    def handle_newline(self):
         """ Function that handles recieving newline characters in the text """
 
-        current_line = self.text_lines[self.cursor_text_pos_y]
+        current_line = self.get_current_line()
+
         new_line_1 = current_line[:self.cursor_text_pos_x]
         new_line_2 = current_line[self.cursor_text_pos_x:]
         self.text_lines[self.cursor_text_pos_y] = new_line_1
@@ -776,8 +783,10 @@ class ScrollTextBlock(Widget):
             self.viewport_y_start = self.viewport_y_start + 1
 
 
-    def handle_backspace(self, current_line):
+    def handle_backspace(self):
         """ Function that handles recieving backspace characters in the text """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_x == 0 and self.cursor_text_pos_y != 0:
             self.cursor_text_pos_x = len(self.text_lines[self.cursor_text_pos_y - 1])
@@ -796,7 +805,7 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
 
-    def handle_home(self, current_line):
+    def handle_home(self):
         """ Function that handles recieving a home keypress """
 
         self.cursor_x = self.cursor_max_left
@@ -804,8 +813,10 @@ class ScrollTextBlock(Widget):
         self.viewport_x_start = 0
 
 
-    def handle_end(self, current_line):
+    def handle_end(self):
         """ Function that handles recieving an end keypress """
+
+        current_line = self.get_current_line()
 
         self.cursor_text_pos_x = len(current_line)
         if len(current_line) > self.viewport_width:
@@ -815,8 +826,10 @@ class ScrollTextBlock(Widget):
             self.cursor_x = self.cursor_max_left + len(current_line)
 
 
-    def handle_delete(self, current_line):
+    def handle_delete(self):
         """ Function that handles recieving a delete keypress """
+
+        current_line = self.get_current_line()
 
         if self.cursor_text_pos_x == len(current_line) and self.cursor_text_pos_y < len(self.text_lines):
             self.text_lines[self.cursor_text_pos_y] = self.text_lines[self.cursor_text_pos_y] + self.text_lines[self.cursor_text_pos_y + 1]
@@ -825,8 +838,10 @@ class ScrollTextBlock(Widget):
             self.set_text_line(current_line[:self.cursor_text_pos_x] + current_line[self.cursor_text_pos_x+1:])
 
 
-    def insert_char(self, current_line, key_pressed):
+    def insert_char(self, key_pressed):
         """ Function that handles recieving a character """
+
+        current_line = self.get_current_line()
 
         self.set_text_line(current_line[:self.cursor_text_pos_x] + chr(key_pressed) + current_line[self.cursor_text_pos_x:])
         if len(current_line) <= self.width - 2 * self.padx - 4:
@@ -841,32 +856,29 @@ class ScrollTextBlock(Widget):
 
         super().handle_key_press(key_pressed)
 
-        # The current line on which the user's cursor is located
-        current_line = self.text_lines[self.cursor_text_pos_y]
-
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left(current_line)
+            self.move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right(current_line)
+            self.move_right()
         elif key_pressed == py_cui.keys.KEY_UP_ARROW:
-            self.move_up(current_line)
+            self.move_up()
         elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self.cursor_text_pos_y < len(self.text_lines) - 1:
-            self.move_down(current_line)
+            self.move_down()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE:
-            self.handle_backspace(current_line)
+            self.handle_backspace()
         elif key_pressed == py_cui.keys.KEY_DELETE:
-            self.handle_delete(current_line)
+            self.handle_delete()
         elif key_pressed == py_cui.keys.KEY_ENTER:
-            self.handle_newline(current_line)
+            self.handle_newline()
         elif key_pressed == py_cui.keys.KEY_TAB:
             for i in range(0, 4):
-                self.insert_char(current_line, py_cui.keys.KEY_SPACE)
+                self.insert_char(py_cui.keys.KEY_SPACE)
         elif key_pressed == py_cui.keys.KEY_HOME:
-            self.handle_home(current_line)
+            self.handle_home()
         elif key_pressed == py_cui.keys.KEY_END:
-            self.handle_end(current_line)
+            self.handle_end()
         elif key_pressed > 31 and key_pressed < 128:
-            self.insert_char(current_line, key_pressed)
+            self.insert_char(key_pressed)
 
 
     def draw(self):

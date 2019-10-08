@@ -63,7 +63,7 @@ class Popup:
         pass
 
 
-    def draw(self, stdscr):
+    def draw(self):
         """ Must be implemented by subclass """
         self.renderer.set_color_mode(self.color)
         target_y = int(self.stop_y - self.start_y / 2)
@@ -88,8 +88,8 @@ class MessagePopup(Popup):
         if (key_pressed == 10 or key_pressed == 32 or key_pressed == 27):
             self.root.close_popup()
 
-    def draw(self, stdscr):
-        super().draw(stdscr)
+    def draw(self):
+        super().draw()
 
 
 ###########################################################
@@ -126,8 +126,8 @@ class YesNoPopup(Popup):
                 self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
 
-    def draw(self, stdscr):
-        super().draw(stdscr)
+    def draw(self):
+        super().draw()
 
 
 
@@ -244,7 +244,7 @@ class TextBoxPopup(Popup):
         elif key_pressed > 31 and key_pressed < 128:
             self.insert_char(key_pressed)
 
-    def draw(self, stdscr):
+    def draw(self):
         """ Override of base draw function """
 
         self.renderer.set_color_mode(self.color)
@@ -339,7 +339,7 @@ class MenuPopup(Popup):
             self.scroll_down()
 
 
-    def draw(self, stdscr):
+    def draw(self):
         """ Overrides base class draw function """
 
         self.renderer.set_color_mode(self.color)
@@ -370,12 +370,12 @@ class LoadingIconPopup(Popup):
         self.icon_counter = 0
         self.message = message
 
-    def draw(self, stdscr):
+    def draw(self):
         self.text = '{} ... {}'.format(self.message, self.loading_icons[self.icon_counter])
         self.icon_counter = self.icon_counter + 1
         if self.icon_counter == len(self.loading_icons):
             self.icon_counter = 0
-        super().draw(stdscr)
+        super().draw()
 
 
 class LoadingBarPopup(Popup):
@@ -384,7 +384,7 @@ class LoadingBarPopup(Popup):
         self.num_items = num_items
         self.completed_items = 0
 
-    def draw(self, stdscr):
+    def draw(self):
         width = self.stop_x - self.start_x
         bar_width = 2 * int(width / 3)
         items_per_bar_block = self.num_items / bar_width
@@ -399,4 +399,4 @@ class LoadingBarPopup(Popup):
         #self.title = '{}, {}, {}, {}, {}'.format(width, bar_width, items_per_bar_block, completed_blocks, non_completed_blocks)
 
         self.text = '{}{} ({}/{})'.format('#' * completed_blocks, '-' * non_completed_blocks, self.completed_items, self.num_items)
-        super().draw(stdscr)
+        super().draw()
