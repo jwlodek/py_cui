@@ -8,3 +8,4 @@ build/
 *.egg-info
 files.txt
 dist/
+notes/
