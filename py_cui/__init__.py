@@ -26,7 +26,7 @@ import py_cui.renderer as renderer
 import py_cui.errors
 import py_cui.widgets as widgets
 import py_cui.widget_set as widget_set
-import py_cui.keybinding as keys
+import py_cui.keys
 import py_cui.popups
 
 
@@ -92,8 +92,8 @@ class PyCUI:
         absolute position of the cursor in the CUI
     grid : py_cui.grid.Grid
         The main layout manager for the CUI
-    cells : list of py_cui.cell.Cell
-        list of cells in the grid
+    widgets : dict of str - py_cui.widgets.Widget
+        dict of widget in the grid
     title_bar : py_cui.statusbar.StatusBar
         a status bar object that gets drawn at the top of the CUI
     status_bar : py_cui.statusbar.StatusBar
@@ -114,7 +114,7 @@ class PyCUI:
         function that adds a status bar widget to the CUI
     """
 
-    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=keys.KEY_Q_LOWER):
+    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER):
 
         self.title = 'PyCUI Window'
         # When this is not set, the escape character delay is too long for exiting focus mode
@@ -129,7 +129,7 @@ class PyCUI:
 
         # Add status and title bar
         self.title_bar = py_cui.statusbar.StatusBar(self.title, BLACK_ON_WHITE)
-        self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(keys.get_char_from_ascii(exit_key))
+        self.init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(py_cui.keys.get_char_from_ascii(exit_key))
         self.status_bar = py_cui.statusbar.StatusBar(self.init_status_bar_text, BLACK_ON_WHITE)
 
         # Initialize grid, renderer, and widget dict
@@ -329,13 +329,13 @@ class PyCUI:
 
         target_row = row
         target_col = column
-        if direction == keys.KEY_DOWN_ARROW:
+        if direction == py_cui.keys.KEY_DOWN_ARROW:
             target_row = target_row + row_span
-        elif direction == keys.KEY_UP_ARROW:
+        elif direction == py_cui.keys.KEY_UP_ARROW:
             target_row = target_row - 1
-        elif direction == keys.KEY_LEFT_ARROW:
+        elif direction == py_cui.keys.KEY_LEFT_ARROW:
             target_col = target_col - 1
-        elif direction == keys.KEY_RIGHT_ARROW:
+        elif direction == py_cui.keys.KEY_RIGHT_ARROW:
             target_col = target_col + col_span
         if target_row < 0 or target_col < 0 or target_row >= self.grid.num_rows or target_col >= self.grid.num_columns:
             return None
@@ -534,17 +534,17 @@ class PyCUI:
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
         if self.in_focused_mode and self.popup is None:
-            if key_pressed == keys.KEY_ESCAPE:
+            if key_pressed == py_cui.keys.KEY_ESCAPE:
                 self.status_bar.set_text(self.init_status_bar_text)
                 self.in_focused_mode = False
                 selected_widget.selected = False
             else:
-                # widget handles remaining keys
+                # widget handles remaining py_cui.keys
                 selected_widget.handle_key_press(key_pressed)
 
-        # Otherwise, barring a popup, we are in overview mode, meaning that arrow keys move between widgets, and Enter key starts focus mode
+        # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         elif self.popup is None:
-            if key_pressed == keys.KEY_ENTER and self.selected_widget is not None and selected_widget.is_selectable:
+            if key_pressed == py_cui.keys.KEY_ENTER and self.selected_widget is not None and selected_widget.is_selectable:
                 self.in_focused_mode = True
                 selected_widget.selected = True
                 # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
@@ -560,9 +560,9 @@ class PyCUI:
                     command = self.keybindings[key]
                     command()
 
-            # If not in focus mode, use the arrow keys to move around the selectable widgets.
+            # If not in focus mode, use the arrow py_cui.keys to move around the selectable widgets.
             neighbor = None
-            if key_pressed == keys.KEY_UP_ARROW or key_pressed == keys.KEY_DOWN_ARROW or key_pressed == keys.KEY_LEFT_ARROW or key_pressed == keys.KEY_RIGHT_ARROW:
+            if key_pressed == py_cui.keys.KEY_UP_ARROW or key_pressed == py_cui.keys.KEY_DOWN_ARROW or key_pressed == py_cui.keys.KEY_LEFT_ARROW or key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
                 neighbor = self.check_if_neighbor_exists(selected_widget.row, selected_widget.column, selected_widget.row_span, selected_widget.column_span, key_pressed)
             if neighbor is not None:
                 selected_widget.selected = False

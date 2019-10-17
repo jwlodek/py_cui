@@ -20,22 +20,30 @@ class SuperNano:
     def __init__(self, root, dir):
         self.root = root
         self.dir = dir
-        self.file_menu = self.root.add_scroll_menu('Directory Files', 0, 0, row_span=4, column_span=2)
-        self.new_dir_box = self.root.add_text_box('Current Directory', 6, 0, column_span=2)
-        self.new_dir_box.set_text(self.dir)
-        self.open_new_directory()
+
+        self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self.save_opened_file)
+
+        self.file_menu = self.root.add_scroll_menu('Directory Files', 0, 0, row_span=5, column_span=2)
 
         self.file_menu.add_key_command(py_cui.keys.KEY_ENTER, self.open_file_dir)
+        self.file_menu.add_key_command(py_cui.keys.KEY_DELETE, self.delete_selected_file)
+        self.file_menu.add_text_color_rule('<DIR>', py_cui.GREEN_ON_BLACK, 'startswith', match_type='region', region=[5,1000])
 
-        self.save_button = self.root.add_button('Save', 4, 0, command=self.save_opened_file)
-        self.delete_button = self.root.add_button('Delete', 4, 1, command=self.delete_selected_file)
-        self.new_file_textbox = self.root.add_text_box('Add New File', 5, 0, column_span=2)
 
+
+        self.new_dir_box = self.root.add_text_box('Current Directory', 6, 0, column_span=2)
+        self.new_dir_box.set_text(self.dir)
+
+
+        self.open_new_directory()
 
         self.edit_text_block = self.root.add_text_block('Open file', 0, 2, row_span=7, column_span=6)
 
         self.new_dir_box.add_key_command(py_cui.keys.KEY_ENTER, self.open_new_directory)
+
+        self.new_file_textbox = self.root.add_text_box('Add New File', 5, 0, column_span=2)
         self.new_file_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.add_new_file)
+
 
     def open_new_directory(self):
         target = self.new_dir_box.get()
@@ -67,10 +75,12 @@ class SuperNano:
     def add_new_file(self):
         self.file_menu.add_item(self.new_file_textbox.get())
         self.file_menu.selected_item = len(self.file_menu.get_item_list()) - 1
+        self.new_file_textbox.selected = False
         self.root.set_selected_widget(self.edit_text_block.id)
         self.edit_text_block.title = self.new_file_textbox.get()
         self.edit_text_block.clear()
         self.new_file_textbox.clear()
+
 
     def open_file_dir(self):
         filename = self.file_menu.get()
@@ -109,7 +119,7 @@ class SuperNano:
             except OSError:
                 self.root.show_error_popup('OS Error', 'Operation could not be completed due to an OS error.')
         else:
-            self.root.show_error_popup('No File Opened', 'Please open a file before saving it.')
+            self.root.show_error_popup('No File Opened', 'Please open a file before deleting it.')
 
 
 def parse_args():

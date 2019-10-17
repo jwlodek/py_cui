@@ -1,5 +1,5 @@
 """
-File containing all error types for py_cui
+Module containing all error types for py_cui
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019

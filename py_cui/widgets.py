@@ -256,7 +256,7 @@ class ScrollMenu(Widget):
         """ Function that scrolls the view up in the scroll menu """
 
         if self.selected:
-            if self.top_view > 0:
+            if self.top_view > 0 and self.selected_item == self.top_view:
                 self.top_view = self.top_view - 1
             if self.selected_item > 0:
                 self.selected_item = self.selected_item - 1
@@ -777,6 +777,7 @@ class ScrollTextBlock(Widget):
         self.cursor_text_pos_y = self.cursor_text_pos_y + 1
         self.cursor_text_pos_x = 0
         self.cursor_x = self.cursor_max_left
+        self.viewport_x_start = 0
         if self.cursor_y < self.cursor_max_down:
             self.cursor_y = self.cursor_y + 1
         elif self.viewport_y_start + self.height - 2 < len(self.text_lines):

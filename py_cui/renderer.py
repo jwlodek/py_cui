@@ -1,5 +1,5 @@
 """
-File containing the py_cui renderer. It is used to draw all of the onscreen widgets and items.
+Module containing the py_cui renderer. It is used to draw all of the onscreen widgets and items.
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019

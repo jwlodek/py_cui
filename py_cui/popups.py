@@ -12,23 +12,34 @@ import py_cui.errors
 
 
 class Popup:
-    """
-    Base popup class. Contains constructor and initial definitions for key_press and draw
+    """Base CUI popup class. 
+    
+    Contains constructor and initial definitions for key_press and draw
     Unlike widgets, they do not have a set grid cell, they are simply centered in the view
     frame
 
     Attributes
     ----------
-    root : PyCUI
-        the root py_cui window
-    title, text : str
-        The message title and text
+    root : py_cui.PyCUI
+        Root CUI window
+    title : str
+        Popup title
+    text : str
+        Popup message text
     color : int
-        The py_cui color code
+        PyCUI color value
+    renderer : py_cui.renderer.Renderer
+        Renderer for drawing the popup
     start_x, start_y : int
         top left corner of the popup
     stop_x, stop_y : int
         bottom right corner of the popup
+    height, width : int
+        The dimensions of the popup 
+    padx, pady : int
+        The padding on either side of the popup
+    selected : bool
+        Always true. Used by the renderer to highlight popup
 
     Methods
     -------
@@ -38,8 +49,23 @@ class Popup:
         Implemented by each subclass, draws the popup to the terminal
     """
 
+
     def __init__(self, root, title, text, color, renderer):
-        """ Constructor for popup class """
+        """Constructor for popup class
+        
+        Parameters
+        ----------
+        root : py_cui.PyCUI
+            Root CUI window
+        title : str
+            Popup title
+        text : str
+            Popup message text
+        color : int
+            PyCUI color value
+        renderer : py_cui.renderer.Renderer
+            Renderer for drawing the popup
+        """
 
         self.root = root
         self.title = title
@@ -58,20 +84,32 @@ class Popup:
 
 
     def handle_key_press(self, key_pressed):
-        """ Must be implemented by subclass """
+        """Handles key presses when popup is open
+        
+        Must be implemented by subclass
+        
+        Parameters
+        ----------
+        key_pressed : int
+            The ascii code for the key that was pressed
+        """
 
         pass
 
 
     def draw(self):
-        """ Must be implemented by subclass """
+        """Function that uses renderer to draw the popup
+        
+        Can be implemented by subclass
+        """
+
         self.renderer.set_color_mode(self.color)
         target_y = int(self.stop_y - self.start_y / 2)
         self.renderer.set_color_rules([])
         self.renderer.set_bold()
         self.renderer.draw_border(self, with_title=False)
-        self.renderer.draw_text(self, self.title, target_y - 2, centered=True)
-        self.renderer.draw_text(self, self.text, target_y, centered=True)
+        self.renderer.draw_text(self, self.title, target_y - 2, centered=True, selected=True)
+        self.renderer.draw_text(self, self.text,  target_y,     centered=True, selected=True)
         self.renderer.unset_color_mode(self.color)
         self.renderer.unset_bold()
         self.renderer.reset_cursor(self)
@@ -79,16 +117,29 @@ class Popup:
 
 
 class MessagePopup(Popup):
+    """Class representing a simple message popup
+    """
 
     def __init__(self, root, title, text, color, renderer):
+        """Constructor for MessagePopup
+        """
+
         super().__init__(root, title, text, color, renderer)
         
 
     def handle_key_press(self, key_pressed):
-        if (key_pressed == 10 or key_pressed == 32 or key_pressed == 27):
+        """Implementation of handle_key_pressed.
+
+        Closes popup if Enter, Space, or Escape is pressed.
+        """
+
+        if (key_pressed == py_cui.keys.KEY_ENTER or key_pressed == py_cui.keys.KEY_ESCAPE or key_pressed == py_cui.keys.KEY_SPACE):
             self.root.close_popup()
 
     def draw(self):
+        """Draw function. Calls superclass draw()
+        """
+
         super().draw()
 
 
@@ -104,12 +155,28 @@ class MessagePopup(Popup):
 
 
 class YesNoPopup(Popup):
+    """Class for Yes/No popup. Extends Popup
+
+    Attributes
+    ----------
+    command : function, 1 boolean parameter
+        Function that takes one boolean parameter. Called with True if yes, called with False if no.
+    """
+
 
     def __init__(self, root, title, text, color, command, renderer):
+        """Constructor for YesNoPopup
+        """
+
         super().__init__(root, title, text, color, renderer)
         self.command = command
 
+
     def handle_key_press(self, key_pressed):
+        """Handle key press overwrite from superclass
+
+        """
+
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
             self.ret_val = True
@@ -128,7 +195,6 @@ class YesNoPopup(Popup):
 
     def draw(self):
         super().draw()
-
 
 
 class TextBoxPopup(Popup):
