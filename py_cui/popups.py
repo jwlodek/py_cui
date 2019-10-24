@@ -198,7 +198,7 @@ class YesNoPopup(Popup):
 
 
 class TextBoxPopup(Popup):
-    def __init__(self, root, title, color, command, renderer):
+    def __init__(self, root, title, color, command, renderer, password):
         super().__init__(root, title, '', color, renderer)
         self.text = ''
         self.command = command
@@ -208,6 +208,7 @@ class TextBoxPopup(Popup):
         self.cursor_max_right = self.start_x + self.width - 1 -self.pady
         self.cursor_y = self.start_y + int(self.height / 2) + 1
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
+        self.password = password
 
 
     def set_text(self, text):
@@ -324,6 +325,9 @@ class TextBoxPopup(Popup):
                 render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
             else:
                 render_text = self.text[end:]
+        if self.password:
+            temp = '*' * len(render_text)
+            render_text = temp
         self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
 
         if self.selected:

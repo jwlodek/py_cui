@@ -409,7 +409,7 @@ class PyCUI:
         self.popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command, self.renderer)
 
 
-    def show_text_box_popup(self, title, command):
+    def show_text_box_popup(self, title, command, password=False):
         """
         Shows a yes/no popup.
         
@@ -417,7 +417,7 @@ class PyCUI:
         """
 
         color=WHITE_ON_BLACK
-        self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer)
+        self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer, password)
     
     
     def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
