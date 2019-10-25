@@ -243,6 +243,8 @@ class PyCUI:
         self.renderer = renderer.Renderer(self, self.stdscr)
         for widget_id in self.widgets.keys():
             self.widgets[widget_id].assign_renderer(self.renderer)
+        if self.popup is not None:
+            self.popup.renderer = self.renderer
 
 
     # Widget add functions. Each of these adds a particular type of widget to the grid
@@ -611,14 +613,14 @@ class PyCUI:
             self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            try:
-                self.draw_status_bars(stdscr, height, width)
-                self.draw_widgets()
-                # draw the popup if required
-                if self.popup is not None:
-                    self.popup.draw()
-            except Exception as e:
-                self.display_window_warning(stdscr, str(e))
+            #try:
+            self.draw_status_bars(stdscr, height, width)
+            self.draw_widgets()
+            # draw the popup if required
+            if self.popup is not None:
+                self.popup.draw()
+            #except Exception as e:
+            #    self.display_window_warning(stdscr, str(e))
 
             # Refresh the screen
             stdscr.refresh()
@@ -639,3 +641,10 @@ class PyCUI:
         curses.endwin()
         if self.on_stop is not None:
             self.on_stop()
+
+
+    def __format__(self, fmt):
+        out = ''
+        for widget in self.widgets.keys():
+            out += '{}\n'.format(self.widgets[widget].title)
+        return out
