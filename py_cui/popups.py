@@ -315,9 +315,9 @@ class TextBoxPopup(Popup):
         """ Override of base draw function """
 
         self.renderer.set_color_mode(self.color)
+        self.renderer.set_color_rules([])
         self.renderer.draw_text(self, self.title, self.cursor_y - 2, bordered=False, selected=True)
         self.renderer.draw_border(self, fill=False, with_title=False)
-        self.renderer.set_color_rules([])
         render_text = self.text
         if len(self.text) > self.width - 2 * self.padx - 4:
             end = len(self.text) - (self.width - 2 * self.padx - 4)

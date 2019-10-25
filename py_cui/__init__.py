@@ -147,6 +147,7 @@ class PyCUI:
         # CUI blocks when loading popup is open
         self.loading = False
         self.stopped = True
+        self.post_loading_callback = None
 
         # Top level keybindings. Exit key is 'q' by default
         self.keybindings = {}
@@ -362,6 +363,11 @@ class PyCUI:
             self.selected_widget = widget_id
 
 
+    def get_widget_id(self, widget):
+        for widget_id in self.widgets.keys():
+            if self.widgets[widget_id] == widget:
+                return widget_id
+
     def lose_focus(self):
         """ Function that forces py_cui out of focus mode. After popup is called, focus is lost """
 
@@ -370,6 +376,12 @@ class PyCUI:
             self.status_bar.set_text(self.init_status_bar_text)
             self.widgets[self.selected_widget].selected = False
 
+
+    def move_focus(self, widget):
+        self.lose_focus()
+        self.set_selected_widget(self.get_widget_id(widget))
+        widget.selected = True
+        self.in_focused_mode = True
 
     def add_key_command(self, key, command):
         """ Function that adds a keybinding to the CUI when in overview mode """
@@ -433,17 +445,21 @@ class PyCUI:
         self.popup = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self.renderer, run_command_if_none)
 
 
-    def show_loading_icon_popup(self, title, message):
+    def show_loading_icon_popup(self, title, message, callback=None):
         """ Shows a loading icon popup """
     
+        if callback is not None:
+            self.post_loading_callback = callback
         color = WHITE_ON_BLACK
         self.loading = True
         self.popup = py_cui.popups.LoadingIconPopup(self, title, message, color, self.renderer)
 
 
-    def show_loading_bar_popup(self, title, num_items):
+    def show_loading_bar_popup(self, title, num_items, callback=None):
         """ Shows loading bar popup. Use 'increment_loading_bar' to show progress """
 
+        if callback is not None:
+            self.post_loading_callback = callback
         color = WHITE_ON_BLACK
         self.loading = True
         self.popup = py_cui.popups.LoadingBarPopup(self, title, num_items, color, self.renderer)
@@ -608,6 +624,11 @@ class PyCUI:
                     self.refresh_height_width(height, width)
                 except Exception as e:
                     self.display_window_warning(stdscr, str(e))
+
+            # If we have a post_loading_callback, fire it here
+            if self.post_loading_callback is not None and not self.loading:
+                self.post_loading_callback()
+                self.post_loading_callback = None
 
             # Handle keypresses
             self.handle_key_presses(key_pressed)
