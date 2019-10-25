@@ -647,11 +647,11 @@ class PyCUI:
             stdscr.refresh()
 
             # Wait for next input
-            if self.loading:
+            if self.loading or self.post_loading_callback is not None:
                 # When loading, refresh screen every quarter second
                 time.sleep(0.25)
                 # Need to reset key_pressed, because otherwise the previously pressed key will be used.
-                key_pressed = py_cui.keys.KEY_ESCAPE
+                key_pressed = 0
             elif self.stopped:
                 key_pressed = self.exit_key
             else:
