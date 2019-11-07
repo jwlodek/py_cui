@@ -201,11 +201,17 @@ class PyCUI:
         curses.wrapper(self.draw)
 
 
-    def stop(self, callback = None):
+    def stop(self):
         """ Function that stops the CUI, and fires the callback function. Callback must be a no arg method """
 
         self.stopped = True
-        self.on_stop = callback
+
+
+    def run_on_exit(self, command):
+        """Sets callback function on CUI exit. Must be a no-argument function or lambda function
+        """
+
+        self.on_stop = command
 
 
     def set_title(self, title):

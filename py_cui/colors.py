@@ -41,7 +41,7 @@ class ColorRule:
     """
 
     def __init__(self, regex, color, rule_type, match_type, region, include_whitespace):
-        """ Constructor for ColorRule object
+        """Constructor for ColorRule object
             
         Parameters
         ----------
@@ -73,7 +73,7 @@ class ColorRule:
 
 
     def check_match(self, line):
-        """ Checks if the color rule matches a line
+        """Checks if the color rule matches a line
         
         Parameters
         ----------
@@ -110,7 +110,7 @@ class ColorRule:
 
 
     def generate_fragments_regex(self, widget, render_text):
-        """ Splits text into fragments based on regular expression
+        """Splits text into fragments based on regular expression
         
         Parameters
         ----------
@@ -140,7 +140,7 @@ class ColorRule:
 
 
     def split_text_on_region(self, widget, render_text):
-        """ Splits text into fragments based on region
+        """Splits text into fragments based on region
         
         Parameters
         ----------
@@ -168,7 +168,7 @@ class ColorRule:
 
 
     def generate_fragments(self, widget, line, render_text):
-        """ Splits text into fragments if matched line to regex
+        """Splits text into fragments if matched line to regex
         
         Parameters
         ----------

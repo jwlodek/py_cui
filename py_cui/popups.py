@@ -100,7 +100,7 @@ class Popup:
     def draw(self):
         """Function that uses renderer to draw the popup
         
-        Can be implemented by subclass
+        Can be implemented by subclass. Base draw function will draw the title and text in a bordered box
         """
 
         self.renderer.set_color_mode(self.color)
@@ -125,7 +125,7 @@ class MessagePopup(Popup):
         """
 
         super().__init__(root, title, text, color, renderer)
-        
+        self.close_keys = [py_cui.keys.KEY_ENTER, py_cui.keys.KEY_ESCAPE, py_cui.keys.KEY_SPACE, py_cui.keys.KEY_BACKSPACE, py_cui.keys.KEY_DELETE]
 
     def handle_key_press(self, key_pressed):
         """Implementation of handle_key_pressed.
@@ -133,25 +133,15 @@ class MessagePopup(Popup):
         Closes popup if Enter, Space, or Escape is pressed.
         """
 
-        if (key_pressed == py_cui.keys.KEY_ENTER or key_pressed == py_cui.keys.KEY_ESCAPE or key_pressed == py_cui.keys.KEY_SPACE):
+        
+        if (key_pressed in self.close_keys):
             self.root.close_popup()
 
     def draw(self):
-        """Draw function. Calls superclass draw()
+        """Draw function for MessagePopup. Calls superclass draw()
         """
 
         super().draw()
-
-
-###########################################################
-#
-# Below popups require some form of blocking + return,
-# which I cannot yet figure out. TODO
-#
-# UNIMPLEMENTED
-#
-###########################################################
-
 
 
 class YesNoPopup(Popup):
