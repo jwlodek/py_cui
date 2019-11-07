@@ -27,7 +27,9 @@ show_yes_no_popup(self, title, command)
 **Usage**
 
 Ask user yes/no question. The `command` parameter passed to the spawn function must be a function that takes a single boolean parameter.
+
 **Keys**
+
 If `KEY_Y_LOWER` is pressed, the command will be run with `True` passed in, otherwise `False` is passed in.
 
 ### Loading Icon/Bar Popup
