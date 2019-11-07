@@ -8,7 +8,7 @@ A **py**thon library for creating **c**ommand line **u**ser **i**nterfaces.
 
 ### What is py_cui?
 
-`py_cui` is a python library meant to simplify writing command line user interfaces in python. It relies on the `curses` module, which is traditionally a unix-specific python module, however, I was able to use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
+`py_cui` is a python library meant to simplify writing command line user interfaces in python. It relies on the `curses` module, which is traditionally a unix-specific python module, however, you may use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
 
 The main advantage `py_cui` has over traditional command line user interfaces is that it relies on widgets and a grid layout manager like most traditional Graphical User Interfaces. You may define a grid size, and then drop predefined widgets onto it into specific grid locations. Widgets can also be stretched accross multiple grid rows and columns. If you've ever made a Tkinter GUI, you will feel right at home.
 
@@ -42,11 +42,12 @@ Below are some screenshots from examples written with py_cui. Source code is ava
     <img src="docs/assets/demo_todo.png">
 </p>
 
-**Autogit - a command line interface for managing git repositories**
+**pyautogit - a command line interface for managing git repositories**
+
+[pyautogit](https://github.com/jwlodek/pyautogit) is the first larger scale project written in `py_cui`. Feel free to use it as a guide.
 <p align="center">
     <img src="docs/assets/autogit_demo.png">
 </p>
-
 
 ### Writing a PyCUI
 
@@ -91,6 +92,15 @@ Popup mode simply displays a popup over the rest of the UI. Each popup type beha
 pytest
 ```
 in the root directory to run all unit tests.
+
+### Powered by py_cui
+
+Below is a table of python projects developed with the help of `py_cui`. If you've made something, feel free to make a pull request to add it!
+
+Project | Description
+--------|-------------
+[pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
+[py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 
 ### License
 
