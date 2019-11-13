@@ -1,14 +1,18 @@
 site_name: py_cui Documentation
+repo_url: https://github.com/jwlodek/py_cui/
+copyright: 2019 - Jakub Wlodek
 nav:
   - Home: index.md
   - Installation: install.md
-  - Usage: usage.md
-  - Widgets: widgets.md
-  - Colors: colors.md
-  - Popups: popups.md
-  - Keys: keybindings.md
-  - Functions: functions.md
-  - Writing a PyCUI step-by-step: writing.md
+  - Using and Writing PyCUIs: 
+    - Basic Usage: usage.md
+    - Widgets: widgets.md
+    - Colors: colors.md
+    - Popups: popups.md
+    - Keys: keybindings.md
+    - Writing a PyCUI step-by-step: writing.md
+  - Classes / Functions:
+    - PyCUI: DocstringGenerated/PyCUI.md
   - For py_cui developers: developers.md
   - Examples: examples.md
   - About: about.md

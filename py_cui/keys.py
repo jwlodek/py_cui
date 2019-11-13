@@ -1,5 +1,4 @@
-"""
-Module containing constants and helper functions for dealing with keys.
+"""Module containing constants and helper functions for dealing with keys.
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019
@@ -11,13 +10,15 @@ import curses
 # Some simple helper functions
 
 def get_ascii_from_char(char):
-    """Function that converts ascii code to character"""
+    """Function that converts ascii code to character
+    """
 
     return ord(char)
 
 
 def get_char_from_ascii(key_num):
-    """Function that converts a character to an ascii code"""
+    """Function that converts a character to an ascii code
+    """
     
     return chr(key_num)
 
