@@ -4,9 +4,12 @@
 @created:   12-Aug-2019
 """
 
+# TODO - expand this
+
 class PyCUIOutOfBoundsError(Exception):
     """Error for when widget or text goes off of the py_cui grid
     """
+
     pass
 
 

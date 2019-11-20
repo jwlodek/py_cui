@@ -1,5 +1,4 @@
-"""
-File containing all error types for py_cui
+"""File containing color rule class and any color-rendering related functions
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019
@@ -30,13 +29,13 @@ class ColorRule:
 
     Methods
     -------
-    check_match(line : str)
+    check_match()
         Function that checks if the regex given matches the input line given the rule type
-    generate_fragments_regex(py_cui.Widget : widget, render_text : str)
+    generate_fragments_regex()
         Splits text into color coded renderable fragments based on regular expression
-    split_text_on_region(py_cui.Widget : widget, render_text : str)
+    split_text_on_region()
         Splits text into color coded renderable fragments based on region
-    generate_fragments(py_cui.Widget : widget, line : str, render_text : str)
+    generate_fragments()
         Checks match of rule with line, then splits render_text into fragments if required
     """
 

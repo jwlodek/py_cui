@@ -11,6 +11,16 @@ import curses
 
 def get_ascii_from_char(char):
     """Function that converts ascii code to character
+
+    Parameters
+    ----------
+    char : character
+        character to convert to ascii
+    
+    Returns
+    -------
+    ascii_code : int
+        Ascii code of character
     """
 
     return ord(char)
@@ -18,6 +28,16 @@ def get_ascii_from_char(char):
 
 def get_char_from_ascii(key_num):
     """Function that converts a character to an ascii code
+
+    Parameters
+    ----------
+    ascii_code : int
+        Ascii code of character
+
+    Returns
+    -------
+    char : character
+        character converted from ascii
     """
     
     return chr(key_num)

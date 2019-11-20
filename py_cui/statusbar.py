@@ -1,5 +1,4 @@
-"""
-File containing class for the status bar
+"""File containing class for the status bar
 
 TODO: File can probably be abstracted away - probably doesn't need a class
 
@@ -9,8 +8,7 @@ TODO: File can probably be abstracted away - probably doesn't need a class
 
 
 class StatusBar:
-    """
-    Very simple class representing a status bar
+    """Very simple class representing a status bar
 
     Attributes
     ----------
@@ -21,13 +19,15 @@ class StatusBar:
     """
 
     def __init__(self, text, color):
-        """ Constructor for statusbar """
+        """Constructor for statusbar
+        """
 
         self.text = text
         self.color = color
 
 
     def set_text(self, text):
-        """ Sets the statusbar text """
+        """Sets the statusbar text
+        """
 
         self.text = text

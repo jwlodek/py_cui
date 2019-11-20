@@ -62,7 +62,8 @@ def fit_text(width, text, center=False):
 
     Returns
     -------
-    text fixed depending on width
+    fitted_text : str
+        text fixed depending on width
     """
 
     if width < 5:
@@ -392,7 +393,7 @@ class PyCUI:
 
         Returns
         -------
-        ScrollMenu
+        new_scroll_menu : ScrollMenu
             A reference to the created scroll menu object.
         """
 
@@ -428,7 +429,7 @@ class PyCUI:
 
         Returns
         -------
-        CheckBoxMenu
+        new_checkbox_menu : CheckBoxMenu
             A reference to the created checkbox object.
         """
 
@@ -464,7 +465,7 @@ class PyCUI:
 
         Returns
         -------
-        TextBox
+        new_text_box : TextBox
             A reference to the created textbox object.
         """
 
@@ -500,7 +501,7 @@ class PyCUI:
 
         Returns
         -------
-        ScrollTextBlock
+        new_text_block : ScrollTextBlock
             A reference to the created textblock object.
         """
 
@@ -534,7 +535,7 @@ class PyCUI:
 
         Returns
         -------
-        Label
+        new_label : Label
             A reference to the created label object.
         """
 
@@ -566,7 +567,7 @@ class PyCUI:
 
         Returns
         -------
-        BlockLabel
+        new_label : BlockLabel
             A reference to the created block label object.
         """
 
@@ -600,7 +601,7 @@ class PyCUI:
 
         Returns
         -------
-        Button
+        new_button : Button
             A reference to the created button object.
         """
 
@@ -635,7 +636,7 @@ class PyCUI:
 
         Returns
         -------
-        str
+        widget_id : str
             The widget neighbor ID if found, None otherwise
         """
 
@@ -681,7 +682,7 @@ class PyCUI:
         
         Returns
         -------
-        str
+        widget_id : str
             The id if found, None otherwise
         """
 

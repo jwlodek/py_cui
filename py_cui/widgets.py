@@ -28,9 +28,57 @@ import py_cui.errors
 
 class Widget:
     """Top Level Widget Base Class
+
+    Extended by all widgets. Contains base classes for handling key presses, drawing,
+    and setting status bar text.
+
+    Attributes
+    ----------
+
+    Parameters
+    ----------
+    id : int
+        Id of the widget
+    title : str
+        Widget title
+    grid : py_cui.grid.Grid
+        The parent grid object of the widget
+    renderer : py_cui.renderer.Renderer
+        The renderer object that draws the widget
+    row, column : int
+        row and column position of the widget
+    row_span, column_span : int
+        number of rows or columns spanned by the widget
+    padx, pady : int
+        Padding size in terminal characters
+    start_x, start_y : int
+        The position on the terminal of the top left corner of the widget
+    width, height : int
+        The width/height of the widget
+    color : int
+        Color code combination
+    selected_color : int
+        color code combination for when widget is selected
+    selected : bool
+        Flag that says if widget is selected
+    is_selectable : bool
+        Flag that says if a widget can be selected
+    help_text : str
+        text displayed in status bar when selected
+    key_commands : dict
+        Dictionary mapping key codes to functions
+    text_color_rules : list of py_cui.ColorRule
+        color rules to load into renderer when drawing widget
+
+    Methods
+    -------
+
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
+        """Constructor for base widget class
+        """
+        
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
         self.id = id
@@ -58,6 +106,11 @@ class Widget:
 
     def set_focus_text(self, text):
         """Function that sets the text of the status bar on focus for a particular widget
+
+        Parameters
+        ----------
+        text : str
+            text to write to status bar when in focus mode.
         """
 
         self.help_text = text
@@ -82,14 +135,18 @@ class Widget:
 
         Parameters
         ----------
-        rule_type : string
-            A supported color rule type
         regex : str
             A string to check against the line for a given rule type
         color : int
             a supported py_cui color value
-        match_entire_line : bool
-            if true, if regex fits rule type, entire line will be colored. If false, only matching text
+        rule_type : string
+            A supported color rule type
+        match_type='line' : str
+            sets match type. Can be 'line', 'regex', or 'region'
+        region : [int, int]
+            A specified region to color if using match_type='region'
+        include_whitespace : bool
+            if false, strip string before checking for match
         """
 
         self.text_color_rules.append(py_cui.colors.ColorRule(regex, color, rule_type, match_type, region, include_whitespace))
@@ -98,6 +155,11 @@ class Widget:
 
     def set_standard_color(self, color):
         """Sets the standard color for the widget
+
+        Parameters
+        ----------
+        color : int
+            Color code for widegt
         """
 
         self.color = color
@@ -105,6 +167,11 @@ class Widget:
 
     def set_selected_color(self, color):
         """Sets the selected color for the widget
+
+        Parameters
+        ----------
+        color : int
+            Color code for widegt when selected
         """
 
         self.selected_color = color
@@ -114,6 +181,16 @@ class Widget:
         """Function that assigns a renderer object to the widget
         
         (Meant for internal usage only)
+
+        Parameters
+        ----------
+        renderer : py_cui.renderer.Renderer
+            Renderer for drawing widget
+
+        Raises
+        ------
+        error : PyCUIError
+            If parameter is not a initialized renderer.
         """
 
         if isinstance(renderer, py_cui.renderer.Renderer):
@@ -124,6 +201,11 @@ class Widget:
 
     def get_absolute_position(self):
         """Gets the absolute position of the widget in characters
+
+        Returns
+        -------
+        x_pos, y_pos : int
+            position of widget in terminal
         """
 
         x_adjust = self.column
@@ -141,6 +223,11 @@ class Widget:
 
     def get_absolute_dims(self):
         """Gets the absolute dimensions of the widget in characters
+
+        Returns
+        -------
+        width, height : int
+            dimensions of widget in terminal
         """
 
         width = self.grid.column_width * self.column_span
@@ -158,6 +245,16 @@ class Widget:
 
     def is_row_col_inside(self, row, col):
         """Checks if a particular row + column is inside the widget area
+
+        Parameters
+        ----------
+        row, col : int
+            row and column position to check
+        
+        Returns
+        -------
+        is_inside : bool
+            True if row, col is within widget bounds, false otherwise
         """
 
         if self.row <= row and row <= (self.row + self.row_span - 1) and self.column <= col and col <= (self.column_span + self.column - 1):
@@ -181,6 +278,11 @@ class Widget:
 
     def get_help_text(self):
         """Returns help text
+
+        Returns
+        -------
+        help_text : str
+            Status bar text
         """
 
         return self.help_text
@@ -191,6 +293,11 @@ class Widget:
 
         When overwriting this function, make sure to add a super().handle_key_press(key_pressed) call,
         as this is required for user defined key command support
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
         """
 
         if key_pressed in self.key_commands.keys():
@@ -213,17 +320,21 @@ class Widget:
 class Label(Widget):
     """The most basic subclass of Widget.
     
-    Simply displays one centered row of text
+    Simply displays one centered row of text. Has no unique attributes or methods
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
+        """Constructor for Label
+        """
+
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
 
 
     def draw(self):
         """Override base draw class.
         
-        Center text and draw it"""
+        Center text and draw it
+        """
 
         super().draw()
         self.renderer.set_color_mode(self.color)
@@ -233,7 +344,12 @@ class Label(Widget):
 
 
 class BlockLabel(Widget):
-    """A Variation of the label widget that renders a block of text
+    """A Variation of the label widget that renders a block of text.
+
+    Attributes
+    ----------
+    lines : list of str
+        list of lines that make up block text
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
@@ -262,14 +378,45 @@ class ScrollMenu(Widget):
     
     Allows for creating a scrollable list of items of which one is selectable.
     Analogous to a RadioButton
+
+    Attributes
+    ----------
+    top_view : int
+        the uppermost menu element in view
+    selected_item : int
+        the currently highlighted menu item
+    view_items : list of str
+        list of menu items
+    
+    Methods
+    -------
+    clear()
+        clears items from menu
+    scroll_up()
+        Function that scrolls the view up in the scroll menu
+    scroll_down()
+        Function that scrolls the view down in the scroll menu
+    add_item()
+        Adds an item to the menu.
+    add_item_list()
+        Adds a list of items to the scroll menu.
+    remove_selected_item()
+        Function that removes the selected item from the scroll menu.
+    get_item_list()
+        Function that gets list of items in a scroll menu
+    get()
+        Function that gets the selected item from the scroll menu
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
+        """Constructor for scroll menu
+        """
+
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.top_view = 0
         self.selected_item = 0
         self.view_items = []
-        self.help_text = 'Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.'
+        self.set_focus_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
 
 
     def clear(self):
@@ -368,7 +515,13 @@ class ScrollMenu(Widget):
     def handle_key_press(self, key_pressed):
         """Override base class function.
         
-        UP_ARROW scrolls up, DOWN_ARROW scrolls down."""
+        UP_ARROW scrolls up, DOWN_ARROW scrolls down.
+        
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
+        """
 
         super().handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
@@ -404,6 +557,24 @@ class ScrollMenu(Widget):
 
 class CheckBoxMenu(ScrollMenu):
     """Extension of ScrollMenu that allows for multiple items to be selected at once.
+
+    Attributes
+    ----------
+    selected_item_list : list of str
+        List of checked items
+    checked_char : char
+        Character to represent a checked item
+
+    Methods
+    -------
+    add_item()
+        Adds item to Checkbox
+    add_item_list()
+        Adds list of items to the checkbox
+    get()
+        Gets list of selected items from the checkbox
+    mark_item_as_checked()
+        Function that marks an item as selected
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, checked_char):
@@ -411,10 +582,15 @@ class CheckBoxMenu(ScrollMenu):
 
         self.selected_item_list = []
         self.checked_char = checked_char
-        self.help_text = 'Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.'
+        self.set_focus_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
     def add_item(self, item_text):
         """Adds item to Checkbox
+
+        Parameters
+        ----------
+        item_text : str
+            Menu item to add
         """
 
         item_text = '[ ] - ' + item_text
@@ -423,6 +599,11 @@ class CheckBoxMenu(ScrollMenu):
 
     def add_item_list(self, item_list):
         """Adds list of items to the checkbox
+
+        Parameters
+        ----------
+        item_list : list of str
+            Menu item list to add
         """
 
         for item in item_list:
@@ -431,6 +612,11 @@ class CheckBoxMenu(ScrollMenu):
 
     def get(self):
         """Gets list of selected items from the checkbox
+
+        Returns
+        -------
+        selected_items : list of str
+            list of checked items
         """
 
         ret = []
@@ -441,6 +627,11 @@ class CheckBoxMenu(ScrollMenu):
 
     def mark_item_as_checked(self, text):
         """Function that marks an item as selected
+
+        Parameters
+        ----------
+        text : str
+            Mark item with text = text as checked
         """
 
         self.selected_item_list.append(text)
@@ -451,6 +642,11 @@ class CheckBoxMenu(ScrollMenu):
         
         First, run the superclass function, scrolling should still work.
         Adds Enter command to toggle selection
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of pressed key
         """
 
         super().handle_key_press(key_pressed)
@@ -468,17 +664,27 @@ class Button(Widget):
     """Basic button widget.
     
     Allows for running a command function on Enter
+
+    Attributes
+    ----------
+    command : function
+        A no-args function to run when the button is pressed.
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.command = command
-        self.color = py_cui.MAGENTA_ON_BLACK
-        self.help_text = 'Focus mode on Button. Press Enter to press button, Esc to exit focus mode.'
+        self.set_color(py_cui.MAGENTA_ON_BLACK)
+        self.set_focus_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
 
 
     def handle_key_press(self, key_pressed):
         """Override of base class, adds ENTER listener that runs the button's command
+
+        Parameters
+        ----------
+        key_pressed : int
+            Key code of pressed key
         """
 
         super().handle_key_press(key_pressed)
@@ -512,6 +718,40 @@ class Button(Widget):
 
 class TextBox(Widget):
     """Widget for entering small single lines of text
+
+    Attributes
+    ----------
+    text : str
+        The text in the text box
+    cursor_x, cursor_y : int
+        The absolute positions of the cursor in the terminal window
+    cursor_text_pos : int
+        the cursor position relative to the text
+    cursor_max_left, cursor_max_right : int
+        The cursor bounds of the text box
+    viewport_width : int
+        The width of the textbox viewport
+
+    Methods
+    -------
+    set_text()
+        sets textbox text
+    get()
+        Gets value of the text in the textbox
+    clear()
+        Clears the text in the textbox
+    move_left()
+        Shifts the cursor the the left. Internal use only
+    move_right()
+        Shifts the cursor the the right. Internal use only
+    insert_char()
+        Inserts char at cursor position.
+    jump_to_start()
+        Jumps to the start of the textbox
+    jump_to_end()
+        Jumps to the end to the textbox
+    erase_char()
+        Erases character at textbox cursor
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
@@ -522,7 +762,7 @@ class TextBox(Widget):
         self.cursor_max_left = self.cursor_x
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.cursor_y = self.start_y + int(self.height / 2) + 1
-        self.help_text = 'Focus mode on TextBox. Press Esc to exit focus mode.'
+        self.set_focus_text('Focus mode on TextBox. Press Esc to exit focus mode.')
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
 
 
@@ -541,6 +781,11 @@ class TextBox(Widget):
 
     def set_text(self, text):
         """Sets the value of the text. Overwrites existing text
+
+        Parameters
+        ----------
+        text : str
+            The text to write to the textbox
         """
 
         self.text = text
@@ -549,8 +794,14 @@ class TextBox(Widget):
             self.cursor_text_pos = len(self.text)
             self.cursor_x = self.cursor_x - diff
 
+
     def get(self):
         """Gets value of the text in the textbox
+
+        Returns
+        -------
+        text : str
+            The current textbox test
         """
 
         return self.text
@@ -583,10 +834,16 @@ class TextBox(Widget):
                 self.cursor_x = self.cursor_x + 1
             self.cursor_text_pos = self.cursor_text_pos + 1
 
+
     def insert_char(self, key_pressed):
         """Inserts char at cursor position.
         
         Internal use only
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
         """
         self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
         if len(self.text) < self.viewport_width:
@@ -621,9 +878,13 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos - 1
 
 
-
     def handle_key_press(self, key_pressed):
         """Override of base handle key press function
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
         """
 
         super().handle_key_press(key_pressed)
@@ -668,6 +929,58 @@ class TextBox(Widget):
 
 class ScrollTextBlock(Widget):
     """Widget for editing large multi-line blocks of text
+    
+    Attributes
+    ----------
+    text_lines : list of str
+        The lines of text in the text box
+    cursor_x, cursor_y : int
+        The absolute positions of the cursor in the terminal window
+    cursor_text_pos_x, cursor_text_pos_y : int
+        the cursor position relative to the text
+    cursor_max_left, cursor_max_right : int
+        The cursor bounds of the text box
+    cursor_max_up, cursor_max_down : int
+        The cursor bounds of the text box
+    viewport_x_start, viewport_y_start : int
+        upper left corner of the viewport
+    viewport_width : int
+        The width of the textbox viewport
+
+    Methods
+    -------
+    get()
+        Gets value of the text in the textbox
+    write()
+        Writes text to the textblock
+    clear()
+        Clears the text in the textbox
+    get_current_line()
+        Gets current line of text (cursor pos)
+    set_text()
+        Function that sets the text for the textblock.
+    set_text_line()
+        Function that sets the current line's text.
+    move_left()
+        Shifts the cursor the the left. Internal use only
+    move_right()
+        Shifts the cursor the the right. Internal use only
+    move_up()
+        Shifts the cursor upwards. Internal use only
+    move_right()
+        Shifts the cursor downwards. Internal use only
+    handle_newline()
+        Handles newline characters
+    handle_backspace()
+        Handles backspace presses
+    handle_home()
+        Handles home key presses
+    handle_end()
+        Handles end key presses
+    handle_delete()
+        handles delete key presses
+    insert_char()
+        Inserts char at cursor position.
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
@@ -686,10 +999,12 @@ class ScrollTextBlock(Widget):
         self.cursor_max_left = self.cursor_x
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
-        self.help_text = 'Focus mode on TextBlock. Press Esc to exit focus mode.'
+        self.set_focus_text('Focus mode on TextBlock. Press Esc to exit focus mode.')
 
 
     def update_height_width(self):
+        """Function that updates the position of the text and cursor on resize
+        """
 
         super().update_height_width()
         self.viewport_y_start = 0
@@ -707,6 +1022,11 @@ class ScrollTextBlock(Widget):
 
     def get(self):
         """Gets all of the text in the textblock and returns it
+
+        Returns
+        -------
+        text : str
+            The current text in the text block
         """
 
         text = ''
@@ -717,6 +1037,11 @@ class ScrollTextBlock(Widget):
 
     def write(self, text):
         """Function used for writing text to the text block
+
+        Parameters
+        ----------
+        text : str
+            Text to write to the text block
         """
 
         lines = text.splitlines()
@@ -737,8 +1062,14 @@ class ScrollTextBlock(Widget):
         self.text_lines = []
         self.text_lines.append('')
 
+
     def get_current_line(self):
         """Returns the line on which the cursor currently resides
+
+        Returns
+        -------
+        current_line : str
+            The current line of text that the cursor is on
         """
 
         return self.text_lines[self.cursor_text_pos_y]
@@ -769,6 +1100,11 @@ class ScrollTextBlock(Widget):
         """Function that sets the current line's text.
         
         Meant only for internal use
+        
+        Parameters
+        ----------
+        text : str
+            text line to write into text block
         """
 
         self.text_lines[self.cursor_text_pos_y] = text
@@ -918,6 +1254,11 @@ class ScrollTextBlock(Widget):
 
     def insert_char(self, key_pressed):
         """Function that handles recieving a character
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
         """
 
         current_line = self.get_current_line()
@@ -932,6 +1273,11 @@ class ScrollTextBlock(Widget):
 
     def handle_key_press(self, key_pressed):
         """Override of base class handle key press function
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
         """
 
         super().handle_key_press(key_pressed)

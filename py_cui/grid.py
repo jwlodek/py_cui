@@ -33,11 +33,11 @@ class Grid:
     
     Methods
     -------
-    set_num_rows(num_rows : int)
+    set_num_rows()
         Sets the grid row size
-    set_num_cols(num_columns : int)
+    set_num_cols()
         Sets the grid column size
-    update_grid_height_width(height : int, width : int)
+    update_grid_height_width()
         Update grid height and width. Allows for on-the-fly size editing
     """
 
@@ -74,6 +74,11 @@ class Grid:
         ----------
         num_rows : int
             New number of grid rows
+
+        Raises
+        ------
+        error : PyCUIOutOfBoundsError
+            If the size of the terminal window is too small
         """
 
         if (3 * num_rows) >= self.height:
@@ -89,6 +94,11 @@ class Grid:
         ----------
         num_columns : int
             New number of grid columns
+        
+        Raises
+        ------
+        error : PyCUIOutOfBoundsError
+            If the size of the terminal window is too small
         """
 
         if (3 * num_columns) >= self.width:
@@ -106,6 +116,11 @@ class Grid:
             The height in characters of the terminal window
         width : int
             The width in characters of the terminal window
+
+        Raises
+        ------
+        error : PyCUIOutOfBoundsError
+            If the size of the terminal window is too small
         """
 
         self.height = height
