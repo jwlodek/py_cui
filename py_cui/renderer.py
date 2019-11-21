@@ -11,50 +11,111 @@ import py_cui.colors
 
 
 class Renderer:
-    """
-    Main renderer class used for drawing widgets to the terminal. Has helper functions for drawing the borders, cursor,
-    and text required for the cui.
+    """Main renderer class used for drawing widgets to the terminal.
     
-    All of the functions supplied by the renderer class should only be used internally.
+    Has helper functions for drawing the borders, cursor,
+    and text required for the cui. All of the functions supplied by the renderer class should only be used internally.
+
+    Attributes
+    ----------
+    root : py_cui.PyCUI
+        The parent window
+    stdscr : standard cursor
+        The cursor with which renderer draws text
+    color_rules : list of py_cui.colors.ColorRule
+        List of currently loaded rules to apply during drawing
+
+    Methods
+    -------
+    set_bold()
+        Sets bold draw mode
+    unset_bold()
+        Unsets bold draw mode
+    set_color_rules()
+        Sets current color rules
+    set_color_mode()
+        Sets the output color mode
+    unset_color_mode()
+        Unsets the output color mode
+    reset_cursor()
+        Positions the cursor at the bottom right of the selected widget
+    draw_cursor()
+        Draws the cursor at a particular location
+    draw_border()
+        Draws border around widget
+    draw_border_top()
+        Draws top of border
+    draw_border_bottom()
+        Draws bottom of border
+    draw_blank_row()
+        Draws a blank row, with an optional border
+    get_render_text()
+        Converts line into renderably sized text.
+    generate_text_color_fragments()
+        Function that applies color rules to text, dividing them if match is found
+    draw_text()
+        Function that draws widget text.
     """
 
     def __init__(self, root, stdscr):
+        """Constructor for renderer object
+        """
+
         self.root = root
         self.stdscr = stdscr
         self.color_rules = []
 
 
     def set_bold(self):
-        """ Sets bold draw mode """
+        """Sets bold draw mode
+        """
 
         self.stdscr.attron(curses.A_BOLD)
 
     def unset_bold(self):
-        """ Unsets bold draw mode """
+        """Unsets bold draw mode
+        """
 
         self.stdscr.attroff(curses.A_BOLD)
 
     def set_color_rules(self, color_rules):
-        """ Sets current color rules """
+        """Sets current color rules
+
+        Parameters
+        ----------
+        color_rules : list of py_cui.colors.ColorRule
+            List of currently loaded rules to apply during drawing
+        """
 
         self.color_rules = color_rules
 
 
     def set_color_mode(self, color_mode):
-        """ Sets the output color mode """
+        """Sets the output color mode
+
+        Parameters
+        ----------
+        color_mode : int
+            Color code to apply during drawing
+        """
 
         self.stdscr.attron(curses.color_pair(color_mode))
 
 
     def unset_color_mode(self, color_mode):
-        """ Unsets the output color mode """
+        """Unsets the output color mode
+
+        Parameters
+        ----------
+        color_mode : int
+            Color code to unapply during drawing
+        """
 
         self.stdscr.attroff(curses.color_pair(color_mode))
 
 
     def reset_cursor(self, widget, fill=True):
-        """
-        Positions the cursor at the bottom right of the selected widget
+        """Positions the cursor at the bottom right of the selected widget
         
         Parameters
         ----------
@@ -77,17 +138,24 @@ class Renderer:
 
 
     def draw_cursor(self, cursor_y, cursor_x):
-        """ Draws the cursor at a particular location """
+        """Draws the cursor at a particular location
+        
+        Parameters
+        ----------
+        cursor_x, cursor_y : int
+            x, y coordinates where to draw the cursor
+        """
 
         self.stdscr.move(cursor_y, cursor_x)
 
 
     def draw_border(self, widget, fill=True, with_title=True):
-        """
-        Draws border around widget
+        """Draws border around widget
 
         Parameters
         ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
         fill : bool
             a flag that tells the renderer if the widget is filling its grid space, or not (ex. Textbox vs textblock)
         with_title : bool
@@ -114,7 +182,17 @@ class Renderer:
 
 
     def draw_border_top(self, widget, y, with_title):
-        """ Internal function for drawing top of border """
+        """Internal function for drawing top of border
+
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
+        y : int
+            the terminal row (top down) on which to draw the text
+        with_title : bool
+            Flag that tells renderer if title should be superimposed into border.
+        """
 
         if not with_title or (len(widget.title) + 4 >= widget.width - 2 * widget.padx):
             self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
@@ -123,19 +201,54 @@ class Renderer:
 
 
     def draw_border_bottom(self, widget, y):
-        """ Internal function for drawing bottom of border """
+        """Internal function for drawing bottom of border
+        
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
+        y : int
+            the terminal row (top down) on which to draw the text
+        """
 
         self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
 
 
     def draw_blank_row(self, widget, y):
-        """ Internal function for drawing a blank row """
+        """Internal function for drawing a blank row
+        
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
+        y : int
+            the terminal row (top down) on which to draw the text
+        """
 
         self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - 2*widget.padx)))
 
 
     def get_render_text(self, widget, line, centered, bordered, start_pos):
-        """ Internal function that computes the scope of the text that should be drawn """
+        """Internal function that computes the scope of the text that should be drawn
+        
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
+        line : str
+            the line of text being drawn
+        centered : bool
+            flag to set if the text should be centered
+        bordered : bool
+            a flag to set if the text should be bordered
+        start_pos : int
+            position to start rendering the text from.
+
+        Returns
+        -------
+        render_text : str
+            The text shortened to fit within given space
+        """
 
         render_text_length = widget.width - (2 * widget.padx)
         if bordered:
@@ -152,7 +265,22 @@ class Renderer:
 
 
     def generate_text_color_fragments(self, widget, line, render_text):
-        """ Function that applies color rules to text, dividing them if match is found """
+        """Function that applies color rules to text, dividing them if match is found
+        
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The widget being drawn
+        line : str
+            the line of text being drawn
+        render_text : str
+            The text shortened to fit within given space
+        
+        Returns
+        -------
+        fragments : list of [int, str]
+            list of text - color code combinations to write
+        """
 
         text_fragments_list = []
 
@@ -166,8 +294,7 @@ class Renderer:
 
 
     def draw_text(self, widget, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
-        """
-        Function that draws widget text.
+        """Function that draws widget text.
 
         Parameters
         ----------
@@ -181,6 +308,8 @@ class Renderer:
             flag to set if the text should be centered
         bordered : bool
             a flag to set if the text should be bordered
+        selected : bool
+            Flag that tells renderer if widget is selected.
         start_pos : int
             position to start rendering the text from.
         """

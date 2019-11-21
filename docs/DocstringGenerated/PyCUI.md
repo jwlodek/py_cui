@@ -204,6 +204,7 @@ Function that adds a new scroll menu to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_scroll_menu | ScrollMenu |             A reference to the created scroll menu object. | 
 
 
 ### add_checkbox_menu
@@ -231,6 +232,7 @@ Function that adds a new checkbox menu to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_checkbox_menu | CheckBoxMenu |             A reference to the created checkbox object. | 
 
 
 ### add_text_box
@@ -256,6 +258,7 @@ Function that adds a new text box to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_text_box | TextBox |             A reference to the created textbox object. | 
 
 
 ### add_text_block
@@ -281,6 +284,7 @@ Function that adds a new text block to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_text_block | ScrollTextBlock |             A reference to the created textblock object. | 
 
 
 ### add_label
@@ -305,6 +309,7 @@ Function that adds a new label to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_label | Label |             A reference to the created label object. | 
 
 
 ### add_block_label
@@ -329,6 +334,7 @@ Function that adds a new block label to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_label | BlockLabel |             A reference to the created block label object. | 
 
 
 ### add_button
@@ -354,6 +360,7 @@ Function that adds a new button to the CUI gri.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         new_button | Button |             A reference to the created button object. | 
 
 
 ### check_if_neighbor_exists
@@ -379,6 +386,7 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         widget_id | str |             The widget neighbor ID if found, None otherwise | 
 
 
 ### set_selected_widget
@@ -411,6 +419,7 @@ Function for grabbing widget I.
 
 | Returns    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
+|         widget_id | str |             The id if found, None otherwise | 
 
 
 ### lose_focus

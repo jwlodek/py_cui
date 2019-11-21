@@ -13,7 +13,14 @@ nav:
     - Writing a PyCUI step-by-step: writing.md
   - Classes / Functions:
     - PyCUI: DocstringGenerated/PyCUI.md
-  - For py_cui developers: developers.md
+    - Grid: DocstringGenerated/Grid.md
+    - Widgets: DocstringGenerated/Widgets.md
+    - Popups: DocstringGenerated/Popups.md
+    - Colors: DocstringGenerated/Colors.md
+    - Widget Sets: DocstringGenerated/WidgetSet.md
+    - Renderer: DocstringGenerated/Renderer.md
+    - Keys: DocstringGenerated/Keys.md
+  - For PyCUI Developers: developers.md
   - Examples: examples.md
   - About: about.md
 theme: readthedocs

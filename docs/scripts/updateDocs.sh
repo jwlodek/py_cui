@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ..
+cd ../../..
 if [ ! -d "py_cui-docs" ]
 then
 git clone https://github.com/jwlodek/py_cui-docs

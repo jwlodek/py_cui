@@ -30,5 +30,5 @@ class PyCUIMissingParentError(Exception):
 class PyCUIMissingChildError(Exception):
     """Error for when child widget is None or invalid
     """
-    
+
     pass

@@ -147,7 +147,7 @@ class WidgetSet:
 
         Returns
         -------
-        CheckBoxMenu
+        new_checkbox_menu : CheckBoxMenu
             A reference to the created checkbox object.
         """
 
@@ -183,7 +183,7 @@ class WidgetSet:
 
         Returns
         -------
-        TextBox
+        new_text_box : TextBox
             A reference to the created textbox object.
         """
 
@@ -219,7 +219,7 @@ class WidgetSet:
 
         Returns
         -------
-        ScrollTextBlock
+        new_text_block : ScrollTextBlock
             A reference to the created textblock object.
         """
 
@@ -253,7 +253,7 @@ class WidgetSet:
 
         Returns
         -------
-        Label
+        new_label : Label
             A reference to the created label object.
         """
 
@@ -285,7 +285,7 @@ class WidgetSet:
 
         Returns
         -------
-        BlockLabel
+        new_label : BlockLabel
             A reference to the created block label object.
         """
 
@@ -319,7 +319,7 @@ class WidgetSet:
 
         Returns
         -------
-        Button
+        new_button : Button
             A reference to the created button object.
         """
 

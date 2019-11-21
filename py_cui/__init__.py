@@ -686,10 +686,7 @@ class PyCUI:
             The id if found, None otherwise
         """
 
-        for widget_id in self.widgets.keys():
-            if self.widgets[widget_id] == widget:
-                return widget_id
-        return None
+        return widget.id
 
 
     def lose_focus(self):
