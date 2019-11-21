@@ -545,7 +545,7 @@ class PyCUI:
         return new_label
 
 
-    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True):
         """Function that adds a new block label to the CUI grid
 
         Parameters
@@ -564,6 +564,8 @@ class PyCUI:
             number of padding characters in the x direction
         pady=0 : int
             number of padding characters in the y direction
+        center : bool
+            flag to tell label to be centered or left-aligned.
 
         Returns
         -------
@@ -572,7 +574,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_label = widgets.BlockLabel(id, title, self.grid, row, column, row_span, column_span, padx, pady)
+        new_label = widgets.BlockLabel(id, title, self.grid, row, column, row_span, column_span, padx, pady, center)
         self.widgets[id] = new_label
         return new_label
 
@@ -980,8 +982,6 @@ class PyCUI:
             stdscr.attroff(curses.color_pair(RED_ON_BLACK))
         except KeyboardInterrupt:
             exit()
-        except:
-            pass
 
 
     def handle_key_presses(self, key_pressed):

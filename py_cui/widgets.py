@@ -350,11 +350,14 @@ class BlockLabel(Widget):
     ----------
     lines : list of str
         list of lines that make up block text
+    center : bool
+        Decides whether or not label should be centered
     """
 
-    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
+    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
         self.lines = title.splitlines()
+        self.center = center
 
 
     def draw(self):
@@ -368,7 +371,7 @@ class BlockLabel(Widget):
         for line in self.lines:
             if counter == self.start_y + self.height - self.pady:
                 break
-            self.renderer.draw_text(self, line, counter, centered=True, bordered=False)
+            self.renderer.draw_text(self, line, counter, centered = self.center, bordered=False)
             counter = counter + 1
         self.renderer.unset_color_mode(self.color)
 
