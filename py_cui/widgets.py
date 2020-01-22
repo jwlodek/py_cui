@@ -328,6 +328,14 @@ class Label(Widget):
         """
 
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
+        self.draw_border = False
+    
+
+    def toggle_border(self):
+        """Function that gives option to draw border around label
+        """
+
+        self.draw_border = not self.draw_border
 
 
     def draw(self):
@@ -338,8 +346,10 @@ class Label(Widget):
 
         super().draw()
         self.renderer.set_color_mode(self.color)
+        if self.draw_border:
+            self.renderer.draw_border(self, with_title=False)
         target_y = self.start_y + int(self.height / 2)
-        self.renderer.draw_text(self, self.title, target_y, centered=True, bordered=False)
+        self.renderer.draw_text(self, self.title, target_y, centered=True, bordered=self.draw_border)
         self.renderer.unset_color_mode(self.color)
 
 
@@ -358,6 +368,14 @@ class BlockLabel(Widget):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
         self.lines = title.splitlines()
         self.center = center
+        self.draw_border = False
+
+
+    def toggle_border(self):
+        """Function that gives option to draw border around label
+        """
+
+        self.draw_border = not self.draw_border
 
 
     def draw(self):
@@ -367,11 +385,13 @@ class BlockLabel(Widget):
 
         super().draw()
         self.renderer.set_color_mode(self.color)
+        if self.draw_border:
+            self.renderer.draw_border(self, with_title=False)
         counter = self.start_y
         for line in self.lines:
             if counter == self.start_y + self.height - self.pady:
                 break
-            self.renderer.draw_text(self, line, counter, centered = self.center, bordered=False)
+            self.renderer.draw_text(self, line, counter, centered = self.center, bordered=self.draw_border)
             counter = counter + 1
         self.renderer.unset_color_mode(self.color)
 
