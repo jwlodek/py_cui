@@ -677,7 +677,7 @@ class Button(Widget):
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.command = command
-        self.set_color(py_cui.MAGENTA_ON_BLACK)
+        self.set_standard_color(py_cui.MAGENTA_ON_BLACK)
         self.set_focus_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
 
 
