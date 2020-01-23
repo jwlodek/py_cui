@@ -72,11 +72,13 @@ class Renderer:
 
         self.stdscr.attron(curses.A_BOLD)
 
+
     def unset_bold(self):
         """Unsets bold draw mode
         """
 
         self.stdscr.attroff(curses.A_BOLD)
+
 
     def set_color_rules(self, color_rules):
         """Sets current color rules

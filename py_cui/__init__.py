@@ -9,7 +9,7 @@ import sys
 import os
 import time
 import shutil       # We use shutil for getting the terminal dimensions
-import threading    # Threading isn't currently used, may be removed
+import threading    # Threading is used for loading icon popups
 
 
 # py_cui uses the curses library. On windows this does not exist, but
@@ -238,6 +238,11 @@ class PyCUI:
 
     def get_widget_set(self):
         """Gets widget set object from current widgets.
+
+        Returns
+        -------
+        new_widget_set : py_cui.widget_set.WidgetSet
+            Widget set collected from widgets currently added to the py_cui
         """
 
         new_widget_set = widget_set.WidgetSet(self.grid.num_rows, self.grid.num_columns)
@@ -277,13 +282,11 @@ class PyCUI:
             raise TypeError("Argument must be of type py_cui.widget_set.WidgetSet")
 
 
-    # Initialization functions
-    # Used to initialzie CUI and its features
-
     # ----------------------------------------------#
     # Initialization functions                      #
     # Used to initialzie CUI and its features       #
     # ----------------------------------------------#
+
 
     def start(self):
         """Function that starts the CUI
@@ -1089,14 +1092,11 @@ class PyCUI:
             self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            #try:
             self.draw_status_bars(stdscr, height, width)
             self.draw_widgets()
             # draw the popup if required
             if self.popup is not None:
                 self.popup.draw()
-            #except Exception as e:
-            #    self.display_window_warning(stdscr, str(e))
 
             # Refresh the screen
             stdscr.refresh()
@@ -1120,7 +1120,7 @@ class PyCUI:
 
 
     def __format__(self, fmt):
-        """Override of base format function. Prints list of current widhets.
+        """Override of base format function. Prints list of current widgets.
 
         Parameters
         ----------

@@ -260,6 +260,7 @@ class TextBoxPopup(Popup):
             self.cursor_text_pos = len(self.text)
             self.cursor_x = self.cursor_x - diff
 
+
     def get(self):
         """Gets value of the text in the textbox
         

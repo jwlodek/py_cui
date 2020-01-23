@@ -1,6 +1,6 @@
 """File containing class that abstracts a collection of widgets. 
 
-It can be used to swap between collections of widgets in a py_cui
+It can be used to swap between collections of widgets (screens) in a py_cui
 
 @Author: Jakub Wlodek
 @Created 05-Oct-2019
@@ -52,6 +52,9 @@ class WidgetSet:
     """
 
     def __init__(self, num_rows, num_cols):
+        """Constructor for WidgetSet
+        """
+
         self.widgets = {}
         self.keybindings = {}
         term_size = shutil.get_terminal_size()
