@@ -292,9 +292,19 @@ Simply displays one centered row of text. Has no unique attributes or methods
  
 | method    | Doc             |
 |:-------|:----------------|
+| toggle_border | Function that gives option to draw border around labe. | 
 | draw | Override base draw class. | 
  
  
+
+### toggle_border
+
+``` python 
+    toggle_border() 
+```
+
+
+Function that gives option to draw border around labe.
 
 ### draw
 
@@ -320,6 +330,7 @@ A Variation of the label widget that renders a block of text.
 | Attributes    | Type             | Doc             |
 |:-------|:-----------------|:----------------|
 |     lines | list of str |         list of lines that make up block text | 
+|     center | bool |         Decides whether or not label should be centered | 
 
 
 --------- 
@@ -329,8 +340,20 @@ A Variation of the label widget that renders a block of text.
  
 | method    | Doc             |
 |:-------|:----------------|
+| draw | Override base draw class. | 
  
  
+
+### draw
+
+``` python 
+    draw() 
+```
+
+
+Override base draw class.
+
+
 
 
 # ScrollMenu 

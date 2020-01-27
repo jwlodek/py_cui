@@ -74,7 +74,7 @@ create an instance of this class, and then add cells + widgets to it.
 | display_window_warning | Function that prints some basic error info if there is an error with the CU. | 
 | handle_key_presses | Function that handles all main loop key presses. | 
 | draw | Main CUI draw loop called by start(. | 
-| __format__ | Override of base format function. Prints list of current widhets. | 
+| __format__ | Override of base format function. Prints list of current widgets. | 
  
  
 
@@ -86,6 +86,11 @@ create an instance of this class, and then add cells + widgets to it.
 
 
 Gets widget set object from current widgets.
+
+| Returns    | Type             | Doc             |
+|:-------|:-----------------|:----------------|
+|         new_widget_set | py_cui.widget_set.WidgetSet |             Widget set collected from widgets currently added to the py_cui | 
+
 
 ### apply_widget_set
 
@@ -315,7 +320,7 @@ Function that adds a new label to the CUI gri.
 ### add_block_label
 
 ``` python 
-    add_block_label(title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0) 
+    add_block_label(title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True) 
 ```
 
 
@@ -330,6 +335,7 @@ Function that adds a new block label to the CUI gri.
 |         column_span=1 | int |             the number of columns to span accross | 
 |         padx=1 | int |             number of padding characters in the x direction | 
 |         pady=0 | int |             number of padding characters in the y direction | 
+|         center | bool |             flag to tell label to be centered or left-aligned. | 
 
 
 | Returns    | Type             | Doc             |
@@ -720,7 +726,7 @@ Main CUI draw loop called by start(.
 ```
 
 
-Override of base format function. Prints list of current widhets.
+Override of base format function. Prints list of current widgets.
 
 | Parameters    | Type             | Doc             |
 |:-------|:-----------------|:----------------|

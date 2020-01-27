@@ -1,7 +1,7 @@
 # File containing class that abstracts a collection of widgets.
 
 
-It can be used to swap between collections of widgets in a py_cui
+It can be used to swap between collections of widgets (screens) in a py_cui
 
 @Author: Jakub Wlodek
 @Created 05-Oct-2019
@@ -32,6 +32,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  
 | method    | Doc             |
 |:-------|:----------------|
+| set_selected_widget | Function that sets the selected cell for the CU. | 
 | add_key_command | Function that adds a keybinding to the CUI when in overview mod. | 
 | add_scroll_menu | Function that adds a new scroll menu to the CUI gri. | 
 | add_checkbox_menu | Function that adds a new checkbox menu to the CUI gri. | 
@@ -42,6 +43,20 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
 | add_button | Function that adds a new button to the CUI gri. | 
  
  
+
+### set_selected_widget
+
+``` python 
+    set_selected_widget(widget_id) 
+```
+
+
+Function that sets the selected cell for the CU.
+
+| Parameters    | Type             | Doc             |
+|:-------|:-----------------|:----------------|
+|         cell_title | str |             the title of the cell | 
+
 
 ### add_key_command
 
@@ -190,7 +205,7 @@ Function that adds a new label to the CUI gri.
 ### add_block_label
 
 ``` python 
-    add_block_label(title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0) 
+    add_block_label(title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True) 
 ```
 
 
@@ -205,6 +220,7 @@ Function that adds a new block label to the CUI gri.
 |         column_span=1 | int |             the number of columns to span accross | 
 |         padx=1 | int |             number of padding characters in the x direction | 
 |         pady=0 | int |             number of padding characters in the y direction | 
+|         center | bool |             flag to tell label to be centered or left-aligned. | 
 
 
 | Returns    | Type             | Doc             |
