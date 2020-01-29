@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/jwlodek/py_cui/master/docs/assets/Logo_Draft1.png">
+    <img src="assets/py_cui_logo.png">
 </p>
 
 # py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master)
