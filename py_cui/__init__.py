@@ -719,7 +719,7 @@ class PyCUI:
         self.set_selected_widget(self.get_widget_id(widget))
         widget.selected = True
         self.in_focused_mode = True
-        self.set_status_bar_text(widget.get_help_text())
+        self.status_bar.set_text(widget.get_help_text())
 
 
     def add_key_command(self, key, command):
