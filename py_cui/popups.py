@@ -67,12 +67,13 @@ class Popup:
         self.pady = 0
         self.renderer = renderer
         self.selected = True
+        self.close_keys = [py_cui.keys.KEY_ESCAPE]
 
 
     def handle_key_press(self, key_pressed):
         """Handles key presses when popup is open
         
-        Must be implemented by subclass
+        By default, only closes popup when Escape is pressed
         
         Parameters
         ----------
@@ -80,7 +81,8 @@ class Popup:
             The ascii code for the key that was pressed
         """
 
-        pass
+        if key_pressed in self.close_keys:
+            self.root.close_popup()
 
 
     def draw(self):
@@ -119,21 +121,6 @@ class MessagePopup(Popup):
         self.close_keys = [py_cui.keys.KEY_ENTER, py_cui.keys.KEY_ESCAPE, py_cui.keys.KEY_SPACE, py_cui.keys.KEY_BACKSPACE, py_cui.keys.KEY_DELETE]
 
 
-    def handle_key_press(self, key_pressed):
-        """Implementation of handle_key_pressed.
-
-        Closes popup if Enter, Space, or Escape is pressed.
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        if key_pressed in self.close_keys:
-            self.root.close_popup()
-
-
     def draw(self):
         """Draw function for MessagePopup. Calls superclass draw()
         """
@@ -167,6 +154,7 @@ class YesNoPopup(Popup):
             key code of key pressed
         """
 
+        super().handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
             self.ret_val = True
@@ -353,6 +341,7 @@ class TextBoxPopup(Popup):
             key code of key pressed
         """
 
+        super().handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
             self.ret_val = self.text
@@ -503,6 +492,7 @@ class MenuPopup(Popup):
             key code of key pressed
         """
 
+        super().handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
             self.ret_val = self.get()
@@ -575,6 +565,20 @@ class LoadingIconPopup(Popup):
         self.message = message
 
 
+    def handle_key_press(self, key_pressed):
+        """Override of base class function.
+
+        Loading icon popups cannot be cancelled, so we wish to avoid default behavior
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of pressed key
+        """
+
+        pass
+
+
     def draw(self):
         """Overrides base draw function
         """
@@ -606,6 +610,20 @@ class LoadingBarPopup(Popup):
         super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer)
         self.num_items = num_items
         self.completed_items = 0
+
+
+    def handle_key_press(self, key_pressed):
+        """Override of base class function.
+
+        Loading icon popups cannot be cancelled, so we wish to avoid default behavior
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of pressed key
+        """
+
+        pass
 
 
     def draw(self):
