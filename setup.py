@@ -6,11 +6,8 @@ from sys import platform
 with open('README.md', 'r') as readme_fp:
     long_description = readme_fp.read()
 
-
-# On windows we need the windows-curses emulation library
-required_libraries = []
-if platform == 'win32':
-    required_libraries.append('windows-curses')
+with open('requirements.txt', 'r') as req_fp:
+    required_libs = req_fp.readlines()
 
 
 # py_cui setup
@@ -24,7 +21,7 @@ setuptools.setup(
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
     packages=['py_cui'],
-    install_requires=required_libraries,
+    install_requires=required_libs,
     url='https://github.com/jwlodek/py_cui',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
