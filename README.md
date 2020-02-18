@@ -2,7 +2,7 @@
     <img src="https://raw.githubusercontent.com/jwlodek/py_cui/master/docs/assets/py_cui_logo.png">
 </p>
 
-# py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master)
+# py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master) [![Downloads](https://pepy.tech/badge/py-cui)](https://pepy.tech/project/py-cui) [![PyPI version](https://badge.fury.io/py/py-cui.svg)](https://badge.fury.io/py/py-cui)
 
 A **py**thon library for creating **c**ommand line **u**ser **i**nterfaces.
 
@@ -18,9 +18,13 @@ If you would like to contribute, feel free to make an issue or pull request afte
 
 You may install `py_cui` via pip:
 ```
+pip install py-cui
+```
+Make sure to run as root/sudo as required. Note that the library is titled `py_cui`, but the name of the pypi package is `py-cui`, though in most cases, installing with 
+```
 pip install py_cui
 ```
-Make sure to run as root/sudo as required.
+should work OK.
 
 If you would like to use `py_cui` directly from source, clone this repository with:
 ```
