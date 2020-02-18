@@ -39,16 +39,22 @@ If you would like to try it out without installing, first make sure that `curses
 
 ### PyCUI Examples
 
-Below are some screenshots from examples written with py_cui. Source code is available for both in the `examples` directory.
+Below are some screenshots/gifs of programs written with py_cui. Additional (simpler) examples are available in the `examples/` directory of this repository.
 
-**Todo List**
+**py_cui_2048 - A command line version of the classic 2048 game**
+
+[py_cui_2048](https://github.com/jwlodek/py_cui_2048) is a demo of using `py_cui` to build simple CUI games and applications. The entire game was made in under 400 lines of code.
 <p align="center">
-    <img src="docs/assets/demo_todo.png">
+    <img src="docs/assets/py2048-demo.gif">
 </p>
 
-**pyautogit - a command line interface for managing git repositories**
+**unipkg - A command line utility that will allow for managing all installed package managers on your system through one cli interface**
 
-[pyautogit](https://github.com/jwlodek/pyautogit) is the first larger scale project written in `py_cui`. Feel free to use it as a guide.
+[unipkg](https://github.com/jwlodek/unipkg) is currently an in-progress project, check back in the future to see a screenshot, and more information.
+
+**pyautogit - A command line interface for managing git repositories**
+
+[pyautogit](https://github.com/jwlodek/pyautogit) is the first larger scale project written in `py_cui`. Feel free to use it as a guide to programming with `py_cui`.
 <p align="center">
     <img src="docs/assets/autogit_demo.png">
 </p>
@@ -105,6 +111,7 @@ Project | Description
 --------|-------------
 [pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
+[unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
 
 ### License
 
