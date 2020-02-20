@@ -16,7 +16,7 @@ setuptools.setup(
     description='A widget and grid based framework for building command line user interfaces in python.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.0.1',
+    version='0.0.2',
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
