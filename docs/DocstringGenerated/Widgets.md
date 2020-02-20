@@ -42,7 +42,7 @@ and setting status bar text.
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  id  |  int | Id of the widget
  title  |  str | Widget title
  grid  |  py_cui.grid.Grid | The parent grid object of the widget
@@ -63,7 +63,7 @@ and setting status bar text.
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_focus_text | Sets status bar text when focused
  add_key_command | Maps a keycode that will be executed in focus mode
  add_text_color_rule | Adds a color rule for text rendering in the widget
@@ -109,7 +109,7 @@ Function that sets the text of the status bar on focus for a particular widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | text to write to status bar when in focus mode.
 
 
@@ -130,7 +130,7 @@ Maps a keycode to a function that will be executed when in focus mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key  |  py_cui.keys.KEY | ascii keycode used to map the key
  command  |  function without args | a non-argument function or lambda function to execute if in focus mode and key is pressed
 
@@ -152,7 +152,7 @@ Forces renderer to draw text using given color if text_condition_function return
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  regex  |  str | A string to check against the line for a given rule type
  color  |  int | a supported py_cui color value
  rule_type  |  string | A supported color rule type
@@ -178,7 +178,7 @@ Sets the standard color for the widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  color  |  int | Color code for widegt
 
 
@@ -199,7 +199,7 @@ Sets the selected color for the widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  color  |  int | Color code for widegt when selected
 
 
@@ -222,7 +222,7 @@ Function that assigns a renderer object to the widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  renderer  |  py_cui.renderer.Renderer | Renderer for drawing widget
  Raises | ------
  error  |  PyCUIError | If parameter is not a initialized renderer.
@@ -245,7 +245,7 @@ Gets the absolute position of the widget in characters
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  x_pos, y_pos  |  int | position of widget in terminal
 
 
@@ -266,7 +266,7 @@ Gets the absolute dimensions of the widget in characters
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  width, height  |  int | dimensions of widget in terminal
 
 
@@ -287,13 +287,13 @@ Checks if a particular row + column is inside the widget area
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  row, col  |  int | row and column position to check
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  is_inside  |  bool | True if row, col is within widget bounds, false otherwise
 
 
@@ -330,7 +330,7 @@ Returns help text
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  help_text  |  str | Status bar text
 
 
@@ -354,7 +354,7 @@ as this is required for user defined key command support
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -396,13 +396,13 @@ Simply displays one centered row of text. Has no unique attributes or methods
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  draw_border  |  bool | Toggle for drawing label border
 
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  toggle_border | Toggle drawing label border
  draw | Override base draw class.
 
@@ -470,14 +470,14 @@ A Variation of the label widget that renders a block of text.
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  lines  |  list of str | list of lines that make up block text
  center  |  bool | Decides whether or not label should be centered
 
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  toggle_border | Toggle drawing label border
  draw | Override base draw class.
 
@@ -547,7 +547,7 @@ Analogous to a RadioButton
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  top_view  |  int | the uppermost menu element in view
  selected_item  |  int | the currently highlighted menu item
  view_items  |  list of str | list of menu items
@@ -555,7 +555,7 @@ Analogous to a RadioButton
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  clear | clears items from menu
  scroll_up | Function that scrolls the view up in the scroll menu
  scroll_down | Function that scrolls the view down in the scroll menu
@@ -640,7 +640,7 @@ Adds an item to the menu.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item_text  |  str | The text for the item
 
 
@@ -661,7 +661,7 @@ Adds a list of items to the scroll menu.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item_list  |  list of str | list of strings to add as items to the scrollmenu
 
 
@@ -696,7 +696,7 @@ Function that gets list of items in a scroll menu
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item_list  |  list of str | list of items in the scrollmenu
 
 
@@ -717,7 +717,7 @@ Function that gets the selected item from the scroll menu
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item  |  str | selected item, or None if there are no items in the menu
 
 
@@ -740,7 +740,7 @@ UP_ARROW scrolls up, DOWN_ARROW scrolls down.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -778,14 +778,14 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  selected_item_list  |  list of str | List of checked items
  checked_char  |  char | Character to represent a checked item
 
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  add_item | Adds item to Checkbox
  add_item_list | Adds list of items to the checkbox
  get | Gets list of selected items from the checkbox
@@ -823,7 +823,7 @@ Adds item to Checkbox
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item_text  |  str | Menu item to add
 
 
@@ -844,7 +844,7 @@ Adds list of items to the checkbox
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item_list  |  list of str | Menu item list to add
 
 
@@ -865,7 +865,7 @@ Gets list of selected items from the checkbox
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  selected_items  |  list of str | list of checked items
 
 
@@ -886,7 +886,7 @@ Function that marks an item as selected
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | Mark item with text = text as checked
 
 
@@ -910,7 +910,7 @@ Adds Enter command to toggle selection
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of pressed key
 
 
@@ -936,13 +936,13 @@ Allows for running a command function on Enter
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  command  |  function | A no-args function to run when the button is pressed.
 
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  handle_key_press | Override of base class function
  draw | Override of base class function
 
@@ -977,7 +977,7 @@ Override of base class, adds ENTER listener that runs the button's command
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | Key code of pressed key
 
 
@@ -1015,7 +1015,7 @@ Widget for entering small single lines of text
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The text in the text box
  cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
  cursor_text_pos  |  int | the cursor position relative to the text
@@ -1025,7 +1025,7 @@ Widget for entering small single lines of text
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_text | sets textbox text
  get | Gets value of the text in the textbox
  clear | Clears the text in the textbox
@@ -1083,7 +1083,7 @@ Sets the value of the text. Overwrites existing text
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The text to write to the textbox
 
 
@@ -1104,7 +1104,7 @@ Gets value of the text in the textbox
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The current textbox test
 
 
@@ -1169,7 +1169,7 @@ Internal use only
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -1232,7 +1232,7 @@ Override of base handle key press function
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -1270,7 +1270,7 @@ Widget for editing large multi-line blocks of text
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text_lines  |  list of str | The lines of text in the text box
  cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
  cursor_text_pos_x, cursor_text_pos_y  |  int | the cursor position relative to the text
@@ -1282,7 +1282,7 @@ Widget for editing large multi-line blocks of text
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  get | Gets value of the text in the textbox
  write | Writes text to the textblock
  clear | Clears the text in the textbox
@@ -1347,7 +1347,7 @@ Gets all of the text in the textblock and returns it
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The current text in the text block
 
 
@@ -1368,7 +1368,7 @@ Function used for writing text to the text block
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | Text to write to the text block
 
 
@@ -1403,7 +1403,7 @@ Returns the line on which the cursor currently resides
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  current_line  |  str | The current line of text that the cursor is on
 
 
@@ -1426,7 +1426,7 @@ Note that this will overwrite any existing text
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | text to write into text block
 
 
@@ -1449,7 +1449,7 @@ Meant only for internal use
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | text line to write into text block
 
 
@@ -1596,7 +1596,7 @@ Function that handles recieving a character
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -1617,7 +1617,7 @@ Override of base class handle key press function
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 

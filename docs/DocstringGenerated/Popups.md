@@ -28,7 +28,7 @@ frame
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  root  |  py_cui.PyCUI | Root CUI window
  title  |  str | Popup title
  text  |  str | Popup message text
@@ -43,7 +43,7 @@ frame
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  handle_key_press | Implemented by each subclass, handles key presses
  draw | Implemented by each subclass, draws the popup to the terminal
 
@@ -80,7 +80,7 @@ By default, only closes popup when Escape is pressed
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | The ascii code for the key that was pressed
 
 
@@ -120,7 +120,7 @@ Class representing a simple message popup
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  close_keys  |  list of int | list of key codes that can be used to close the popup
 
 
@@ -171,7 +171,7 @@ Class for Yes/No popup. Extends Popup
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  command  |  function, 1 boolean parameter | Function that takes one boolean parameter. Called with True if yes, called with False if no.
 
 
@@ -205,7 +205,7 @@ Handle key press overwrite from superclass
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -243,7 +243,7 @@ Class representing a textbox popup
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The text in the text box
  command  |  function | The command to run when enter is pressed
  cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
@@ -255,7 +255,7 @@ Class representing a textbox popup
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_text | sets textbox text
  get | Gets value of the text in the textbox
  clear | Clears the text in the textbox
@@ -297,7 +297,7 @@ Sets the value of the text. Overwrites existing text
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The text to write to the textbox
 
 
@@ -318,7 +318,7 @@ Gets value of the text in the textbox
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | The current textbox test
 
 
@@ -381,7 +381,7 @@ Inserts char at cursor position. Internal use only
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -444,7 +444,7 @@ Override of base handle key press function
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -484,7 +484,7 @@ Allows for popup with several menu items to select from
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  top_view  |  int | the uppermost menu element in view
  selected_item  |  int | the currently highlighted menu item
  view_items  |  list of str | list of menu items
@@ -494,7 +494,7 @@ Allows for popup with several menu items to select from
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  clear | clears items from menu
  scroll_up | Function that scrolls the view up in the scroll menu
  scroll_down | Function that scrolls the view down in the scroll menu
@@ -563,7 +563,7 @@ Function that gets the selected item from the scroll menu
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  item  |  str | selected item, or None if there are no items in the menu
 
 
@@ -586,7 +586,7 @@ Enter key runs command, Escape key closes menu
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of key pressed
 
 
@@ -626,7 +626,7 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  loading_icons  |  list of str | Animation frames for loading icon
  icon_counter  |  int | Current frame of animation
  message  |  str | Loading message
@@ -664,7 +664,7 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of pressed key
 
 
@@ -704,7 +704,7 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  num_items  |  int | NUmber of items to count through
  completed_items  |  int | counter for completed items
 
@@ -741,7 +741,7 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  int | key code of pressed key
 
 

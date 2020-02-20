@@ -27,7 +27,7 @@ being too long
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  width  |  int | width of window in characters
  text  |  str | input text
  center  |  Boolean | flag to center text
@@ -35,7 +35,7 @@ being too long
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fitted_text  |  str | text fixed depending on width
 
 
@@ -59,7 +59,7 @@ create an instance of this class, and then add cells + widgets to it.
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  cursor_x, cursor_y  |  int | absolute position of the cursor in the CUI
  grid  |  py_cui.grid.Grid | The main layout manager for the CUI
  widgets  |  dict of str - py_cui.widgets.Widget | dict of widget in the grid
@@ -72,7 +72,7 @@ create an instance of this class, and then add cells + widgets to it.
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  get_widget_set | Gets widget set object from current widgets.
  apply_widget_set | Function that replaces all widgets in a py_cui with those of a different widget set
  start | starts the CUI once all of the widgets have been added
@@ -145,7 +145,7 @@ Gets widget set object from current widgets.
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_widget_set  |  py_cui.widget_set.WidgetSet | Widget set collected from widgets currently added to the py_cui
 
 
@@ -166,7 +166,7 @@ Function that replaces all widgets in a py_cui with those of a different widget 
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_widget_set  |  WidgetSet | The new widget set to switch to
  Raises | ------
  TypeError | If input is not of type widget set
@@ -219,7 +219,7 @@ Sets callback function on CUI exit. Must be a no-argument function or lambda fun
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  command  |  function | A no-argument or lambda function to be fired on exit
 
 
@@ -240,7 +240,7 @@ Sets the title bar text
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | New title for CUI
 
 
@@ -261,7 +261,7 @@ Sets the status bar text when in overview mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  text  |  str | Status bar text
 
 
@@ -310,7 +310,7 @@ Function that adds a new scroll menu to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the scroll menu
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -322,7 +322,7 @@ Function that adds a new scroll menu to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_scroll_menu  |  ScrollMenu | A reference to the created scroll menu object.
 
 
@@ -343,7 +343,7 @@ Function that adds a new checkbox menu to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the checkbox
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -356,7 +356,7 @@ Function that adds a new checkbox menu to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_checkbox_menu  |  CheckBoxMenu | A reference to the created checkbox object.
 
 
@@ -377,7 +377,7 @@ Function that adds a new text box to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the textbox
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -390,7 +390,7 @@ Function that adds a new text box to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_text_box  |  TextBox | A reference to the created textbox object.
 
 
@@ -411,7 +411,7 @@ Function that adds a new text block to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the text block
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -424,7 +424,7 @@ Function that adds a new text block to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_text_block  |  ScrollTextBlock | A reference to the created textblock object.
 
 
@@ -445,7 +445,7 @@ Function that adds a new label to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the label
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -457,7 +457,7 @@ Function that adds a new label to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_label  |  Label | A reference to the created label object.
 
 
@@ -478,7 +478,7 @@ Function that adds a new block label to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the block label
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -491,7 +491,7 @@ Function that adds a new block label to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_label  |  BlockLabel | A reference to the created block label object.
 
 
@@ -512,7 +512,7 @@ Function that adds a new button to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the button
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -525,7 +525,7 @@ Function that adds a new button to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_button  |  Button | A reference to the created button object.
 
 
@@ -548,7 +548,7 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  row  |  int | row of current widget
  column  |  int | column of current widget
  row_span  |  int | row span of current widget
@@ -558,7 +558,7 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget_id  |  str | The widget neighbor ID if found, None otherwise
 
 
@@ -579,7 +579,7 @@ Function that sets the selected cell for the CUI
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget_id  |  str | the id of the widget
 
 
@@ -600,13 +600,13 @@ Function for grabbing widget ID
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  Widget | The widget object we wish to get an ID from
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget_id  |  str | The id if found, None otherwise
 
 
@@ -643,7 +643,7 @@ Moves focus mode to different widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  Widget | The widget object we want to move focus to.
 
 
@@ -664,7 +664,7 @@ Function that adds a keybinding to the CUI when in overview mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key  |  py_cui.keys.KEY_* | The key bound to the command
  command  |  Function | A no-arg or lambda function to fire on keypress
 
@@ -686,7 +686,7 @@ Shows a message popup
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Message title
  text  |  str | Message text
 
@@ -708,7 +708,7 @@ Shows a warning popup
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Warning title
  text  |  str | Warning text
 
@@ -730,7 +730,7 @@ Shows an error popup
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Error title
  text  |  str | Error text
 
@@ -754,7 +754,7 @@ The 'command' parameter must be a function with a single boolean parameter
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Message title
  command  |  function | A function taking in a single boolean parameter. Will be fired with True if yes selected, false otherwise
 
@@ -778,7 +778,7 @@ The 'command' parameter must be a function with a single string parameter
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Message title
  command  |  Function | A function with a single string parameter, fired with contents of textbox when enter key pressed
  password=False  |  bool | If true, write characters as '*'
@@ -803,7 +803,7 @@ The 'command' parameter must be a function with a single string parameter
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | menu title
  menu_items  |  list of str | A list of menu items
  command  |  Function | A function taking in a single string argument. Fired with selected menu item when ENTER pressed.
@@ -827,7 +827,7 @@ Shows a loading icon popup
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Message title
  message  |  str | Message text. Will show as '$message...'
  callback=None  |  Function | If not none, fired after loading is completed. Must be a no-arg function
@@ -852,7 +852,7 @@ Use 'increment_loading_bar' to show progress
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | Message title
  num_items  |  int | Number of items to iterate through for loading
  callback=None  |  Function | If not none, fired after loading is completed. Must be a no-arg function
@@ -919,7 +919,7 @@ Function that updates the height and width of the CUI based on terminal window s
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  height  |  int | Window height in terminal characters
  width  |  int | Window width in terminal characters
 
@@ -955,7 +955,7 @@ Draws status bar and title bar
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  stdscr  |  curses Standard cursor | The cursor used to draw the status bar
  height  |  int | Window height in terminal characters
  width  |  int | Window width in terminal characters
@@ -978,7 +978,7 @@ Function that prints some basic error info if there is an error with the CUI
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  stdscr  |  curses Standard cursor | The cursor used to draw the warning
  error_info  |  str | The information regarding the error.
 
@@ -1000,7 +1000,7 @@ Function that handles all main loop key presses.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key_pressed  |  py_cui.keys.KEY_* | The key being pressed
 
 
@@ -1021,7 +1021,7 @@ Main CUI draw loop called by start()
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  stdscr  |  curses Standard cursor | The cursor used to draw the CUI
 
 
@@ -1042,7 +1042,7 @@ Override of base format function. Prints list of current widgets.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fmt  |  Format | The format to override
 
 

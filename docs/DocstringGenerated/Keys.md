@@ -24,13 +24,13 @@ Function that converts ascii code to character
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  char  |  character | character to convert to ascii
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  ascii_code  |  int | Ascii code of character
 
 
@@ -51,13 +51,13 @@ Function that converts a character to an ascii code
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  ascii_code  |  int | Ascii code of character
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  char  |  character | character converted from ascii
 
 

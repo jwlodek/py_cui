@@ -28,7 +28,7 @@ and text required for the cui. All of the functions supplied by the renderer cla
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  root  |  py_cui.PyCUI | The parent window
  stdscr  |  standard cursor | The cursor with which renderer draws text
  color_rules  |  list of py_cui.colors.ColorRule | List of currently loaded rules to apply during drawing
@@ -36,7 +36,7 @@ and text required for the cui. All of the functions supplied by the renderer cla
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_bold | Sets bold draw mode
  unset_bold | Unsets bold draw mode
  set_color_rules | Sets current color rules
@@ -111,7 +111,7 @@ Sets current color rules
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  color_rules  |  list of py_cui.colors.ColorRule | List of currently loaded rules to apply during drawing
 
 
@@ -132,7 +132,7 @@ Sets the output color mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  color_mode  |  int | Color code to apply during drawing
 
 
@@ -153,7 +153,7 @@ Unsets the output color mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  color_mode  |  int | Color code to unapply during drawing
 
 
@@ -174,7 +174,7 @@ Positions the cursor at the bottom right of the selected widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | widget for which to reset cursor
  fill  |  bool | a flag that tells the renderer if the widget is filling its grid space, or not (ex. Textbox vs textblock)
 
@@ -196,7 +196,7 @@ Draws the cursor at a particular location
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  cursor_x, cursor_y  |  int | x, y coordinates where to draw the cursor
 
 
@@ -217,7 +217,7 @@ Draws border around widget
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  fill  |  bool | a flag that tells the renderer if the widget is filling its grid space, or not (ex. Textbox vs textblock)
  with_title  |  bool | flag that tells whether or not to draw widget title
@@ -240,7 +240,7 @@ Internal function for drawing top of border
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  y  |  int | the terminal row (top down) on which to draw the text
  with_title  |  bool | Flag that tells renderer if title should be superimposed into border.
@@ -263,7 +263,7 @@ Internal function for drawing bottom of border
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  y  |  int | the terminal row (top down) on which to draw the text
 
@@ -285,7 +285,7 @@ Internal function for drawing a blank row
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  y  |  int | the terminal row (top down) on which to draw the text
 
@@ -307,7 +307,7 @@ Internal function that computes the scope of the text that should be drawn
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  line  |  str | the line of text being drawn
  centered  |  bool | flag to set if the text should be centered
@@ -317,7 +317,7 @@ Internal function that computes the scope of the text that should be drawn
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  render_text  |  str | The text shortened to fit within given space
 
 
@@ -338,7 +338,7 @@ Function that applies color rules to text, dividing them if match is found
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  line  |  str | the line of text being drawn
  render_text  |  str | The text shortened to fit within given space
@@ -346,7 +346,7 @@ Function that applies color rules to text, dividing them if match is found
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fragments  |  list of [int, str] | list of text - color code combinations to write
 
 
@@ -367,7 +367,7 @@ Function that draws widget text.
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.widgets.Widget | The widget being drawn
  line  |  str | the line of text being drawn
  y  |  int | the terminal row (top down) on which to draw the text

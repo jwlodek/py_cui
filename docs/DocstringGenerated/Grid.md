@@ -26,7 +26,7 @@ Class representing the CUI grid
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  num_rows  |  int | Number of grid rows
  num_columns  |  int | Number of grid columns
  height  |  int | The height in characters of the terminal window
@@ -39,7 +39,7 @@ Class representing the CUI grid
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_num_rows | Sets the grid row size
  set_num_cols | Sets the grid column size
  update_grid_height_width | Update grid height and width. Allows for on-the-fly size editing
@@ -61,7 +61,7 @@ Constructor for the Grid class
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  num_rows  |  int | Number of grid rows
  num_columns  |  int | Number of grid columns
  height  |  int | The height in characters of the terminal window
@@ -85,7 +85,7 @@ Sets the grid row size
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  num_rows  |  int | New number of grid rows
  Raises | ------
  error  |  PyCUIOutOfBoundsError | If the size of the terminal window is too small
@@ -108,7 +108,7 @@ Sets the grid column size
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  num_columns  |  int | New number of grid columns
  Raises | ------
  error  |  PyCUIOutOfBoundsError | If the size of the terminal window is too small
@@ -131,7 +131,7 @@ Update grid height and width. Allows for on-the-fly size editing
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  height  |  int | The height in characters of the terminal window
  width  |  int | The width in characters of the terminal window
  Raises | ------

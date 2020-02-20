@@ -24,7 +24,7 @@ Class representing a text color rendering rule
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  regex  |  str | A python 're' module string
  color  |  int | A valid color value. Ex. py_cui.WHITE_ON_BLACK
  rule_type  |  str | String representing rule type. ['startswith', 'endswith', 'notstartswith', 'notendswith', 'contains']
@@ -35,7 +35,7 @@ Class representing a text color rendering rule
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  check_match | Function that checks if the regex given matches the input line given the rule type
  generate_fragments_regex | Splits text into color coded renderable fragments based on regular expression
  split_text_on_region | Splits text into color coded renderable fragments based on region
@@ -58,7 +58,7 @@ Constructor for ColorRule object
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  regex  |  str | A python 're' module string
  color  |  int | A valid color value. Ex. py_cui.WHITE_ON_BLACK
  rule_type  |  str | String representing rule type. ['startswith', 'endswith', 'notstartswith', 'notendswith', 'contains']
@@ -84,13 +84,13 @@ Checks if the color rule matches a line
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  line  |  str | The input line of text to try to match the rule against
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  matched  |  bool | True if a match was found, false otherwise
 
 
@@ -111,14 +111,14 @@ Splits text into fragments based on regular expression
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.Widget | Widget containing the render text
  render_text  |  str | text being rendered
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fragments  |  list of lists of [str, color] | the render text split into fragments of strings paired with colors
 
 
@@ -139,14 +139,14 @@ Splits text into fragments based on region
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.Widget | Widget containing the render text
  render_text  |  str | text being rendered
 
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fragments  |  list of lists of [str, color] | the render text split into fragments of strings paired with colors
 
 
@@ -167,7 +167,7 @@ Splits text into fragments if matched line to regex
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  widget  |  py_cui.Widget | Widget containing the render text
  line  |  str | the line to match
  render_text  |  str | text being rendered
@@ -175,7 +175,7 @@ Splits text into fragments if matched line to regex
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  fragments  |  list of lists of [str, color] | the render text split into fragments of strings paired with colors
  matched  |  bool | Boolean output saying if a match was found in the line.
 

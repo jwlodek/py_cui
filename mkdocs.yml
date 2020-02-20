@@ -12,7 +12,7 @@ nav:
     - Keys: keybindings.md
     - Writing a PyCUI step-by-step: writing.md
   - Classes / Functions:
-    - PyCUI: DocstringGenerated/PyCUI.md
+    - PyCUI: DocstringGenerated/PyCui.md
     - Grid: DocstringGenerated/Grid.md
     - Widgets: DocstringGenerated/Widgets.md
     - Popups: DocstringGenerated/Popups.md

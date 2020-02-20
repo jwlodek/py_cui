@@ -28,7 +28,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
 #### Attributes
 
  Attribute  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  grid  |  py_cui.grid.Grid | The main layout manager for the CUI
  widgets  |  dict of str - py_cui.widgets.Widget | dict of widget in the grid
  keybindings  |  list of py_cui.keybinding.KeyBinding | list of keybindings to check against in the main CUI loop
@@ -37,7 +37,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
 #### Methods
 
  Method  | Doc
------|----------|-----
+-----|-----
  set_selected_widget | Function that sets the selected cell for the CUI
  add_scroll_menu | Function that adds a new scroll menu to the CUI grid
  add_checkbox_menu | Function that adds a new checkbox menu to the CUI grid
@@ -79,7 +79,7 @@ Function that sets the selected cell for the CUI
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  cell_title  |  str | the title of the cell
 
 
@@ -100,7 +100,7 @@ Function that adds a keybinding to the CUI when in overview mode
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  key  |  py_cui.keys.KEY_* | The key bound to the command
  command  |  Function | A no-arg or lambda function to fire on keypress
 
@@ -122,7 +122,7 @@ Function that adds a new scroll menu to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the scroll menu
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -134,7 +134,7 @@ Function that adds a new scroll menu to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  ScrollMenu | A reference to the created scroll menu object.
 
 
@@ -155,7 +155,7 @@ Function that adds a new checkbox menu to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the checkbox
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -168,7 +168,7 @@ Function that adds a new checkbox menu to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_checkbox_menu  |  CheckBoxMenu | A reference to the created checkbox object.
 
 
@@ -189,7 +189,7 @@ Function that adds a new text box to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the textbox
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -202,7 +202,7 @@ Function that adds a new text box to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_text_box  |  TextBox | A reference to the created textbox object.
 
 
@@ -223,7 +223,7 @@ Function that adds a new text block to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the text block
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -236,7 +236,7 @@ Function that adds a new text block to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_text_block  |  ScrollTextBlock | A reference to the created textblock object.
 
 
@@ -257,7 +257,7 @@ Function that adds a new label to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the label
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -269,7 +269,7 @@ Function that adds a new label to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_label  |  Label | A reference to the created label object.
 
 
@@ -290,7 +290,7 @@ Function that adds a new block label to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the block label
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -303,7 +303,7 @@ Function that adds a new block label to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_label  |  BlockLabel | A reference to the created block label object.
 
 
@@ -324,7 +324,7 @@ Function that adds a new button to the CUI grid
 #### Parameters
 
  Parameter  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  title  |  str | The title of the button
  row  |  int | The row value, from the top down
  column  |  int | The column value from the top down
@@ -337,7 +337,7 @@ Function that adds a new button to the CUI grid
 #### Returns
 
  Return Variable  | Type  | Doc
------|----------|----------|-----
+-----|----------|-----
  new_button  |  Button | A reference to the created button object.
 
 
