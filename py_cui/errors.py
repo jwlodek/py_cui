@@ -1,6 +1,6 @@
 """Module containing all error types for py_cui
 
-@author:    Jakub Wlodek
+@author:    Jakub Wlodek  
 @created:   12-Aug-2019
 """
 

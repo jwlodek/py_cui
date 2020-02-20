@@ -2,8 +2,8 @@
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
-@Author: Jakub Wlodek
-@Created 05-Oct-2019
+@author: Jakub Wlodek  
+@created: 05-Oct-2019
 """
 
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.

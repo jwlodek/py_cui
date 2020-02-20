@@ -1,6 +1,6 @@
 """File containing classes for all popups used by py_cui
 
-@author:    Jakub Wlodek
+@author:    Jakub Wlodek  
 @created:   12-Aug-2019
 """
 

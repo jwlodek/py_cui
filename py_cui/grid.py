@@ -2,7 +2,7 @@
 
 The grid is currently the only supported layout manager for py_cui
 
-@author:    Jakub Wlodek
+@author:    Jakub Wlodek  
 @created:   12-Aug-2019
 """
 
