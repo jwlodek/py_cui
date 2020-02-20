@@ -7,4 +7,4 @@ then
 git clone https://github.com/jwlodek/npdoc2md
 fi
 cd npdoc2md
-./npdoc2md.py ../../../py_cui ../../DocstringGenerated -i statusbar.py errors.py
+python3 npdoc2md.py ../../../py_cui ../../DocstringGenerated -i statusbar.py errors.py
