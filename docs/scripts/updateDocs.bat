@@ -6,6 +6,7 @@ git clone https://github.com/jwlodek/py_cui-docs
 :DOCSEXIST
 cd py_cui
 git pull
+pip install mkdocs
 py -m mkdocs build -d ..\py_cui-docs
 cd ..\py_cui-docs
 git add -A
