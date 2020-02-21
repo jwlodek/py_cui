@@ -56,7 +56,7 @@ Below are some screenshots/gifs of programs written with py_cui. Additional (sim
 
 [pyautogit](https://github.com/jwlodek/pyautogit) is the first larger scale project written in `py_cui`. Feel free to use it as a guide to programming with `py_cui`.
 <p align="center">
-    <img src="docs/assets/autogit_demo.png">
+    <img src="docs/assets/pyautogit-demo.gif">
 </p>
 
 ### Writing a PyCUI
