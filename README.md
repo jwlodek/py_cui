@@ -16,7 +16,7 @@ If you would like to contribute, feel free to make an issue or pull request afte
 
 ### Installation
 
-You may install `py_cui` via pip:
+You may install `py_cui` via pip (use `pip3` if python 2 and 3 are installed side by side)
 ```
 pip install py-cui
 ```
