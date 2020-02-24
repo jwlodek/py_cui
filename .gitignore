@@ -11,3 +11,5 @@ dist/
 notes/
 markdoc/
 npdoc2md/
+*.*~
+ecui/
