@@ -177,6 +177,10 @@ class PyCUI:
         Function for initialzing curses colors. Called when CUI is first created.
     initialize_widget_renderer()
         Function that creates the renderer object that will draw each widget
+    get_widgets_by_row()
+        Function that gets all widgets in a specific row
+    def get_widgets_by_col(self, col):
+        Function that gets all widgets in a specific column
     check_if_neighbor_exists()
         Function that checks if widget has neighbor in specified cell.
     set_selected_widget()
@@ -617,6 +621,41 @@ class PyCUI:
             self.set_selected_widget(id)
         return new_button
 
+    def get_widgets_by_row(self, row):
+        """Gets all widgets in a specific row
+
+        Parameters
+        ----------
+        row : int
+
+        Returns
+        -------
+        widget_list : list[Widget]
+            A list of the widgets in the given row
+        """
+        widget_list = []
+        for widget_id in self.widgets:
+            if self.widgets[widget_id].row == row:
+                widget_list.append(self.widgets[widget_id])
+        return widget_list
+
+    def get_widgets_by_col(self, col):
+        """Gets all widgets in a specific column
+
+        Parameters
+        ----------
+        col : int
+
+        Returns
+        -------
+        widget_list : list[Widget]
+            A list of the widgets in the given column
+        """
+        widget_list = []
+        for widget_id in self.widgets:
+            if self.widgets[widget_id].column == col:
+                widget_list.append(self.widgets[widget_id])
+        return widget_list
 
     # CUI status functions. Used to switch between widgets, set the mode, and 
     # identify neighbors for overview mode
@@ -644,24 +683,38 @@ class PyCUI:
         widget_id : str
             The widget neighbor ID if found, None otherwise
         """
+        # Find the widget we started at
+        start_widget = None
+        for widget_id in self.widgets:
+            if self.widgets[widget_id].is_row_col_inside(row, column):
+                start_widget = widget_id
+                break
 
-        target_row = row
-        target_col = column
-        if direction == py_cui.keys.KEY_DOWN_ARROW:
-            target_row = target_row + row_span
-        elif direction == py_cui.keys.KEY_UP_ARROW:
-            target_row = target_row - 1
-        elif direction == py_cui.keys.KEY_LEFT_ARROW:
-            target_col = target_col - 1
-        elif direction == py_cui.keys.KEY_RIGHT_ARROW:
-            target_col = target_col + col_span
-        if target_row < 0 or target_col < 0 or target_row >= self.grid.num_rows or target_col >= self.grid.num_columns:
-            return None
+        # Find all the widgets in the given row or column
+        if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
+            widgets = [i.id for i in self.get_widgets_by_col(column)]
+            vertical = True
+        elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
+            widgets = [i.id for i in self.get_widgets_by_row(row)]
+            vertical = False
         else:
-            for widget_id in self.widgets:
-                if self.widgets[widget_id].is_row_col_inside(target_row, target_col):
-                    return widget_id
             return None
+        
+        if vertical:
+            widgets = sorted(widgets, key=lambda x: self.widgets[x].column)
+        else:
+            widgets = sorted(widgets, key=lambda x: self.widgets[x].row)
+
+        # Find the widget and move from there
+        current_index = widgets.index(start_widget)
+        if direction == py_cui.keys.KEY_UP_ARROW or direction == py_cui.keys.KEY_LEFT_ARROW:
+            current_index -= 1
+        elif direction == py_cui.keys.KEY_DOWN_ARROW or direction == py_cui.keys.KEY_RIGHT_ARROW:
+            current_index += 1
+
+        if current_index >= len(widgets) or current_index < 0:
+            return None
+        return widgets[current_index]
 
 
     def set_selected_widget(self, widget_id):
