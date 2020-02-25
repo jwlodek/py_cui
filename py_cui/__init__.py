@@ -621,12 +621,14 @@ class PyCUI:
             self.set_selected_widget(id)
         return new_button
 
+
     def get_widgets_by_row(self, row):
         """Gets all widgets in a specific row
 
         Parameters
         ----------
         row : int
+            Grid row
 
         Returns
         -------
@@ -634,10 +636,12 @@ class PyCUI:
             A list of the widgets in the given row
         """
         widget_list = []
-        for widget_id in self.widgets:
-            if self.widgets[widget_id].row == row:
-                widget_list.append(self.widgets[widget_id])
+        for i in range(0, self.grid.num_columns):
+            for widget_id in self.widgets.keys():
+                if self.widgets[widget_id].is_row_col_inside(row, i) and self.widgets[widget_id] not in widget_list:
+                    widget_list.append(self.widgets[widget_id])
         return widget_list
+
 
     def get_widgets_by_col(self, col):
         """Gets all widgets in a specific column
@@ -645,6 +649,7 @@ class PyCUI:
         Parameters
         ----------
         col : int
+            Grid column
 
         Returns
         -------
@@ -652,15 +657,17 @@ class PyCUI:
             A list of the widgets in the given column
         """
         widget_list = []
-        for widget_id in self.widgets:
-            if self.widgets[widget_id].column == col:
-                widget_list.append(self.widgets[widget_id])
+        for i in range(0, self.grid.num_rows):
+            for widget_id in self.widgets:
+                if self.widgets[widget_id].is_row_col_inside(i, col) and self.widgets[widget_id] not in widget_list:
+                    widget_list.append(self.widgets[widget_id])
         return widget_list
+
 
     # CUI status functions. Used to switch between widgets, set the mode, and 
     # identify neighbors for overview mode
 
-    def check_if_neighbor_exists(self, row, column, row_span, col_span, direction):
+    def check_if_neighbor_exists(self, row, column, direction):
         """Function that checks if widget has neighbor in specified cell. 
         
         Used for navigating CUI, as arrow keys find the immediate neighbor
@@ -671,10 +678,6 @@ class PyCUI:
             row of current widget
         column : int
             column of current widget
-        row_span : int
-            row span of current widget
-        col_span : int
-            column span of current widget
         direction : py_cui.keys.KEY_*
             The direction in which to search
 
@@ -683,12 +686,8 @@ class PyCUI:
         widget_id : str
             The widget neighbor ID if found, None otherwise
         """
-        # Find the widget we started at
-        start_widget = None
-        for widget_id in self.widgets:
-            if self.widgets[widget_id].is_row_col_inside(row, column):
-                start_widget = widget_id
-                break
+
+        start_widget = self.selected_widget
 
         # Find all the widgets in the given row or column
         if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
@@ -1087,7 +1086,7 @@ class PyCUI:
             # If not in focus mode, use the arrow py_cui.keys to move around the selectable widgets.
             neighbor = None
             if key_pressed == py_cui.keys.KEY_UP_ARROW or key_pressed == py_cui.keys.KEY_DOWN_ARROW or key_pressed == py_cui.keys.KEY_LEFT_ARROW or key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-                neighbor = self.check_if_neighbor_exists(selected_widget.row, selected_widget.column, selected_widget.row_span, selected_widget.column_span, key_pressed)
+                neighbor = self.check_if_neighbor_exists(selected_widget.row, selected_widget.column, key_pressed)
             if neighbor is not None:
                 selected_widget.selected = False
                 self.set_selected_widget(neighbor)

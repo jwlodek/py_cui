@@ -107,6 +107,8 @@ create an instance of this class, and then add cells + widgets to it.
  set_status_bar_text | Sets the status bar text when in overview mode
  initialize_colors | Function for initialzing curses colors. Called when CUI is first created.
  initialize_widget_renderer | Function that creates the renderer object that will draw each widget
+ get_widgets_by_row | Function that gets all widgets in a specific row
+ def get_widgets_by_col | Function that gets all widgets in a specific column
  check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
  set_selected_widget | Function that sets the selected cell for the CUI
  get_widget_id | Function for grabbing widget ID
@@ -532,10 +534,64 @@ Function that adds a new button to the CUI grid
 
 
 
+### get_widgets_by_row
+
+```python
+def get_widgets_by_row(self, row)
+```
+
+Gets all widgets in a specific row
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ row  |  int | Grid row
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ widget_list  |  list[Widget] | A list of the widgets in the given row
+
+
+
+
+
+### get_widgets_by_col
+
+```python
+def get_widgets_by_col(self, col)
+```
+
+Gets all widgets in a specific column
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ col  |  int | Grid column
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ widget_list  |  list[Widget] | A list of the widgets in the given column
+
+
+
+
+
 ### check_if_neighbor_exists
 
 ```python
-def check_if_neighbor_exists(self, row, column, row_span, col_span, direction)
+def check_if_neighbor_exists(self, row, column, direction)
 ```
 
 Function that checks if widget has neighbor in specified cell.
@@ -551,8 +607,6 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 -----|----------|-----
  row  |  int | row of current widget
  column  |  int | column of current widget
- row_span  |  int | row span of current widget
- col_span  |  int | column span of current widget
  direction  |  py_cui.keys.KEY_* | The direction in which to search
 
 #### Returns
