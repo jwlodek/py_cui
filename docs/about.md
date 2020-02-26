@@ -8,7 +8,8 @@ Created on August 12, 2019
 
 ### Contributing Authors
 
-[Maciej Wlodek](https://github.com/maciejwlodek)
+[Maciej Wlodek](https://github.com/maciejwlodek)  
+[telday](https://github.com/telday)
 
 ### License
 
