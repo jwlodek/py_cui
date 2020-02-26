@@ -1,26 +1,26 @@
 site_name: py_cui Documentation
 repo_url: https://github.com/jwlodek/py_cui/
-copyright: 2019 - Jakub Wlodek
+copyright: 2020 - Jakub Wlodek
 nav:
-  - Home: index.md
-  - Installation: install.md
-  - Using and Writing PyCUIs: 
-    - Basic Usage: usage.md
-    - Widgets: widgets.md
-    - Colors: colors.md
-    - Popups: popups.md
-    - Keys: keybindings.md
-    - Writing a PyCUI step-by-step: writing.md
-  - Classes / Functions:
-    - PyCUI: DocstringGenerated/PyCUI.md
-    - Grid: DocstringGenerated/Grid.md
-    - Widgets: DocstringGenerated/Widgets.md
-    - Popups: DocstringGenerated/Popups.md
-    - Colors: DocstringGenerated/Colors.md
-    - Widget Sets: DocstringGenerated/WidgetSet.md
-    - Renderer: DocstringGenerated/Renderer.md
-    - Keys: DocstringGenerated/Keys.md
-  - For PyCUI Developers: developers.md
-  - Examples: examples.md
-  - About: about.md
+    - Home: index.md
+    - Installation: install.md
+    - Using and Writing PyCUIs: 
+        - Basic Usage: usage.md
+        - Widgets: widgets.md
+        - Colors: colors.md
+        - Popups: popups.md
+        - Keys: keybindings.md
+        - Writing a PyCUI step-by-step: writing.md
+    - Classes and Functions:
+        - PyCUI: DocstringGenerated/PyCUI.md
+        - Grid: DocstringGenerated/Grid.md
+        - Widgets: DocstringGenerated/Widgets.md
+        - Popups: DocstringGenerated/Popups.md
+        - Colors: DocstringGenerated/Colors.md
+        - Widget Sets: DocstringGenerated/WidgetSet.md
+        - Renderer: DocstringGenerated/Renderer.md
+        - Keys: DocstringGenerated/Keys.md
+    - For PyCUI Developers: developers.md
+    - Examples: examples.md
+    - About: about.md
 theme: readthedocs
