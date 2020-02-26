@@ -161,6 +161,7 @@ def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, pad
     return new_scroll_menu
 ```
 The function must:
+
 * Create an id titled 'Widget####' where #### is replaced with the number of widget
 * Add the widget to the PyCUI widgets dict with the ID as a key
 * If there is no selected widget, make this new widget the selected one

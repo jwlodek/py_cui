@@ -22,6 +22,7 @@ BLUE_ON_BLACK    |BLUE|BLACK
 ### Using Color Rules
 
 There are severl possible color rules that can be added to a py_cui widget, and these are classified under:
+
 * Rule Type - How we attempt to match a text line with a given regular expression
 * Match Type - How the resulting matched text is rendered
 
