@@ -28,27 +28,6 @@ class WidgetSet:
         list of keybindings to check against in the main CUI loop
     height, width : int
         height of the terminal in characters, width of terminal in characters
-
-    Methods
-    -------
-    set_selected_widget()
-        Function that sets the selected cell for the CUI
-    add_scroll_menu()
-        Function that adds a new scroll menu to the CUI grid
-    add_checkbox_menu()
-        Function that adds a new checkbox menu to the CUI grid
-    add_text_box()
-        Function that adds a new text box to the CUI grid
-    add_text_block()
-        Function that adds a new text block to the CUI grid
-    add_label()
-        Function that adds a new label to the CUI grid
-    add_block_label()
-        Function that adds a new block label to the CUI grid
-    add_button()
-        Function that adds a new button to the CUI grid
-    add_key_command()
-        Function that adds a keybinding to the CUI when in overview mode
     """
 
     def __init__(self, num_rows, num_cols):
@@ -118,6 +97,7 @@ class WidgetSet:
         ScrollMenu
             A reference to the created scroll menu object.
         """
+
         id = 'Widget{}'.format(len(self.widgets.keys()))
         new_scroll_menu = widgets.ScrollMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
         self.widgets[id] = new_scroll_menu

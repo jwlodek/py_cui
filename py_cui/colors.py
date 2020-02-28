@@ -26,17 +26,6 @@ class ColorRule:
         Start and end positions for the coloring, None if match_type != 'region'
     include_whitespace : bool
         Flag to determine whether to strip whitespace before matching.
-
-    Methods
-    -------
-    check_match()
-        Function that checks if the regex given matches the input line given the rule type
-    generate_fragments_regex()
-        Splits text into color coded renderable fragments based on regular expression
-    split_text_on_region()
-        Splits text into color coded renderable fragments based on region
-    generate_fragments()
-        Checks match of rule with line, then splits render_text into fragments if required
     """
 
     def __init__(self, regex, color, rule_type, match_type, region, include_whitespace):

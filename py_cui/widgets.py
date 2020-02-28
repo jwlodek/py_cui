@@ -66,35 +66,6 @@ class Widget:
         Dictionary mapping key codes to functions
     text_color_rules : list of py_cui.ColorRule
         color rules to load into renderer when drawing widget
-
-    Methods
-    -------
-    set_focus_text()
-        Sets status bar text when focused
-    add_key_command()
-        Maps a keycode that will be executed in focus mode
-    add_text_color_rule()
-        Adds a color rule for text rendering in the widget
-    set_standard_color()
-        Sets the default color of the widget
-    set_selected_color()
-        Sets the default color of widget when selected
-    assign_renderer()
-        Assigns a renderer object to the widget
-    get_absolute_position()
-        Gets absolute position of widget in characters
-    get_absolute_dims()
-        Gets absolute dimensions of the widget
-    is_row_col_inside()
-        Checks if given row/column spot in grid is occupied by the widget
-    update_height_width()
-        Refreshes widget position and dims on resize
-    get_help_text()
-        Gets status bar text
-    handle_key_press()
-        Executes appropriate function based on key press
-    draw()
-        Uses the renderer to display the widget
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
@@ -347,13 +318,6 @@ class Label(Widget):
     ----------
     draw_border : bool
         Toggle for drawing label border
-
-    Methods
-    -------
-    toggle_border()
-        Toggle drawing label border
-    draw()
-        Override base draw class.
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady):
@@ -395,13 +359,6 @@ class BlockLabel(Widget):
         list of lines that make up block text
     center : bool
         Decides whether or not label should be centered
-    
-    Methods
-    -------
-    toggle_border()
-        Toggle drawing label border
-    draw()
-        Override base draw class.
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center):
@@ -450,29 +407,6 @@ class ScrollMenu(Widget):
         the currently highlighted menu item
     view_items : list of str
         list of menu items
-    
-    Methods
-    -------
-    clear()
-        clears items from menu
-    scroll_up()
-        Function that scrolls the view up in the scroll menu
-    scroll_down()
-        Function that scrolls the view down in the scroll menu
-    add_item()
-        Adds an item to the menu.
-    add_item_list()
-        Adds a list of items to the scroll menu.
-    remove_selected_item()
-        Function that removes the selected item from the scroll menu.
-    get_item_list()
-        Function that gets list of items in a scroll menu
-    get()
-        Function that gets the selected item from the scroll menu
-    handle_key_press()
-        Override of base class function
-    draw()
-        Override of base class function
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
@@ -631,19 +565,6 @@ class CheckBoxMenu(ScrollMenu):
         List of checked items
     checked_char : char
         Character to represent a checked item
-
-    Methods
-    -------
-    add_item()
-        Adds item to Checkbox
-    add_item_list()
-        Adds list of items to the checkbox
-    get()
-        Gets list of selected items from the checkbox
-    mark_item_as_checked()
-        Function that marks an item as selected
-    handle_key_press()
-        Override of base class function
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, checked_char):
@@ -738,13 +659,6 @@ class Button(Widget):
     ----------
     command : function
         A no-args function to run when the button is pressed.
-
-    Methods
-    -------
-    handle_key_press()
-        Override of base class function
-    draw()
-        Override of base class function
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command):
@@ -807,31 +721,6 @@ class TextBox(Widget):
         The cursor bounds of the text box
     viewport_width : int
         The width of the textbox viewport
-
-    Methods
-    -------
-    set_text()
-        sets textbox text
-    get()
-        Gets value of the text in the textbox
-    clear()
-        Clears the text in the textbox
-    move_left()
-        Shifts the cursor the the left. Internal use only
-    move_right()
-        Shifts the cursor the the right. Internal use only
-    insert_char()
-        Inserts char at cursor position.
-    jump_to_start()
-        Jumps to the start of the textbox
-    jump_to_end()
-        Jumps to the end to the textbox
-    erase_char()
-        Erases character at textbox cursor
-    handle_key_press()
-        Override of base class function
-    draw()
-        Override of base class function
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
@@ -1026,45 +915,6 @@ class ScrollTextBlock(Widget):
         upper left corner of the viewport
     viewport_width : int
         The width of the textbox viewport
-
-    Methods
-    -------
-    get()
-        Gets value of the text in the textbox
-    write()
-        Writes text to the textblock
-    clear()
-        Clears the text in the textbox
-    get_current_line()
-        Gets current line of text (cursor pos)
-    set_text()
-        Function that sets the text for the textblock.
-    set_text_line()
-        Function that sets the current line's text.
-    move_left()
-        Shifts the cursor the the left. Internal use only
-    move_right()
-        Shifts the cursor the the right. Internal use only
-    move_up()
-        Shifts the cursor upwards. Internal use only
-    move_right()
-        Shifts the cursor downwards. Internal use only
-    handle_newline()
-        Handles newline characters
-    handle_backspace()
-        Handles backspace presses
-    handle_home()
-        Handles home key presses
-    handle_end()
-        Handles end key presses
-    handle_delete()
-        handles delete key presses
-    insert_char()
-        Inserts char at cursor position.
-    handle_key_press()
-        Override of base class function
-    draw()
-        Override of base class function
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
@@ -1198,14 +1048,13 @@ class ScrollTextBlock(Widget):
         """Function that moves the cursor/text position one location to the left
         """
 
-        current_line = self.get_current_line()
-
         if self.cursor_text_pos_x > 0:
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
             elif self.viewport_x_start > 0:
                 self.viewport_x_start = self.viewport_x_start - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
+
 
     def move_right(self):
         """Function that moves the cursor/text position one location to the right
@@ -1377,7 +1226,7 @@ class ScrollTextBlock(Widget):
         elif key_pressed == py_cui.keys.KEY_ENTER:
             self.handle_newline()
         elif key_pressed == py_cui.keys.KEY_TAB:
-            for i in range(0, 4):
+            for _ in range(0, 4):
                 self.insert_char(py_cui.keys.KEY_SPACE)
         elif key_pressed == py_cui.keys.KEY_HOME:
             self.handle_home()
