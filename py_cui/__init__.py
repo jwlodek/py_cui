@@ -106,93 +106,6 @@ class PyCUI:
         height of the terminal in characters, width of terminal in characters
     exit_key : key_code
         a key code for a key that exits the CUI
-
-    Methods
-    -------
-    get_widget_set()
-        Gets widget set object from current widgets.
-    apply_widget_set()
-        Function that replaces all widgets in a py_cui with those of a different widget set
-    start()
-        starts the CUI once all of the widgets have been added
-    stop()
-        Function that stops CUI and runs the run_on_exit function if set.
-    run_on_exit()
-        Sets callback function on CUI exit. Must be a no-argument function or lambda function
-    add_scroll_menu()
-        Function that adds a new scroll menu to the CUI grid
-    add_checkbox_menu()
-        Function that adds a new checkbox menu to the CUI grid
-    add_text_box()
-        Function that adds a new text box to the CUI grid
-    add_text_block()
-        Function that adds a new text block to the CUI grid
-    add_label()
-        Function that adds a new label to the CUI grid
-    add_block_label()
-        Function that adds a new block label to the CUI grid
-    add_button()
-        Function that adds a new button to the CUI grid
-    add_key_command()
-        Function that adds a keybinding to the CUI when in overview mode
-    show_message_popup()
-        Shows a message popup
-    show_warning_popup()
-        Shows a warning popup
-    show_error_popup()
-        Shows an error popup
-    show_yes_no_popup()
-        Shows a yes/no popup.
-    show_text_box_popup()
-        Shows a textbox popup.
-    show_menu_popup()
-        Shows a menu popup.
-    show_loading_icon_popup()
-        Shows a loading icon popup
-    show_loading_bar_popup()
-        Shows loading bar popup.
-    increment_loading_bar()
-        Increments progress bar if loading bar popup is open
-    stop_loading_popup()
-        Leaves loading state, and closes popup.
-    close_popup()
-        Closes the popup, and resets focus
-    refresh_height_width()
-        Function that updates the height and width of the CUI based on terminal window size
-    draw_widgets()
-        Function that draws all of the widgets to the screen
-    draw_status_bars()
-        Draws status bar and title bar
-    display_window_warning()
-        Function that prints some basic error info if there is an error with the CUI
-    handle_key_presses()
-        Function that handles all main loop key presses.
-    draw()
-        Main CUI draw loop called by start()
-    set_title()
-        Sets the title bar text
-    set_status_bar_text()
-        Sets the status bar text when in overview mode
-    initialize_colors()
-        Function for initialzing curses colors. Called when CUI is first created.
-    initialize_widget_renderer()
-        Function that creates the renderer object that will draw each widget
-    get_widgets_by_row()
-        Function that gets all widgets in a specific row
-    def get_widgets_by_col(self, col):
-        Function that gets all widgets in a specific column
-    check_if_neighbor_exists()
-        Function that checks if widget has neighbor in specified cell.
-    set_selected_widget()
-        Function that sets the selected cell for the CUI
-    get_widget_id()
-        Function for grabbing widget ID
-    lose_focus()
-        Function that forces py_cui out of focus mode.
-    move_focus()
-        Moves focus mode to different widget
-    add_status_bar()
-        function that adds a status bar widget to the CUI
     """
 
     def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER):
@@ -218,6 +131,7 @@ class PyCUI:
         # Initialize grid, renderer, and widget dict
         self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
         self.renderer = None
+        self.border_characters = None
         self.stdscr = None
         self.widgets = {}
 
@@ -263,11 +177,6 @@ class PyCUI:
         ----------
         new_widget_set : WidgetSet
             The new widget set to switch to
-
-        Raises
-        ------
-        TypeError
-            If input is not of type widget set
         """
 
         if isinstance(new_widget_set, widget_set.WidgetSet):
@@ -373,6 +282,42 @@ class PyCUI:
             self.widgets[widget_id].assign_renderer(self.renderer)
         if self.popup is not None:
             self.popup.renderer = self.renderer
+
+
+    def toggle_unicode_borders(self):
+        """Function for toggling unicode based border rendering
+        """
+
+        self.set_widget_border_characters('\u256d', '\u256e', '\u2570', '\u256f', '\u2500', '\u2502')
+
+
+    def set_widget_border_characters(self, upper_left_corner, upper_right_corner, lower_left_corner, lower_right_corner, horizontal, vertical):
+        """Function that can be used to set arbitrary border characters for drawing widget borders by renderer.
+
+        Parameters
+        ----------
+        upper_left_corner : char
+            Upper left corner character
+        upper_right_corner : char
+            Upper right corner character
+        lower_left_corner : char
+            Upper left corner character
+        lower_right_corner : char
+            Lower right corner character
+        horizontal : char
+            Horizontal border character
+        vertical : char
+            Vertical border character
+        """
+
+        self.border_characters = {
+            'UP_LEFT'       : upper_left_corner,
+            'UP_RIGHT'      : upper_right_corner,
+            'DOWN_LEFT'     : lower_left_corner,
+            'DOWN_RIGHT'    : lower_right_corner,
+            'HORIZONTAL'    : horizontal,
+            'VERTICAL'      : vertical
+        }
 
 
     # Widget add functions. Each of these adds a particular type of widget to the grid
@@ -1115,6 +1060,10 @@ class PyCUI:
         # Initialization functions. Generates colors and renderer
         self.initialize_colors()
         self.initialize_widget_renderer()
+
+        # If user sets non-default border characters, update them here
+        if self.border_characters is not None:
+            self.renderer.set_border_renderer_chars(self.border_characters)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self.exit_key or self.in_focused_mode or self.popup is not None:

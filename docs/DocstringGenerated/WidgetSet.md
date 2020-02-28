@@ -9,6 +9,12 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 @author: Jakub Wlodek  
 @created: 05-Oct-2019
 
+#### Classes
+
+ Class  | Doc
+-----|-----
+ WidgetSet | Class that represents a collection of widgets.
+
 
 
 
@@ -39,6 +45,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  Method  | Doc
 -----|-----
  set_selected_widget | Function that sets the selected cell for the CUI
+ add_key_command | Function that adds a keybinding to the CUI when in overview mode
  add_scroll_menu | Function that adds a new scroll menu to the CUI grid
  add_checkbox_menu | Function that adds a new checkbox menu to the CUI grid
  add_text_box | Function that adds a new text box to the CUI grid
@@ -46,7 +53,6 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
- add_key_command | Function that adds a keybinding to the CUI when in overview mode
 
 
 
@@ -135,7 +141,7 @@ Function that adds a new scroll menu to the CUI grid
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- ScrollMenu | A reference to the created scroll menu object.
+ ScrollMenu | Unknown | A reference to the created scroll menu object.
 
 
 

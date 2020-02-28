@@ -1,5 +1,4 @@
-"""
-Module containing the py_cui renderer. It is used to draw all of the onscreen widgets and items.
+"""Module containing the py_cui renderer. It is used to draw all of the onscreen widgets and items.
 
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
@@ -24,37 +23,6 @@ class Renderer:
         The cursor with which renderer draws text
     color_rules : list of py_cui.colors.ColorRule
         List of currently loaded rules to apply during drawing
-
-    Methods
-    -------
-    set_bold()
-        Sets bold draw mode
-    unset_bold()
-        Unsets bold draw mode
-    set_color_rules()
-        Sets current color rules
-    set_color_mode()
-        Sets the output color mode
-    unset_color_mode()
-        Unsets the output color mode
-    reset_cursor()
-        Positions the cursor at the bottom right of the selected widget
-    draw_cursor()
-        Draws the cursor at a particular location
-    draw_border()
-        Draws border around widget
-    draw_border_top()
-        Draws top of border
-    draw_border_bottom()
-        Draws bottom of border
-    draw_blank_row()
-        Draws a blank row, with an optional border
-    get_render_text()
-        Converts line into renderably sized text.
-    generate_text_color_fragments()
-        Function that applies color rules to text, dividing them if match is found
-    draw_text()
-        Function that draws widget text.
     """
 
     def __init__(self, root, stdscr):
@@ -64,6 +32,33 @@ class Renderer:
         self.root = root
         self.stdscr = stdscr
         self.color_rules = []
+
+        # Define widget border characters
+        self.border_characters = {
+            'UP_LEFT'       : '+',
+            'UP_RIGHT'      : '+',
+            'DOWN_LEFT'     : '+',
+            'DOWN_RIGHT'    : '+',
+            'HORIZONTAL'    : '-',
+            'VERTICAL'      : '|'
+        }
+
+
+    def set_border_renderer_chars(self, border_char_set):
+        """Function that sets the border characters for widgets
+
+        Parameters
+        ----------
+        border_characters : Dict of str to str
+            The border characters as specified by user
+        """
+
+        self.border_characters['UP_LEFT'   ] = border_char_set['UP_LEFT'   ]
+        self.border_characters['UP_RIGHT'  ] = border_char_set['UP_RIGHT'  ]
+        self.border_characters['DOWN_LEFT' ] = border_char_set['DOWN_LEFT' ]
+        self.border_characters['DOWN_RIGHT'] = border_char_set['DOWN_RIGHT']
+        self.border_characters['HORIZONTAL'] = border_char_set['HORIZONTAL']
+        self.border_characters['VERTICAL'  ] = border_char_set['VERTICAL'  ]
 
 
     def set_bold(self):
@@ -152,7 +147,7 @@ class Renderer:
 
 
     def draw_border(self, widget, fill=True, with_title=True):
-        """Draws border around widget
+        """Draws ascii border around widget
 
         Parameters
         ----------
@@ -197,9 +192,11 @@ class Renderer:
         """
 
         if not with_title or (len(widget.title) + 4 >= widget.width - 2 * widget.padx):
-            self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
+            render_text = '{}{}{}'.format(self.border_characters['UP_LEFT'], self.border_characters['HORIZONTAL'] * (widget.width - 2 - 2 * widget.padx), self.border_characters['UP_RIGHT'])
+            self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
         else:
-            self.stdscr.addstr(y, widget.start_x + widget.padx, '+--{}{}+'.format(widget.title, '-' * (widget.width - 4 - 2*widget.padx - len(widget.title))))
+            render_text = '{}{} {} {}{}'.format(self.border_characters['UP_LEFT'], 2 * self.border_characters['HORIZONTAL'], widget.title, self.border_characters['HORIZONTAL'] * (widget.width - 6 - 2*widget.padx - len(widget.title)), self.border_characters['UP_RIGHT'])
+            self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
 
 
     def draw_border_bottom(self, widget, y):
@@ -213,7 +210,8 @@ class Renderer:
             the terminal row (top down) on which to draw the text
         """
 
-        self.stdscr.addstr(y, widget.start_x + widget.padx, '+{}+'.format('-'*(widget.width-2 - 2*widget.padx)))
+        render_text = '{}{}{}'.format(self.border_characters['DOWN_LEFT'], self.border_characters['HORIZONTAL'] * (widget.width-2 - 2*widget.padx), self.border_characters['DOWN_RIGHT'])
+        self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
 
 
     def draw_blank_row(self, widget, y):
@@ -227,7 +225,8 @@ class Renderer:
             the terminal row (top down) on which to draw the text
         """
 
-        self.stdscr.addstr(y, widget.start_x + widget.padx, '|{}|'.format(' ' *(widget.width-2 - 2*widget.padx)))
+        render_text = '{}{}{}'.format(self.border_characters['VERTICAL'], ' ' * (widget.width - 2 - 2 * widget.padx), self.border_characters['VERTICAL'])
+        self.stdscr.addstr(y, widget.start_x + widget.padx, render_text)
 
 
     def get_render_text(self, widget, line, centered, bordered, start_pos):
@@ -284,8 +283,6 @@ class Renderer:
             list of text - color code combinations to write
         """
 
-        text_fragments_list = []
-
         fragments = [[render_text, widget.color]]
         for color_rule in self.color_rules:
             fragments, match = color_rule.generate_fragments(widget, line, render_text)
@@ -322,7 +319,7 @@ class Renderer:
             self.stdscr.attron(curses.A_BOLD)
 
         if bordered:
-            self.stdscr.addstr(y, widget.start_x + widget.padx, '|')
+            self.stdscr.addstr(y, widget.start_x + widget.padx, self.border_characters['VERTICAL'])
             current_start_x = current_start_x + 2
 
         if widget.selected:
@@ -349,7 +346,7 @@ class Renderer:
             self.stdscr.attron(curses.A_BOLD)
 
         if bordered:
-            self.stdscr.addstr(y, widget.start_x + widget.width - 2 * widget.padx, '|')
+            self.stdscr.addstr(y, widget.start_x + widget.width - 2 * widget.padx, self.border_characters['VERTICAL'])
 
         if widget.selected:
             self.stdscr.attroff(curses.A_BOLD)

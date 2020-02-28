@@ -22,6 +22,19 @@ file and extending the base Widget class, or if appropriate one of the other cor
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
 
+#### Classes
+
+ Class  | Doc
+-----|-----
+ Widget | Top Level Widget Base Class
+ Label(Widget) | The most basic subclass of Widget.
+ BlockLabel(Widget) | A Variation of the label widget that renders a block of text.
+ ScrollMenu(Widget) | A scroll menu widget.
+ CheckBoxMenu(ScrollMenu) | Extension of ScrollMenu that allows for multiple items to be selected at once.
+ Button(Widget) | Basic button widget.
+ TextBox(Widget) | Widget for entering small single lines of text
+ ScrollTextBlock(Widget) | Widget for editing large multi-line blocks of text
+
 
 
 
@@ -64,19 +77,19 @@ and setting status bar text.
 
  Method  | Doc
 -----|-----
- set_focus_text | Sets status bar text when focused
- add_key_command | Maps a keycode that will be executed in focus mode
- add_text_color_rule | Adds a color rule for text rendering in the widget
- set_standard_color | Sets the default color of the widget
- set_selected_color | Sets the default color of widget when selected
- assign_renderer | Assigns a renderer object to the widget
- get_absolute_position | Gets absolute position of widget in characters
- get_absolute_dims | Gets absolute dimensions of the widget
- is_row_col_inside | Checks if given row/column spot in grid is occupied by the widget
- update_height_width | Refreshes widget position and dims on resize
- get_help_text | Gets status bar text
- handle_key_press | Executes appropriate function based on key press
- draw | Uses the renderer to display the widget
+ set_focus_text | Function that sets the text of the status bar on focus for a particular widget
+ add_key_command | Maps a keycode to a function that will be executed when in focus mode
+ add_text_color_rule | Forces renderer to draw text using given color if text_condition_function returns True
+ set_standard_color | Sets the standard color for the widget
+ set_selected_color | Sets the selected color for the widget
+ assign_renderer | Function that assigns a renderer object to the widget
+ get_absolute_position | Gets the absolute position of the widget in characters
+ get_absolute_dims | Gets the absolute dimensions of the widget in characters
+ is_row_col_inside | Checks if a particular row + column is inside the widget area
+ update_height_width | Function that refreshes position and dimensons on resize.
+ get_help_text | Returns help text
+ handle_key_press | Base class function that handles all assigned key presses.
+ draw | Base class draw class that checks if renderer is valid.
 
 
 
@@ -224,7 +237,11 @@ Function that assigns a renderer object to the widget
  Parameter  | Type  | Doc
 -----|----------|-----
  renderer  |  py_cui.renderer.Renderer | Renderer for drawing widget
- Raises | ------
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
  error  |  PyCUIError | If parameter is not a initialized renderer.
 
 
@@ -403,7 +420,7 @@ Simply displays one centered row of text. Has no unique attributes or methods
 
  Method  | Doc
 -----|-----
- toggle_border | Toggle drawing label border
+ toggle_border | Function that gives option to draw border around label
  draw | Override base draw class.
 
 
@@ -478,7 +495,7 @@ A Variation of the label widget that renders a block of text.
 
  Method  | Doc
 -----|-----
- toggle_border | Toggle drawing label border
+ toggle_border | Function that gives option to draw border around label
  draw | Override base draw class.
 
 
@@ -556,7 +573,7 @@ Analogous to a RadioButton
 
  Method  | Doc
 -----|-----
- clear | clears items from menu
+ clear | Clears all items from the Scroll Menu
  scroll_up | Function that scrolls the view up in the scroll menu
  scroll_down | Function that scrolls the view down in the scroll menu
  add_item | Adds an item to the menu.
@@ -564,8 +581,8 @@ Analogous to a RadioButton
  remove_selected_item | Function that removes the selected item from the scroll menu.
  get_item_list | Function that gets list of items in a scroll menu
  get | Function that gets the selected item from the scroll menu
- handle_key_press | Override of base class function
- draw | Override of base class function
+ handle_key_press | Override base class function.
+ draw | Overrides base class draw function
 
 
 
@@ -790,7 +807,7 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
  add_item_list | Adds list of items to the checkbox
  get | Gets list of selected items from the checkbox
  mark_item_as_checked | Function that marks an item as selected
- handle_key_press | Override of base class function
+ handle_key_press | Override of key presses.
 
 
 
@@ -943,8 +960,8 @@ Allows for running a command function on Enter
 
  Method  | Doc
 -----|-----
- handle_key_press | Override of base class function
- draw | Override of base class function
+ handle_key_press | Override of base class, adds ENTER listener that runs the button's command
+ draw | Override of base class draw function
 
 
 
@@ -1026,7 +1043,8 @@ Widget for entering small single lines of text
 
  Method  | Doc
 -----|-----
- set_text | sets textbox text
+ update_height_width | Need to update all cursor positions on resize
+ set_text | Sets the value of the text. Overwrites existing text
  get | Gets value of the text in the textbox
  clear | Clears the text in the textbox
  move_left | Shifts the cursor the the left. Internal use only
@@ -1035,8 +1053,8 @@ Widget for entering small single lines of text
  jump_to_start | Jumps to the start of the textbox
  jump_to_end | Jumps to the end to the textbox
  erase_char | Erases character at textbox cursor
- handle_key_press | Override of base class function
- draw | Override of base class function
+ handle_key_press | Override of base handle key press function
+ draw | Override of base draw function
 
 
 
@@ -1283,24 +1301,25 @@ Widget for editing large multi-line blocks of text
 
  Method  | Doc
 -----|-----
- get | Gets value of the text in the textbox
- write | Writes text to the textblock
- clear | Clears the text in the textbox
- get_current_line | Gets current line of text (cursor pos)
+ update_height_width | Function that updates the position of the text and cursor on resize
+ get | Gets all of the text in the textblock and returns it
+ write | Function used for writing text to the text block
+ clear | Function that clears the text block
+ get_current_line | Returns the line on which the cursor currently resides
  set_text | Function that sets the text for the textblock.
  set_text_line | Function that sets the current line's text.
- move_left | Shifts the cursor the the left. Internal use only
- move_right | Shifts the cursor the the right. Internal use only
- move_up | Shifts the cursor upwards. Internal use only
- move_right | Shifts the cursor downwards. Internal use only
- handle_newline | Handles newline characters
- handle_backspace | Handles backspace presses
- handle_home | Handles home key presses
- handle_end | Handles end key presses
- handle_delete | handles delete key presses
- insert_char | Inserts char at cursor position.
- handle_key_press | Override of base class function
- draw | Override of base class function
+ move_left | Function that moves the cursor/text position one location to the left
+ move_right | Function that moves the cursor/text position one location to the right
+ move_up | Function that moves the cursor/text position one location up
+ move_down | Function that moves the cursor/text position one location down
+ handle_newline | Function that handles recieving newline characters in the text
+ handle_backspace | Function that handles recieving backspace characters in the text
+ handle_home | Function that handles recieving a home keypress
+ handle_end | Function that handles recieving an end keypress
+ handle_delete | Function that handles recieving a delete keypress
+ insert_char | Function that handles recieving a character
+ handle_key_press | Override of base class handle key press function
+ draw | Override of base class draw function
 
 
 

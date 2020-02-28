@@ -5,4 +5,4 @@ git clone https://github.com/jwlodek/npdoc2md
 :SCRIPTEXIST
 cd npdoc2md
 git pull
-py npdoc2md.py ..\..\..\py_cui ..\..\DocstringGenerated -i statusbar.py errors.py
+py npdoc2md.py -i ..\..\..\py_cui -o ..\..\DocstringGenerated -s statusbar.py errors.py

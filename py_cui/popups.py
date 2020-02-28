@@ -39,13 +39,6 @@ class Popup:
         The padding on either side of the popup
     selected : bool
         Always true. Used by the renderer to highlight popup
-
-    Methods
-    -------
-    handle_key_press()
-        Implemented by each subclass, handles key presses
-    draw()
-        Implemented by each subclass, draws the popup to the terminal
     """
 
 
@@ -197,27 +190,6 @@ class TextBoxPopup(Popup):
         The width of the textbox viewport
     password : bool
         If set, replace all characters with *
-
-    Methods
-    -------
-    set_text()
-        sets textbox text
-    get()
-        Gets value of the text in the textbox
-    clear()
-        Clears the text in the textbox
-    move_left()
-        Shifts the cursor the the left. Internal use only
-    move_right()
-        Shifts the cursor the the right. Internal use only
-    insert_char()
-        Inserts char at cursor position.
-    jump_to_start()
-        Jumps to the start of the textbox
-    jump_to_end()
-        Jumps to the end to the textbox
-    erase_char()
-        Erases character at textbox cursor
     """
 
     def __init__(self, root, title, color, command, renderer, password):
@@ -412,25 +384,6 @@ class MenuPopup(Popup):
         a function that takes a single string parameter, run when ENTER pressed
     run_command_if_none : bool
         Runs command even if there are no menu items (passes None)
-    
-    Methods
-    -------
-    clear()
-        clears items from menu
-    scroll_up()
-        Function that scrolls the view up in the scroll menu
-    scroll_down()
-        Function that scrolls the view down in the scroll menu
-    add_item()
-        Adds an item to the menu.
-    add_item_list()
-        Adds a list of items to the scroll menu.
-    remove_selected_item()
-        Function that removes the selected item from the scroll menu.
-    get_item_list()
-        Function that gets list of items in a scroll menu
-    get()
-        Function that gets the selected item from the scroll menu
     """
 
     def __init__(self, root, items, title, color, command, renderer, run_command_if_none):

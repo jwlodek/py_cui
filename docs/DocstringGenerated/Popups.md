@@ -7,6 +7,18 @@ File containing classes for all popups used by py_cui
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
 
+#### Classes
+
+ Class  | Doc
+-----|-----
+ Popup | Base CUI popup class.
+ MessagePopup(Popup) | Class representing a simple message popup
+ YesNoPopup(Popup) | Class for Yes/No popup. Extends Popup
+ TextBoxPopup(Popup) | Class representing a textbox popup
+ MenuPopup(Popup) | A scroll menu popup.
+ LoadingIconPopup(Popup) | Loading icon popup class
+ LoadingBarPopup(Popup) | Class for Loading Bar Popup
+
 
 
 
@@ -44,8 +56,8 @@ frame
 
  Method  | Doc
 -----|-----
- handle_key_press | Implemented by each subclass, handles key presses
- draw | Implemented by each subclass, draws the popup to the terminal
+ handle_key_press | Handles key presses when popup is open
+ draw | Function that uses renderer to draw the popup
 
 
 
@@ -123,6 +135,12 @@ Class representing a simple message popup
 -----|----------|-----
  close_keys  |  list of int | list of key codes that can be used to close the popup
 
+#### Methods
+
+ Method  | Doc
+-----|-----
+ draw | Draw function for MessagePopup. Calls superclass draw()
+
 
 
 
@@ -173,6 +191,13 @@ Class for Yes/No popup. Extends Popup
  Attribute  | Type  | Doc
 -----|----------|-----
  command  |  function, 1 boolean parameter | Function that takes one boolean parameter. Called with True if yes, called with False if no.
+
+#### Methods
+
+ Method  | Doc
+-----|-----
+ handle_key_press | Handle key press overwrite from superclass
+ draw | Uses base class draw function
 
 
 
@@ -256,15 +281,17 @@ Class representing a textbox popup
 
  Method  | Doc
 -----|-----
- set_text | sets textbox text
+ set_text | Sets the value of the text. Overwrites existing text
  get | Gets value of the text in the textbox
  clear | Clears the text in the textbox
  move_left | Shifts the cursor the the left. Internal use only
  move_right | Shifts the cursor the the right. Internal use only
- insert_char | Inserts char at cursor position.
+ insert_char | Inserts char at cursor position. Internal use only
  jump_to_start | Jumps to the start of the textbox
  jump_to_end | Jumps to the end to the textbox
  erase_char | Erases character at textbox cursor
+ handle_key_press | Override of base handle key press function
+ draw | Override of base draw function
 
 
 
@@ -495,14 +522,11 @@ Allows for popup with several menu items to select from
 
  Method  | Doc
 -----|-----
- clear | clears items from menu
  scroll_up | Function that scrolls the view up in the scroll menu
  scroll_down | Function that scrolls the view down in the scroll menu
- add_item | Adds an item to the menu.
- add_item_list | Adds a list of items to the scroll menu.
- remove_selected_item | Function that removes the selected item from the scroll menu.
- get_item_list | Function that gets list of items in a scroll menu
  get | Function that gets the selected item from the scroll menu
+ handle_key_press | Override of base handle key press function
+ draw | Overrides base class draw function
 
 
 
@@ -631,6 +655,13 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
  icon_counter  |  int | Current frame of animation
  message  |  str | Loading message
 
+#### Methods
+
+ Method  | Doc
+-----|-----
+ handle_key_press | Override of base class function.
+ draw | Overrides base draw function
+
 
 
 
@@ -707,6 +738,13 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 -----|----------|-----
  num_items  |  int | NUmber of items to count through
  completed_items  |  int | counter for completed items
+
+#### Methods
+
+ Method  | Doc
+-----|-----
+ handle_key_press | Override of base class function.
+ draw | Override of base draw function
 
 
 

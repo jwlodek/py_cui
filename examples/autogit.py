@@ -343,5 +343,6 @@ def parse_args():
 
 dir = parse_args()
 root = py_cui.PyCUI(9, 8)
+root.toggle_unicode_borders()
 frame = AutoGitCUI(root, dir)
 root.start()
