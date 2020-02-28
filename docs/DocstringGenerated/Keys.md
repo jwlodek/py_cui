@@ -7,6 +7,13 @@ Module containing constants and helper functions for dealing with keys.
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
 
+#### Functions
+
+ Function  | Doc
+-----|-----
+ get_ascii_from_char | Function that converts ascii code to character
+ get_char_from_ascii | Function that converts a character to an ascii code
+
 
 
 

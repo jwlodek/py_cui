@@ -9,6 +9,12 @@ The grid is currently the only supported layout manager for py_cui
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
 
+#### Classes
+
+ Class  | Doc
+-----|-----
+ Grid | Class representing the CUI grid
+
 
 
 
@@ -87,7 +93,11 @@ Sets the grid row size
  Parameter  | Type  | Doc
 -----|----------|-----
  num_rows  |  int | New number of grid rows
- Raises | ------
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
  error  |  PyCUIOutOfBoundsError | If the size of the terminal window is too small
 
 
@@ -110,7 +120,11 @@ Sets the grid column size
  Parameter  | Type  | Doc
 -----|----------|-----
  num_columns  |  int | New number of grid columns
- Raises | ------
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
  error  |  PyCUIOutOfBoundsError | If the size of the terminal window is too small
 
 
@@ -134,7 +148,11 @@ Update grid height and width. Allows for on-the-fly size editing
 -----|----------|-----
  height  |  int | The height in characters of the terminal window
  width  |  int | The width in characters of the terminal window
- Raises | ------
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
  error  |  PyCUIOutOfBoundsError | If the size of the terminal window is too small
 
 

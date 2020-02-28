@@ -1,12 +1,17 @@
 # renderer
 
-
-
-
 Module containing the py_cui renderer. It is used to draw all of the onscreen widgets and items.
+
+
 
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
+
+#### Classes
+
+ Class  | Doc
+-----|-----
+ Renderer | Main renderer class used for drawing widgets to the terminal.
 
 
 
@@ -37,6 +42,7 @@ and text required for the cui. All of the functions supplied by the renderer cla
 
  Method  | Doc
 -----|-----
+ set_border_renderer_chars | Function that sets the border characters for widgets
  set_bold | Sets bold draw mode
  unset_bold | Unsets bold draw mode
  set_color_rules | Sets current color rules
@@ -44,11 +50,11 @@ and text required for the cui. All of the functions supplied by the renderer cla
  unset_color_mode | Unsets the output color mode
  reset_cursor | Positions the cursor at the bottom right of the selected widget
  draw_cursor | Draws the cursor at a particular location
- draw_border | Draws border around widget
- draw_border_top | Draws top of border
- draw_border_bottom | Draws bottom of border
- draw_blank_row | Draws a blank row, with an optional border
- get_render_text | Converts line into renderably sized text.
+ draw_border | Draws ascii border around widget
+ draw_border_top | Internal function for drawing top of border
+ draw_border_bottom | Internal function for drawing bottom of border
+ draw_blank_row | Internal function for drawing a blank row
+ get_render_text | Internal function that computes the scope of the text that should be drawn
  generate_text_color_fragments | Function that applies color rules to text, dividing them if match is found
  draw_text | Function that draws widget text.
 
@@ -64,6 +70,27 @@ def __init__(self, root, stdscr)
 Constructor for renderer object
 
 
+
+
+
+
+
+### set_border_renderer_chars
+
+```python
+def set_border_renderer_chars(self, border_char_set)
+```
+
+Function that sets the border characters for widgets
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ border_characters  |  Dict of str to str | The border characters as specified by user
 
 
 
@@ -209,7 +236,7 @@ Draws the cursor at a particular location
 def draw_border(self, widget, fill=True, with_title=True)
 ```
 
-Draws border around widget
+Draws ascii border around widget
 
 
 

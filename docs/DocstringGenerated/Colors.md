@@ -7,6 +7,12 @@ File containing color rule class and any color-rendering related functions
 @author:    Jakub Wlodek  
 @created:   12-Aug-2019
 
+#### Classes
+
+ Class  | Doc
+-----|-----
+ ColorRule | Class representing a text color rendering rule
+
 
 
 
@@ -36,10 +42,10 @@ Class representing a text color rendering rule
 
  Method  | Doc
 -----|-----
- check_match | Function that checks if the regex given matches the input line given the rule type
- generate_fragments_regex | Splits text into color coded renderable fragments based on regular expression
- split_text_on_region | Splits text into color coded renderable fragments based on region
- generate_fragments | Checks match of rule with line, then splits render_text into fragments if required
+ check_match | Checks if the color rule matches a line
+ generate_fragments_regex | Splits text into fragments based on regular expression
+ split_text_on_region | Splits text into fragments based on region
+ generate_fragments | Splits text into fragments if matched line to regex
 
 
 
