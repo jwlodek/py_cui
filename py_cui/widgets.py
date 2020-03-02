@@ -1174,7 +1174,7 @@ class ScrollTextBlock(Widget):
 
         current_line = self.get_current_line()
 
-        if self.cursor_text_pos_x == len(current_line) and self.cursor_text_pos_y < len(self.text_lines):
+        if self.cursor_text_pos_x == len(current_line) and self.cursor_text_pos_y < len(self.text_lines) - 1:
             self.text_lines[self.cursor_text_pos_y] = self.text_lines[self.cursor_text_pos_y] + self.text_lines[self.cursor_text_pos_y + 1]
             self.text_lines = self.text_lines[:self.cursor_text_pos_y+1] + self.text_lines[self.cursor_text_pos_y + 2:]
         elif self.cursor_text_pos_x < len(current_line):
