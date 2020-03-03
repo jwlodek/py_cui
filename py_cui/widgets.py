@@ -574,6 +574,7 @@ class CheckBoxMenu(ScrollMenu):
         self.checked_char = checked_char
         self.set_focus_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
+
     def add_item(self, item_text):
         """Adds item to Checkbox
 
@@ -624,7 +625,14 @@ class CheckBoxMenu(ScrollMenu):
             Mark item with text = text as checked
         """
 
-        self.selected_item_list.append(text)
+        if '[ ] - {}'.format(text) in self.view_items:
+            item_index_of = self.view_items.index('[ ] - {}'.format(text))
+            self.view_items[item_index_of] = '[{}] - '.format(self.checked_char) + self.view_items[item_index_of][6:]
+            self.selected_item_list.append(text)
+        elif '[{}] - {}'.format(self.checked_char, text) in self.view_items:
+            item_index_of = self.view_items.index('[{}] - {}'.format(self.checked_char, text))
+            self.view_items[item_index_of] = '[ ] - ' + self.view_items[item_index_of][6:]
+            self.selected_item_list.remove(text)
 
 
     def handle_key_press(self, key_pressed):
