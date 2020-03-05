@@ -393,7 +393,7 @@ class PyCUI:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False):
         """Function that adds a new text box to the CUI grid
 
         Parameters
