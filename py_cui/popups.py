@@ -1,6 +1,6 @@
 """File containing classes for all popups used by py_cui
 
-@author:    Jakub Wlodek  
+@author:    Jakub Wlodek
 @created:   12-Aug-2019
 """
 
@@ -11,8 +11,8 @@ import py_cui.errors
 
 
 class Popup:
-    """Base CUI popup class. 
-    
+    """Base CUI popup class.
+
     Contains constructor and initial definitions for key_press and draw
     Unlike widgets, they do not have a set grid cell, they are simply centered in the view
     frame
@@ -34,7 +34,7 @@ class Popup:
     stop_x, stop_y : int
         bottom right corner of the popup
     height, width : int
-        The dimensions of the popup 
+        The dimensions of the popup
     padx, pady : int
         The padding on either side of the popup
     selected : bool
@@ -65,9 +65,9 @@ class Popup:
 
     def handle_key_press(self, key_pressed):
         """Handles key presses when popup is open
-        
+
         By default, only closes popup when Escape is pressed
-        
+
         Parameters
         ----------
         key_pressed : int
@@ -80,7 +80,7 @@ class Popup:
 
     def draw(self):
         """Function that uses renderer to draw the popup
-        
+
         Can be implemented by subclass. Base draw function will draw the title and text in a bordered box
         """
 
@@ -211,7 +211,7 @@ class TextBoxPopup(Popup):
         Parameters
         ----------
         text : str
-            The text to write to the textbox    
+            The text to write to the textbox
         """
 
         self.text = text
@@ -223,7 +223,7 @@ class TextBoxPopup(Popup):
 
     def get(self):
         """Gets value of the text in the textbox
-        
+
         Returns
         -------
         text : str
@@ -369,7 +369,7 @@ class TextBoxPopup(Popup):
 
 class MenuPopup(Popup):
     """A scroll menu popup.
-    
+
     Allows for popup with several menu items to select from
 
     Attributes
@@ -428,7 +428,7 @@ class MenuPopup(Popup):
         item : str
             selected item, or None if there are no items in the menu
         """
-        
+
         if len(self.view_items) > 0:
             return self.view_items[self.selected_item]
         return None
@@ -461,7 +461,7 @@ class MenuPopup(Popup):
                     self.command(self.ret_val)
             else:
                 self.root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
-        
+
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self.scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
