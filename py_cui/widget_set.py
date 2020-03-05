@@ -178,42 +178,6 @@ class WidgetSet:
         return new_text_box
 
 
-    def add_password_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
-        """Function that adds a new text box to the CUI grid
-
-        Parameters
-        ----------
-        title : str
-            The title of the passwordtextbox
-        row : int
-            The row value, from the top down
-        column : int
-            The column value from the top down
-        row_span=1 : int
-            The number of rows to span accross
-        column_span=1 : int
-            the number of columns to span accross
-        padx=1 : int
-            number of padding characters in the x direction
-        pady=0 : int
-            number of padding characters in the y direction
-        initial_text='' : str
-            Initial text for the passwordtextbox
-
-        Returns
-        -------
-        new_password_text_box : PasswordTextBox
-            A reference to the created passwordtextbox object.
-        """
-
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_password_text_box = widgets.PasswordTextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
-        self.widgets[id] = new_text_box
-        if self.selected_widget is None:
-            self.set_selected_widget(id)
-        return new_password_text_box
-
-
     def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
         """Function that adds a new text block to the CUI grid
 
