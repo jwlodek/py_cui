@@ -171,7 +171,7 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text, password)
         self.widgets[id] = new_text_box
         if self.selected_widget is None:
             self.set_selected_widget(id)

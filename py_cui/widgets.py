@@ -741,6 +741,7 @@ class TextBox(Widget):
         self.cursor_y = self.start_y + int(self.height / 2) + 1
         self.set_focus_text('Focus mode on TextBox. Press Esc to exit focus mode.')
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
+        self.password = password
 
 
     def update_height_width(self):
@@ -906,7 +907,7 @@ class TextBox(Widget):
         if self.password:
             temp = '*' * len(render_text)
             render_text = temp
-            
+
         self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
