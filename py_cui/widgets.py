@@ -1,6 +1,6 @@
-"""File contatining all core widget classes for py_cui. 
+"""File contatining all core widget classes for py_cui.
 
-Widgets are the basic building blocks of a user interface made with py_cui. 
+Widgets are the basic building blocks of a user interface made with py_cui.
 This file contains classes for:
 
 * Base Widget class
@@ -15,7 +15,7 @@ This file contains classes for:
 Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
 
-@author:    Jakub Wlodek  
+@author:    Jakub Wlodek
 @created:   12-Aug-2019
 """
 
@@ -71,7 +71,7 @@ class Widget:
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         """Constructor for base widget class
         """
-        
+
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
         self.id = id
@@ -171,7 +171,7 @@ class Widget:
 
     def assign_renderer(self, renderer):
         """Function that assigns a renderer object to the widget
-        
+
         (Meant for internal usage only)
 
         Parameters
@@ -242,7 +242,7 @@ class Widget:
         ----------
         row, col : int
             row and column position to check
-        
+
         Returns
         -------
         is_inside : bool
@@ -259,8 +259,8 @@ class Widget:
 
 
     def update_height_width(self):
-        """Function that refreshes position and dimensons on resize. 
-        
+        """Function that refreshes position and dimensons on resize.
+
         If necessary, make sure required widget attributes updated here as well.
         """
 
@@ -299,7 +299,7 @@ class Widget:
 
     def draw(self):
         """Base class draw class that checks if renderer is valid.
-        
+
         Should be called with super().draw() in overrides
         """
 
@@ -311,7 +311,7 @@ class Widget:
 
 class Label(Widget):
     """The most basic subclass of Widget.
-    
+
     Simply displays one centered row of text. Has no unique attributes or methods
 
     Attributes
@@ -326,7 +326,7 @@ class Label(Widget):
 
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
         self.draw_border = False
-    
+
 
     def toggle_border(self):
         """Function that gives option to draw border around label
@@ -337,7 +337,7 @@ class Label(Widget):
 
     def draw(self):
         """Override base draw class.
-        
+
         Center text and draw it
         """
 
@@ -377,7 +377,7 @@ class BlockLabel(Widget):
 
     def draw(self):
         """Override base draw class.
-        
+
         Center text and draw it"""
 
         super().draw()
@@ -395,7 +395,7 @@ class BlockLabel(Widget):
 
 class ScrollMenu(Widget):
     """A scroll menu widget.
-    
+
     Allows for creating a scrollable list of items of which one is selectable.
     Analogous to a RadioButton
 
@@ -507,7 +507,7 @@ class ScrollMenu(Widget):
         item : str
             selected item, or None if there are no items in the menu
         """
-        
+
         if len(self.view_items) > 0:
             return self.view_items[self.selected_item]
         return None
@@ -515,9 +515,9 @@ class ScrollMenu(Widget):
 
     def handle_key_press(self, key_pressed):
         """Override base class function.
-        
+
         UP_ARROW scrolls up, DOWN_ARROW scrolls down.
-        
+
         Parameters
         ----------
         key_pressed : int
@@ -637,7 +637,7 @@ class CheckBoxMenu(ScrollMenu):
 
     def handle_key_press(self, key_pressed):
         """Override of key presses.
-        
+
         First, run the superclass function, scrolling should still work.
         Adds Enter command to toggle selection
 
@@ -660,7 +660,7 @@ class CheckBoxMenu(ScrollMenu):
 
 class Button(Widget):
     """Basic button widget.
-    
+
     Allows for running a command function on Enter
 
     Attributes
@@ -814,7 +814,7 @@ class TextBox(Widget):
 
     def insert_char(self, key_pressed):
         """Inserts char at cursor position.
-        
+
         Internal use only
 
         Parameters
@@ -890,7 +890,7 @@ class TextBox(Widget):
     def draw(self):
         """Override of base draw function
         """
-        
+
         super().draw()
 
         self.renderer.set_color_mode(self.color)
@@ -912,9 +912,233 @@ class TextBox(Widget):
         self.renderer.unset_color_mode(self.color)
 
 
+class PasswordTextBox(Widget):
+    """Widget for entering passwords hidden with asterix
+
+    Attributes
+    ----------
+    text : str
+        The password as input by the user
+    cursor_x, cursor_y : int
+        The absolute positions of the cursor in the terminal window
+    cursor_text_pos : int
+        the cursor position relative to the text
+    cursor_max_left, cursor_max_right : int
+        The cursor bounds of the text box
+    viewport_width : int
+        The width of the textbox viewport
+
+    Methods
+    -------
+    set_text()
+        sets textbox text
+    get()
+        Gets value of the text in the textbox
+    clear()
+        Clears the text in the textbox
+    move_left()
+        Shifts the cursor the the left. Internal use only
+    move_right()
+        Shifts the cursor the the right. Internal use only
+    insert_char()
+        Inserts char at cursor position.
+    jump_to_start()
+        Jumps to the start of the textbox
+    jump_to_end()
+        Jumps to the end to the textbox
+    erase_char()
+        Erases character at textbox cursor
+    handle_key_press()
+        Override of base class function
+    draw()
+        Override of base class function. Takes lengeth of text and adds and asterix instread of character
+    """
+
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
+        self.text = initial_text
+        self.cursor_x = self.start_x + padx + 2
+        self.cursor_text_pos = 0
+        self.cursor_max_left = self.cursor_x
+        self.cursor_max_right = self.start_x + self.width - padx - 1
+        self.cursor_y = self.start_y + int(self.height / 2) + 1
+        self.set_focus_text('Focus mode on TextBox. Press Esc to exit focus mode.')
+        self.viewport_width = self.cursor_max_right - self.cursor_max_left
+
+
+    def update_height_width(self):
+        """Need to update all cursor positions on resize
+        """
+
+        super().update_height_width()
+        self.cursor_y = self.start_y + int(self.height / 2) + 1
+        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_text_pos = 0
+        self.cursor_max_right = self.start_x + self.width - self.padx - 1
+        self.cursor_max_left = self.cursor_x
+        self.viewport_width = self.cursor_max_right - self.cursor_max_left
+
+
+    def set_text(self, text):
+        """Sets the value of the text. Overwrites existing text
+
+        Parameters
+        ----------
+        text : str
+            The text to write to the textbox
+        """
+
+        self.text = text
+        if self.cursor_text_pos > len(self.text):
+            diff = self.cursor_text_pos - len(self.text)
+            self.cursor_text_pos = len(self.text)
+            self.cursor_x = self.cursor_x - diff
+
+
+    def get(self):
+        """Gets value of the text in the textbox
+
+        Returns
+        -------
+        text : str
+            The current textbox test
+        """
+
+        return self.text
+
+
+    def clear(self):
+        """Clears the text in the textbox
+        """
+
+        self.cursor_x = self.cursor_max_left
+        self.cursor_text_pos = 0
+        self.text = ''
+
+
+    def move_left(self):
+        """Shifts the cursor the the left. Internal use only
+        """
+
+        if  self.cursor_text_pos > 0:
+            if self.cursor_x > self.cursor_max_left:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos = self.cursor_text_pos - 1
+
+
+    def move_right(self):
+        """Shifts the cursor the the right. Internal use only
+        """
+        if self.cursor_text_pos < len(self.text):
+            if self.cursor_x < self.cursor_max_right:
+                self.cursor_x = self.cursor_x + 1
+            self.cursor_text_pos = self.cursor_text_pos + 1
+
+
+    def insert_char(self, key_pressed):
+        """Inserts char at cursor position.
+
+        Internal use only
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
+        """
+        self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
+        if len(self.text) < self.viewport_width:
+            self.cursor_x = self.cursor_x + 1
+        self.cursor_text_pos = self.cursor_text_pos + 1
+
+
+    def jump_to_start(self):
+        """Jumps to the start of the textbox
+        """
+
+        self.cursor_x = self.start_x + self.padx + 2
+        self.cursor_text_pos = 0
+
+
+    def jump_to_end(self):
+        """Jumps to the end to the textbox
+        """
+
+        self.cursor_text_pos = len(self.text)
+        self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
+
+
+    def erase_char(self):
+        """Erases character at textbox cursor
+        """
+
+        if self.cursor_text_pos > 0:
+            self.text = self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:]
+            if len(self.text) < self.width - 2 * self.padx - 4:
+                self.cursor_x = self.cursor_x - 1
+            self.cursor_text_pos = self.cursor_text_pos - 1
+
+
+
+    def handle_key_press(self, key_pressed):
+        """Override of base handle key press function
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
+        """
+
+        super().handle_key_press(key_pressed)
+        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
+            self.move_left()
+        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
+            self.move_right()
+        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+            self.erase_char()
+        elif key_pressed == py_cui.keys.KEY_HOME:
+            self.jump_to_start()
+        elif key_pressed == py_cui.keys.KEY_END:
+            self.jump_to_end()
+        elif key_pressed > 31 and key_pressed < 128:
+            self.insert_char(key_pressed)
+
+
+    def draw(self):
+        """Override of base draw function
+        """
+
+        super().draw()
+
+        self.renderer.set_color_mode(self.color)
+        self.renderer.draw_text(self, self.title, self.cursor_y - 2, bordered=False)
+        self.renderer.draw_border(self, fill=False, with_title=False)
+
+        #Get length of self.text
+        text_length = len(self.text)
+
+        #Render text is equal to and astrix multiplied by text_length
+        render_text = ('*' * text_length)
+
+        if len(self.text) > self.width - 2 * self.padx - 4:
+            end = len(self.text) - (self.width - 2 * self.padx - 4)
+            if self.cursor_text_pos < end:
+                render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
+            else:
+                render_text = self.text[end:]
+        self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
+
+        if self.selected:
+            self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
+        else:
+            self.renderer.reset_cursor(self, fill=False)
+        self.renderer.unset_color_mode(self.color)
+
+
+
+
 class ScrollTextBlock(Widget):
     """Widget for editing large multi-line blocks of text
-    
+
     Attributes
     ----------
     text_lines : list of str
@@ -1026,9 +1250,9 @@ class ScrollTextBlock(Widget):
 
 
     def set_text(self, text):
-        """Function that sets the text for the textblock. 
-        
-        Note that this will overwrite any existing text 
+        """Function that sets the text for the textblock.
+
+        Note that this will overwrite any existing text
 
         Parameters
         ----------
@@ -1048,9 +1272,9 @@ class ScrollTextBlock(Widget):
 
     def set_text_line(self, text):
         """Function that sets the current line's text.
-        
+
         Meant only for internal use
-        
+
         Parameters
         ----------
         text : str

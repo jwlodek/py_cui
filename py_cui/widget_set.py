@@ -1,8 +1,8 @@
-"""File containing class that abstracts a collection of widgets. 
+"""File containing class that abstracts a collection of widgets.
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
-@author: Jakub Wlodek  
+@author: Jakub Wlodek
 @created: 05-Oct-2019
 """
 
@@ -14,7 +14,7 @@ import py_cui.grid as grid
 
 
 class WidgetSet:
-    """Class that represents a collection of widgets. 
+    """Class that represents a collection of widgets.
 
     Use PyCUI.apply_widget_set() to set a given widget set for display
 
@@ -68,7 +68,7 @@ class WidgetSet:
         command : Function
             A no-arg or lambda function to fire on keypress
         """
-        
+
         self.keybindings[key] = command
 
 
@@ -108,7 +108,7 @@ class WidgetSet:
 
     def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
         """Function that adds a new checkbox menu to the CUI grid
-        
+
         Parameters
         ----------
         title : str
@@ -176,6 +176,42 @@ class WidgetSet:
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_text_box
+
+
+    def add_password_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+        """Function that adds a new text box to the CUI grid
+
+        Parameters
+        ----------
+        title : str
+            The title of the passwordtextbox
+        row : int
+            The row value, from the top down
+        column : int
+            The column value from the top down
+        row_span=1 : int
+            The number of rows to span accross
+        column_span=1 : int
+            the number of columns to span accross
+        padx=1 : int
+            number of padding characters in the x direction
+        pady=0 : int
+            number of padding characters in the y direction
+        initial_text='' : str
+            Initial text for the passwordtextbox
+
+        Returns
+        -------
+        new_password_text_box : PasswordTextBox
+            A reference to the created passwordtextbox object.
+        """
+
+        id = 'Widget{}'.format(len(self.widgets.keys()))
+        new_password_text_box = widgets.PasswordTextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        self.widgets[id] = new_text_box
+        if self.selected_widget is None:
+            self.set_selected_widget(id)
+        return new_password_text_box
 
 
     def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
@@ -314,4 +350,3 @@ class WidgetSet:
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_button
-
