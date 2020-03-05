@@ -303,6 +303,15 @@ class TextBoxPopup(Popup):
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
 
+    
+    def delete_char(self):
+        """Deletes character to right of texbox cursor
+        """
+
+        if self.cursor_text_pos < len(self.text):
+            self.text = self.text[:self.cursor_text_pos] + self.text[self.cursor_text_pos + 1:]
+
+
 
     def handle_key_press(self, key_pressed):
         """Override of base handle key press function
@@ -332,6 +341,8 @@ class TextBoxPopup(Popup):
             self.move_right()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE:
             self.erase_char()
+        elif key_pressed == py_cui.keys.KEY_DELETE:
+            self.delete_char()
         elif key_pressed == py_cui.keys.KEY_HOME:
             self.jump_to_start()
         elif key_pressed == py_cui.keys.KEY_END:
