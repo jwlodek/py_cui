@@ -731,7 +731,7 @@ class TextBox(Widget):
         The width of the textbox viewport
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text, password):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.text = initial_text
         self.cursor_x = self.start_x + padx + 2
@@ -903,8 +903,11 @@ class TextBox(Widget):
                 render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
             else:
                 render_text = self.text[end:]
+        if self.password:
+            temp = '*' * len(render_text)
+            render_text = temp
+            
         self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
-
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
         else:
