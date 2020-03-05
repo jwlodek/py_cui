@@ -907,9 +907,7 @@ class TextBox(Widget):
         if self.password:
             temp = '*' * len(render_text)
             render_text = temp
-        else:
-            render_text = self.text
-
+            
         self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
