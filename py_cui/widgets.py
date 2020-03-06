@@ -729,6 +729,8 @@ class TextBox(Widget):
         The cursor bounds of the text box
     viewport_width : int
         The width of the textbox viewport
+    password : bool
+        Toggle to display password characters or text
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text, password):

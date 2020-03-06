@@ -4,7 +4,7 @@ File contatining all core widget classes for py_cui.
 
 
 
-Widgets are the basic building blocks of a user interface made with py_cui. 
+Widgets are the basic building blocks of a user interface made with py_cui.
 This file contains classes for:
 
 * Base Widget class
@@ -1038,6 +1038,7 @@ Widget for entering small single lines of text
  cursor_text_pos  |  int | the cursor position relative to the text
  cursor_max_left, cursor_max_right  |  int | The cursor bounds of the text box
  viewport_width  |  int | The width of the textbox viewport
+ password  |  bool | Toggle to display password characters or text
 
 #### Methods
 
@@ -1053,6 +1054,7 @@ Widget for entering small single lines of text
  jump_to_start | Jumps to the start of the textbox
  jump_to_end | Jumps to the end to the textbox
  erase_char | Erases character at textbox cursor
+ delete_char | Deletes character to right of texbox cursor
  handle_key_press | Override of base handle key press function
  draw | Override of base draw function
 
@@ -1062,7 +1064,7 @@ Widget for entering small single lines of text
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text, password)
 ```
 
 
@@ -1229,6 +1231,20 @@ def erase_char(self)
 ```
 
 Erases character at textbox cursor
+
+
+
+
+
+
+
+### delete_char
+
+```python
+def delete_char(self)
+```
+
+Deletes character to right of texbox cursor
 
 
 
@@ -1439,7 +1455,7 @@ Function that sets the text for the textblock.
 
 
 
-Note that this will overwrite any existing text 
+Note that this will overwrite any existing text
 
 
 #### Parameters

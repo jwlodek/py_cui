@@ -414,6 +414,8 @@ class PyCUI:
             number of padding characters in the y direction
         initial_text='' : str
             Initial text for the textbox
+        password=False : bool
+            Toggle to show '*' instead of characters.
 
         Returns
         -------

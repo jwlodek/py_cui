@@ -420,7 +420,7 @@ Function that adds a new checkbox menu to the CUI grid
 ### add_text_box
 
 ```python
-def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '')
+def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False)
 ```
 
 Function that adds a new text box to the CUI grid
@@ -440,6 +440,7 @@ Function that adds a new text box to the CUI grid
  padx=1  |  int | number of padding characters in the x direction
  pady=0  |  int | number of padding characters in the y direction
  initial_text=''  |  str | Initial text for the textbox
+ password=False  |  bool | Toggle to show '*' instead of characters.
 
 #### Returns
 
