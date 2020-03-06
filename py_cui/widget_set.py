@@ -2,7 +2,7 @@
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
-@author: Jakub Wlodek
+@author: Jakub Wlodek  
 @created: 05-Oct-2019
 """
 

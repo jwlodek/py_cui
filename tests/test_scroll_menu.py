@@ -10,6 +10,7 @@ scroll.selected = True
 
 elems = ["Elem0","Elem1","Elem2","Elem3","Elem4"]
 
+
 def test_add_item_list():
     scroll.add_item_list(elems)
     counter = 0
@@ -19,6 +20,7 @@ def test_add_item_list():
     assert scroll.selected_item == 0
     assert scroll.get() == "Elem0"
     scroll.clear()
+
 
 def test_scroll_up():
     scroll.add_item_list(elems)
@@ -31,6 +33,7 @@ def test_scroll_up():
     assert scroll.selected_item == 1
     assert scroll.get() == "Elem1"
     scroll.clear()
+
 
 def test_scroll_down():
     scroll.add_item_list(elems)

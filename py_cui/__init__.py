@@ -1,6 +1,6 @@
 """A python library for creating command line based user interfaces.
 
-@author:    Jakub Wlodek
+@author:    Jakub Wlodek  
 @created:   12-Aug-2019
 """
 

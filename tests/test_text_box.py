@@ -20,12 +20,14 @@ def test_move_left_side():
     assert text_box.cursor_text_pos == 4
     assert text_box.cursor_x == (temp + 5 - 1)
 
+
 def test_clear():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
     text_box.clear()
     assert text_box.get() == ''
     assert text_box.cursor_text_pos == 0
     assert text_box.cursor_x == 12
+
 
 def test_get_initial():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
@@ -36,13 +38,13 @@ def test_get_initial():
     assert text_box.cursor_max_right == 27
 
 
-
 def test_insert_char():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
     text_box.insert_char(py_cui.keys.KEY_D_UPPER)
     assert text_box.get() == 'DHello World'
     assert text_box.cursor_x == text_box.cursor_max_left + 1
     assert text_box.cursor_text_pos == 1
+
 
 def test_erase_char():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
@@ -52,6 +54,7 @@ def test_erase_char():
     assert text_box.cursor_x == text_box.cursor_max_left + 1
     assert text_box.cursor_text_pos == 1
     assert text_box.get() == 'Hllo World'
+
 
 def test_get_edited():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
@@ -63,6 +66,7 @@ def test_get_edited():
     assert text_box.cursor_x == text_box.cursor_max_left + 4
     assert text_box.cursor_text_pos == 4
     assert text_box.get() == 'HeaElo World'
+
 
 def test_jump_to_start():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
@@ -88,11 +92,13 @@ def test_move_right_overflow():
     assert text_box.cursor_text_pos == 14
     assert text_box.cursor_x == text_box.cursor_max_left + 5
 
+
 def test_move_left_overflow():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
     text_box.move_left()
     assert text_box.cursor_text_pos == 0
     assert text_box.cursor_x == 12
+
 
 def test_set_text():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
