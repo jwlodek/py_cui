@@ -1,6 +1,6 @@
 """A python library for creating command line based user interfaces.
 
-@author:    Jakub Wlodek  
+@author:    Jakub Wlodek
 @created:   12-Aug-2019
 """
 
@@ -30,7 +30,7 @@ import py_cui.popups
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
-# create these values as pairs of the bat to be selected. 
+# create these values as pairs of the bat to be selected.
 # Format is FOREGROUND_ON_BACKGROUND
 # TODO add more color options
 WHITE_ON_BLACK      = 1
@@ -210,8 +210,8 @@ class PyCUI:
 
 
     def stop(self):
-        """Function that stops the CUI, and fires the callback function. 
-        
+        """Function that stops the CUI, and fires the callback function.
+
         Callback must be a no arg method
         """
 
@@ -359,7 +359,7 @@ class PyCUI:
 
     def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
         """Function that adds a new checkbox menu to the CUI grid
-        
+
         Parameters
         ----------
         title : str
@@ -393,7 +393,7 @@ class PyCUI:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False):
         """Function that adds a new text box to the CUI grid
 
         Parameters
@@ -422,7 +422,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text, password)
         self.widgets[id] = new_text_box
         if self.selected_widget is None:
             self.set_selected_widget(id)
@@ -609,12 +609,12 @@ class PyCUI:
         return widget_list
 
 
-    # CUI status functions. Used to switch between widgets, set the mode, and 
+    # CUI status functions. Used to switch between widgets, set the mode, and
     # identify neighbors for overview mode
 
     def check_if_neighbor_exists(self, row, column, direction):
-        """Function that checks if widget has neighbor in specified cell. 
-        
+        """Function that checks if widget has neighbor in specified cell.
+
         Used for navigating CUI, as arrow keys find the immediate neighbor
 
         Parameters
@@ -643,7 +643,7 @@ class PyCUI:
             vertical = False
         else:
             return None
-        
+
         if vertical:
             widgets = sorted(widgets, key=lambda x: self.widgets[x].column)
         else:
@@ -681,7 +681,7 @@ class PyCUI:
         ----------
         widget : Widget
             The widget object we wish to get an ID from
-        
+
         Returns
         -------
         widget_id : str
@@ -693,7 +693,7 @@ class PyCUI:
 
     def lose_focus(self):
         """Function that forces py_cui out of focus mode.
-        
+
         After popup is called, focus is lost
         """
 
@@ -782,7 +782,7 @@ class PyCUI:
 
     def show_yes_no_popup(self, title, command):
         """Shows a yes/no popup.
-        
+
         The 'command' parameter must be a function with a single boolean parameter
 
         Parameters
@@ -799,7 +799,7 @@ class PyCUI:
 
     def show_text_box_popup(self, title, command, password=False):
         """Shows a textbox popup.
-        
+
         The 'command' parameter must be a function with a single string parameter
 
         Parameters
@@ -814,11 +814,11 @@ class PyCUI:
 
         color=WHITE_ON_BLACK
         self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer, password)
-    
-    
+
+
     def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
         """Shows a menu popup.
-        
+
         The 'command' parameter must be a function with a single string parameter
 
         Parameters
@@ -849,7 +849,7 @@ class PyCUI:
         callback=None : Function
             If not none, fired after loading is completed. Must be a no-arg function
         """
-    
+
         if callback is not None:
             self.post_loading_callback = callback
         color = WHITE_ON_BLACK
@@ -859,7 +859,7 @@ class PyCUI:
 
     def show_loading_bar_popup(self, title, num_items, callback=None):
         """Shows loading bar popup.
-        
+
         Use 'increment_loading_bar' to show progress
 
         Parameters
@@ -890,7 +890,7 @@ class PyCUI:
 
     def stop_loading_popup(self):
         """Leaves loading state, and closes popup.
-        
+
         Must be called by user to escape loading.
         """
 
