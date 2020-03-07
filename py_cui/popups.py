@@ -61,7 +61,7 @@ class Popup:
         self.renderer = renderer
         self.selected = True
         self.key_map = py_cui.keys.KeyMap()
-        self.key_map.bind_key(key=py_cui.keys.Key.ESCAPE, lambda x: self.root.close_popup())
+        self.key_map.bind_key(key=py_cui.keys.Key.ESCAPE, definition=lambda x: self.root.close_popup())
 
     def handle_key_press(self, key_pressed):
         """Handles key presses when popup is open
