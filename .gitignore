@@ -12,4 +12,6 @@ notes/
 markdoc/
 npdoc2md/
 *.*~
-ecui/
+epy_cui/
+activate.bat
+*.swp
