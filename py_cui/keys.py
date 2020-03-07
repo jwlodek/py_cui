@@ -44,6 +44,7 @@ def get_char_from_ascii(key_num):
 
 
 class Key(enum.Enum):
+    """Enum representing a Key internally"""
     # KeysSupported py_cui keys
     ENTER       = get_ascii_from_char('\n')
     #Esccape character is ascii #27
@@ -124,6 +125,13 @@ class Key(enum.Enum):
 
 
 class KeyMap(object):
+    """Represents a map of keys to functionality internally
+
+    Attributes
+    ----------
+    _bindings : dict
+        The list of bindings
+    """
     def __init__(self):
         self._bindings = dict()
 
@@ -153,6 +161,13 @@ class KeyMap(object):
             self._bindings[key.value] = (definition, key)
     
     def execute(self, key: Key):
+        """Execute the given key on this map
+
+        Parameters
+        ----------
+        key : Key
+            The key to execute
+        """
         if not isinstance(key, Key):
             raise ValueError(f"{key} is an invalid value for key")
         elif key.value not in self._bindings.keys():
@@ -180,13 +195,38 @@ class KeyMap(object):
             return k
 
 class RawKeyMap(object):
+    """
+    A keymap for mapping large amounts of characters to
+    a single action/definition
+
+    Attributes
+    ----------
+    char_range : range
+        The range of characters to map
+    definition : Callable
+        The function to call on execution
+    """
     def __init__(self, char_range: range):
         self.char_range = char_range
         self.definition = None
 
     def add_definition(self, definition):
+        """Add a definition/function to this RawKeyMap
+
+        Parameters
+        ----------
+        definition : Callable
+            The definition to add
+        """
         self.definition = definition
 
     def execute(self, key: int):
+        """Execute this keymap on the given key
+
+        Parameters
+        ----------
+        key : int
+            The key to execute
+        """
         if key in self.char_range and self.definition:
             self.definition(key)
