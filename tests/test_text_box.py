@@ -40,7 +40,7 @@ def test_get_initial():
 
 def test_insert_char():
     text_box = py_cui.widgets.TextBox('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World', False)
-    text_box.insert_char(py_cui.keys.KEY_D_UPPER)
+    text_box.insert_char(py_cui.keys.Key.D_UPPER.value)
     assert text_box.get() == 'DHello World'
     assert text_box.cursor_x == text_box.cursor_max_left + 1
     assert text_box.cursor_text_pos == 1
@@ -61,8 +61,8 @@ def test_get_edited():
     for i in range(0, 3):
         text_box.move_right()
     text_box.erase_char()
-    text_box.insert_char(py_cui.keys.KEY_A_LOWER)
-    text_box.insert_char(py_cui.keys.KEY_E_UPPER)
+    text_box.insert_char(py_cui.keys.Key.A_LOWER.value)
+    text_box.insert_char(py_cui.keys.Key.E_UPPER.value)
     assert text_box.cursor_x == text_box.cursor_max_left + 4
     assert text_box.cursor_text_pos == 4
     assert text_box.get() == 'HeaElo World'
