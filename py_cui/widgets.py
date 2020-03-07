@@ -102,8 +102,27 @@ class Widget:
         self.raw_key_map = py_cui.keys.RawKeyMap(range(32, 128))
 
     def _on_lose_focus(self, key: py_cui.keys.Key):
+        """Called on this widget losing focus
+
+        Parameters
+        ----------
+        key : Key
+            The key pressed to trigger this event
+        """
         if self.on_lose_focus:
             self.on_lose_focus()
+
+    def add_key_command(self, key, command):
+        """Maps a keycode to a function that will be executed when in focus mode
+
+        Parameters
+        ----------
+        key : py_cui.keys.KEY
+            ascii keycode used to map the key
+        command : function without args
+            a non-argument function or lambda function to execute if in focus mode and key is pressed
+        """
+        self.key_map.bind_key(key=key, definition=lambda x: command())
 
     def set_focus_text(self, text):
         """Function that sets the text of the status bar on focus for a particular widget
@@ -424,14 +443,9 @@ class ScrollMenu(Widget):
         self.top_view = 0
 
 
-    def scroll_up(self, key: py_cui.keys.Key):
-        """Function that scrolls the view up in the scroll menu
-
-        Parameters
-        ----------
-        key : Key
-            The key pressed to trigger this event
-        """
+    @py_cui.keys.ignore_key
+    def scroll_up(self):
+        """Function that scrolls the view up in the scroll menu"""
 
         if self.selected:
             if self.top_view > 0 and self.selected_item == self.top_view:
@@ -440,14 +454,9 @@ class ScrollMenu(Widget):
                 self.selected_item = self.selected_item - 1
 
 
-    def scroll_down(self, key: py_cui.keys.Key):
-        """Function that scrolls the view down in the scroll menu
-
-        Parameters
-        ----------
-        key : Key
-            The key pressed to trigger this event
-        """
+    @py_cui.keys.ignore_key
+    def scroll_down(self):
+        """Function that scrolls the view down in the scroll menu"""
         if self.selected:
             if self.selected_item < len(self.view_items) - 1:
                 self.selected_item = self.selected_item + 1
@@ -559,15 +568,10 @@ class CheckBoxMenu(ScrollMenu):
         self.checked_char = checked_char
         self.set_focus_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
         self.key_map.bind(key=py_cui.keys.Key.ENTER, definition=self.select_item)
-        
-    def select_item(self, key: py_cui.keys.Key):
-        """Select a given item and set its view
-
-        Parameters
-        ----------
-        key : Key
-            The key pressed to execute this event
-        """
+    
+    @py_cui.keys.ignore_key
+    def select_item(self):
+        """Select a given item and set its view"""
         if super().get() in self.selected_item_list:
             self.selected_item_list.remove(super().get())
             self.view_items[self.selected_item] = '[ ] - ' + self.view_items[self.selected_item][6:]
@@ -653,14 +657,9 @@ class Button(Widget):
         self.set_focus_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
         self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.button_action)
 
-    def button_action(self, key: py_cui.keys.Key):
-        """Called when the button is pressed
-
-        Parameters
-        ----------
-        key : int
-            The key used to trigger this event
-        """
+    @py_cui.keys.ignore_key
+    def button_action(self):
+        """Called when the button is pressed"""
         self.selected_color = py_cui.WHITE_ON_RED
         if self.command is not None:
             ret = self.command()
@@ -775,7 +774,7 @@ class TextBox(Widget):
         self.cursor_text_pos = 0
         self.text = ''
 
-
+    @py_cui.keys.ignore_key
     def move_left(self):
         """Shifts the cursor the the left. Internal use only
         """
@@ -786,6 +785,7 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos - 1
 
 
+    @py_cui.keys.ignore_key
     def move_right(self):
         """Shifts the cursor the the right. Internal use only
         """
@@ -810,16 +810,16 @@ class TextBox(Widget):
             self.cursor_x = self.cursor_x + 1
         self.cursor_text_pos = self.cursor_text_pos + 1
 
-
-    def jump_to_start(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def jump_to_start(self):
         """Jumps to the start of the textbox
         """
 
         self.cursor_x = self.start_x + self.padx + 2
         self.cursor_text_pos = 0
 
-
-    def jump_to_end(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def jump_to_end(self):
         """Jumps to the end to the textbox
         """
 
@@ -827,7 +827,8 @@ class TextBox(Widget):
         self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
 
 
-    def erase_char(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def erase_char(self):
         """Erases character at textbox cursor
         """
 
@@ -837,7 +838,8 @@ class TextBox(Widget):
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
 
-    def delete_char(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def delete_char(self):
         """Deletes character to right of texbox cursor
         """
 
@@ -918,7 +920,7 @@ class ScrollTextBlock(Widget):
         self.key_map.bind_key(key=py_cui.keys.Key.BACKSPACE, definition=self.handle_backspace)
         self.key_map.bind_key(key=py_cui.keys.Key.DELETE, definition=self.handle_delete)
         self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.handle_newline)
-        self.key_map.bind_key(key=py_cui.keys.Key.TAB, definition=lambda x: [self.insert_char(py_cui.keys.Key.SPACE) for _ in range(4)])
+        self.key_map.bind_key(key=py_cui.keys.Key.TAB, definition=lambda x: [self.insert_char(py_cui.keys.Key.SPACE.value) for _ in range(4)])
         self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.handle_home)
         self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.handle_end)
         
@@ -1032,7 +1034,8 @@ class ScrollTextBlock(Widget):
         self.text_lines[self.cursor_text_pos_y] = text
 
 
-    def move_left(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def move_left(self):
         """Function that moves the cursor/text position one location to the left
         """
         if self.cursor_text_pos_x > 0:
@@ -1043,7 +1046,8 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
 
-    def move_right(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def move_right(self):
         """Function that moves the cursor/text position one location to the right
         """
 
@@ -1057,7 +1061,8 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x + 1
 
 
-    def move_up(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def move_up(self):
         """Function that moves the cursor/text position one location up
         """
 
@@ -1073,7 +1078,8 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def move_down(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def move_down(self):
         """Function that moves the cursor/text position one location down
         """
         if self.cursor_text_pos_y < len(self.text_lines) - 1:
@@ -1088,7 +1094,8 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def handle_newline(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def handle_newline(self):
         """Function that handles recieving newline characters in the text
         """
 
@@ -1108,7 +1115,8 @@ class ScrollTextBlock(Widget):
             self.viewport_y_start = self.viewport_y_start + 1
 
 
-    def handle_backspace(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def handle_backspace(self):
         """Function that handles recieving backspace characters in the text
         """
 
@@ -1130,8 +1138,8 @@ class ScrollTextBlock(Widget):
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
-
-    def handle_home(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def handle_home(self):
         """Function that handles recieving a home keypress
         """
 
@@ -1140,7 +1148,8 @@ class ScrollTextBlock(Widget):
         self.viewport_x_start = 0
 
 
-    def handle_end(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def handle_end(self):
         """Function that handles recieving an end keypress
         """
 
@@ -1154,7 +1163,8 @@ class ScrollTextBlock(Widget):
             self.cursor_x = self.cursor_max_left + len(current_line)
 
 
-    def handle_delete(self, key: py_cui.keys.Key):
+    @py_cui.keys.ignore_key
+    def handle_delete(self):
         """Function that handles recieving a delete keypress
         """
 
@@ -1178,7 +1188,7 @@ class ScrollTextBlock(Widget):
 
         current_line = self.get_current_line()
 
-        self.set_text_line(current_line[:self.cursor_text_pos_x] + chr(key_pressed) + current_line[self.cursor_text_pos_x:])
+        self.set_text_line(current_line[:self.cursor_text_pos_x] + chr(key) + current_line[self.cursor_text_pos_x:])
         if len(current_line) <= self.width - 2 * self.padx - 4:
             self.cursor_x = self.cursor_x + 1
         elif self.viewport_x_start + self.width - 2 * self.padx - 4 < len(current_line):

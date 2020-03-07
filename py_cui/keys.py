@@ -42,6 +42,10 @@ def get_char_from_ascii(key_num):
     """
     return chr(key_num)
 
+def ignore_key(method):
+    def wrapper(self, key=None, *args, **kwargs):
+        return method(self)
+    return wrapper
 
 class Key(enum.Enum):
     """Enum representing a Key internally"""
