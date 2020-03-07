@@ -100,7 +100,7 @@ class PyCUI:
         a status bar object that gets drawn at the top of the CUI
     status_bar : py_cui.statusbar.StatusBar
         a status bar object that gets drawn at the bottom of the CUI
-    keybindings : list of py_cui.keybinding.KeyBinding
+    key_map : py_cui.keys.KeyMap
         list of keybindings to check against in the main CUI loop
     height, width : int
         height of the terminal in characters, width of terminal in characters
@@ -151,6 +151,20 @@ class PyCUI:
         # Callback to fire when CUI is stopped.
         self.on_stop = None
 
+    def add_key_command(self, key, command):
+        """Adds a new command to the given key
+
+        *DEPRICATED*
+
+        Parameters
+        ----------
+        key : py_cui.keys.Key
+            The key to add a command to
+        command : Callable
+            The command to execute
+        """
+        self.key_map.bind_key(key=key, definition=lambda x: command())
+
     def load_default_keymap(self):
         stop_wrapper = lambda x: self.stop()
         self.key_map.bind_key(key=py_cui.keys.Key.Q_LOWER, definition=stop_wrapper)
@@ -173,7 +187,7 @@ class PyCUI:
         new_widget_set = widget_set.WidgetSet(self.grid.num_rows, self.grid.num_columns)
         new_widget_set.grid = self.grid
         new_widget_set.widgets = self.widgets
-        new_widget_set.keybindings = self.keybindings
+        new_widget_set.key_map = self.key_map
         return new_widget_set
 
 
@@ -190,7 +204,6 @@ class PyCUI:
             self.lose_focus()
             self.widgets = new_widget_set.widgets
             self.grid = new_widget_set.grid
-            self.keybindings = new_widget_set.keybindings
             term_size = shutil.get_terminal_size()
             height = term_size.lines
             width = term_size.columns
@@ -699,7 +712,7 @@ class PyCUI:
 
         return widget.id
 
-
+    @py_cui.keys.ignore_key
     def lose_focus(self):
         """Function that forces py_cui out of focus mode.
 
@@ -1039,7 +1052,6 @@ class PyCUI:
         # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
         if self.selected_widget is None:
             return
-
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         if not self.popup and self.selected_widget and self.in_focused_mode:
             self.widgets[self.selected_widget].handle_key_press(key_pressed)
@@ -1100,7 +1112,8 @@ class PyCUI:
                 self.post_loading_callback = None
 
             # Handle keypresses
-            self.handle_key_presses(key_pressed)
+            if key_pressed != 0:
+                self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
             self.draw_status_bars(stdscr, height, width)
@@ -1111,13 +1124,14 @@ class PyCUI:
 
             # Refresh the screen
             stdscr.refresh()
-
             # Wait for next input
             if self.loading or self.post_loading_callback is not None:
                 # When loading, refresh screen every quarter second
                 time.sleep(0.25)
                 # Need to reset key_pressed, because otherwise the previously pressed key will be used.
                 key_pressed = 0
+            elif self.stopped:
+                break
             else:
                 key_pressed = stdscr.getch()
 

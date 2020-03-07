@@ -9,6 +9,7 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
 
 import shutil
+import py_cui.keys
 import py_cui.widgets as widgets
 import py_cui.grid as grid
 
@@ -35,7 +36,7 @@ class WidgetSet:
         """
 
         self.widgets = {}
-        self.keybindings = {}
+        self.key_map = py_cui.keys.KeyMap()
         term_size = shutil.get_terminal_size()
 
         self.height = term_size.lines
@@ -68,9 +69,7 @@ class WidgetSet:
         command : Function
             A no-arg or lambda function to fire on keypress
         """
-
-        self.keybindings[key] = command
-
+        self.key_map.bind_key(key=key, definition=lambda x: command())
 
     def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """Function that adds a new scroll menu to the CUI grid
