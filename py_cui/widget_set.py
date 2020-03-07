@@ -63,7 +63,7 @@ class WidgetSet:
 
         Parameters
         ----------
-        key : py_cui.keys.KEY_*
+        key : py_cui.keys.Key.*
             The key bound to the command
         command : Function
             A no-arg or lambda function to fire on keypress

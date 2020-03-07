@@ -705,12 +705,11 @@ class PyCUI:
 
         After popup is called, focus is lost
         """
-
         if self.in_focused_mode:
             self.in_focused_mode = False
             self.status_bar.set_text(self.init_status_bar_text)
             self.widgets[self.selected_widget].selected = False
-
+            self.widgets[self.selected_widget].on_lose_focus = None
 
     def move_focus(self, widget):
         """Moves focus mode to different widget
@@ -726,6 +725,7 @@ class PyCUI:
         widget.selected = True
         self.in_focused_mode = True
         self.status_bar.set_text(widget.get_help_text())
+        widget.on_lose_focus = self.lose_focus
 
     # Popup functions. Used to display messages, warnings, and errors to the user.
 
@@ -1003,6 +1003,7 @@ class PyCUI:
         if self.popup is None and self.selected_widget is not None and selected_widget.is_selectable:
             self.in_focused_mode = True
             selected_widget.selected = True
+            selected_widget.on_lose_focus = self.lose_focus
             # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
             if self.auto_focus_buttons and isinstance(selected_widget, widgets.Button):
                 self.in_focused_mode = False
@@ -1035,7 +1036,6 @@ class PyCUI:
         key_pressed : py_cui.keys.Key.*
             The key being pressed
         """
-        print(key_pressed.value, key_pressed.name)
         # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
         if self.selected_widget is None:
             return
@@ -1043,15 +1043,15 @@ class PyCUI:
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         if not self.popup and self.selected_widget and self.in_focused_mode:
             self.widgets[self.selected_widget].handle_key_press(key_pressed)
-            print('processed widget handler')
         # if we have a popup, that takes key control from both overview and focus mode
         elif self.popup is not None:
-            print('popup handler')
             self.popup.handle_key_press(key_pressed)
         else:
-            print('executing main keymap')
-            self.key_map.execute(key_pressed)
-
+            try:
+                key = py_cui.keys.Key(key_pressed)
+                self.key_map.execute(key)
+            except ValueError:
+                return
 
     def draw(self, stdscr):
         """Main CUI draw loop called by start()
@@ -1100,12 +1100,7 @@ class PyCUI:
                 self.post_loading_callback = None
 
             # Handle keypresses
-            if key_pressed != 0:
-                try:
-                    key = py_cui.keys.Key(key_pressed)
-                    self.handle_key_presses(key)
-                except ValueError as e:
-                    continue
+            self.handle_key_presses(key_pressed)
 
             # Draw status/title bar, and all widgets. Selected widget will be bolded.
             self.draw_status_bars(stdscr, height, width)

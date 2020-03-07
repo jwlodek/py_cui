@@ -63,7 +63,7 @@ class Popup:
         self.key_map = py_cui.keys.KeyMap()
         self.key_map.bind_key(key=py_cui.keys.Key.ESCAPE, definition=lambda x: self.root.close_popup())
 
-    def handle_key_press(self, key_pressed):
+    def handle_key_press(self, key_pressed: int):
         """Handles key presses when popup is open
 
         By default, only closes popup when Escape is pressed
@@ -73,7 +73,12 @@ class Popup:
         key_pressed : int
             The ascii code for the key that was pressed
         """
-        self.key_map.execute(key_pressed)
+        try:
+            self.key_map.execute(key_pressed)
+            key = py_cui.keys.Key(key_pressed)
+            self.raw_key_map.execute(key)
+        except ValueError:
+            return
 
     def draw(self):
         """Function that uses renderer to draw the popup
@@ -198,8 +203,7 @@ class TextBoxPopup(Popup):
         self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.jump_to_start)
         self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.jump_to_end)
         
-        for i in range(32, 128):
-            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
+        self.raw_key_map.add_definition(self.insert_char)   
 
     def return_input(self, key: py_cui.keys.Key):
             self.root.close_popup()
@@ -265,7 +269,7 @@ class TextBoxPopup(Popup):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def insert_char(self, key: py_cui.keys.Key):
+    def insert_char(self, key: int):
         """Inserts char at cursor position. Internal use only
 
         Parameters

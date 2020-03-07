@@ -24,6 +24,7 @@ import curses
 import py_cui
 import py_cui.colors
 import py_cui.errors
+import py_cui.keys
 
 
 class Widget:
@@ -66,12 +67,14 @@ class Widget:
         Dictionary mapping key codes to functions
     text_color_rules : list of py_cui.ColorRule
         color rules to load into renderer when drawing widget
+    on_lose_focus : Callable
+        called when this widget loses focus
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         """Constructor for base widget class
         """
-
+        self.on_lose_focus = None
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
         self.id = id
@@ -95,7 +98,12 @@ class Widget:
         self.help_text = 'No help text available.'
         self.text_color_rules = []
         self.key_map = py_cui.keys.KeyMap()
+        self.key_map.bind_key(key=py_cui.keys.Key.ESCAPE, definition=self._on_lose_focus)
+        self.raw_key_map = py_cui.keys.RawKeyMap(range(32, 128))
 
+    def _on_lose_focus(self, key: py_cui.keys.Key):
+        if self.on_lose_focus:
+            self.on_lose_focus()
 
     def set_focus_text(self, text):
         """Function that sets the text of the status bar on focus for a particular widget
@@ -276,7 +284,12 @@ class Widget:
         key_pressed : int
             key code of key pressed
         """
-        self.key_map.execute(key_pressed)
+        try:
+            self.raw_key_map.execute(key_pressed)
+            key = py_cui.keys.Key(key_pressed)
+            self.key_map.execute(key)
+        except ValueError:
+            return
 
     def draw(self):
         """Base class draw class that checks if renderer is valid.
@@ -710,9 +723,8 @@ class TextBox(Widget):
         self.key_map.bind_key(key=py_cui.keys.Key.DELETE, definition=self.delete_char)
         self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.jump_to_start)
         self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.jump_to_end)
-
-        for i in range(32, 128):
-            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
+        
+        self.raw_key_map.add_definition(self.insert_char)
 
     def update_height_width(self):
         """Need to update all cursor positions on resize
@@ -783,7 +795,7 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def insert_char(self, key: py_cui.keys.Key):
+    def insert_char(self, key: int):
         """Inserts char at cursor position.
 
         Internal use only
@@ -793,7 +805,7 @@ class TextBox(Widget):
         key_pressed : int
             key code of key pressed
         """
-        self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
+        self.text = self.text[:self.cursor_text_pos] + chr(key) + self.text[self.cursor_text_pos:]
         if len(self.text) < self.viewport_width:
             self.cursor_x = self.cursor_x + 1
         self.cursor_text_pos = self.cursor_text_pos + 1
@@ -910,8 +922,7 @@ class ScrollTextBlock(Widget):
         self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.handle_home)
         self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.handle_end)
         
-        for i in range(32, 128):
-            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
+        self.raw_key_map.add_definition(self.insert_char)
 
     def update_height_width(self):
         """Function that updates the position of the text and cursor on resize
@@ -1156,7 +1167,7 @@ class ScrollTextBlock(Widget):
             self.set_text_line(current_line[:self.cursor_text_pos_x] + current_line[self.cursor_text_pos_x+1:])
 
 
-    def insert_char(self, key_pressed):
+    def insert_char(self, key: int):
         """Function that handles recieving a character
 
         Parameters

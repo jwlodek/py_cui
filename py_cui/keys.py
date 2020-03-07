@@ -149,7 +149,8 @@ class KeyMap(object):
             raise ValueError(f"Cannot bind to both a key and a callable")
         if old:
             self._bindings[key.value] = self._bindings[old.value]
-        self._bindings[key.value] = definition
+        else:
+            self._bindings[key.value] = (definition, key)
     
     def execute(self, key: Key):
         if not isinstance(key, Key):
@@ -157,7 +158,7 @@ class KeyMap(object):
         elif key.value not in self._bindings.keys():
             return
 
-        self._bindings[key.value](key)
+        self._bindings[key.value][0](self._bindings[key.value][1])
 
     def unbind(self, key: Key):
         """Unbinds a key from the map
@@ -177,3 +178,15 @@ class KeyMap(object):
             k = KeyMap()
             k._bindings = {**value._binings, **self._bindings}
             return k
+
+class RawKeyMap(object):
+    def __init__(self, char_range: range):
+        self.char_range = char_range
+        self.definition = None
+
+    def add_definition(self, definition):
+        self.definition = definition
+
+    def execute(self, key: int):
+        if key in self.char_range and self.definition:
+            self.definition(key)
