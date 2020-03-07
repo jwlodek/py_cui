@@ -139,7 +139,7 @@ class KeyMap(object):
     def __init__(self):
         self._bindings = dict()
 
-    def bind_key(self, /, key: Key, *, definition: Callable=None, old: Key=None):
+    def bind_key(self, key: Key, definition: Callable=None, old: Key=None):
         """Binds a key to either a function or a key that previously had a binding
 
         Parameters
