@@ -169,3 +169,11 @@ class KeyMap(object):
         """
         while key.value in self._bindings:
             del self._bindings[key.value]
+    
+    def __add__(self, value):
+        if not isinstance(value, self.__class__):
+            raise ValueError(f"Cannot add a KeyMap and {value.__class__} type")
+        else:
+            k = KeyMap()
+            k._bindings = {**value._binings, **self._bindings}
+            return k
