@@ -152,13 +152,13 @@ class KeyMap(object):
             The already bound key to bind to
         """
         if not isinstance(key, Key):
-            raise ValueError(f"{key} is an invalid value for key")
+            raise ValueError("{} is an invalid value for key".format(key))
         if old and old.value not in self._bindings:
-            raise ValueError(f"{old} is not in the bindings list, cannot bind to it")
+            raise ValueError("{old} is not in the bindings list, cannot bind to it".format(key))
         if not old and not definition:
-            raise ValueError(f"Either old or definition must be defined")
+            raise ValueError("Either old or definition must be defined".format(key))
         if old and definition:
-            raise ValueError(f"Cannot bind to both a key and a callable")
+            raise ValueError("Cannot bind to both a key and a callable".format(key))
         if old:
             self._bindings[key.value] = self._bindings[old.value]
         else:
@@ -173,7 +173,7 @@ class KeyMap(object):
             The key to execute
         """
         if not isinstance(key, Key):
-            raise ValueError(f"{key} is an invalid value for key")
+            raise ValueError("{} is an invalid value for key".format(key))
         elif key.value not in self._bindings.keys():
             return
 
@@ -192,7 +192,7 @@ class KeyMap(object):
     
     def __add__(self, value):
         if not isinstance(value, self.__class__):
-            raise ValueError(f"Cannot add a KeyMap and {value.__class__} type")
+            raise ValueError("Cannot add a KeyMap and {} type".format(value.__class))
         else:
             k = KeyMap()
             k._bindings = {**value._binings, **self._bindings}
