@@ -11,7 +11,7 @@ dist/
 notes/
 markdoc/
 npdoc2md/
-*.*~
+*~
 epy_cui/
 activate.bat
 *.swp
