@@ -60,8 +60,8 @@ class Popup:
         self.pady = 0
         self.renderer = renderer
         self.selected = True
-        self.close_keys = [py_cui.keys.KEY_ESCAPE]
-
+        self.key_map = py_cui.keys.KeyMap()
+        self.key_map.bind_key(key=py_cui.keys.Key.ESCAPE, lambda x: self.root.close_popup())
 
     def handle_key_press(self, key_pressed):
         """Handles key presses when popup is open
@@ -73,10 +73,7 @@ class Popup:
         key_pressed : int
             The ascii code for the key that was pressed
         """
-
-        if key_pressed in self.close_keys:
-            self.root.close_popup()
-
+        self.key_map.execute(key_pressed)
 
     def draw(self):
         """Function that uses renderer to draw the popup
@@ -111,7 +108,7 @@ class MessagePopup(Popup):
         """
 
         super().__init__(root, title, text, color, renderer)
-        self.close_keys = [py_cui.keys.KEY_ENTER, py_cui.keys.KEY_ESCAPE, py_cui.keys.KEY_SPACE, py_cui.keys.KEY_BACKSPACE, py_cui.keys.KEY_DELETE]
+        self.close_keys = [py_cui.keys.Key.ENTER, py_cui.keys.Key.ESCAPE, py_cui.keys.Key.SPACE, py_cui.keys.Key.BACKSPACE, py_cui.keys.Key.DELETE]
 
 
     def draw(self):
@@ -136,33 +133,23 @@ class YesNoPopup(Popup):
 
         super().__init__(root, title, text, color, renderer)
         self.command = command
+        self.key_map.bind_key(key=py_cui.keys.key.Y_LOWER, definition=self.positive_answer)
+        self.key_map.bind_key(key=py_cui.keys.key.Y_UPPER, definition=self.positive_answer)
+        self.key_map.bind_key(key=py_cui.keys.key.N_LOWER, definition=self.negative_answer)
+        self.key_map.bind_key(key=py_cui.keys.key.N_UPPER, definition=self.negative_answer)
 
 
-    def handle_key_press(self, key_pressed):
-        """Handle key press overwrite from superclass
+    def positive_answer(self, key: py_cui.keys.Key):
+        if self.command:
+            self.command(True)
+        else:
+            self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-        valid_pressed = False
-        if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
-            self.ret_val = True
-            valid_pressed = True
-        elif key_pressed == py_cui.keys.KEY_N_UPPER or key_pressed == py_cui.keys.KEY_N_LOWER:
-            self.ret_val = False
-            valid_pressed = True
-
-        if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                self.command(self.ret_val)
-            else:
-                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
-
+    def negative_answer(self, key: py_cui.keys.Key):
+        if self.command:
+            self.command(False)
+        else:
+            self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
     def draw(self):
         """Uses base class draw function
@@ -203,7 +190,23 @@ class TextBoxPopup(Popup):
         self.cursor_y = self.start_y + int(self.height / 2) + 1
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
         self.password = password
+        self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.return_input)
+        self.key_map.bind_key(key=py_cui.keys.Key.LEFT_ARROW, definition=self.move_left)
+        self.key_map.bind_key(key=py_cui.keys.Key.RIGHT_ARROW, definition=self.move_right)
+        self.key_map.bind_key(key=py_cui.keys.Key.BACKSPACE, definition=self.erase_char)
+        self.key_map.bind_key(key=py_cui.keys.Key.DELETE, definition=self.delete_char)
+        self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.jump_to_start)
+        self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.jump_to_end)
+        
+        for i in range(32, 128):
+            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
 
+    def return_input(self, key: py_cui.keys.Key):
+            self.root.close_popup()
+            if self.command is not None:
+                self.command(self.ret_val)
+            else:
+                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
     def set_text(self, text):
         """Sets the value of the text. Overwrites existing text
@@ -242,7 +245,7 @@ class TextBoxPopup(Popup):
         self.text = ''
 
 
-    def move_left(self):
+    def move_left(self, key: py_cui.keys.Key):
         """Shifts the cursor the the left. Internal use only
         """
 
@@ -252,7 +255,7 @@ class TextBoxPopup(Popup):
             self.cursor_text_pos = self.cursor_text_pos - 1
 
 
-    def move_right(self):
+    def move_right(self, key: py_cui.keys.Key):
         """Shifts the cursor the the right. Internal use only
         """
 
@@ -262,7 +265,7 @@ class TextBoxPopup(Popup):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def insert_char(self, key_pressed):
+    def insert_char(self, key: py_cui.keys.Key):
         """Inserts char at cursor position. Internal use only
 
         Parameters
@@ -277,7 +280,7 @@ class TextBoxPopup(Popup):
         self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def jump_to_start(self):
+    def jump_to_start(self, key: py_cui.keys.Key):
         """Jumps to the start of the textbox
         """
 
@@ -285,7 +288,7 @@ class TextBoxPopup(Popup):
         self.cursor_text_pos = 0
 
 
-    def jump_to_end(self):
+    def jump_to_end(self, key: py_cui.keys.Key):
         """Jumps to the end to the textbox
         """
 
@@ -293,7 +296,7 @@ class TextBoxPopup(Popup):
         self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
 
 
-    def erase_char(self):
+    def erase_char(self, key: py_cui.keys.Key):
         """Erases character at textbox cursor
         """
 
@@ -304,52 +307,12 @@ class TextBoxPopup(Popup):
             self.cursor_text_pos = self.cursor_text_pos - 1
 
     
-    def delete_char(self):
+    def delete_char(self, key: py_cui.keys.Key):
         """Deletes character to right of texbox cursor
         """
 
         if self.cursor_text_pos < len(self.text):
             self.text = self.text[:self.cursor_text_pos] + self.text[self.cursor_text_pos + 1:]
-
-
-
-    def handle_key_press(self, key_pressed):
-        """Override of base handle key press function
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-        valid_pressed = False
-        if key_pressed == py_cui.keys.KEY_ENTER:
-            self.ret_val = self.text
-            valid_pressed = True
-
-        if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                self.command(self.ret_val)
-            else:
-                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
-
-        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left()
-        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
-            self.erase_char()
-        elif key_pressed == py_cui.keys.KEY_DELETE:
-            self.delete_char()
-        elif key_pressed == py_cui.keys.KEY_HOME:
-            self.jump_to_start()
-        elif key_pressed == py_cui.keys.KEY_END:
-            self.jump_to_end()
-        elif key_pressed > 31 and key_pressed < 128:
-            self.insert_char(key_pressed)
-
 
     def draw(self):
         """Override of base draw function
@@ -407,9 +370,28 @@ class MenuPopup(Popup):
         self.view_items = items
         self.command = command
         self.run_command_if_none = run_command_if_none
+        self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.choose_value)
+        self.key_map.bind_key(key=py_cui.keys.Key.UP_ARROW, definition=self.scroll_up)
+        self.key_map.bind_key(key=py_cui.keys.Key.DOWN_ARROW, definition=self.scroll_down)
 
+    def choose_value(self, key: py_cui.keys.Key):
+        valid_pressed = False
+        if key == py_cui.keys.Key.ENTER:
+            self.ret_val = self.get()
+            valid_pressed = True
+        elif key == py_cui.keys.Key.ESCAPE:
+            self.ret_val = None
+            valid_pressed = True
 
-    def scroll_up(self):
+        if valid_pressed:
+            self.root.close_popup()
+            if self.command is not None:
+                if self.ret_val is not None or self.run_command_if_none:
+                    self.command(self.ret_val)
+            else:
+                self.root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
+        
+    def scroll_up(self, key: py_cui.keys.Key):
         """Function that scrolls the view up in the scroll menu
         """
 
@@ -420,7 +402,7 @@ class MenuPopup(Popup):
                 self.selected_item = self.selected_item - 1
 
 
-    def scroll_down(self):
+    def scroll_down(self, key: py_cui.keys.Key):
         """Function that scrolls the view down in the scroll menu
         """
 
@@ -443,41 +425,6 @@ class MenuPopup(Popup):
         if len(self.view_items) > 0:
             return self.view_items[self.selected_item]
         return None
-
-
-    def handle_key_press(self, key_pressed):
-        """Override of base handle key press function
-
-        Enter key runs command, Escape key closes menu
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-        valid_pressed = False
-        if key_pressed == py_cui.keys.KEY_ENTER:
-            self.ret_val = self.get()
-            valid_pressed = True
-        elif key_pressed == py_cui.keys.KEY_ESCAPE:
-            self.ret_val = None
-            valid_pressed = True
-
-        if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                if self.ret_val is not None or self.run_command_if_none:
-                    self.command(self.ret_val)
-            else:
-                self.root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
-
-        if key_pressed == py_cui.keys.KEY_UP_ARROW:
-            self.scroll_up()
-        if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            self.scroll_down()
-
 
     def draw(self):
         """Overrides base class draw function
@@ -528,21 +475,6 @@ class LoadingIconPopup(Popup):
         self.icon_counter = 0
         self.message = message
 
-
-    def handle_key_press(self, key_pressed):
-        """Override of base class function.
-
-        Loading icon popups cannot be cancelled, so we wish to avoid default behavior
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of pressed key
-        """
-
-        pass
-
-
     def draw(self):
         """Overrides base draw function
         """
@@ -574,21 +506,6 @@ class LoadingBarPopup(Popup):
         super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer)
         self.num_items = num_items
         self.completed_items = 0
-
-
-    def handle_key_press(self, key_pressed):
-        """Override of base class function.
-
-        Loading icon popups cannot be cancelled, so we wish to avoid default behavior
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of pressed key
-        """
-
-        pass
-
 
     def draw(self):
         """Override of base draw function
