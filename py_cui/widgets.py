@@ -93,8 +93,8 @@ class Widget:
         self.selected = False
         self.is_selectable = selectable
         self.help_text = 'No help text available.'
-        self.key_commands = {}
         self.text_color_rules = []
+        self.key_map = py_cui.keys.KeyMap()
 
 
     def set_focus_text(self, text):
@@ -107,21 +107,6 @@ class Widget:
         """
 
         self.help_text = text
-
-
-    def add_key_command(self, key, command):
-        """Maps a keycode to a function that will be executed when in focus mode
-
-        Parameters
-        ----------
-        key : py_cui.keys.KEY
-            ascii keycode used to map the key
-        command : function without args
-            a non-argument function or lambda function to execute if in focus mode and key is pressed
-        """
-
-        self.key_commands[key] = command
-
 
     def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
         """Forces renderer to draw text using given color if text_condition_function returns True
@@ -291,11 +276,7 @@ class Widget:
         key_pressed : int
             key code of key pressed
         """
-
-        if key_pressed in self.key_commands.keys():
-            command = self.key_commands[key_pressed]
-            command()
-
+        self.key_map.execute(key_pressed)
 
     def draw(self):
         """Base class draw class that checks if renderer is valid.
@@ -418,7 +399,8 @@ class ScrollMenu(Widget):
         self.selected_item = 0
         self.view_items = []
         self.set_focus_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
-
+        self.key_map.bind_key(key=py_cui.keys.Key.UP_ARROW, definition=self.scroll_up)
+        self.key_map.bind_key(key=py_cui.keys.Key.DOWN_ARROW, definition=self.scroll_down)
 
     def clear(self):
         """Clears all items from the Scroll Menu
@@ -429,8 +411,13 @@ class ScrollMenu(Widget):
         self.top_view = 0
 
 
-    def scroll_up(self):
+    def scroll_up(self, key: py_cui.keys.Key):
         """Function that scrolls the view up in the scroll menu
+
+        Parameters
+        ----------
+        key : Key
+            The key pressed to trigger this event
         """
 
         if self.selected:
@@ -440,10 +427,14 @@ class ScrollMenu(Widget):
                 self.selected_item = self.selected_item - 1
 
 
-    def scroll_down(self):
+    def scroll_down(self, key: py_cui.keys.Key):
         """Function that scrolls the view down in the scroll menu
-        """
 
+        Parameters
+        ----------
+        key : Key
+            The key pressed to trigger this event
+        """
         if self.selected:
             if self.selected_item < len(self.view_items) - 1:
                 self.selected_item = self.selected_item + 1
@@ -512,25 +503,6 @@ class ScrollMenu(Widget):
             return self.view_items[self.selected_item]
         return None
 
-
-    def handle_key_press(self, key_pressed):
-        """Override base class function.
-
-        UP_ARROW scrolls up, DOWN_ARROW scrolls down.
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-        if key_pressed == py_cui.keys.KEY_UP_ARROW:
-            self.scroll_up()
-        if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            self.scroll_down()
-
-
     def draw(self):
         """Overrides base class draw function
         """
@@ -573,7 +545,22 @@ class CheckBoxMenu(ScrollMenu):
         self.selected_item_list = []
         self.checked_char = checked_char
         self.set_focus_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
+        self.key_map.bind(key=py_cui.keys.Key.ENTER, definition=self.select_item)
+        
+    def select_item(self, key: py_cui.keys.Key):
+        """Select a given item and set its view
 
+        Parameters
+        ----------
+        key : Key
+            The key pressed to execute this event
+        """
+        if super().get() in self.selected_item_list:
+            self.selected_item_list.remove(super().get())
+            self.view_items[self.selected_item] = '[ ] - ' + self.view_items[self.selected_item][6:]
+        else:
+            self.view_items[self.selected_item] = '[{}] - '.format(self.checked_char) + self.view_items[self.selected_item][6:]
+            self.selected_item_list.append(self.view_items[self.selected_item])
 
     def add_item(self, item_text):
         """Adds item to Checkbox
@@ -635,29 +622,6 @@ class CheckBoxMenu(ScrollMenu):
             self.selected_item_list.remove(text)
 
 
-    def handle_key_press(self, key_pressed):
-        """Override of key presses.
-
-        First, run the superclass function, scrolling should still work.
-        Adds Enter command to toggle selection
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of pressed key
-        """
-
-        super().handle_key_press(key_pressed)
-        if key_pressed == py_cui.keys.KEY_ENTER:
-            if super().get() in self.selected_item_list:
-                self.selected_item_list.remove(super().get())
-                self.view_items[self.selected_item] = '[ ] - ' + self.view_items[self.selected_item][6:]
-            else:
-                self.view_items[self.selected_item] = '[{}] - '.format(self.checked_char) + self.view_items[self.selected_item][6:]
-                self.selected_item_list.append(self.view_items[self.selected_item])
-
-
-
 class Button(Widget):
     """Basic button widget.
 
@@ -674,25 +638,21 @@ class Button(Widget):
         self.command = command
         self.set_standard_color(py_cui.MAGENTA_ON_BLACK)
         self.set_focus_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
+        self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.button_action)
 
-
-    def handle_key_press(self, key_pressed):
-        """Override of base class, adds ENTER listener that runs the button's command
+    def button_action(self, key: py_cui.keys.Key):
+        """Called when the button is pressed
 
         Parameters
         ----------
-        key_pressed : int
-            Key code of pressed key
+        key : int
+            The key used to trigger this event
         """
-
-        super().handle_key_press(key_pressed)
-        if key_pressed == py_cui.keys.KEY_ENTER:
-            self.selected_color = py_cui.WHITE_ON_RED
-            if self.command is not None:
-                ret = self.command()
-            self.selected_color = py_cui.BLACK_ON_GREEN
-            return ret
-
+        self.selected_color = py_cui.WHITE_ON_RED
+        if self.command is not None:
+            ret = self.command()
+        self.selected_color = py_cui.BLACK_ON_GREEN
+        return ret
 
     def draw(self):
         """Override of base class draw function
@@ -744,7 +704,15 @@ class TextBox(Widget):
         self.set_focus_text('Focus mode on TextBox. Press Esc to exit focus mode.')
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
         self.password = password
+        self.key_map.bind_key(key=py_cui.keys.Key.LEFT_ARROW, definition=self.move_left)
+        self.key_map.bind_key(key=py_cui.keys.Key.RIGHT_ARROW, definition=self.move_right)
+        self.key_map.bind_key(key=py_cui.keys.Key.BACKSPACE, definition=self.erase_char)
+        self.key_map.bind_key(key=py_cui.keys.Key.DELETE, definition=self.delete_char)
+        self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.jump_to_start)
+        self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.jump_to_end)
 
+        for i in range(32, 128):
+            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
 
     def update_height_width(self):
         """Need to update all cursor positions on resize
@@ -815,7 +783,7 @@ class TextBox(Widget):
             self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def insert_char(self, key_pressed):
+    def insert_char(self, key: py_cui.keys.Key):
         """Inserts char at cursor position.
 
         Internal use only
@@ -831,7 +799,7 @@ class TextBox(Widget):
         self.cursor_text_pos = self.cursor_text_pos + 1
 
 
-    def jump_to_start(self):
+    def jump_to_start(self, key: py_cui.keys.Key):
         """Jumps to the start of the textbox
         """
 
@@ -839,7 +807,7 @@ class TextBox(Widget):
         self.cursor_text_pos = 0
 
 
-    def jump_to_end(self):
+    def jump_to_end(self, key: py_cui.keys.Key):
         """Jumps to the end to the textbox
         """
 
@@ -847,7 +815,7 @@ class TextBox(Widget):
         self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
 
 
-    def erase_char(self):
+    def erase_char(self, key: py_cui.keys.Key):
         """Erases character at textbox cursor
         """
 
@@ -857,38 +825,12 @@ class TextBox(Widget):
                 self.cursor_x = self.cursor_x - 1
             self.cursor_text_pos = self.cursor_text_pos - 1
 
-    def delete_char(self):
+    def delete_char(self, key: py_cui.keys.Key):
         """Deletes character to right of texbox cursor
         """
 
         if self.cursor_text_pos < len(self.text):
             self.text = self.text[:self.cursor_text_pos] + self.text[self.cursor_text_pos + 1:]
-
-    def handle_key_press(self, key_pressed):
-        """Override of base handle key press function
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left()
-        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
-            self.erase_char()
-        elif key_pressed == py_cui.keys.KEY_DELETE:
-            self.delete_char()
-        elif key_pressed == py_cui.keys.KEY_HOME:
-            self.jump_to_start()
-        elif key_pressed == py_cui.keys.KEY_END:
-            self.jump_to_end()
-        elif key_pressed > 31 and key_pressed < 128:
-            self.insert_char(key_pressed)
-
 
     def draw(self):
         """Override of base draw function
@@ -956,7 +898,20 @@ class ScrollTextBlock(Widget):
         self.cursor_max_right = self.start_x + self.width - padx - 1
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
         self.set_focus_text('Focus mode on TextBlock. Press Esc to exit focus mode.')
-
+        
+        self.key_map.bind_key(key=py_cui.keys.Key.LEFT_ARROW, definition=self.move_left)
+        self.key_map.bind_key(key=py_cui.keys.Key.RIGHT_ARROW, definition=self.move_right)
+        self.key_map.bind_key(key=py_cui.keys.Key.UP_ARROW, definition=self.move_up)
+        self.key_map.bind_key(key=py_cui.keys.Key.DOWN_ARROW, definition=self.move_down)
+        self.key_map.bind_key(key=py_cui.keys.Key.BACKSPACE, definition=self.handle_backspace)
+        self.key_map.bind_key(key=py_cui.keys.Key.DELETE, definition=self.handle_delete)
+        self.key_map.bind_key(key=py_cui.keys.Key.ENTER, definition=self.handle_newline)
+        self.key_map.bind_key(key=py_cui.keys.Key.TAB, definition=lambda x: [self.insert_char(py_cui.keys.Key.SPACE) for _ in range(4)])
+        self.key_map.bind_key(key=py_cui.keys.Key.HOME, definition=self.handle_home)
+        self.key_map.bind_key(key=py_cui.keys.Key.END, definition=self.handle_end)
+        
+        for i in range(32, 128):
+            self.key_map.bind_key(key=py_cui.keys.Key(i), definition=self.insert_char)
 
     def update_height_width(self):
         """Function that updates the position of the text and cursor on resize
@@ -1066,10 +1021,9 @@ class ScrollTextBlock(Widget):
         self.text_lines[self.cursor_text_pos_y] = text
 
 
-    def move_left(self):
+    def move_left(self, key: py_cui.keys.Key):
         """Function that moves the cursor/text position one location to the left
         """
-
         if self.cursor_text_pos_x > 0:
             if self.cursor_x > self.cursor_max_left:
                 self.cursor_x = self.cursor_x - 1
@@ -1078,7 +1032,7 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
 
-    def move_right(self):
+    def move_right(self, key: py_cui.keys.Key):
         """Function that moves the cursor/text position one location to the right
         """
 
@@ -1092,7 +1046,7 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x + 1
 
 
-    def move_up(self):
+    def move_up(self, key: py_cui.keys.Key):
         """Function that moves the cursor/text position one location up
         """
 
@@ -1108,10 +1062,9 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def move_down(self):
+    def move_down(self, key: py_cui.keys.Key):
         """Function that moves the cursor/text position one location down
         """
-
         if self.cursor_text_pos_y < len(self.text_lines) - 1:
             if self.cursor_y < self.cursor_max_down:
                 self.cursor_y = self.cursor_y + 1
@@ -1124,7 +1077,7 @@ class ScrollTextBlock(Widget):
                 self.cursor_text_pos_x = temp
 
 
-    def handle_newline(self):
+    def handle_newline(self, key: py_cui.keys.Key):
         """Function that handles recieving newline characters in the text
         """
 
@@ -1144,7 +1097,7 @@ class ScrollTextBlock(Widget):
             self.viewport_y_start = self.viewport_y_start + 1
 
 
-    def handle_backspace(self):
+    def handle_backspace(self, key: py_cui.keys.Key):
         """Function that handles recieving backspace characters in the text
         """
 
@@ -1167,7 +1120,7 @@ class ScrollTextBlock(Widget):
             self.cursor_text_pos_x = self.cursor_text_pos_x - 1
 
 
-    def handle_home(self):
+    def handle_home(self, key: py_cui.keys.Key):
         """Function that handles recieving a home keypress
         """
 
@@ -1176,7 +1129,7 @@ class ScrollTextBlock(Widget):
         self.viewport_x_start = 0
 
 
-    def handle_end(self):
+    def handle_end(self, key: py_cui.keys.Key):
         """Function that handles recieving an end keypress
         """
 
@@ -1190,7 +1143,7 @@ class ScrollTextBlock(Widget):
             self.cursor_x = self.cursor_max_left + len(current_line)
 
 
-    def handle_delete(self):
+    def handle_delete(self, key: py_cui.keys.Key):
         """Function that handles recieving a delete keypress
         """
 
@@ -1220,43 +1173,6 @@ class ScrollTextBlock(Widget):
         elif self.viewport_x_start + self.width - 2 * self.padx - 4 < len(current_line):
             self.viewport_x_start = self.viewport_x_start + 1
         self.cursor_text_pos_x = self.cursor_text_pos_x + 1
-
-
-    def handle_key_press(self, key_pressed):
-        """Override of base class handle key press function
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        super().handle_key_press(key_pressed)
-
-        if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left()
-        elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right()
-        elif key_pressed == py_cui.keys.KEY_UP_ARROW:
-            self.move_up()
-        elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self.cursor_text_pos_y < len(self.text_lines) - 1:
-            self.move_down()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
-            self.handle_backspace()
-        elif key_pressed == py_cui.keys.KEY_DELETE:
-            self.handle_delete()
-        elif key_pressed == py_cui.keys.KEY_ENTER:
-            self.handle_newline()
-        elif key_pressed == py_cui.keys.KEY_TAB:
-            for _ in range(0, 4):
-                self.insert_char(py_cui.keys.KEY_SPACE)
-        elif key_pressed == py_cui.keys.KEY_HOME:
-            self.handle_home()
-        elif key_pressed == py_cui.keys.KEY_END:
-            self.handle_end()
-        elif key_pressed > 31 and key_pressed < 128:
-            self.insert_char(key_pressed)
-
 
     def draw(self):
         """Override of base class draw function
