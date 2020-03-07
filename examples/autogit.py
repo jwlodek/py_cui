@@ -35,13 +35,13 @@ class AutoGitCUI:
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
 
         # Keybindings when in overview mode, and set info bar
-        self.root.add_key_command(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
-        self.root.add_key_command(py_cui.keys.KEY_L_LOWER, self.show_log)
-        self.root.add_key_command(py_cui.keys.KEY_A_LOWER, self.add_all)
-        self.root.add_key_command(py_cui.keys.KEY_E_LOWER, self.open_editor)
-        self.root.add_key_command(py_cui.keys.KEY_F_LOWER, self.fetch_branch)
-        self.root.add_key_command(py_cui.keys.KEY_P_LOWER, self.push_branch)
-        self.root.add_key_command(py_cui.keys.KEY_M_LOWER, self.show_menu)
+        self.root.add_key_command(py_cui.keys.Key.R_LOWER, self.refresh_git_status)
+        self.root.add_key_command(py_cui.keys.Key.L_LOWER, self.show_log)
+        self.root.add_key_command(py_cui.keys.Key.A_LOWER, self.add_all)
+        self.root.add_key_command(py_cui.keys.Key.E_LOWER, self.open_editor)
+        self.root.add_key_command(py_cui.keys.Key.F_LOWER, self.fetch_branch)
+        self.root.add_key_command(py_cui.keys.Key.P_LOWER, self.push_branch)
+        self.root.add_key_command(py_cui.keys.Key.M_LOWER, self.show_menu)
         self.root.set_status_bar_text('Quit - q | Refresh - r | Add all - a | Git log - l | Open Editor - e | Pull Branch - f | Push Branch - p')
 
         # Create the add files menu. Add color rules to color first characters based on git status
@@ -77,24 +77,24 @@ class AutoGitCUI:
         self.commit_message_box = self.root.add_text_box('Commit Message', 8, 2, column_span=6)
 
         # Key commands for our file menus. Enter will git add, Space will show diff
-        self.add_files_menu.add_key_command(py_cui.keys.KEY_ENTER, self.add_revert_file)
-        self.add_files_menu.add_key_command(py_cui.keys.KEY_SPACE, self.open_git_diff)
+        self.add_files_menu.add_key_command(py_cui.keys.Key.ENTER, self.add_revert_file)
+        self.add_files_menu.add_key_command(py_cui.keys.Key.SPACE, self.open_git_diff)
         self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
 
         # Enter will show remote info
-        self.git_remotes_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_remote_info)
+        self.git_remotes_menu.add_key_command(py_cui.keys.Key.ENTER, self.show_remote_info)
 
         # Enter will show commit diff
-        self.git_commits_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_git_commit_diff)
+        self.git_commits_menu.add_key_command(py_cui.keys.Key.ENTER, self.show_git_commit_diff)
         self.git_commits_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,7], include_whitespace=True)
 
         # Enter will checkout 
-        self.branch_menu.add_key_command(py_cui.keys.KEY_ENTER, self.checkout_branch)
-        self.branch_menu.add_key_command(py_cui.keys.KEY_SPACE, self.show_log)
+        self.branch_menu.add_key_command(py_cui.keys.Key.ENTER, self.checkout_branch)
+        self.branch_menu.add_key_command(py_cui.keys.Key.SPACE, self.show_log)
 
         # Add commands for committing and branch checkout.
-        self.new_branch_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.create_new_branch)
-        self.commit_message_box.add_key_command(py_cui.keys.KEY_ENTER, self.ask_to_commit)
+        self.new_branch_textbox.add_key_command(py_cui.keys.Key.ENTER, self.create_new_branch)
+        self.commit_message_box.add_key_command(py_cui.keys.Key.ENTER, self.ask_to_commit)
 
 
     def get_logo(self):
