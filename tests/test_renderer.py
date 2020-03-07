@@ -19,6 +19,7 @@ def test_dummy_grid():
     assert dummy_widget.height == 10
     assert dummy_widget.width == 10
 
+
 def test_get_render_text_A():
     render_fragment = dummy_renderer.get_render_text(dummy_widget, test_string_A, False, False, 0)
     assert render_fragment[0][0] == "Hello wo"
@@ -29,6 +30,7 @@ def test_get_render_text_A():
     render_fragment = dummy_renderer.get_render_text(dummy_widget, test_string_A, True, True, 0)
     assert render_fragment[0][0] == "Hell"
 
+
 def test_get_render_text_B():
     render_fragment = dummy_renderer.get_render_text(dummy_widget, test_string_B, False, False, 0)
     assert render_fragment[0][0] == "     Tes"
@@ -38,6 +40,7 @@ def test_get_render_text_B():
     assert render_fragment[0][0] == "    "
     render_fragment = dummy_renderer.get_render_text(dummy_widget, test_string_B, True, True, 0)
     assert render_fragment[0][0] == "    "
+
 
 def test_get_render_text_C():
     render_fragment = dummy_renderer.get_render_text(dummy_widget, test_string_C, False, False, 0)

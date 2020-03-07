@@ -1,4 +1,4 @@
-"""File containing class that abstracts a collection of widgets. 
+"""File containing class that abstracts a collection of widgets.
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
@@ -14,7 +14,7 @@ import py_cui.grid as grid
 
 
 class WidgetSet:
-    """Class that represents a collection of widgets. 
+    """Class that represents a collection of widgets.
 
     Use PyCUI.apply_widget_set() to set a given widget set for display
 
@@ -68,7 +68,7 @@ class WidgetSet:
         command : Function
             A no-arg or lambda function to fire on keypress
         """
-        
+
         self.keybindings[key] = command
 
 
@@ -108,7 +108,7 @@ class WidgetSet:
 
     def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
         """Function that adds a new checkbox menu to the CUI grid
-        
+
         Parameters
         ----------
         title : str
@@ -142,7 +142,7 @@ class WidgetSet:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False):
         """Function that adds a new text box to the CUI grid
 
         Parameters
@@ -171,7 +171,7 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
+        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text, password)
         self.widgets[id] = new_text_box
         if self.selected_widget is None:
             self.set_selected_widget(id)
@@ -314,4 +314,3 @@ class WidgetSet:
         if self.selected_widget is None:
             self.set_selected_widget(id)
         return new_button
-

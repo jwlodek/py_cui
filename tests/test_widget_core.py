@@ -19,7 +19,6 @@ test_cell_over_B = widgets.Widget('6', 'Test Over B', test_grid_over, 0, 2, 1, 1
 test_cell_over_C = widgets.Widget('7', 'Test Over C', test_grid_over, 2, 2, 1, 1, 1, 0)
 
 
-
 def test_illegal_create_1():
     try:
         test_cell_E = widgets.Widget('8', 'Test E', None, 0, 5, 1, 1, 1, 0)
@@ -42,6 +41,7 @@ def test_illegal_create_3():
         assert False
     except err.PyCUIOutOfBoundsError:
         assert True
+
 
 def test_illegal_create_4():
     try:

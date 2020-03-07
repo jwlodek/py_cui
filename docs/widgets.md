@@ -174,7 +174,8 @@ Draws all menu items starting with `self.top_view` down, along with a border. `s
 * `self.cursor_max_right` - maximum terminal position for the cursor on the right
 * `self.cursor_y` - cursor y location in terms of terminal characters
 * `self.viewport_width` - Width of the text viewport
-        
+* `self.password` - Replaces characters with asterisks if true
+
 **Widget Specific Functions**
 
 * `update_height_width()` - Updates the height/width of the textbox. Internal use only
@@ -220,7 +221,7 @@ Draws `self.title` above a bordered entry field centered in the grid cell assign
 * `self.cursor_max_right` - maximum terminal position for the cursor on the right
 * `self.cursor_y` - cursor y location in terms of terminal characters
 * `self.viewport_width` - Width of the text viewport
-        
+
 **Widget Specific Functions**
 
 * `update_height_width()` - Updates the height/width of the textbox. Internal use only
