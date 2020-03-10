@@ -1,6 +1,6 @@
-"""File contatining all core widget classes for py_cui. 
+"""File contatining all core widget classes for py_cui.
 
-Widgets are the basic building blocks of a user interface made with py_cui. 
+Widgets are the basic building blocks of a user interface made with py_cui.
 This file contains classes for:
 
 * Base Widget class
@@ -71,7 +71,7 @@ class Widget:
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True):
         """Constructor for base widget class
         """
-        
+
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
         self.id = id
@@ -171,7 +171,7 @@ class Widget:
 
     def assign_renderer(self, renderer):
         """Function that assigns a renderer object to the widget
-        
+
         (Meant for internal usage only)
 
         Parameters
@@ -242,7 +242,7 @@ class Widget:
         ----------
         row, col : int
             row and column position to check
-        
+
         Returns
         -------
         is_inside : bool
@@ -259,8 +259,8 @@ class Widget:
 
 
     def update_height_width(self):
-        """Function that refreshes position and dimensons on resize. 
-        
+        """Function that refreshes position and dimensons on resize.
+
         If necessary, make sure required widget attributes updated here as well.
         """
 
@@ -299,7 +299,7 @@ class Widget:
 
     def draw(self):
         """Base class draw class that checks if renderer is valid.
-        
+
         Should be called with super().draw() in overrides
         """
 
@@ -311,7 +311,7 @@ class Widget:
 
 class Label(Widget):
     """The most basic subclass of Widget.
-    
+
     Simply displays one centered row of text. Has no unique attributes or methods
 
     Attributes
@@ -326,7 +326,7 @@ class Label(Widget):
 
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, selectable=False)
         self.draw_border = False
-    
+
 
     def toggle_border(self):
         """Function that gives option to draw border around label
@@ -337,7 +337,7 @@ class Label(Widget):
 
     def draw(self):
         """Override base draw class.
-        
+
         Center text and draw it
         """
 
@@ -377,7 +377,7 @@ class BlockLabel(Widget):
 
     def draw(self):
         """Override base draw class.
-        
+
         Center text and draw it"""
 
         super().draw()
@@ -395,7 +395,7 @@ class BlockLabel(Widget):
 
 class ScrollMenu(Widget):
     """A scroll menu widget.
-    
+
     Allows for creating a scrollable list of items of which one is selectable.
     Analogous to a RadioButton
 
@@ -507,7 +507,7 @@ class ScrollMenu(Widget):
         item : str
             selected item, or None if there are no items in the menu
         """
-        
+
         if len(self.view_items) > 0:
             return self.view_items[self.selected_item]
         return None
@@ -515,9 +515,9 @@ class ScrollMenu(Widget):
 
     def handle_key_press(self, key_pressed):
         """Override base class function.
-        
+
         UP_ARROW scrolls up, DOWN_ARROW scrolls down.
-        
+
         Parameters
         ----------
         key_pressed : int
@@ -637,7 +637,7 @@ class CheckBoxMenu(ScrollMenu):
 
     def handle_key_press(self, key_pressed):
         """Override of key presses.
-        
+
         First, run the superclass function, scrolling should still work.
         Adds Enter command to toggle selection
 
@@ -660,7 +660,7 @@ class CheckBoxMenu(ScrollMenu):
 
 class Button(Widget):
     """Basic button widget.
-    
+
     Allows for running a command function on Enter
 
     Attributes
@@ -729,9 +729,11 @@ class TextBox(Widget):
         The cursor bounds of the text box
     viewport_width : int
         The width of the textbox viewport
+    password : bool
+        Toggle to display password characters or text
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text):
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text, password):
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
         self.text = initial_text
         self.cursor_x = self.start_x + padx + 2
@@ -741,6 +743,7 @@ class TextBox(Widget):
         self.cursor_y = self.start_y + int(self.height / 2) + 1
         self.set_focus_text('Focus mode on TextBox. Press Esc to exit focus mode.')
         self.viewport_width = self.cursor_max_right - self.cursor_max_left
+        self.password = password
 
 
     def update_height_width(self):
@@ -814,7 +817,7 @@ class TextBox(Widget):
 
     def insert_char(self, key_pressed):
         """Inserts char at cursor position.
-        
+
         Internal use only
 
         Parameters
@@ -890,7 +893,7 @@ class TextBox(Widget):
     def draw(self):
         """Override of base draw function
         """
-        
+
         super().draw()
 
         self.renderer.set_color_mode(self.color)
@@ -903,8 +906,11 @@ class TextBox(Widget):
                 render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
             else:
                 render_text = self.text[end:]
+        if self.password:
+            temp = '*' * len(render_text)
+            render_text = temp
+            
         self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
-
         if self.selected:
             self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
         else:
@@ -914,7 +920,7 @@ class TextBox(Widget):
 
 class ScrollTextBlock(Widget):
     """Widget for editing large multi-line blocks of text
-    
+
     Attributes
     ----------
     text_lines : list of str
@@ -1026,9 +1032,9 @@ class ScrollTextBlock(Widget):
 
 
     def set_text(self, text):
-        """Function that sets the text for the textblock. 
-        
-        Note that this will overwrite any existing text 
+        """Function that sets the text for the textblock.
+
+        Note that this will overwrite any existing text
 
         Parameters
         ----------
@@ -1048,9 +1054,9 @@ class ScrollTextBlock(Widget):
 
     def set_text_line(self, text):
         """Function that sets the current line's text.
-        
+
         Meant only for internal use
-        
+
         Parameters
         ----------
         text : str

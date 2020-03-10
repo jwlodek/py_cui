@@ -24,12 +24,14 @@ def test_move_left_side():
     assert text_box.cursor_text_pos_x == 4
     assert text_box.cursor_x == (temp + 5 - 1)
 
+
 def test_clear():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     text_box.clear()
     assert text_box.get() == '\n'
     assert text_box.cursor_text_pos_x == 0
     assert text_box.cursor_x == 42
+
 
 def test_get_initial():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World\nSecond Line')
@@ -47,6 +49,7 @@ def test_insert_char():
     assert text_box.cursor_x == text_box.cursor_max_left + 1
     assert text_box.cursor_text_pos_x == 1
 
+
 def test_handle_backspace():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     for i in range(0,2):
@@ -56,6 +59,7 @@ def test_handle_backspace():
     assert text_box.cursor_text_pos_x == 1
     assert text_box.get_current_line() == 'Hllo World'
 
+
 def test_handle_backspace_startline():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello\n World')
     text_box.move_down()
@@ -63,7 +67,6 @@ def test_handle_backspace_startline():
     assert text_box.cursor_x == text_box.cursor_max_left + 5
     assert text_box.cursor_text_pos_x == 5
     assert text_box.get_current_line() == 'Hello World'
-
 
 
 def test_get_edited():
@@ -76,6 +79,7 @@ def test_get_edited():
     assert text_box.cursor_x == text_box.cursor_max_left + 4
     assert text_box.cursor_text_pos_x == 4
     assert text_box.get_current_line() == 'HeaElo World'
+
 
 def test_jump_to_start():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
@@ -101,11 +105,13 @@ def test_move_right_overflow():
     assert text_box.cursor_text_pos_x == 50
     assert text_box.cursor_x == text_box.cursor_max_left + text_box.width - 2 * text_box.padx - 3
 
+
 def test_move_left_overflow():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
     text_box.move_left()
     assert text_box.cursor_text_pos_x == 0
     assert text_box.cursor_x == 42
+
 
 def test_set_text():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')
@@ -155,6 +161,7 @@ def test_handle_delete_inline():
     assert text_box.cursor_text_pos_x == 2
     assert text_box.cursor_x == text_box.cursor_max_left + 2
 
+
 def test_handle_delete_endline():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello\nWorld')
     for i in range(0, 5):
@@ -173,6 +180,7 @@ def test_enter_endline():
     assert text_box.get_current_line() == ''
     assert text_box.cursor_text_pos_x == 0
     assert text_box.cursor_x == text_box.cursor_max_left
+
 
 def test_enter_inline():
     text_box = py_cui.widgets.ScrollTextBlock('id', 'Test', grid_test, 1, 1, 1, 2, 1, 0 , 'Hello World')

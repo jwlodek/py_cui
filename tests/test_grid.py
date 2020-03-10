@@ -33,6 +33,7 @@ def test_set_num_rows_legal():
     assert test_grid_C.row_height == 10
     assert test_grid_C.column_width == 30
 
+
 def test_set_num_cols_illegal():
     try:
         test_grid_A.set_num_cols(300)
@@ -40,16 +41,19 @@ def test_set_num_cols_illegal():
     except err.PyCUIOutOfBoundsError:
         assert True
 
+
 def test_set_num_cols_legal():
     test_grid_C.set_num_cols(10)
     assert test_grid_C.column_width == 15
-    
+
+
 def test_update_height_width_illegal_1():
     try:
         test_grid_A.update_grid_height_width(9, 10)
         assert False
     except err.PyCUIOutOfBoundsError:
         assert True
+
 
 def test_update_height_width_illegal_2():
     try:

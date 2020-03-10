@@ -104,6 +104,7 @@ def test_generate_fragments_C():
     assert fragments[0][0] == test_string_C
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
+
 def test_generate_fragments_D():
     fragments, match = color_rule_D.generate_fragments(dummy_widget, test_string_A, test_string_A)
     assert match == True

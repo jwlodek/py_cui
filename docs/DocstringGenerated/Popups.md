@@ -290,6 +290,7 @@ Class representing a textbox popup
  jump_to_start | Jumps to the start of the textbox
  jump_to_end | Jumps to the end to the textbox
  erase_char | Erases character at textbox cursor
+ delete_char | Deletes character to right of texbox cursor
  handle_key_press | Override of base handle key press function
  draw | Override of base draw function
 
@@ -450,6 +451,20 @@ def erase_char(self)
 ```
 
 Erases character at textbox cursor
+
+
+
+
+
+
+
+### delete_char
+
+```python
+def delete_char(self)
+```
+
+Deletes character to right of texbox cursor
 
 
 
