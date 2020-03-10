@@ -29,6 +29,10 @@ import py_cui.keys
 import py_cui.popups
 
 
+# Version number
+__version__ = '0.0.3'
+
+
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
 # create these values as pairs of the bat to be selected.
 # Format is FOREGROUND_ON_BACKGROUND
