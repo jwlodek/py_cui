@@ -1,5 +1,4 @@
-"""
-Example of using py_cui to create a simple Command line TODO list in under 150 lines of code
+"""Example of using py_cui to create a simple Command line TODO list in under 150 lines of code
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019
@@ -37,14 +36,16 @@ class SimpleTodoList:
 
 
     def push_and_reset(self):
-        """ Adds item and clears textbox. called when textbox is in focus mode and enter is pressed """
+        """Adds item and clears textbox. called when textbox is in focus mode and enter is pressed
+        """
 
         self.add_item()
         self.new_todo_textbox.clear()
 
 
     def read_todo_file(self):
-        """ Read a saved todo file """
+        """Read a saved todo file
+        """
 
         todo = []
         in_progress = []
@@ -76,19 +77,22 @@ class SimpleTodoList:
 
 
     def add_item(self):
-        """ Add a todo item """
+        """Add a todo item
+        """
 
         self.todo_scroll_cell.add_item('{}'.format(self.new_todo_textbox.get()))
 
 
     def remove_item(self):
-        """ Remove a todo item """
+        """Remove a todo item
+        """
 
         self.todo_scroll_cell.remove_selected_item()
 
 
     def mark_as_in_progress(self):
-        """ Mark a todo item as inprogress. Remove it from todo scroll list, add it to in progress list, or show error popup if no tasks """
+        """Mark a todo item as inprogress. Remove it from todo scroll list, add it to in progress list, or show error popup if no tasks
+        """
 
         in_prog = self.todo_scroll_cell.get()
         if in_prog is None:
@@ -99,7 +103,8 @@ class SimpleTodoList:
 
 
     def mark_as_done(self):
-        """ Mark a inprogress item as done. Remove it from inprogress scroll list, add it to done list, or show error popup if no tasks """
+        """Mark a inprogress item as done. Remove it from inprogress scroll list, add it to done list, or show error popup if no tasks
+        """
 
         done = self.in_progress_scroll_cell.get()
         if done is None:
@@ -110,7 +115,8 @@ class SimpleTodoList:
 
 
     def save_todo_file(self):
-        """ Save the three lists in a specific format """
+        """Save the three lists in a specific format
+        """
 
         if os.path.exists('TODO.txt'):
             os.remove('TODO.txt')

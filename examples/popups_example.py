@@ -1,5 +1,4 @@
-"""
-A simple example of using all py_cui popup types
+"""A simple example of using all py_cui popup types
 
 @author:    Jakub Wlodek
 @created:   27-Sep-2019
@@ -31,7 +30,8 @@ class PopupExample:
     # -------------------------------------------------------------------------------
 
     def show_message(self):
-        """ Displays a simple message popup """
+        """Displays a simple message popup
+        """
 
         self.master.show_message_popup('Hello!', 'This is a message popup. You can also spawn warnings and errors.')
         # Below is the syntax for warning and error popups. Feel free to experiment with these
@@ -46,7 +46,8 @@ class PopupExample:
     # -------------------------------------------------------------------------------
 
     def show_yes_no(self):
-        """ Displays a yes no popup asking if the user would like to quit """
+        """Displays a yes no popup asking if the user would like to quit
+        """
 
         # For the yes/no popup, the 'command' parameter must take a function that requires a single boolean parameter
         self.master.show_yes_no_popup('Are you sure you want to quit?', self.quit_cui)
@@ -108,7 +109,8 @@ class PopupExample:
     # -------------------------------------------------------------------------------
 
     def show_loading_icon(self):
-        """ Function that shows the usage for spwaning a loading icon popup """
+        """Function that shows the usage for spwaning a loading icon popup
+        """
 
         # The loading popup will remain onscreen until the stop loading function is called. Call this before a large operation, and call
         # stop after the operation is finished. Note that for these long operations, you must use a different thread
@@ -118,14 +120,16 @@ class PopupExample:
         operation_thread.start()
 
     def show_loading_bar(self):
-        """ Function that shows the usage for spawning a loading bar popup """
+        """Function that shows the usage for spawning a loading bar popup
+        """
 
         self.master.show_loading_bar_popup('Incrementing a counter...', 100)
         operation_thread = threading.Thread(target=self.long_operation)
         operation_thread.start()
 
     def long_operation(self):
-        """ A simple function that demonstrates a long callback operation performed while loading popup is open """
+        """A simple function that demonstrates a long callback operation performed while loading popup is open
+        """
 
         counter = 0
         for i in range(0, 100):
