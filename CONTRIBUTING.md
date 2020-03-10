@@ -5,9 +5,13 @@ I'll welcome anyone wanting to contribute to the development of `py_cui`. If you
 
 Before you create a pull request, here are some things to keep in mind:
 
+#### Don't break backwards compatibility
+
+In some extreme cases there may be exceptions to this, but in general I would like to retain compatibility with any previous programs written with `py_cui`. I would like to avoid a situation where projects are locked to a certain release because a new feature broke an existing one. I have already written many interfaces that I use day to day, and I would like to keep using them without dealing with multiple versions of the library. Generally, if with your changes the examples in this repository won't run without fixes, I will probably ask you to change your PR so that they do. Compatibility with older python versions is also recommended, as currently `py_cui` supports as far back as 3.2, but likely this will move to a newer version soon.
+
 #### Make sure the unit tests pass
 
-If you make a pull request and Travis tells you a unit test failed, please fix the issue and append to the pull request. I will most likely only look closely at pull requests that don't show any issues with the CI.
+If you make a pull request and Travis tells you a unit test failed, please fix the issue and append to the pull request. I will most likely only look closely at pull requests that don't show any issues with the CI. Note that if your changes edit existing functions, you may need to edit the test itself to reflect them. If you are adding a new feature, please add unit tests and confirm they pass as well.
 
 #### Use consistent numpy documentation
 
