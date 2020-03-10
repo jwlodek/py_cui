@@ -562,6 +562,8 @@ class LoadingBarPopup(Popup):
 
         super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer)
         self.num_items = num_items
+        self.loading_icons = ['\\', '|', '/', '-']
+        self.icon_counter = 0
         self.completed_items = 0
 
 
@@ -586,15 +588,20 @@ class LoadingBarPopup(Popup):
         width = self.stop_x - self.start_x
         bar_width = 2 * int(width / 3)
         items_per_bar_block = self.num_items / bar_width
-        if bar_width > self.num_items:
-            bar_width = self.num_items
-            items_per_bar_block = 1
+        bar_blocks_per_item = bar_width / self.num_items
+
         if self.completed_items == self.num_items:
             self.root.stop_loading_popup()
 
-        completed_blocks = int(self.completed_items / items_per_bar_block)
-        non_completed_blocks = bar_width - completed_blocks
-        #self.title = '{}, {}, {}, {}, {}'.format(width, bar_width, items_per_bar_block, completed_blocks, non_completed_blocks)
+        if items_per_bar_block >= 1:
+            completed_blocks = int(self.completed_items / items_per_bar_block)
+        else:
+            completed_blocks = int(bar_blocks_per_item * self.completed_items)
 
-        self.text = '{}{} ({}/{})'.format('#' * completed_blocks, '-' * non_completed_blocks, self.completed_items, self.num_items)
+        non_completed_blocks = bar_width - completed_blocks
+        self.icon_counter = self.icon_counter + 1
+        if self.icon_counter == len(self.loading_icons):
+            self.icon_counter = 0
+
+        self.text = '{}{} ({}/{}) {}'.format('#' * completed_blocks, '-' * non_completed_blocks, self.completed_items, self.num_items, self.loading_icons[self.icon_counter])
         super().draw()
