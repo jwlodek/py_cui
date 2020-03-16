@@ -1,0 +1,28 @@
+name: Doc Build Test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**.py'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.py'
+
+jobs:
+  build_docs:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Build Docs
+      run: |
+        cd docs/scripts && bash generateFromDocstrings.sh
