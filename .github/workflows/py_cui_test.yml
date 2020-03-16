@@ -1,6 +1,6 @@
 # This workflow will install Python dependencies, run tests and lint for several python version on push and pull request
 
-name: Automated Unit Testing
+name: build
 
 on: [push, pull_request]
 

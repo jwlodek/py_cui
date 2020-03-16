@@ -27,6 +27,7 @@ import py_cui.widgets as widgets
 import py_cui.widget_set as widget_set
 import py_cui.keys
 import py_cui.popups
+import py_cui.logger
 
 
 # Version number
@@ -157,6 +158,9 @@ class PyCUI:
         # Callback to fire when CUI is stopped.
         self.on_stop = None
 
+        # Logging object for root
+        self.logger = py_cui.logger.initialize_logging(name='py_cui')
+
 
     def get_widget_set(self):
         """Gets widget set object from current widgets.
@@ -196,7 +200,7 @@ class PyCUI:
             self.initialize_widget_renderer()
             self.selected_widget = new_widget_set.selected_widget
         else:
-            raise TypeError("Argument must be of type py_cui.widget_set.WidgetSet")
+            raise TypeError('Argument must be of type py_cui.widget_set.WidgetSet')
 
 
     # ----------------------------------------------#
