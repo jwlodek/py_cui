@@ -1,4 +1,4 @@
-# About csplit
+# About py_cui
 
 ### Primary Author
 
