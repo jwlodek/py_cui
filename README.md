@@ -112,6 +112,7 @@ Project | Description
 [pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
+[tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
 
 ### License
 
