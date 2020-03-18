@@ -22,12 +22,12 @@ class StatusBar:
         """Constructor for statusbar
         """
 
-        self.text = text
-        self.color = color
+        self.__text = text
+        self.__color = color
 
 
     def set_text(self, text):
         """Sets the statusbar text
         """
 
-        self.text = text
+        self.__text = text
