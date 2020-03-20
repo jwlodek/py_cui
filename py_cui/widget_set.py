@@ -30,19 +30,23 @@ class WidgetSet:
         height of the terminal in characters, width of terminal in characters
     """
 
-    def __init__(self, num_rows, num_cols):
+    def __init__(self, num_rows, num_cols, logger):
         """Constructor for WidgetSet
         """
 
-        self.widgets = {}
-        self.keybindings = {}
+        self.__widgets      = {}
+        self.__keybindings  = {}
+        
         term_size = shutil.get_terminal_size()
 
-        self.height = term_size.lines
-        self.width = term_size.columns
-        self.height = self.height - 4
-        self.grid = grid.Grid(num_rows, num_cols, self.height, self.width)
-        self.selected_widget = None
+        self.__height = term_size.lines
+        self.__width = term_size.columns
+        self.__height = self.__height - 4
+
+        self.__grid = grid.Grid(num_rows, num_cols, self.__height, self.__width, logger)
+
+        self.__selected_widget = None
+        self.__logger = logger
 
 
     def set_selected_widget(self, widget_id):
@@ -54,8 +58,8 @@ class WidgetSet:
             the title of the cell
         """
 
-        if widget_id in self.widgets.keys():
-            self.selected_widget = widget_id
+        if widget_id in self.__widgets.keys():
+            self.__selected_widget = widget_id
 
 
     def add_key_command(self, key, command):
@@ -69,7 +73,7 @@ class WidgetSet:
             A no-arg or lambda function to fire on keypress
         """
 
-        self.keybindings[key] = command
+        self.__keybindings[key] = command
 
 
     def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
@@ -94,15 +98,25 @@ class WidgetSet:
 
         Returns
         -------
-        ScrollMenu
+        new_scroll_menu : ScrollMenu
             A reference to the created scroll menu object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_scroll_menu = widgets.ScrollMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
-        self.widgets[id] = new_scroll_menu
-        if self.selected_widget is None:
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_scroll_menu     = widgets.ScrollMenu(   id, 
+                                                    title, 
+                                                    self.__grid, 
+                                                    row, 
+                                                    column, 
+                                                    row_span, 
+                                                    column_span, 
+                                                    padx, 
+                                                    pady, 
+                                                    self.__logger)
+        self.__widgets[id]  = new_scroll_menu
+        if self.__selected_widget is None:
             self.set_selected_widget(id)
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
         return new_scroll_menu
 
 
@@ -134,11 +148,22 @@ class WidgetSet:
             A reference to the created checkbox object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_checkbox_menu = widgets.CheckBoxMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady, checked_char)
-        self.widgets[id] = new_checkbox_menu
-        if self.selected_widget is None:
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_checkbox_menu   = widgets.CheckBoxMenu(  id, 
+                                                    title, 
+                                                    self.__grid, 
+                                                    row, 
+                                                    column, 
+                                                    row_span, 
+                                                    column_span, 
+                                                    padx, 
+                                                    pady, 
+                                                    self.__logger, 
+                                                    checked_char)
+        self.__widgets[id]  = new_checkbox_menu
+        if self.__selected_widget is None:
             self.set_selected_widget(id)
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_checkbox_menu))))
         return new_checkbox_menu
 
 
@@ -163,6 +188,8 @@ class WidgetSet:
             number of padding characters in the y direction
         initial_text='' : str
             Initial text for the textbox
+        password=False : bool
+            Toggle to show '*' instead of characters.
 
         Returns
         -------
@@ -170,11 +197,21 @@ class WidgetSet:
             A reference to the created textbox object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_text_box = widgets.TextBox(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text, password)
-        self.widgets[id] = new_text_box
-        if self.selected_widget is None:
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_text_box        = widgets.TextBox(   id, 
+                                                title, 
+                                                self.__grid, 
+                                                row, column, 
+                                                row_span, 
+                                                column_span, 
+                                                padx, pady, 
+                                                self.__logger, 
+                                                initial_text, 
+                                                password)
+        self.__widgets[id]    = new_text_box
+        if self.__selected_widget is None:
             self.set_selected_widget(id)
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_box))))
         return new_text_box
 
 
@@ -206,11 +243,22 @@ class WidgetSet:
             A reference to the created textblock object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_text_block = widgets.ScrollTextBlock(id, title,  self.grid, row, column, row_span, column_span, padx, pady, initial_text)
-        self.widgets[id] = new_text_block
-        if self.selected_widget is None:
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_text_block      = widgets.ScrollTextBlock(   id, 
+                                                        title, 
+                                                        self.__grid, 
+                                                        row, 
+                                                        column, 
+                                                        row_span, 
+                                                        column_span, 
+                                                        padx, 
+                                                        pady, 
+                                                        self.__logger, 
+                                                        initial_text)
+        self.__widgets[id]  = new_text_block
+        if self.__selected_widget is None:
             self.set_selected_widget(id)
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_block))))
         return new_text_block
 
 
@@ -240,9 +288,19 @@ class WidgetSet:
             A reference to the created label object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_label = widgets.Label(id, title, self.grid, row, column, row_span, column_span, padx, pady)
-        self.widgets[id] = new_label
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_label           = widgets.Label( id, 
+                                            title, 
+                                            self.__grid, 
+                                            row, 
+                                            column, 
+                                            row_span, 
+                                            column_span, 
+                                            padx, 
+                                            pady, 
+                                            self.__logger)
+        self.__widgets[id]  = new_label
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -274,9 +332,20 @@ class WidgetSet:
             A reference to the created block label object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_label = widgets.BlockLabel(id, title, self.grid, row, column, row_span, column_span, padx, pady, center)
-        self.widgets[id] = new_label
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_label           = widgets.BlockLabel(    id, 
+                                                    title, 
+                                                    self.__grid, 
+                                                    row, 
+                                                    column, 
+                                                    row_span, 
+                                                    column_span, 
+                                                    padx, 
+                                                    pady, 
+                                                    self.__logger, 
+                                                    center)
+        self.__widgets[id]  = new_label
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -308,9 +377,20 @@ class WidgetSet:
             A reference to the created button object.
         """
 
-        id = 'Widget{}'.format(len(self.widgets.keys()))
-        new_button = widgets.Button(id, title, self.grid, row, column, row_span, column_span, padx, pady, command)
-        self.widgets[id] = new_button
-        if self.selected_widget is None:
+        id = 'Widget{}'.format(len(self.__widgets.keys()))
+        new_button          = widgets.Button(    id, 
+                                                title, 
+                                                self.__grid, 
+                                                row, 
+                                                column, 
+                                                row_span, 
+                                                column_span, 
+                                                padx, 
+                                                pady, 
+                                                self.__logger, 
+                                                command)
+        self.__widgets[id]  = new_button
+        if self.__selected_widget is None:
             self.set_selected_widget(id)
+        self.__logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
