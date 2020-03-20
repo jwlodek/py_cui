@@ -115,7 +115,7 @@ class PyCUI:
         a key code for a key that exits the CUI
     """
 
-    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER):
+    def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal=None):
         """Constructor for PyCUI class
         """
 
@@ -123,16 +123,25 @@ class PyCUI:
         # When this is not set, the escape character delay is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
 
-        term_size = shutil.get_terminal_size()
+        # For unit testing purposes, we want to simulate terminal dimensions so that we don't get errors
+        self._simulated_terminal = simulated_terminal
 
-        self._height     = term_size.lines
-        self._width      = term_size.columns
+        if self._simulated_terminal is None:
+            term_size = shutil.get_terminal_size()
+            height  = term_size.lines
+            width   = term_size.columns
+        else:
+            height  = simulated_terminal[0]
+            width   = simulated_terminal[1]
+
+        self._height     = height
+        self._width      = width
         self._height     = self._height - 4
 
         # Add status and title bar
-        self._title_bar            = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
+        self._title_bar             = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
         exit_key_char               = py_cui.keys.get_char_from_ascii(exit_key)
-        self._init_status_bar_text = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(exit_key_char)
+        self._init_status_bar_text  = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(exit_key_char)
         self.status_bar             = py_cui.statusbar.StatusBar(self._init_status_bar_text, BLACK_ON_WHITE)
 
         # Logging object for py_cui
@@ -164,12 +173,12 @@ class PyCUI:
         self._on_stop = None
 
 
-    def enable_logging(self, logging_level = logging.DEBUG):
+    def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG):
         """Function enables logging for py_cui library
         """
 
         try:
-            py_cui.debug._enable_logging(self._logger, logging_level=logging_level)
+            py_cui.debug._enable_logging(self._logger, filename=log_file_path, logging_level=logging_level)
             self._logger.debug('Initialized logger')
         except PermissionError as e:
             print('Failed to initialize logger: {}'.format(str(e)))
@@ -207,9 +216,14 @@ class PyCUI:
             self._grid         = new_widget_set._grid
             self._keybindings  = new_widget_set._keybindings
             
-            term_size = shutil.get_terminal_size()
-            height  = term_size.lines
-            width   = term_size.columns
+            if self._simulated_terminal is None:
+                term_size = shutil.get_terminal_size()
+                height  = term_size.lines
+                width   = term_size.columns
+            else:
+                height  = self._simulated_terminal[0]
+                width   = self._simulated_terminal[1]
+
             height  = height - 4
             
             self._refresh_height_width(height, width)
@@ -230,7 +244,6 @@ class PyCUI:
         """
 
         self._logger.debug('Starting {} CUI'.format(self._title))
-        self.stopped = False
         curses.wrapper(self._draw)
 
 
@@ -241,7 +254,7 @@ class PyCUI:
         """
 
         self._logger.debug('Stopping CUI')
-        self.stopped = True
+        self._stopped = True
 
 
     def run_on_exit(self, command):
@@ -253,7 +266,7 @@ class PyCUI:
             A no-argument or lambda function to be fired on exit
         """
 
-        self.on_stop = command
+        self._on_stop = command
 
 
     def set_title(self, title):
@@ -345,6 +358,18 @@ class PyCUI:
             'VERTICAL'      : vertical
         }
         self._logger.debug('Set border_characters to {}'.format(self.border_characters))
+
+
+    def get_widgets(self):
+        """Function that gets current set of widgets
+
+        Returns
+        -------
+        widgets : dict of str -> widget
+            dictionary mapping widget IDs to object instances
+        """
+
+        return self._widgets
 
 
     # Widget add functions. Each of these adds a particular type of widget to the grid
@@ -1206,56 +1231,61 @@ class PyCUI:
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self._exit_key or self._in_focused_mode or self._popup is not None:
 
-            #try:
-            if self._stopped:
-                break
+            try:
+                if self._stopped:
+                    break
 
-            # Initialization and size adjustment
-            stdscr.clear()
-            # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
-            height, width   = stdscr.getmaxyx()
-            height          = height - 4
-            width           = width
+                # Initialization and size adjustment
+                stdscr.clear()
 
-            # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
-            # Resize the grid and the widgets if there was a resize operation
-            if key_pressed == curses.KEY_RESIZE:
-                self._refresh_height_width(height, width)
+                # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
+                if self._simulated_terminal is None:
+                    height, width   = stdscr.getmaxyx()
+                else:
+                    height  = self._simulated_terminal[0]
+                    width   = self._simulated_terminal[1]
 
-            # If we have a post_loading_callback, fire it here
-            if self._post_loading_callback is not None and not self._loading:
-                self._post_loading_callback()
-                self._post_loading_callback = None
+                height          = height - 4
 
-            # Handle keypresses
-            self._handle_key_presses(key_pressed)
+                # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
+                # Resize the grid and the widgets if there was a resize operation
+                if key_pressed == curses.KEY_RESIZE:
+                    self._refresh_height_width(height, width)
 
-            # Draw status/title bar, and all widgets. Selected widget will be bolded.
-            self._draw_status_bars(stdscr, height, width)
-            self._draw_widgets()
-            # draw the popup if required
-            if self._popup is not None:
-                self._popup._draw()
+                # If we have a post_loading_callback, fire it here
+                if self._post_loading_callback is not None and not self._loading:
+                    self._post_loading_callback()
+                    self._post_loading_callback = None
 
-            # Refresh the screen
-            stdscr.refresh()
+                # Handle keypresses
+                self._handle_key_presses(key_pressed)
 
-            # Wait for next input
-            if self._loading or self._post_loading_callback is not None:
-                # When loading, refresh screen every quarter second
-                time.sleep(0.25)
-                # Need to reset key_pressed, because otherwise the previously pressed key will be used.
-                key_pressed = 0
-            elif self._stopped:
-                key_pressed = self._exit_key
-            else:
-                key_pressed = stdscr.getch()
+                # Draw status/title bar, and all widgets. Selected widget will be bolded.
+                self._draw_status_bars(stdscr, height, width)
+                self._draw_widgets()
+                # draw the popup if required
+                if self._popup is not None:
+                    self._popup._draw()
+
+                # Refresh the screen
+                stdscr.refresh()
+
+                # Wait for next input
+                if self._loading or self._post_loading_callback is not None:
+                    # When loading, refresh screen every quarter second
+                    time.sleep(0.25)
+                    # Need to reset key_pressed, because otherwise the previously pressed key will be used.
+                    key_pressed = 0
+                elif self._stopped:
+                    key_pressed = self._exit_key
+                else:
+                    key_pressed = stdscr.getch()
             
-            #except KeyboardInterrupt:
-            #    self._logger.info('Exiting...')
-            #    self._stopped = True
-            #except Exception as e:
-            #    self._display_window_warning(stdscr, str(e))
+            except KeyboardInterrupt:
+                self._logger.info('Exiting...')
+                self._stopped = True
+            except Exception as e:
+                self._display_window_warning(stdscr, str(e))
 
         stdscr.clear()
         stdscr.refresh()

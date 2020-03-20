@@ -30,17 +30,25 @@ class WidgetSet:
         height of the terminal in characters, width of terminal in characters
     """
 
-    def __init__(self, num_rows, num_cols, logger):
+    def __init__(self, num_rows, num_cols, logger, simulated_terminal=None):
         """Constructor for WidgetSet
         """
 
         self._widgets      = {}
         self._keybindings  = {}
         
-        term_size = shutil.get_terminal_size()
+        self._simulated_terminal = simulated_terminal
+        
+        if self._simulated_terminal is None:
+            term_size = shutil.get_terminal_size()
+            height = term_size.lines
+            width = term_size.columns
+        else:
+            height  = self._simulated_terminal[0]
+            width   = self._simulated_terminal[1]
 
-        self._height = term_size.lines
-        self._width = term_size.columns
+        self._height = height
+        self._width = width
         self._height = self._height - 4
 
         self._grid = grid.Grid(num_rows, num_cols, self._height, self._width, logger)
@@ -60,6 +68,18 @@ class WidgetSet:
 
         if widget_id in self._widgets.keys():
             self._selected_widget = widget_id
+
+
+    def get_widgets(self):
+        """Function that gets current set of widgets
+
+        Returns
+        -------
+        widgets : dict of str -> widget
+            dictionary mapping widget IDs to object instances
+        """
+
+        return self._widgets
 
 
     def add_key_command(self, key, command):

@@ -13,3 +13,4 @@ markdoc/
 npdoc2md/
 *.*~
 ecui/
+.coverage
