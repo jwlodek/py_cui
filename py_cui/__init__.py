@@ -1146,6 +1146,7 @@ class PyCUI:
         stdscr.addstr(0, 0, 'Error displaying CUI!!!')
         stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
         stdscr.attroff(curses.color_pair(RED_ON_BLACK))
+        stdscr.refresh()
         self._logger.debug('Encountered error -> {}'.format(error_info))
 
 
