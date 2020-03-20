@@ -35,30 +35,25 @@ class Widget(py_cui.ui.UIElement):
 
     Attributes
     ----------
-    grid : py_cui.grid.Grid
+    _grid : py_cui.grid.Grid
         The parent grid object of the widget
-    row, column : int
+    _row, _column : int
         row and column position of the widget
-    row_span, column_span : int
+    _row_span, _column_span : int
         number of rows or columns spanned by the widget
-    padx, pady : int
-        Padding size in terminal characters
-    start_x, start_y : int
-        The position on the terminal of the top left corner of the widget
-    width, height : int
-        The width/height of the widget
-    selected_color : int
-        color code combination for when widget is selected
-    is_selectable : bool
+    _selectable : bool
         Flag that says if a widget can be selected
-    key_commands : dict
+    _key_commands : dict
         Dictionary mapping key codes to functions
-    text_color_rules : list of py_cui.ColorRule
+    _text_color_rules : List[py_cui.ColorRule]
         color rules to load into renderer when drawing widget
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True):
-        """Constructor for base widget class
+        """Initializer for base widget class
+
+        Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+        and color rules and key commands
         """
 
         super().__init__(id, title, None, logger)
@@ -109,7 +104,7 @@ class Widget(py_cui.ui.UIElement):
             A supported color rule type
         match_type='line' : str
             sets match type. Can be 'line', 'regex', or 'region'
-        region : [int, int]
+        region=[0,1] : [int, int]
             A specified region to color if using match_type='region'
         include_whitespace : bool
             if false, strip string before checking for match
@@ -120,7 +115,7 @@ class Widget(py_cui.ui.UIElement):
 
 
     def get_absolute_start_pos(self):
-        """Gets the absolute position of the widget in characters
+        """Gets the absolute position of the widget in characters. Override of base class function
 
         Returns
         -------
@@ -145,7 +140,7 @@ class Widget(py_cui.ui.UIElement):
 
 
     def get_absolute_stop_pos(self):
-        """Gets the absolute dimensions of the widget in characters
+        """Gets the absolute dimensions of the widget in characters. Override of base class function
 
         Returns
         -------
@@ -173,13 +168,38 @@ class Widget(py_cui.ui.UIElement):
 
 
     def get_grid_cell(self):
+        """Gets widget row, column in grid
+
+        Returns
+        -------
+        row, column : int
+            Initial row and column placement for widget in grid
+        """
+
         return self._row, self._column
 
 
     def get_grid_cell_spans(self):
+        """Gets widget row span, column span in grid
+
+        Returns
+        -------
+        row_span, column_span : int
+            Initial row span and column span placement for widget in grid
+        """
+
         return self._row_span, self._column_span
 
+
     def is_selectable(self):
+        """Checks if the widget is selectable
+
+        Returns
+        -------
+        selectable : bool
+            True if selectable, false otherwise
+        """
+
         return self._selectable
 
 
@@ -212,7 +232,7 @@ class Widget(py_cui.ui.UIElement):
     def _handle_key_press(self, key_pressed):
         """Base class function that handles all assigned key presses.
 
-        When overwriting this function, make sure to add a super().handle_key_press(key_pressed) call,
+        When overwriting this function, make sure to add a super()._handle_key_press(key_pressed) call,
         as this is required for user defined key command support
 
         Parameters
@@ -229,7 +249,8 @@ class Widget(py_cui.ui.UIElement):
     def _draw(self):
         """Base class draw class that checks if renderer is valid.
 
-        Should be called with super().draw() in overrides
+        Should be called with super()._draw() in overrides.
+        Also intializes color rules, so if not called color rules will not be applied
         """
 
         if self._renderer is None:
@@ -250,7 +271,7 @@ class Label(Widget):
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, logger):
-        """Constructor for Label
+        """Initalizer for Label widget
         """
 
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable=False)
@@ -291,6 +312,9 @@ class BlockLabel(Widget):
     """
 
     def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center, logger):
+        """Initializer for blocklabel widget
+        """
+
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable=False)
         self._lines        = title.splitlines()
         self._center       = center
@@ -351,7 +375,6 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            
             self._scroll_down(self.get_viewport_height())
 
 
@@ -392,8 +415,10 @@ class CheckBoxMenu(ScrollMenu):
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char):
-        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+        """Initializer for CheckBoxMenu Widget. Builds on ScrollMenu
+        """
 
+        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         self.selected_item_list = []
         self.checked_char       = checked_char
         self.set_help_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
@@ -494,6 +519,9 @@ class Button(Widget):
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, command):
+        """Initializer for Button Widget
+        """
+
         super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         self.command = command
         self.set_color(py_cui.MAGENTA_ON_BLACK)
@@ -535,6 +563,9 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text, password):
+        """Initializer for TextBox widget. Uses TextBoxImplementation as base
+        """
+
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.TextBoxImplementation.__init__(self, initial_text, password, logger)
         self.update_height_width()
@@ -614,26 +645,12 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
 
 class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
     """Widget for editing large multi-line blocks of text
-
-    Attributes
-    ----------
-    text_lines : list of str
-        The lines of text in the text box
-    cursor_x, cursor_y : int
-        The absolute positions of the cursor in the terminal window
-    cursor_text_pos_x, cursor_text_pos_y : int
-        the cursor position relative to the text
-    cursor_max_left, cursor_max_right : int
-        The cursor bounds of the text box
-    cursor_max_up, cursor_max_down : int
-        The cursor bounds of the text box
-    viewport_x_start, viewport_y_start : int
-        upper left corner of the viewport
-    viewport_width : int
-        The width of the textbox viewport
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text):
+        """Initializer for TextBlock Widget. Uses TextBlockImplementation as base
+        """
+
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.TextBlockImplementation.__init__(self, initial_text, logger)
         self.update_height_width()
@@ -676,6 +693,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             self._move_right()
         elif key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._move_up()
+        # TODO: Fix this janky operation here
         elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self._cursor_text_pos_y < len(self._text_lines) - 1:
             self._move_down()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE:

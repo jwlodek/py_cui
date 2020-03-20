@@ -9,8 +9,43 @@ import py_cui.colors
 
 
 class UIElement:
+    """Base class for all UI elements. Extended by base widget and popup classes.
+
+    Interfaces between UIImplementation subclasses and CUI engine. For example,
+    a widget is a subclass of a UIElement. Then a TextBox widget would be a subclass
+    of the base widget class, and the TextBoxImplementation. The TextBoxImplementation
+    superclass contains logic for all textbox required operations, while the widget base
+    class contains all links to the CUI engine.
+
+    Attributes
+    ----------
+    _id : str
+        Internal UI element unique ID
+    _title : str
+        UI element title
+    _padx, pady : int, int
+        padding in terminal characters
+    _start_x, _start_y: int, int
+        Coords in terminal characters for top-left corner of element
+    _stop_x, _stop_y : int, int
+        Coords in terminal characters for bottom-right corner of element
+    _height, width : int, int
+        absolute dimensions of ui element in terminal characters
+    _color : int
+        Default color for which to draw element
+    _selected : bool
+        toggle for marking an element as selected
+    _renderer : py_cui.renderer.Renderer
+        The default ui renderer
+    _logger   : py_cui.debug.PyCUILogger
+        The default logger inherited from the parent
+    _help_text: str
+        Text to diplay when selected in status bar
+    """
 
     def __init__(self, id, title, renderer, logger):
+        """Initializer for UIElement base class
+        """
 
         self._id       = id
         self._title    = title
@@ -27,12 +62,17 @@ class UIElement:
 
 
     def get_absolute_start_pos(self):
+        """Must be implemented by subclass, computes the absolute coords of upper-left corner
+        """
 
-        return 0, 0
+        pass
 
 
     def get_absolute_stop_pos(self):
-        return 0, 0
+        """Must be implemented by subclass, computes the absolute coords of bottom-right corner
+        """
+
+        pass
 
 
     def get_absolute_dimensions(self):
@@ -41,18 +81,38 @@ class UIElement:
         Returns
         -------
         height, width : int, int
-            Dimensions of element in characters
+            Dimensions of element in terminal characters
         """
         start_x,    start_y = self.get_absolute_start_pos()
         stop_x,     stop_y  = self.get_absolute_stop_pos()
         return (stop_y - start_y), (stop_x - start_x)
 
 
+    def update_height_width(self):
+        """Function that refreshes position and dimensons on resize.
+
+        If necessary, make sure required widget attributes updated here as well.
+        """
+
+        self._start_x, self._start_y  = self.get_absolute_start_pos()
+        self._stop_x,  self._stop_y   = self.get_absolute_stop_pos()
+        self._height,  self._width    = self.get_absolute_dimensions()
+
+
     def get_viewport_height(self):
+        """Gets the height of the element viewport (height minus padding and borders)
+
+        Returns
+        -------
+        viewport_height : int
+            Height of element viewport in terminal characters
+        """
+
         return self._height - (2 * self._pady) - 3
 
+
     def get_id(self):
-        """Gets the widget ID
+        """Gets the element ID
         
         Returns
         -------
@@ -71,6 +131,7 @@ class UIElement:
         title : str
             UI element title
         """
+
         return self._title
 
 
@@ -82,6 +143,7 @@ class UIElement:
         padx, pady : int, int
             Padding on either axis in characters
         """
+
         return self._padx, self._pady
 
 
@@ -97,7 +159,7 @@ class UIElement:
         return self._start_x, self._start_y
 
 
-    def get_stop_positions(self):
+    def get_stop_position(self):
         """Gets coords of lower right corner
         
         Returns
@@ -107,7 +169,6 @@ class UIElement:
         """
 
         return self._stop_x, self._stop_y
-
 
 
     def get_color(self):
@@ -145,48 +206,67 @@ class UIElement:
 
         return self._renderer
 
+
     def get_help_text(self):
+        """Returns current help text
+
+        Returns
+        -------
+        help_text : str
+            Current element status bar help message
+        """
+
         return self._help_text
 
 
-    def set_padding(self, padx, pady):
-
-
-        self._padx = padx
-        self._pady = pady
-
-
-    def update_height_width(self):
-        """Function that refreshes position and dimensons on resize.
-
-        If necessary, make sure required widget attributes updated here as well.
-        """
-
-        self._start_x, self._start_y  = self.get_absolute_start_pos()
-        self._stop_x,  self._stop_y   = self.get_absolute_stop_pos()
-        self._height,  self._width    = self.get_absolute_dimensions()
-
-
     def set_color(self, color):
+        """Sets element default color
+
+        Parameters
+        ----------
+        color : int
+            New color pair key code
+        """
 
         self._color = color
 
 
     def set_selected(self, selected):
+        """Marks the UI element as selected or not selected
+
+        Parameters
+        ----------
+        selected : bool
+            The new selected state of the element
+        """
 
         self._selected = selected
 
+
     def set_help_text(self, help_text):
+        """Sets status bar help text
+
+        Parameters
+        ----------
+        help_text : str
+            New statusbar help text
+        """
+
         self._help_text = help_text
 
 
     def _handle_key_press(self, key_pressed):
+        """Must be implemented by subclass. Used to handle keypresses
+        """
 
         pass
 
     
     def _draw(self):
-        self._renderer.set_color_mode(self._color)
+        """Must be implemented by subclasses. Uses renderer to draw element to terminal
+        """
+
+        pass
 
 
     def _assign_renderer(self, renderer):
@@ -202,7 +282,7 @@ class UIElement:
         Raises
         ------
         error : PyCUIError
-            If parameter is not a initialized renderer.
+            If parameter is not an initialized renderer.
         """
 
         if isinstance(renderer, py_cui.renderer.Renderer):
@@ -218,6 +298,7 @@ class UIImplementation:
 
     Should be extended for creating logic common accross ui elements.
     For example, a textbox needs the same logic for a widget or popup.
+    This base class is only used to initialize the logger
 
     Attributes
     ----------
@@ -236,19 +317,23 @@ class TextBoxImplementation(UIImplementation):
     ----------
     _text : str
         The text in the text box
-    cursor_x, cursor_y : int
+    _initial_cursor : int
+        Initial position of the cursor
+    _cursor_x, _cursor_y : int
         The absolute positions of the cursor in the terminal window
-    cursor_text_pos : int
+    _cursor_text_pos : int
         the cursor position relative to the text
-    cursor_max_left, cursor_max_right : int
+    _cursor_max_left, cursor_max_right : int
         The cursor bounds of the text box
-    viewport_width : int
+    _viewport_width : int
         The width of the textbox viewport
-    password : bool
+    _password : bool
         Toggle to display password characters or text
     """
 
     def __init__(self, initial_text, password, logger):
+        """Initializer for the TextBoxImplementation base class
+        """
 
         super().__init__(logger)
         self._text             = initial_text
@@ -264,18 +349,62 @@ class TextBoxImplementation(UIImplementation):
     # Variable getter + setter functions
 
     def get_initial_cursor_pos(self):
+        """Gets initial cursor position
+
+        Returns
+        -------
+        initial_cursor : int
+            Initial position of the cursor
+        """
+
         return self._initial_cursor
 
+
     def get_cursor_text_pos(self):
+        """Gets current position of cursor relative to text
+        
+        Returns
+        -------
+        cursor_text_pos : int
+            the cursor position relative to the text
+        """
+
         return self._cursor_text_pos
 
+
     def get_cursor_limits(self):
+        """Gets cursor extreme points in terminal position
+
+        Returns
+        -------
+        cursor_max_left, cursor_max_right : int
+            The cursor bounds of the text box
+        """
+
         return self._cursor_max_left, self._cursor_max_right
 
+
     def get_cursor_position(self):
+        """Returns current cursor poition
+
+        Returns
+        -------
+        cursor_x, cursor_y : int
+            The absolute positions of the cursor in the terminal window
+        """
+
         return self._cursor_x, self._cursor_y
 
+
     def get_viewport_width(self):
+        """Gets the width of the textbox viewport
+
+        Returns
+        -------
+        viewport_width : int
+            The width of the textbox viewport
+        """
+
         return self._viewport_width
 
 
@@ -336,9 +465,7 @@ class TextBoxImplementation(UIImplementation):
 
 
     def _insert_char(self, key_pressed):
-        """Inserts char at cursor position.
-
-        Internal use only
+        """Inserts char at cursor position. Internal use only
 
         Parameters
         ----------
@@ -352,7 +479,7 @@ class TextBoxImplementation(UIImplementation):
 
 
     def _jump_to_start(self):
-        """Jumps to the start of the textbox
+        """Jumps to the start of the textbox. Internal use only
         """
 
         self._cursor_x = self._initial_cursor
@@ -360,7 +487,7 @@ class TextBoxImplementation(UIImplementation):
 
 
     def _jump_to_end(self):
-        """Jumps to the end to the textbox
+        """Jumps to the end to the textbox. Internal use only
         """
 
         self._cursor_text_pos = len(self._text)
@@ -368,7 +495,7 @@ class TextBoxImplementation(UIImplementation):
 
 
     def _erase_char(self):
-        """Erases character at textbox cursor
+        """Erases character at textbox cursor. Internal Use only
         """
 
         if self._cursor_text_pos > 0:
@@ -379,7 +506,7 @@ class TextBoxImplementation(UIImplementation):
 
 
     def _delete_char(self):
-        """Deletes character to right of texbox cursor
+        """Deletes character to right of texbox cursor. Internal use only
         """
 
         if self._cursor_text_pos < len(self._text):
@@ -394,15 +521,18 @@ class MenuImplementation(UIImplementation):
 
     Attributes
     ----------
-    top_view : int
+    _top_view : int
         the uppermost menu element in view
-    selected_item : int
+    _selected_item : int
         the currently highlighted menu item
-    view_items : list of str
+    _view_items : list of str
         list of menu items
     """
 
     def __init__(self, logger):
+        """Initializer for MenuImplementation base class
+        """
+
         super().__init__(logger)
         self._top_view         = 0
         self._selected_item    = 0
@@ -417,10 +547,28 @@ class MenuImplementation(UIImplementation):
         self._selected_item = 0
         self._top_view = 0
 
+
     def get_selected_item(self):
+        """Gets the currently selected item
+
+        Returns
+        -------
+        selected_item : int
+            the currently highlighted menu item
+        """
+
         return self._selected_item
 
+
     def set_selected_item(self, selected_item):
+        """Sets the currently selected item
+
+        Parameters
+        ----------
+        selected_item : int
+            The new selected item index
+        """
+
         self._selected_item = selected_item
 
 
@@ -436,6 +584,8 @@ class MenuImplementation(UIImplementation):
 
     def _scroll_down(self, viewport_height):
         """Function that scrolls the view down in the scroll menu
+
+        TODO: Viewport height should be calculated internally, and not rely on a parameter.
 
         Parameters
         ----------
@@ -512,8 +662,34 @@ class MenuImplementation(UIImplementation):
 
 
 class TextBlockImplementation(UIImplementation):
+    """Base class for TextBlockImplementation
+    
+    Contains all logic required for a textblock ui element to function.
+    Currently only implemented in widget form, though popup form is possible.
+
+    Attributes
+    ----------
+    _text_lines : List[str]
+        the lines of text in the texbox
+    _viewport_x_start, _viewport_y_start : int
+        Initial location of viewport relative to text
+    _cursor_text_pos_x, _cursor_text_pos_y : int
+        Cursor position relative to text
+    _cursor_x, _cursor_y : int
+        Absolute cursor position in characters
+    _cursor_max_up, _cursor_max_down : int
+        cursor limits in vertical space
+    _cursor_max_left, _cursor_max_right : int
+        Cursor limits in horizontal space
+    _viewport_height, _viewport_width : int
+        The dimensions of the viewport in characters
+    """
 
     def __init__(self, initial_text, logger):
+        """Initializer for TextBlockImplementation base class
+
+        Zeros attributes, and parses initial text
+        """
 
         super().__init__(logger)
         self._text_lines = initial_text.splitlines()
@@ -536,25 +712,76 @@ class TextBlockImplementation(UIImplementation):
 
     # Getters and setters
 
-    def viewport_y_start(self):
-        return self._viewport_y_start
-
     def get_viewport_start_pos(self):
+        """Gets upper left corner position of viewport
+
+        Returns
+        -------
+        viewport_x_start, viewport_y_start : int
+            Initial location of viewport relative to text
+        """
+
         return self._viewport_x_start, self._viewport_y_start
 
+
     def get_viewport_dims(self):
+        """Gets viewport dimensions in characters
+
+        Returns
+        -------
+        viewport_height, viewport_width : int
+            The dimensions of the viewport in characters
+        """
+
         return self._viewport_height, self._viewport_width
 
+
     def get_cursor_text_pos(self):
+        """Gets cursor postion relative to text
+
+        Returns
+        -------
+        cursor_text_pos_x, cursor_text_pos_y : int
+            Cursor position relative to text
+        """
+
+
         return self._cursor_text_pos_x, self._cursor_text_pos_y
 
+
     def get_abs_cursor_position(self):
+        """Gets absolute cursor position in terminal characters
+
+        Returns
+        -------
+        cursor_x, cursor_y : int
+            Absolute cursor position in characters
+        """
+
         return self._cursor_x, self._cursor_y
 
+
     def get_cursor_limits_vertical(self):
+        """Gets limits for cursor in vertical direction
+
+        Returns
+        -------
+        cursor_max_up, cursor_max_down : int
+            cursor limits in vertical space
+        """
+
         return self._cursor_max_up, self._cursor_max_down
 
+
     def get_cursor_limits_horizontal(self):
+        """Gets limits for cursor in horizontal direction
+
+        Returns
+        -------
+        cursor_max_left, cursor_max_right : int
+            Cursor limits in horizontal space
+        """
+
         return self._cursor_max_left, self._cursor_max_right
 
 
