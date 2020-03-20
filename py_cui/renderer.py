@@ -169,7 +169,7 @@ class Renderer:
         height, _     = ui_element.get_absolute_dimensions()
 
         if ui_element.is_selected():
-            self._stdscr.attron(curses.A_BOLD)
+            self._set_bold()
 
         if fill:
             border_y_start = start_y + pady
@@ -184,7 +184,7 @@ class Renderer:
         self._draw_border_bottom(ui_element, border_y_stop)
 
         if ui_element.is_selected():
-            self._stdscr.attroff(curses.A_BOLD)
+            self._unset_bold()
 
 
     def _draw_border_top(self, ui_element, y, with_title):
@@ -360,14 +360,14 @@ class Renderer:
         render_text = self._get_render_text(ui_element, line, centered, bordered, start_pos)
         current_start_x = start_x + padx
         if ui_element.is_selected():
-            self._stdscr.attron(curses.A_BOLD)
+            self._set_bold()
 
         if bordered:
             self._stdscr.addstr(y, start_x + padx, self._border_characters['VERTICAL'])
             current_start_x = current_start_x + 2
 
         if ui_element.is_selected():
-            self._stdscr.attroff(curses.A_BOLD)
+            self._unset_bold()
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
@@ -375,22 +375,22 @@ class Renderer:
                 self.set_color_mode(text_elem[1])
 
             if selected:
-                self._stdscr.attron(curses.A_BOLD)
+                self._set_bold()
 
             self._stdscr.addstr(y, current_start_x, text_elem[0])
             current_start_x = current_start_x + len(text_elem[0])
 
             if selected:
-                self._stdscr.attroff(curses.A_BOLD)
+                self._unset_bold()
 
             if text_elem[1] != ui_element.get_color():
                 self.unset_color_mode(text_elem[1])
 
         if ui_element.is_selected():
-            self._stdscr.attron(curses.A_BOLD)
+            self._set_bold()
 
         if bordered:
             self._stdscr.addstr(y, start_x + width - 2 * padx, self._border_characters['VERTICAL'])
 
         if ui_element.is_selected():
-            self._stdscr.attroff(curses.A_BOLD)
+            self._unset_bold()

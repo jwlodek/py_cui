@@ -45,8 +45,8 @@ class Grid:
         self._num_columns   = num_columns
         self._height        = height
         self._width         = width
-        self._offset_y      = self._height  % self._num_rows    - 1
         self._offset_x      = self._width   % self._num_columns - 1
+        self._offset_y      = self._height  % self._num_rows    - 1
         self._row_height    = int(self._height   / self._num_rows)
         self._column_width  = int(self._width    / self._num_columns)
         self._logger        = logger
@@ -180,6 +180,6 @@ class Grid:
 
         self._row_height     = int(self._height   / self._num_rows)
         self._column_width   = int(self._width    / self._num_columns)
-        self._offset_y       = self._height   % self._num_rows
         self._offset_x       = self._width    % self._num_columns
-        self._logger.debug('Finished updating grid height/width')
+        self._offset_y       = self._height   % self._num_rows
+        self._logger.debug('Updated grid. Cell dims: {}x{}, Offsets {},{}'.format(self._row_height, self._column_width, self._offset_x, self._offset_y))

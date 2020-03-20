@@ -20,31 +20,19 @@ class Popup(py_cui.ui.UIElement):
 
     Attributes
     ----------
-    root : py_cui.PyCUI
+    _root : py_cui.PyCUI
         Root CUI window
-    title : str
-        Popup title
-    text : str
+    _text : str
         Popup message text
-    color : int
-        PyCUI color value
-    renderer : py_cui.renderer.Renderer
-        Renderer for drawing the popup
-    start_x, start_y : int
-        top left corner of the popup
-    stop_x, stop_y : int
-        bottom right corner of the popup
-    height, width : int
-        The dimensions of the popup
-    padx, pady : int
-        The padding on either side of the popup
-    selected : bool
+    _selected : bool
         Always true. Used by the renderer to highlight popup
+    _close_keys : List[int]
+        List of keycodes used to close popup
     """
 
 
     def __init__(self, root, title, text, color, renderer, logger):
-        """Constructor for popup class
+        """Initializer for main popup class. Calls UIElement intialier, and sets some initial values
         """
 
         super().__init__(0, title, renderer, logger)
@@ -63,16 +51,39 @@ class Popup(py_cui.ui.UIElement):
 
 
     def set_text(self, text):
+        """Sets popup text (message)
+
+        Parameters
+        ----------
+        text : str
+            The new popup text
+        """
+
         self._text = text
 
 
     def get_absolute_start_pos(self):
+        """Override of base class, computes position based on root dimensions
+        
+        Returns
+        -------
+        start_x, start_y : int
+            The coords of the upper-left corner of the popup
+        """
 
         root_height, root_width = self._root.get_absolute_size()
         return int(root_width / 4), int(root_height / 3)
 
 
     def get_absolute_stop_pos(self):
+        """Override of base class, computes position based on root dimensions
+        
+        Returns
+        -------
+        stop_x, stop_y : int
+            The coords of the lower-right corner of the popup
+        """
+
         root_height, root_width = self._root.get_absolute_size()
         return (int(3 * root_width / 4)), (int(2 * root_height / 3))
 
@@ -113,15 +124,10 @@ class Popup(py_cui.ui.UIElement):
 
 class MessagePopup(Popup):
     """Class representing a simple message popup
-
-    Attributes
-    ----------
-    close_keys : list of int
-        list of key codes that can be used to close the popup
     """
 
     def __init__(self, root, title, text, color, renderer, logger):
-        """Constructor for MessagePopup
+        """Initializer for MessagePopup
         """
 
         super().__init__(root, title, text, color, renderer, logger)
@@ -144,12 +150,12 @@ class YesNoPopup(Popup):
 
     Attributes
     ----------
-    command : function, 1 boolean parameter
+    _command : function, 1 boolean parameter
         Function that takes one boolean parameter. Called with True if yes, called with False if no.
     """
 
     def __init__(self, root, title, text, color, command, renderer, logger):
-        """Constructor for YesNoPopup
+        """Initializer for YesNoPopup
         """
 
         super().__init__(root, title, text, color, renderer, logger)
@@ -199,6 +205,9 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
     """
 
     def __init__(self, root, title, color, command, renderer, password, logger):
+        """Initializer for textbox popup. Uses TextBoxImplementation as base
+        """
+
         Popup.__init__(self, root, title, '', color, renderer, logger)
         py_cui.ui.TextBoxImplementation.__init__(self, '', password, logger)
         self._command = command
@@ -276,14 +285,14 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
 
     Attributes
     ----------
-    command : function
+    _command : function
         a function that takes a single string parameter, run when ENTER pressed
-    run_command_if_none : bool
+    _run_command_if_none : bool
         Runs command even if there are no menu items (passes None)
     """
 
     def __init__(self, root, items, title, color, command, renderer, logger, run_command_if_none):
-        """Constructor for MenuPopup
+        """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
         Popup.__init__(self, root, title, '', color, renderer, logger)
@@ -360,16 +369,16 @@ class LoadingIconPopup(Popup):
 
     Attributes
     ----------
-    loading_icons : list of str
+    _loading_icons : list of str
         Animation frames for loading icon
-    icon_counter : int
+    _icon_counter : int
         Current frame of animation
-    message : str
+    _message : str
         Loading message
     """
 
     def __init__(self, root, title, message, color, renderer, logger):
-        """Constructor for LoadingIconPopup
+        """Initializer for LoadingIconPopup
         """
 
         super().__init__(root, title, '{} ... \\'.format(message), color, renderer, logger)
@@ -400,6 +409,8 @@ class LoadingIconPopup(Popup):
         self._icon_counter = self._icon_counter + 1
         if self._icon_counter == len(self._loading_icons):
             self._icon_counter = 0
+        
+        # Use Superclass draw after new text is computed
         super()._draw()
 
 
@@ -417,7 +428,7 @@ class LoadingBarPopup(Popup):
     """
 
     def __init__(self, root, title, num_items, color, renderer, logger):
-        """Constructor for LoadingBarPopup
+        """Initializer for LoadingBarPopup
         """
 
         super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer, logger)
@@ -474,4 +485,6 @@ class LoadingBarPopup(Popup):
                                                 self._completed_items, 
                                                 self._num_items, 
                                                 self._loading_icons[self._icon_counter]))
+        
+        # Use Superclass draw after new text is computed
         super()._draw()
