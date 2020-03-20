@@ -47,23 +47,23 @@ class ColorRule:
             Flag to determine whether to strip whitespace before matching.
         """
         
-        self.__regex            = regex
-        self.__color            = color
-        self.__rule_type        = rule_type
-        self.__match_type       = match_type
-        self.__region           = region
+        self._regex            = regex
+        self._color            = color
+        self._rule_type        = rule_type
+        self._match_type       = match_type
+        self._region           = region
 
-        if self.__region is not None:
-            if self.__region[0] > self.__region[1]:
+        if self._region is not None:
+            if self._region[0] > self._region[1]:
                 temp = region[0]
-                self.__region[0] = self.__region[1]
-                self.__region[1] = temp
+                self._region[0] = self._region[1]
+                self._region[1] = temp
 
-        self.__include_whitespace   = include_whitespace
-        self.__logger               = logger
+        self._include_whitespace   = include_whitespace
+        self._logger               = logger
 
 
-    def __check_match(self, line):
+    def _check_match(self, line):
         """Checks if the color rule matches a line
         
         Parameters
@@ -78,29 +78,29 @@ class ColorRule:
         """
 
         temp = line
-        if not self.__include_whitespace:
+        if not self._include_whitespace:
             temp = temp.strip()
-        if self.__rule_type == 'startswith':
-            if temp.startswith(self.__regex):
+        if self._rule_type == 'startswith':
+            if temp.startswith(self._regex):
                 return True
-        elif self.__rule_type == 'endswith':
-            if temp.endswith(self.__regex):
+        elif self._rule_type == 'endswith':
+            if temp.endswith(self._regex):
                 return True
-        elif self.__rule_type == 'notstartswith':
-            if temp.startswith(self.__regex):
+        elif self._rule_type == 'notstartswith':
+            if temp.startswith(self._regex):
                 return False
             return True
-        elif self.__rule_type == 'notendswith':
-            if temp.endswith(self.__regex):
+        elif self._rule_type == 'notendswith':
+            if temp.endswith(self._regex):
                 return False
             return True
-        elif self.__rule_type == 'contains':
-            if re.search(self.__regex, line) is not None:
+        elif self._rule_type == 'contains':
+            if re.search(self._regex, line) is not None:
                 return True
         return False
 
 
-    def __generate_fragments_regex(self, widget, render_text):
+    def _generate_fragments_regex(self, widget, render_text):
         """Splits text into fragments based on regular expression
         
         Parameters
@@ -117,20 +117,20 @@ class ColorRule:
         """
 
         fragments = []
-        matches = re.findall(self.__regex, render_text)
+        matches = re.findall(self._regex, render_text)
         current_render_text = render_text
         for match in matches:
             temp = current_render_text.split(match, 1)
             if len(temp) == 2:
                 fragments.append([temp[0], widget.color])
-                fragments.append([match, self.__color])
+                fragments.append([match, self._color])
                 current_render_text = temp[1]
         fragments.append([current_render_text, widget.color])
 
         return fragments
 
 
-    def __split_text_on_region(self, widget, render_text):
+    def _split_text_on_region(self, widget, render_text):
         """Splits text into fragments based on region
         
         Parameters
@@ -147,14 +147,14 @@ class ColorRule:
         """
 
         fragments = []
-        if self.__region is None or len(render_text) < self.__region[0]:
+        if self._region is None or len(render_text) < self._region[0]:
             return [[render_text, widget.color]]
-        elif len(render_text) < self.__region[1]:
-            self.__region[1] = len(render_text)
-        if self.__region[0] != 0:
-            fragments.append([render_text[0:self.__region[0]], widget.color])
-        fragments.append([render_text[self.__region[0]:self.__region[1]], self.__color])
-        fragments.append([render_text[self.__region[1]:], widget.color])
+        elif len(render_text) < self._region[1]:
+            self._region[1] = len(render_text)
+        if self._region[0] != 0:
+            fragments.append([render_text[0:self._region[0]], widget.color])
+        fragments.append([render_text[self._region[0]:self._region[1]], self._color])
+        fragments.append([render_text[self._region[1]:], widget.color])
 
         return fragments
 
@@ -179,18 +179,18 @@ class ColorRule:
             Boolean output saying if a match was found in the line.
         """
 
-        match       = self.__check_match(line)
+        match       = self._check_match(line)
         fragments   = [[render_text, widget.color]]
         
         if match:
 
-            if self.__match_type == 'line':
-                fragments = [[render_text, self.__color]]
-            elif self.__match_type == 'regex':
-                fragments = self.__generate_fragments_regex(widget, render_text)
-            elif self.__match_type == 'region':
-                fragments = self.__split_text_on_region(widget, render_text)
+            if self._match_type == 'line':
+                fragments = [[render_text, self._color]]
+            elif self._match_type == 'regex':
+                fragments = self._generate_fragments_regex(widget, render_text)
+            elif self._match_type == 'region':
+                fragments = self._split_text_on_region(widget, render_text)
         
-            self.__logger.info('Generated fragments: {}'.format(fragments))
+            self._logger.info('Generated fragments: {}'.format(fragments))
         
         return fragments, match

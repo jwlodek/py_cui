@@ -13,15 +13,15 @@ class Grid:
 
     Attributes
     ----------
-    __num_rows, __num_columns : int
+    _num_rows, _num_columns : int
         Number of grid rows and columns
-    __height, __width : int
+    _height, _width : int
         The height, width in characters of the terminal window
-    __offset_y, __offset_x : int
+    _offset_y, _offset_x : int
         The number of additional characters found by height mod rows and width mod columns
-    __row_height, __column_width : int
+    _row_height, _column_width : int
         The number of characters in a single grid row, column
-    __logger : py_cui.debug.PyCUILogger
+    _logger : py_cui.debug.PyCUILogger
         logger object for maintaining debug messages
     """
 
@@ -41,15 +41,15 @@ class Grid:
             The width in characters of the terminal window
         """
 
-        self.__num_rows      = num_rows
-        self.__num_columns   = num_columns
-        self.__height        = height
-        self.__width         = width
-        self.__offset_y      = self.__height  % self.__num_rows    - 1
-        self.__offset_x      = self.__width   % self.__num_columns - 1
-        self.__row_height    = int(self.__height   / self.__num_rows)
-        self.__column_width  = int(self.__width    / self.__num_columns)
-        self.__logger        = logger
+        self._num_rows      = num_rows
+        self._num_columns   = num_columns
+        self._height        = height
+        self._width         = width
+        self._offset_y      = self._height  % self._num_rows    - 1
+        self._offset_x      = self._width   % self._num_columns - 1
+        self._row_height    = int(self._height   / self._num_rows)
+        self._column_width  = int(self._width    / self._num_columns)
+        self._logger        = logger
 
 
     def get_dimensions(self):
@@ -63,7 +63,7 @@ class Grid:
             size of grid in columns
         """
 
-        return self.__num_rows, self.__num_columns
+        return self._num_rows, self._num_columns
 
 
     def get_dimensions_absolute(self):
@@ -77,7 +77,7 @@ class Grid:
             width in characters
         """
 
-        return self.__height, self.__width
+        return self._height, self._width
 
 
     def get_offsets(self):
@@ -91,7 +91,7 @@ class Grid:
             leftover chars in y direction
         """
 
-        return self.__offset_x, self.__offset_y
+        return self._offset_x, self._offset_y
 
 
     def get_cell_dimensions(self):
@@ -105,7 +105,7 @@ class Grid:
             width of column in characters
         """
 
-        return self.__row_height, self.__column_width
+        return self._row_height, self._column_width
 
 
     def set_num_rows(self, num_rows):
@@ -122,11 +122,11 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self.__logger.debug('Updating row count and height')
-        if (3 * num_rows) >= self.__height:
+        self._logger.debug('Updating row count and height')
+        if (3 * num_rows) >= self._height:
             raise py_cui.errors.PyCUIOutOfBoundsError
-        self.__num_rows = num_rows
-        self.__row_height = int(self.__height / self.__num_rows)
+        self._num_rows = num_rows
+        self._row_height = int(self._height / self._num_rows)
 
 
     def set_num_cols(self, num_columns):
@@ -143,12 +143,12 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self.__logger.debug('Updating column count and width')
-        if (3 * num_columns) >= self.__width:
+        self._logger.debug('Updating column count and width')
+        if (3 * num_columns) >= self._width:
             raise py_cui.errors.PyCUIOutOfBoundsError
         
-        self.__num_columns   = num_columns
-        self.__column_width  = int(self.__width / self.__num_columns)
+        self._num_columns   = num_columns
+        self._column_width  = int(self._width / self._num_columns)
 
 
     def update_grid_height_width(self, height, width):
@@ -167,19 +167,19 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self.__logger.debug('Updating grid height and width')
-        self.__height = height
-        self.__width  = width
+        self._logger.debug('Updating grid height and width')
+        self._height = height
+        self._width  = width
 
-        self.__logger.debug('Checking height width based on terminal dimensions')
-        if (3 * self.__num_columns) >= self.__width:
+        self._logger.debug('Checking height width based on terminal dimensions')
+        if (3 * self._num_columns) >= self._width:
             raise py_cui.errors.PyCUIOutOfBoundsError
 
-        if (3 * self.__num_rows) >= self.__height:
+        if (3 * self._num_rows) >= self._height:
             raise py_cui.errors.PyCUIOutOfBoundsError
 
-        self.__row_height     = int(self.__height   / self.__num_rows)
-        self.__column_width   = int(self.__width    / self.__num_columns)
-        self.__offset_y       = self.__height   % self.__num_rows
-        self.__offset_x       = self.__width    % self.__num_columns
-        self.__logger.debug('Finished updating grid height/width')
+        self._row_height     = int(self._height   / self._num_rows)
+        self._column_width   = int(self._width    / self._num_columns)
+        self._offset_y       = self._height   % self._num_rows
+        self._offset_x       = self._width    % self._num_columns
+        self._logger.debug('Finished updating grid height/width')
