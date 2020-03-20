@@ -123,9 +123,9 @@ class Renderer:
             a flag that tells the renderer if the element is filling its grid space, or not (ex. Textbox vs textblock)
         """
 
-        padx, pady       = ui_element._get_padding()
-        start_x, start_y = ui_element._get_start_position()
-        height, width    = ui_element._get_dimensions()
+        padx, pady       = ui_element.get_padding()
+        start_x, start_y = ui_element.get_start_position()
+        height, width    = ui_element.get_absolute_dimensions()
         
         if fill:
             cursor_y = start_y + height - pady - 1
@@ -164,9 +164,9 @@ class Renderer:
             flag that tells whether or not to draw ui_element title
         """
 
-        _, pady       = ui_element._get_padding()
-        _, start_y    = ui_element._get_start_position()
-        height, _     = ui_element._get_dimensions()
+        _, pady       = ui_element.get_padding()
+        _, start_y    = ui_element.get_start_position()
+        height, _     = ui_element.get_absolute_dimensions()
 
         if ui_element.is_selected():
             self._stdscr.attron(curses.A_BOLD)
@@ -202,7 +202,7 @@ class Renderer:
 
         padx, _       = ui_element.get_padding()
         start_x, _    = ui_element.get_start_position()
-        _, width      = ui_element.get_dimensions()
+        _, width      = ui_element.get_absolute_dimensions()
         title         = ui_element.get_title()
 
         if not with_title or (len(title) + 4 >= width - 2 * padx):
@@ -232,7 +232,7 @@ class Renderer:
 
         padx, _       = ui_element.get_padding()
         start_x, _    = ui_element.get_start_position()
-        _, width      = ui_element.get_dimensions()
+        _, width      = ui_element.get_absolute_dimensions()
 
         render_text = '{}{}{}'.format(  self._border_characters['DOWN_LEFT'], 
                                         self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx), 
@@ -253,7 +253,7 @@ class Renderer:
 
         padx, _       = ui_element.get_padding()
         start_x, _    = ui_element.get_start_position()
-        _, width      = ui_element.get_dimensions()
+        _, width      = ui_element.get_absolute_dimensions()
 
         render_text = '{}{}{}'.format(  self._border_characters['VERTICAL'], 
                                         ' ' * (width - 2 - 2 * padx), 
@@ -284,7 +284,7 @@ class Renderer:
         """
 
         padx, _       = ui_element.get_padding()
-        _, width      = ui_element.get_dimensions()
+        _, width      = ui_element.get_absolute_dimensions()
 
         render_text_length = width - (2 * padx)
 

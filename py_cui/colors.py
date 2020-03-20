@@ -122,10 +122,10 @@ class ColorRule:
         for match in matches:
             temp = current_render_text.split(match, 1)
             if len(temp) == 2:
-                fragments.append([temp[0], widget.color])
+                fragments.append([temp[0], widget.get_color()])
                 fragments.append([match, self._color])
                 current_render_text = temp[1]
-        fragments.append([current_render_text, widget.color])
+        fragments.append([current_render_text, widget.get_color()])
 
         return fragments
 
@@ -148,13 +148,13 @@ class ColorRule:
 
         fragments = []
         if self._region is None or len(render_text) < self._region[0]:
-            return [[render_text, widget.color]]
+            return [[render_text, widget.get_color()]]
         elif len(render_text) < self._region[1]:
             self._region[1] = len(render_text)
         if self._region[0] != 0:
-            fragments.append([render_text[0:self._region[0]], widget.color])
+            fragments.append([render_text[0:self._region[0]], widget.get_color()])
         fragments.append([render_text[self._region[0]:self._region[1]], self._color])
-        fragments.append([render_text[self._region[1]:], widget.color])
+        fragments.append([render_text[self._region[1]:], widget.get_color()])
 
         return fragments
 
@@ -180,7 +180,7 @@ class ColorRule:
         """
 
         match       = self._check_match(line)
-        fragments   = [[render_text, widget.color]]
+        fragments   = [[render_text, widget.get_color()]]
         
         if match:
 
