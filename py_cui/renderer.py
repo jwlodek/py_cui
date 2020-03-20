@@ -76,7 +76,7 @@ class Renderer:
         self._stdscr.attroff(curses.A_BOLD)
 
 
-    def _set_color_rules(self, color_rules):
+    def set_color_rules(self, color_rules):
         """Sets current color rules
 
         Parameters
@@ -88,7 +88,7 @@ class Renderer:
         self._color_rules = color_rules
 
 
-    def _set_color_mode(self, color_mode):
+    def set_color_mode(self, color_mode):
         """Sets the output color mode
 
         Parameters
@@ -100,7 +100,7 @@ class Renderer:
         self._stdscr.attron(curses.color_pair(color_mode))
 
 
-    def _unset_color_mode(self, color_mode):
+    def unset_color_mode(self, color_mode):
         """Unsets the output color mode
 
         Parameters
@@ -112,7 +112,7 @@ class Renderer:
         self._stdscr.attroff(curses.color_pair(color_mode))
 
 
-    def _reset_cursor(self, ui_element, fill=True):
+    def reset_cursor(self, ui_element, fill=True):
         """Positions the cursor at the bottom right of the selected element
         
         Parameters
@@ -151,7 +151,7 @@ class Renderer:
         self._stdscr.move(cursor_y, cursor_x)
 
 
-    def _draw_border(self, ui_element, fill=True, with_title=True):
+    def draw_border(self, ui_element, fill=True, with_title=True):
         """Draws ascii border around ui element
 
         Parameters
@@ -213,7 +213,7 @@ class Renderer:
         else:
             render_text = '{}{} {} {}{}'.format(self._border_characters['UP_LEFT'], 
                                                 2 * self._border_characters['HORIZONTAL'], 
-                                                ui_element.title, 
+                                                title, 
                                                 self._border_characters['HORIZONTAL'] * (width - 6 - 2 * padx - len(title)), 
                                                 self._border_characters['UP_RIGHT'])
             self._stdscr.addstr(y, start_x + padx, render_text)
@@ -332,7 +332,7 @@ class Renderer:
         return fragments
 
 
-    def _draw_text(self, ui_element, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
+    def draw_text(self, ui_element, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
         """Function that draws ui_element text.
 
         Parameters
@@ -354,24 +354,25 @@ class Renderer:
         """
 
         padx, _       = ui_element.get_padding()
+        _, width      = ui_element.get_absolute_dimensions()
         start_x, _    = ui_element.get_start_position()
 
         render_text = self._get_render_text(ui_element, line, centered, bordered, start_pos)
         current_start_x = start_x + padx
-        if ui_element.selected:
+        if ui_element.is_selected():
             self._stdscr.attron(curses.A_BOLD)
 
         if bordered:
             self._stdscr.addstr(y, start_x + padx, self._border_characters['VERTICAL'])
             current_start_x = current_start_x + 2
 
-        if ui_element.selected:
+        if ui_element.is_selected():
             self._stdscr.attroff(curses.A_BOLD)
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
             if text_elem[1] != ui_element.get_color():
-                self._set_color_mode(text_elem[1])
+                self.set_color_mode(text_elem[1])
 
             if selected:
                 self._stdscr.attron(curses.A_BOLD)
@@ -383,13 +384,13 @@ class Renderer:
                 self._stdscr.attroff(curses.A_BOLD)
 
             if text_elem[1] != ui_element.get_color():
-                self._unset_color_mode(text_elem[1])
+                self.unset_color_mode(text_elem[1])
 
         if ui_element.is_selected():
             self._stdscr.attron(curses.A_BOLD)
 
         if bordered:
-            self._stdscr.addstr(y, ui_element.start_x + ui_element.width - 2 * ui_element.padx, self._border_characters['VERTICAL'])
+            self._stdscr.addstr(y, start_x + width - 2 * padx, self._border_characters['VERTICAL'])
 
         if ui_element.is_selected():
             self._stdscr.attroff(curses.A_BOLD)
