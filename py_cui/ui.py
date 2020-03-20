@@ -474,7 +474,7 @@ class MenuImplementation(UIImplementation):
             self.add_item(item)
 
 
-    def remove__selected_item(self):
+    def remove_selected_item(self):
         """Function that removes the selected item from the scroll menu.
         """
 

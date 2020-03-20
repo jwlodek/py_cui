@@ -139,7 +139,7 @@ class Renderer:
             self._stdscr.move(0,0)
 
 
-    def _draw_cursor(self, cursor_y, cursor_x):
+    def draw_cursor(self, cursor_y, cursor_x):
         """Draws the cursor at a particular location
         
         Parameters

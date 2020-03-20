@@ -172,7 +172,18 @@ class Widget(py_cui.ui.UIElement):
         return width + self._start_x, height + self._start_y
 
 
-    def is_row_col_inside(self, row, col):
+    def get_grid_cell(self):
+        return self._row, self._column
+
+
+    def get_grid_cell_spans(self):
+        return self._row_span, self._column_span
+
+    def is_selectable(self):
+        return self._selectable
+
+
+    def _is_row_col_inside(self, row, col):
         """Checks if a particular row + column is inside the widget area
 
         Parameters
@@ -510,11 +521,12 @@ class Button(Widget):
         """
 
         super()._draw()
+        self._renderer.set_color_mode(self.get_color())
         self._renderer.draw_border(self, with_title=False)
         button_text_y_pos = self._start_y + int(self._height / 2)
         self._renderer.draw_text(self, self._title, button_text_y_pos, centered=True, selected=self._selected)
         self._renderer.reset_cursor(self)
-        self._renderer.unset_color_mode(self._color)
+        self._renderer.unset_color_mode(self.get_color())
 
 
 

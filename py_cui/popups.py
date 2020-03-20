@@ -52,6 +52,7 @@ class Popup(py_cui.ui.UIElement):
         self._text         = text
         self._selected     = True
         self._close_keys   = [py_cui.keys.KEY_ESCAPE]
+        self.update_height_width()
 
     
     def _increment_counter(self):
@@ -61,13 +62,17 @@ class Popup(py_cui.ui.UIElement):
         pass
 
 
-    def _get_absolute_start_pos(self):
+    def set_text(self, text):
+        self._text = text
+
+
+    def get_absolute_start_pos(self):
 
         root_height, root_width = self._root.get_absolute_size()
         return int(root_width / 4), int(root_height / 3)
 
 
-    def _get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self):
         root_height, root_width = self._root.get_absolute_size()
         return (int(3 * root_width / 4)), (int(2 * root_height / 3))
 
@@ -95,14 +100,14 @@ class Popup(py_cui.ui.UIElement):
 
         super()._draw()
         target_y = int(self._stop_y - self._start_y / 2)
-        self._renderer._set_color_rules([])
+        self._renderer.set_color_rules([])
         self._renderer._set_bold()
-        self._renderer._draw_border(self, with_title=False)
-        self._renderer._draw_text(  self, self._title, target_y - 2, centered=True, selected=True)
-        self._renderer._draw_text(  self, self._text,  target_y,     centered=True, selected=True)
-        self._renderer._unset_color_mode(self._color)
+        self._renderer.draw_border(self, with_title=False)
+        self._renderer.draw_text(  self, self._title, target_y - 2, centered=True, selected=True)
+        self._renderer.draw_text(  self, self._text,  target_y,     centered=True, selected=True)
+        self._renderer.unset_color_mode(self._color)
         self._renderer._unset_bold()
-        self._renderer._reset_cursor(self)
+        self._renderer.reset_cursor(self)
 
 
 
@@ -120,7 +125,7 @@ class MessagePopup(Popup):
         """
 
         super().__init__(root, title, text, color, renderer, logger)
-        self.close_keys = [ py_cui.keys.KEY_ENTER, 
+        self._close_keys = [ py_cui.keys.KEY_ENTER, 
                             py_cui.keys.KEY_ESCAPE, 
                             py_cui.keys.KEY_SPACE, 
                             py_cui.keys.KEY_BACKSPACE, 
@@ -148,7 +153,7 @@ class YesNoPopup(Popup):
         """
 
         super().__init__(root, title, text, color, renderer, logger)
-        self.command = command
+        self._command = command
 
 
     def _handle_key_press(self, key_pressed):
@@ -163,16 +168,16 @@ class YesNoPopup(Popup):
         super()._handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
-            self.ret_val = True
+            ret_val = True
             valid_pressed = True
         elif key_pressed == py_cui.keys.KEY_N_UPPER or key_pressed == py_cui.keys.KEY_N_LOWER:
-            self.ret_val = False
+            ret_val = False
             valid_pressed = True
 
         if valid_pressed:
             self._root.close_popup()
-            if self.command is not None:
-                self.command(self.ret_val)
+            if self._command is not None:
+                self._command(ret_val)
             else:
                 self._root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
@@ -283,6 +288,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
 
         Popup.__init__(self, root, title, '', color, renderer, logger)
         py_cui.ui.MenuImplementation.__init__(self, logger)
+        self.add_item_list(items)
         self._command              = command
         self._run_command_if_none  = run_command_if_none
 
@@ -322,7 +328,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
             self._scroll_down(viewport_height)
 
 
-    def draw(self):
+    def _draw(self):
         """Overrides base class draw function
         """
 
@@ -337,7 +343,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
             else:
                 if counter >= self._height - self._pady - 1:
                     break
-                if line_counter == self._selected_item:
+                if line_counter == self.get_selected_item():
                     self._renderer.draw_text(self, line, self._start_y + counter, selected=True)
                 else:
                     self._renderer.draw_text(self, line, self._start_y + counter)
@@ -434,6 +440,12 @@ class LoadingBarPopup(Popup):
 
         pass
 
+    def _increment_counter(self):
+        """Function that increments an internal counter
+        """
+
+        self._completed_items += 1
+
 
     def _draw(self):
         """Override of base draw function
@@ -457,9 +469,9 @@ class LoadingBarPopup(Popup):
         if self._icon_counter == len(self._loading_icons):
             self._icon_counter = 0
 
-        self.text = '{}{} ({}/{}) {}'.format(   '#' * completed_blocks, 
+        self.set_text('{}{} ({}/{}) {}'.format( '#' * completed_blocks, 
                                                 '-' * non_completed_blocks, 
                                                 self._completed_items, 
                                                 self._num_items, 
-                                                self._loading_icons[self._icon_counter])
+                                                self._loading_icons[self._icon_counter]))
         super()._draw()

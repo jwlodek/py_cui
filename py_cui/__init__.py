@@ -303,9 +303,9 @@ class PyCUI:
         """Function that creates the renderer object that will draw each widget
         """
 
-        self.renderer = renderer.Renderer(self, self._stdscr, self._logger)
+        self._renderer = renderer.Renderer(self, self._stdscr, self._logger)
         for widget_id in self._widgets.keys():
-            self._widgets[widget_id]._assign_renderer(self.renderer)
+            self._widgets[widget_id]._assign_renderer(self._renderer)
         if self._popup is not None:
             self._popup._assign_renderer(self._renderer)
 
@@ -686,7 +686,9 @@ class PyCUI:
 
         widget_list = []
         id_list     = []
-        for i in range(0, self._grid._num_columns):
+        _, num_cols = self._grid.get_dimensions()
+
+        for i in range(0, num_cols):
             for widget_id in self._widgets.keys():
                 if self._widgets[widget_id]._is_row_col_inside(row, i) and self._widgets[widget_id] not in widget_list:
                     widget_list.append(self._widgets[widget_id])
@@ -712,8 +714,9 @@ class PyCUI:
 
         widget_list = []
         id_list     = []
-        
-        for i in range(0, self._grid.num_rows):
+        num_rows, _ = self._grid.get_dimensions()
+
+        for i in range(0, num_rows):
             for widget_id in self._widgets:
                 if self._widgets[widget_id]._is_row_col_inside(i, col) and self._widgets[widget_id] not in widget_list:
                     widget_list.append(self._widgets[widget_id])
@@ -750,18 +753,18 @@ class PyCUI:
 
         # Find all the widgets in the given row or column
         if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
-            widgets = [i.id for i in self._get_widgets_by_col(column)]
+            widgets = [w.get_id() for w in self._get_widgets_by_col(column)]
             vertical = True
         elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
-            widgets = [i.id for i in self._get_widgets_by_row(row)]
+            widgets = [w.get_id() for w in self._get_widgets_by_row(row)]
             vertical = False
         else:
             return None
 
         if vertical:
-            widgets = sorted(widgets, key=lambda x: self._widgets[x].column)
+            widgets = sorted(widgets, key=lambda x: self._widgets[x].get_grid_cell()[1])
         else:
-            widgets = sorted(widgets, key=lambda x: self._widgets[x].row)
+            widgets = sorted(widgets, key=lambda x: self._widgets[x].get_grid_cell()[0])
 
         # Find the widget and move from there
         current_index = widgets.index(start_widget)
@@ -859,6 +862,7 @@ class PyCUI:
         """
 
         color=WHITE_ON_BLACK
+        self._logger.debug(str(self._renderer))
         self._popup = py_cui.popups.MessagePopup(self, title, text, color, self._renderer, self._logger)
         self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
@@ -929,7 +933,7 @@ class PyCUI:
         """
 
         color=WHITE_ON_BLACK
-        self.popup = py_cui.popups.TextBoxPopup(self, title, color, command, self.renderer, self._logger, password)
+        self._popup = py_cui.popups.TextBoxPopup(self, title, color, command, self._renderer, self._logger, password)
         self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
@@ -951,7 +955,7 @@ class PyCUI:
         """
 
         color       = WHITE_ON_BLACK
-        self.popup  = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self.renderer, self._logger, run_command_if_none)
+        self._popup  = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self._renderer, self._logger, run_command_if_none)
         self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
@@ -1007,9 +1011,9 @@ class PyCUI:
             if isinstance(self._popup, py_cui.popups.LoadingBarPopup):
                 self._popup._increment_counter()
             else:
-                self._logger.warn('increment_loading_bar: Open popup is not a loading bar popup')
+                self._logger.warn('Open popup is not a loading bar popup')
         else:
-            self._logger.warn('increment_loading_bar: No popup is currently opened.')
+            self._logger.warn('No popup is currently opened.')
 
 
     def stop_loading_popup(self):
@@ -1019,11 +1023,11 @@ class PyCUI:
         """
 
         self._loading = False
-        self._close_popup()
+        self.close_popup()
         self._logger.info('Stopping  open loading popup')
 
 
-    def _close_popup(self):
+    def close_popup(self):
         """Closes the popup, and resets focus
         """
 
@@ -1042,11 +1046,15 @@ class PyCUI:
             Window width in terminal characters
         """
 
-        self._width  = width
         self._height = height
+        self._width  = width
         self._grid._update_grid_height_width(self._height, self._width)
         for widget_id in self._widgets.keys():
             self._widgets[widget_id]._update_height_width()
+
+    def get_absolute_size(self):
+        self._logger.debug('{},{}'.format(self._height, self._width))
+        return self._height, self._width
 
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
@@ -1132,24 +1140,26 @@ class PyCUI:
             if key_pressed == py_cui.keys.KEY_ESCAPE:
                 self.status_bar.set_text(self._init_status_bar_text)
                 self._in_focused_mode = False
-                selected_widget.selected = False
+                selected_widget.set_selected(False)
             else:
                 # widget handles remaining py_cui.keys
                 selected_widget._handle_key_press(key_pressed)
 
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         elif self._popup is None:
-            if key_pressed == py_cui.keys.KEY_ENTER and self._selected_widget is not None and selected_widget.is_selectable:
+            if key_pressed == py_cui.keys.KEY_ENTER and self._selected_widget is not None and selected_widget.is_selectable():
                 self._in_focused_mode = True
-                selected_widget.selected = True
+                selected_widget.set_selected(True)
+
                 # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
                 if self._auto_focus_buttons and isinstance(selected_widget, widgets.Button):
                     self._in_focused_mode = False
-                    selected_widget.selected = False
+                    selected_widget.set_selected(False)
                     if selected_widget.command is not None:
                         selected_widget.command()
                 else:
                     self.status_bar.set_text(selected_widget.get_help_text())
+    
             for key in self._keybindings.keys():
                 if key_pressed == key:
                     command = self._keybindings[key]
@@ -1158,7 +1168,8 @@ class PyCUI:
             # If not in focus mode, use the arrow py_cui.keys to move around the selectable widgets.
             neighbor = None
             if key_pressed == py_cui.keys.KEY_UP_ARROW or key_pressed == py_cui.keys.KEY_DOWN_ARROW or key_pressed == py_cui.keys.KEY_LEFT_ARROW or key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-                neighbor = self._check_if_neighbor_exists(selected_widget.row, selected_widget.column, key_pressed)
+                row, col = selected_widget.get_grid_cell()
+                neighbor = self._check_if_neighbor_exists(row, col, key_pressed)
             if neighbor is not None:
                 selected_widget.selected = False
                 self.set_selected_widget(neighbor)
@@ -1190,7 +1201,7 @@ class PyCUI:
 
         # If user sets non-default border characters, update them here
         if self._border_characters is not None:
-            self._renderer.set_border_renderer_chars(self._border_characters)
+            self._renderer._set_border_renderer_chars(self._border_characters)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
         while key_pressed != self._exit_key or self._in_focused_mode or self._popup is not None:

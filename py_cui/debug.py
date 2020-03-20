@@ -35,7 +35,7 @@ def _enable_logging(logger, filename='py_cui_log.txt', logging_level=logging.DEB
         raise TypeError('Only the PyCUILogger can be used for logging in the py_cui module.')
 
     log_file    = logging.FileHandler(filename)
-    formatter   = logging.Formatter('%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s')
+    formatter   = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s | %(message)s')
     log_file.setFormatter(formatter)
     logger.addHandler(log_file)
     logger.setLevel(logging_level)
@@ -111,7 +111,7 @@ class PyCUILogger(logging.Logger):
         """
 
         func = inspect.currentframe().f_back.f_back.f_code
-        return "{}: Function {} in {}:{}".format(text, func.co_name, func.co_filename, func.co_firstlineno)
+        return "{}: Function {} in {}:{}".format(text, func.co_name, os.path.basename(func.co_filename), func.co_firstlineno)
     
     
     def info(self, text):
