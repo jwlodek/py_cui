@@ -1169,6 +1169,7 @@ class PyCUI:
         stdscr.attron(curses.color_pair(RED_ON_BLACK))
         stdscr.addstr(0, 0, 'Error displaying CUI!!!')
         stdscr.addstr(1, 0, 'Error Type: {}'.format(error_info))
+        stdscr.addstr(2, 0, 'Most likely terminal dimensions are too small.')
         stdscr.attroff(curses.color_pair(RED_ON_BLACK))
         stdscr.refresh()
         self._logger.debug('Encountered error -> {}'.format(error_info))
@@ -1301,12 +1302,15 @@ class PyCUI:
                 # Handle keypresses
                 self._handle_key_presses(key_pressed)
 
-                # Draw status/title bar, and all widgets. Selected widget will be bolded.
-                self._draw_status_bars(stdscr, height, width)
-                self._draw_widgets()
-                # draw the popup if required
-                if self._popup is not None:
-                    self._popup._draw()
+                try:
+                    # Draw status/title bar, and all widgets. Selected widget will be bolded.
+                    self._draw_status_bars(stdscr, height, width)
+                    self._draw_widgets()
+                    # draw the popup if required
+                    if self._popup is not None:
+                        self._popup._draw()
+                except Exception as e:
+                    self._display_window_warning(stdscr, str(e))
 
                 # Refresh the screen
                 stdscr.refresh()
@@ -1326,8 +1330,6 @@ class PyCUI:
             except KeyboardInterrupt:
                 self._logger.debug('Detect Keyboard Interrupt, Exiting...')
                 self._stopped = True
-            #except Exception as e:
-            #    self._display_window_warning(stdscr, str(e))
 
 
         stdscr.clear()
