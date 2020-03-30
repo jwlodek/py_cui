@@ -21,7 +21,7 @@ class MultiWindowDemo:
         self.widget_set_A = self.root.get_widget_set()
 
         # Create a second widget set (window). This one will have a 5x5 grid, not 3x3 like the original CUI
-        self.widget_set_B = py_cui.widget_set.WidgetSet(5, 5)
+        self.widget_set_B = self.root.create_new_widget_set(5, 5)
 
         # Add a text box to the second widget set
         self.text_box_B = self.widget_set_B.add_text_box('Enter something', 0, 0, column_span=2)

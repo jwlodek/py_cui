@@ -97,8 +97,8 @@ class PopupExample:
         elif new_color == "MAGENTA":
             color = py_cui.MAGENTA_ON_BLACK
         for key in self.master.widgets.keys():
-            if isinstance(self.master.widgets[key], py_cui.widgets.Button):
-                self.master.widgets[key].color = color
+            if isinstance(self.master.get_widgets()[key], py_cui.widgets.Button):
+                self.master.get_widgets()[key].set_color(color)
 
 
     # -------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ class PopupExample:
         """
 
         counter = 0
-        for i in range(0, 100):
+        for _ in range(0, 100):
             time.sleep(0.1)
             counter= counter +1
             self.master.status_bar.set_text(str(counter))
