@@ -374,7 +374,7 @@ class PyCUI:
             Vertical border character
         """
 
-        self.border_characters = {
+        self._border_characters = {
             'UP_LEFT'       : upper_left_corner,
             'UP_RIGHT'      : upper_right_corner,
             'DOWN_LEFT'     : lower_left_corner,
@@ -382,7 +382,7 @@ class PyCUI:
             'HORIZONTAL'    : horizontal,
             'VERTICAL'      : vertical
         }
-        self._logger.debug('Set border_characters to {}'.format(self.border_characters))
+        self._logger.debug('Set border_characters to {}'.format(self._border_characters))
 
 
     def get_widgets(self):
@@ -862,7 +862,7 @@ class PyCUI:
         if self._in_focused_mode:
             self._in_focused_mode = False
             self.status_bar.set_text(self._init_status_bar_text)
-            self.get_widgets()[self._selected_widget].selected = False
+            self.get_widgets()[self._selected_widget].set_selected(False)
         else:
             self._logger.info('lose_focus: Not currently in focus mode')
 
