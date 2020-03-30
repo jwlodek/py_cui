@@ -29,9 +29,9 @@ class SimpleTodoList:
         self.save_todo_button = self.master.add_button('Save',             7, 4, column_span=2,    command=self.save_todo_file)
 
         # add some custom keybindings
-        self.new_todo_textbox.add_key_command(          py_cui.keys.KEY_ENTER, self.push_and_reset)
-        self.todo_scroll_cell.add_key_command(          py_cui.keys.KEY_ENTER, self.mark_as_in_progress)
-        self.in_progress_scroll_cell.add_key_command(   py_cui.keys.KEY_ENTER, self.mark_as_done)
+        self.new_todo_textbox.add_key_command(          py_cui.keys.Key.ENTER, self.push_and_reset)
+        self.todo_scroll_cell.add_key_command(          py_cui.keys.Key.ENTER, self.mark_as_in_progress)
+        self.in_progress_scroll_cell.add_key_command(   py_cui.keys.Key.ENTER, self.mark_as_done)
         self.read_todo_file()
 
 

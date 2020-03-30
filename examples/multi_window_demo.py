@@ -25,7 +25,7 @@ class MultiWindowDemo:
 
         # Add a text box to the second widget set
         self.text_box_B = self.widget_set_B.add_text_box('Enter something', 0, 0, column_span=2)
-        self.text_box_B.add_key_command(py_cui.keys.KEY_ENTER, self.open_set_A)
+        self.text_box_B.add_key_command(py_cui.keys.Key.ENTER, self.open_set_A)
 
 
     def open_set_A(self):

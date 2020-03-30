@@ -26,15 +26,15 @@ class SuperNano:
         self.dir = dir
 
         # If we press 's' we want to save the opened file
-        self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self.save_opened_file)
+        self.root.add_key_command(py_cui.keys.Key.S_LOWER, self.save_opened_file)
 
         # Add a file selection menu
         self.file_menu = self.root.add_scroll_menu('Directory Files', 0, 0, row_span=5, column_span=2)
 
         # With ENTER key press, we open the selected file or directory, DELETE will delete the selected file or directory
         # See the callback functions for how these operations are performed
-        self.file_menu.add_key_command(py_cui.keys.KEY_ENTER, self.open_file_dir)
-        self.file_menu.add_key_command(py_cui.keys.KEY_DELETE, self.delete_selected_file)
+        self.file_menu.add_key_command(py_cui.keys.Key.ENTER, self.open_file_dir)
+        self.file_menu.add_key_command(py_cui.keys.Key.DELETE, self.delete_selected_file)
 
         # To better distingusish directories, add a color rule that is used to color directory names green
         # First parameter is a regex, second is color, third is how the rule should check the regex against the line.
@@ -46,7 +46,7 @@ class SuperNano:
         self.current_dir_box.set_text(self.dir)
 
         # You can manually enter directory path, and ENTER will try to open it
-        self.current_dir_box.add_key_command(py_cui.keys.KEY_ENTER, self.open_new_directory)
+        self.current_dir_box.add_key_command(py_cui.keys.Key.ENTER, self.open_new_directory)
 
         # Function that opens initial directory
         self.open_new_directory()
@@ -56,7 +56,7 @@ class SuperNano:
 
         # Add a textbox for adding new files on ENTER key
         self.new_file_textbox = self.root.add_text_box('Add New File', 5, 0, column_span=2)
-        self.new_file_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.add_new_file)
+        self.new_file_textbox.add_key_command(py_cui.keys.Key.ENTER, self.add_new_file)
 
 
     def open_new_directory(self):
