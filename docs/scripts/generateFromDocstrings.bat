@@ -6,3 +6,5 @@ git clone https://github.com/jwlodek/npdoc2md
 cd npdoc2md
 git pull
 py npdoc2md.py -i ..\..\..\py_cui -o ..\..\DocstringGenerated -s statusbar.py errors.py
+cd ..
+rmdir /s /q npdoc2md
