@@ -11,7 +11,7 @@ In some extreme cases there may be exceptions to this, but in general I would li
 
 #### Make sure the unit tests pass
 
-If you make a pull request and Travis tells you a unit test failed, please fix the issue and append to the pull request. I will most likely only look closely at pull requests that don't show any issues with the CI. Note that if your changes edit existing functions, you may need to edit the test itself to reflect them. If you are adding a new feature, please add unit tests and confirm they pass as well.
+If you make a pull request and the CI tells you a unit test failed, please fix the issue and append to the pull request. I will most likely only look closely at pull requests that don't show any issues with the CI. Note that if your changes edit existing functions, you may need to edit the test itself to reflect them. If you are adding a new feature, please add unit tests and confirm they pass as well.
 
 #### Use consistent numpy documentation
 
