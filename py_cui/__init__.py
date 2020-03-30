@@ -134,9 +134,10 @@ class PyCUI:
             height  = simulated_terminal[0]
             width   = simulated_terminal[1]
 
-        self._height     = height
-        self._width      = width
-        self._height     = self._height - 4
+        # Init terminal height width. Subtract 4 from height for title/status bar and padding
+        self._height                = height
+        self._width                 = width
+        self._height                = self._height - 4
 
         # Add status and title bar
         self._title_bar             = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
@@ -145,25 +146,25 @@ class PyCUI:
         self.status_bar             = py_cui.statusbar.StatusBar(self._init_status_bar_text, BLACK_ON_WHITE)
 
         # Logging object for py_cui
-        self._logger = py_cui.debug._initialize_logger(self, name='py_cui')
+        self._logger                = py_cui.debug._initialize_logger(self, name='py_cui')
 
         # Initialize grid, renderer, and widget dict
-        self._grid                 = grid.Grid(num_rows, num_cols, self._height, self._width, self._logger)
-        self._renderer             = None
-        self._border_characters    = None
-        self._stdscr               = None
-        self._widgets              = {}
+        self._grid                  = grid.Grid(num_rows, num_cols, self._height, self._width, self._logger)
+        self._renderer              = None
+        self._border_characters     = None
+        self._stdscr                = None
+        self._widgets               = {}
 
         # Variables for determining selected widget/focus mode
-        self._selected_widget      = None
-        self._in_focused_mode      = False
-        self._popup                = None
-        self._auto_focus_buttons   = auto_focus_buttons
+        self._selected_widget       = None
+        self._in_focused_mode       = False
+        self._popup                 = None
+        self._auto_focus_buttons    = auto_focus_buttons
 
         # CUI blocks when loading popup is open
-        self._loading                  = False
-        self._stopped                  = False
-        self._post_loading_callback    = None
+        self._loading               = False
+        self._stopped               = False
+        self._post_loading_callback = None
 
         # Top level keybindings. Exit key is 'q' by default
         self._keybindings  = {}
@@ -227,10 +228,33 @@ class PyCUI:
             height  = height - 4
             
             self._refresh_height_width(height, width)
-            self._initialize_widget_renderer()
-            self._selected_widget = new_widget_set.selected_widget
+            if self._stdscr is not None:
+                self._initialize_widget_renderer()
+            self._selected_widget = new_widget_set._selected_widget
         else:
             raise TypeError('Argument must be of type py_cui.widget_set.WidgetSet')
+
+
+    def create_new_widget_set(self, num_rows, num_cols):
+        """Function that is used to create additional widget sets
+
+        Use this function instead of directly creating widget set object instances, to allow
+        for logging support.
+
+        Parameters
+        ----------
+        num_rows : int
+            row count for new widget set
+        num_cols : int
+            column count for new widget set
+        
+        Returns
+        -------
+        new_widget_set : py_cui.widget_set.WidgetSet
+            The new widget set object instance
+        """
+
+        return py_cui.widget_set.WidgetSet(num_rows, num_cols, self._logger, simulated_terminal=self._simulated_terminal)
 
 
     # ----------------------------------------------#
@@ -959,7 +983,7 @@ class PyCUI:
         """
 
         color=WHITE_ON_BLACK
-        self._popup = py_cui.popups.TextBoxPopup(self, title, color, command, self._renderer, self._logger, password)
+        self._popup = py_cui.popups.TextBoxPopup(self, title, color, command, self._renderer, password, self._logger)
         self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
@@ -1302,8 +1326,9 @@ class PyCUI:
             except KeyboardInterrupt:
                 self._logger.debug('Detect Keyboard Interrupt, Exiting...')
                 self._stopped = True
-            except Exception as e:
-                self._display_window_warning(stdscr, str(e))
+            #except Exception as e:
+            #    self._display_window_warning(stdscr, str(e))
+
 
         stdscr.clear()
         stdscr.refresh()

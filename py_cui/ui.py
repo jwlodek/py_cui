@@ -65,14 +65,14 @@ class UIElement:
         """Must be implemented by subclass, computes the absolute coords of upper-left corner
         """
 
-        pass
+        return 0, 0
 
 
     def get_absolute_stop_pos(self):
         """Must be implemented by subclass, computes the absolute coords of bottom-right corner
         """
 
-        pass
+        return 1, 1
 
 
     def get_absolute_dimensions(self):
@@ -219,6 +219,18 @@ class UIElement:
         return self._help_text
 
 
+    def set_title(self, title):
+        """Function that sets the widget title.
+
+        Parameters
+        ----------
+        title : str
+            New widget title
+        """
+
+        self._title = title
+
+
     def set_color(self, color):
         """Sets element default color
 
@@ -253,6 +265,18 @@ class UIElement:
         """
 
         self._help_text = help_text
+
+
+    def set_focus_text(self, focus_text):
+        """Sets status bar focus text. Legacy function, overridden by set_focus_text
+
+        Parameters
+        ----------
+        focus_text : str
+            New statusbar help text
+        """
+
+        self._help_text = focus_text
 
 
     def _handle_key_press(self, key_pressed):

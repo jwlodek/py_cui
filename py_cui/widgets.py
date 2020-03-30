@@ -91,6 +91,21 @@ class Widget(py_cui.ui.UIElement):
         self._key_commands[key] = command
 
 
+    def update_key_command(self, key, command):
+        """Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
+
+        Parameters
+        ----------
+        key : py_cui.keys.KEY
+            ascii keycode used to map the key
+        command : function without args
+            a non-argument function or lambda function to execute if in focus mode and key is pressed
+        """
+
+        if key in self._key_commands.keys():
+            self.add_key_command(key, command)
+
+
     def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
         """Forces renderer to draw text using given color if text_condition_function returns True
 
@@ -577,7 +592,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         """
 
         super().update_height_width()
-        padx, _          = self.get_padding()
+        padx, _             = self.get_padding()
         start_x, start_y    = self.get_start_position()
         height, width       = self.get_absolute_dimensions()
         self._initial_cursor     = start_x + padx + 2
