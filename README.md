@@ -113,6 +113,7 @@ Project | Description
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
 [tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
+[hue-tui](https://github.com/channel-42/hue-tui) | A CUI controlling for Philips Hue lights.
 
 ### License
 
