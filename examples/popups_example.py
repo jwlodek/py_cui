@@ -8,6 +8,7 @@ import py_cui
 import time
 import os
 import threading
+import logging
 
 class PopupExample:
 
@@ -71,8 +72,7 @@ class PopupExample:
         self.master.show_text_box_popup('Please enter a new window title', self.reset_title)
 
     def reset_title(self, new_title):
-        self.master.title = new_title
-
+        self.master.set_title(new_title)
 
     # -------------------------------------------------------------------------------
     # The menu popup requires a list of strings, which will serve as menu items.
@@ -97,8 +97,8 @@ class PopupExample:
         elif new_color == "MAGENTA":
             color = py_cui.MAGENTA_ON_BLACK
         for key in self.master.widgets.keys():
-            if isinstance(self.master.widgets[key], py_cui.widgets.Button):
-                self.master.widgets[key].color = color
+            if isinstance(self.master.get_widgets()[key], py_cui.widgets.Button):
+                self.master.get_widgets()[key].set_color(color)
 
 
     # -------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ class PopupExample:
         """
 
         counter = 0
-        for i in range(0, 100):
+        for _ in range(0, 100):
             time.sleep(0.1)
             counter= counter +1
             self.master.status_bar.set_text(str(counter))
@@ -144,5 +144,6 @@ class PopupExample:
 # Create the CUI, pass it to the wrapper object, and start it
 root = py_cui.PyCUI(3, 3)
 root.set_title('CUI Popups Example')
+root.enable_logging(logging_level=logging.DEBUG)
 s = PopupExample(root)
 root.start()

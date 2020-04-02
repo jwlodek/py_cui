@@ -79,7 +79,7 @@ class AutoGitCUI:
         # Key commands for our file menus. Enter will git add, Space will show diff
         self.add_files_menu.add_key_command(py_cui.keys.KEY_ENTER, self.add_revert_file)
         self.add_files_menu.add_key_command(py_cui.keys.KEY_SPACE, self.open_git_diff)
-        self.add_files_menu.help_text = 'Enter - git add, Space - see diff, Arrows - scroll, Esc - exit'
+        self.add_files_menu.set_help_text('Enter - git add, Space - see diff, Arrows - scroll, Esc - exit')
 
         # Enter will show remote info
         self.git_remotes_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_remote_info)
@@ -127,9 +127,9 @@ class AutoGitCUI:
         try:
             commit_val = self.git_commits_menu.get()[:7]
             proc = Popen(['git', 'diff', commit_val], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode()
-            self.diff_text_block.title = 'Git Diff for {}'.format(commit_val)
+            self.diff_text_block.set_title('Git Diff for {}'.format(commit_val))
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to read commit diff information')
@@ -137,7 +137,7 @@ class AutoGitCUI:
     def add_all(self):
         try:
             proc = Popen(['git', 'add', '-A'], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            _, _ = proc.communicate()
             self.refresh_git_status(preserve_selected=True)
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to reset file, please check git installation')
@@ -147,9 +147,9 @@ class AutoGitCUI:
         try:
             remote = self.git_remotes_menu.get()
             proc = Popen(['git', 'remote', 'show', '-n', remote], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode()
-            self.diff_text_block.title = 'Git Remote Info'
+            self.diff_text_block.set_title('Git Remote Info')
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Error', 'Unable to open git remote info, please check git installation')
@@ -157,7 +157,7 @@ class AutoGitCUI:
 
     def open_editor(self):
         try:
-            proc = Popen(['code', '.'], stdout=PIPE, stderr=PIPE)
+            _ = Popen(['code', '.'], stdout=PIPE, stderr=PIPE)
         except:
             self.root.show_warning_popup('Open Failed', 'Please install VSCode')
 
@@ -165,9 +165,9 @@ class AutoGitCUI:
         try:
             branch = self.branch_menu.get()[2:]
             proc = Popen(['git', '--no-pager', 'log', branch], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode()
-            self.diff_text_block.title='Git Log'
+            self.diff_text_block.set_title('Git Log')
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Error', 'Unable to open git log, please check git installation')
@@ -180,7 +180,7 @@ class AutoGitCUI:
             return
         try:
             proc = Popen(['git', 'checkout', '-b', new_branch_name])
-            out, err = proc.communicate()
+            _, err = proc.communicate()
             res = proc.returncode
             if res != 0:
                 self.root.show_error_popup('Create Branch Failed Failed', '{}'.format(err))
@@ -203,7 +203,7 @@ class AutoGitCUI:
                 self.root.show_error_popup('Invalid Commit Message', 'Please enter a commit message')
                 return
             proc = Popen(['git', 'commit', '-m', message])
-            out, err = proc.communicate()
+            _, err = proc.communicate()
             res = proc.returncode
             if res != 0:
                 self.root.show_error_popup('Create Branch Failed Failed', '{}'.format(err))
@@ -219,7 +219,7 @@ class AutoGitCUI:
         try:
             target = self.branch_menu.get()[2:]
             proc = Popen(['git', 'checkout', target])
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             res = proc.returncode
             if res != 0:
                 self.root.show_error_popup('Checkout Failed', '{}'.format(out))
@@ -233,7 +233,7 @@ class AutoGitCUI:
     def revert_changes(self):
         try:
             target = self.add_files_menu.get()[3:]
-            proc = Popen(['git', 'reset', 'HEAD', target])
+            _ = Popen(['git', 'reset', 'HEAD', target])
             self.refresh_git_status(preserve_selected=True)
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to reset file, please check git installation')
@@ -243,7 +243,7 @@ class AutoGitCUI:
         target = self.add_files_menu.get()[3:]
         self.diff_text_block.title = '{} File Diff'.format(target)
         proc = Popen(['git', 'diff', target], stdout=PIPE, stderr=PIPE)
-        out, err = proc.communicate()
+        out, _ = proc.communicate()
         out = out.decode()
         self.diff_text_block.set_text(out)
 
@@ -253,7 +253,7 @@ class AutoGitCUI:
             target = self.add_files_menu.get()
             if target.startswith(' ') or target.startswith('?'):
                 target = target[3:]
-                proc = Popen(['git', 'add', target], stdout=PIPE, stderr=PIPE)
+                _ = Popen(['git', 'add', target], stdout=PIPE, stderr=PIPE)
                 self.refresh_git_status(preserve_selected=True)
             else:
                 self.revert_changes()
@@ -265,7 +265,7 @@ class AutoGitCUI:
 
         try:
             proc = Popen(['git', 'branch'], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode().splitlines()
             self.branch_menu.clear()
             self.branch_menu.add_item_list(out)
@@ -275,33 +275,33 @@ class AutoGitCUI:
                     break
                 selected_branch = selected_branch + 1
 
-            remote = self.git_remotes_menu.selected_item
+            remote = self.git_remotes_menu.get_selected_item()
             proc = Popen(['git', 'remote'], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode().splitlines()
             self.git_remotes_menu.clear()
             self.git_remotes_menu.add_item_list(out)
 
             proc = Popen(['git', '--no-pager', 'log', self.branch_menu.get()[2:], '--oneline'], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode().splitlines()
             self.git_commits_menu.clear()
             self.git_commits_menu.add_item_list(out)
 
-            selected_file = self.add_files_menu.selected_item
+            selected_file = self.add_files_menu.get_selected_item()
             proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             out = out.decode().splitlines()
             self.add_files_menu.clear()
             self.add_files_menu.add_item_list(out)
 
             if preserve_selected:
                 if len(self.branch_menu.get_item_list()) > selected_branch:
-                    self.branch_menu.selected_item = selected_branch
+                    self.branch_menu.set_selected_item(selected_branch)
                 if len(self.git_remotes_menu.get_item_list()) > remote:
                     self.git_remotes_menu.selected_item = remote
                 if len(self.add_files_menu.get_item_list()) > selected_file:
-                    self.add_files_menu.selected_item = selected_file
+                    self.add_files_menu.set_selected_item(selected_file)
 
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to get git status, please check git installation')
@@ -312,7 +312,7 @@ class AutoGitCUI:
             target = self.branch_menu.get()[2:]
             remote = self.remote_menu.get()
             proc = Popen(['git', 'pull', remote, target, target])
-            out, err = proc.communicate()
+            out, _ = proc.communicate()
             res = proc.returncode
             if res != 0:
                 self.root.show_error_popup('Checkout Failed', '{}'.format(out))

@@ -118,4 +118,4 @@ Project | Description
 
 BSD 3-Clause License
 
-Copyright (c) 2019, Jakub Wlodek
+Copyright (c) 2019-2020, Jakub Wlodek

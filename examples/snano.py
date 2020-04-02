@@ -94,8 +94,8 @@ class SuperNano:
         # Add item to file menu, and refresh. File not saved to disk until 's' pressed.
         self.file_menu.add_item(self.new_file_textbox.get())
         self.file_menu.selected_item = len(self.file_menu.get_item_list()) - 1
-        self.new_file_textbox.selected = False
-        self.root.set_selected_widget(self.edit_text_block.id)
+        self.new_file_textbox.set_selected(False)
+        self.root.set_selected_widget(self.edit_text_block.get_id())
         self.edit_text_block.title = self.new_file_textbox.get()
         self.edit_text_block.clear()
         self.new_file_textbox.clear()
@@ -116,7 +116,7 @@ class SuperNano:
                 text = fp.read()
                 fp.close()
                 self.edit_text_block.set_text(text)
-                self.edit_text_block.title = filename
+                self.edit_text_block.set_title(filename)
             except:
                 # if we get an error, it wasn't a text file, so show warning poup
                 self.root.show_warning_popup('Not a text file', 'The selected file could not be opened - not a text file')
@@ -124,22 +124,22 @@ class SuperNano:
 
     def save_opened_file(self):
         # If we have an opened file, save it to the disk
-        if self.edit_text_block.title != 'Open file':
-            fp = open(os.path.join(self.dir, self.edit_text_block.title), 'w')
+        if self.edit_text_block.get_title() != 'Open file':
+            fp = open(os.path.join(self.dir, self.edit_text_block.get_title()), 'w')
             fp.write(self.edit_text_block.get())
             fp.close()
-            self.root.show_message_popup('Saved', 'Your file has been saved as {}'.format(self.edit_text_block.title))
+            self.root.show_message_popup('Saved', 'Your file has been saved as {}'.format(self.edit_text_block.get_title()))
         else:
             self.root.show_error_popup('No File Opened', 'Please open a file before saving it.')
 
 
     def delete_selected_file(self):
         # If we have an opened file, delete it from the disk
-        if self.edit_text_block.title != 'Open file':
+        if self.edit_text_block.get_title() != 'Open file':
             try:
-                os.remove(os.path.join(self.dir, self.edit_text_block.title))
+                os.remove(os.path.join(self.dir, self.edit_text_block.get_title()))
                 self.edit_text_block.clear()
-                self.edit_text_block.title = 'Open file'
+                self.edit_text_block.set_title('Open file')
                 self.file_menu.remove_selected_item()
             except OSError:
                 self.root.show_error_popup('OS Error', 'Operation could not be completed due to an OS error.')

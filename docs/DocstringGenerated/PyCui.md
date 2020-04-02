@@ -85,17 +85,20 @@ create an instance of this class, and then add cells + widgets to it.
 
  Method  | Doc
 -----|-----
+ enable_logging | Function enables logging for py_cui library
  get_widget_set | Gets widget set object from current widgets.
  apply_widget_set | Function that replaces all widgets in a py_cui with those of a different widget set
+ create_new_widget_set | Function that is used to create additional widget sets
  start | Function that starts the CUI
  stop | Function that stops the CUI, and fires the callback function.
  run_on_exit | Sets callback function on CUI exit. Must be a no-argument function or lambda function
  set_title | Sets the title bar text
  set_status_bar_text | Sets the status bar text when in overview mode
- initialize_colors | Function for initialzing curses colors. Called when CUI is first created.
- initialize_widget_renderer | Function that creates the renderer object that will draw each widget
+ _initialize_colors | Function for initialzing curses colors. Called when CUI is first created.
+ _initialize_widget_renderer | Function that creates the renderer object that will draw each widget
  toggle_unicode_borders | Function for toggling unicode based border rendering
  set_widget_border_characters | Function that can be used to set arbitrary border characters for drawing widget borders by renderer.
+ get_widgets | Function that gets current set of widgets
  add_scroll_menu | Function that adds a new scroll menu to the CUI grid
  add_checkbox_menu | Function that adds a new checkbox menu to the CUI grid
  add_text_box | Function that adds a new text box to the CUI grid
@@ -103,11 +106,11 @@ create an instance of this class, and then add cells + widgets to it.
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
- get_widgets_by_row | Gets all widgets in a specific row
- get_widgets_by_col | Gets all widgets in a specific column
- check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
+ _get_widgets_by_row | Gets all widgets in a specific row
+ _get_widgets_by_col | Gets all widgets in a specific column
+ _check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
+ get_selected_widget |
  set_selected_widget | Function that sets the selected cell for the CUI
- get_widget_id | Function for grabbing widget ID
  lose_focus | Function that forces py_cui out of focus mode.
  move_focus | Moves focus mode to different widget
  add_key_command | Function that adds a keybinding to the CUI when in overview mode
@@ -122,12 +125,13 @@ create an instance of this class, and then add cells + widgets to it.
  increment_loading_bar | Increments progress bar if loading bar popup is open
  stop_loading_popup | Leaves loading state, and closes popup.
  close_popup | Closes the popup, and resets focus
- refresh_height_width | Function that updates the height and width of the CUI based on terminal window size
- draw_widgets | Function that draws all of the widgets to the screen
- draw_status_bars | Draws status bar and title bar
- display_window_warning | Function that prints some basic error info if there is an error with the CUI
- handle_key_presses | Function that handles all main loop key presses.
- draw | Main CUI draw loop called by start()
+ _refresh_height_width | Function that updates the height and width of the CUI based on terminal window size
+ get_absolute_size | Returns dimensions of CUI
+ _draw_widgets | Function that draws all of the widgets to the screen
+ _draw_status_bars | Draws status bar and title bar
+ _display_window_warning | Function that prints some basic error info if there is an error with the CUI
+ _handle_key_presses | Function that handles all main loop key presses.
+ _draw | Main CUI draw loop called by start()
  __format__ | Override of base format function. Prints list of current widgets.
 
 
@@ -136,10 +140,24 @@ create an instance of this class, and then add cells + widgets to it.
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER)
+def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal=None)
 ```
 
 Constructor for PyCUI class
+
+
+
+
+
+
+
+### enable_logging
+
+```python
+def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG)
+```
+
+Function enables logging for py_cui library
 
 
 
@@ -184,6 +202,37 @@ Function that replaces all widgets in a py_cui with those of a different widget 
  Parameter  | Type  | Doc
 -----|----------|-----
  new_widget_set  |  WidgetSet | The new widget set to switch to
+
+
+
+
+
+### create_new_widget_set
+
+```python
+def create_new_widget_set(self, num_rows, num_cols)
+```
+
+Function that is used to create additional widget sets
+
+
+
+Use this function instead of directly creating widget set object instances, to allow
+for logging support.
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ num_rows  |  int | row count for new widget set
+ num_cols  |  int | column count for new widget set
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ new_widget_set  |  py_cui.widget_set.WidgetSet | The new widget set object instance
 
 
 
@@ -282,10 +331,10 @@ Sets the status bar text when in overview mode
 
 
 
-### initialize_colors
+### _initialize_colors
 
 ```python
-def initialize_colors(self)
+def _initialize_colors(self)
 ```
 
 Function for initialzing curses colors. Called when CUI is first created.
@@ -296,10 +345,10 @@ Function for initialzing curses colors. Called when CUI is first created.
 
 
 
-### initialize_widget_renderer
+### _initialize_widget_renderer
 
 ```python
-def initialize_widget_renderer(self)
+def _initialize_widget_renderer(self)
 ```
 
 Function that creates the renderer object that will draw each widget
@@ -345,6 +394,27 @@ Function that can be used to set arbitrary border characters for drawing widget 
  lower_right_corner  |  char | Lower right corner character
  horizontal  |  char | Horizontal border character
  vertical  |  char | Vertical border character
+
+
+
+
+
+### get_widgets
+
+```python
+def get_widgets(self)
+```
+
+Function that gets current set of widgets
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ widgets  |  dict of str -> widget | dictionary mapping widget IDs to object instances
 
 
 
@@ -587,10 +657,10 @@ Function that adds a new button to the CUI grid
 
 
 
-### get_widgets_by_row
+### _get_widgets_by_row
 
 ```python
-def get_widgets_by_row(self, row)
+def _get_widgets_by_row(self, row)
 ```
 
 Gets all widgets in a specific row
@@ -614,10 +684,10 @@ Gets all widgets in a specific row
 
 
 
-### get_widgets_by_col
+### _get_widgets_by_col
 
 ```python
-def get_widgets_by_col(self, col)
+def _get_widgets_by_col(self, col)
 ```
 
 Gets all widgets in a specific column
@@ -641,10 +711,10 @@ Gets all widgets in a specific column
 
 
 
-### check_if_neighbor_exists
+### _check_if_neighbor_exists
 
 ```python
-def check_if_neighbor_exists(self, row, column, direction)
+def _check_if_neighbor_exists(self, row, column, direction)
 ```
 
 Function that checks if widget has neighbor in specified cell.
@@ -672,6 +742,20 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 
 
 
+### get_selected_widget
+
+```python
+def get_selected_widget(self)
+```
+
+
+
+
+
+
+
+
+
 ### set_selected_widget
 
 ```python
@@ -688,33 +772,6 @@ Function that sets the selected cell for the CUI
  Parameter  | Type  | Doc
 -----|----------|-----
  widget_id  |  str | the id of the widget
-
-
-
-
-
-### get_widget_id
-
-```python
-def get_widget_id(self, widget)
-```
-
-Function for grabbing widget ID
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- widget  |  Widget | The widget object we wish to get an ID from
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- widget_id  |  str | The id if found, None otherwise
 
 
 
@@ -1012,10 +1069,10 @@ Closes the popup, and resets focus
 
 
 
-### refresh_height_width
+### _refresh_height_width
 
 ```python
-def refresh_height_width(self, height, width)
+def _refresh_height_width(self, height, width)
 ```
 
 Function that updates the height and width of the CUI based on terminal window size
@@ -1034,10 +1091,31 @@ Function that updates the height and width of the CUI based on terminal window s
 
 
 
-### draw_widgets
+### get_absolute_size
 
 ```python
-def draw_widgets(self)
+def get_absolute_size(self)
+```
+
+Returns dimensions of CUI
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ height, width  |  int | The dimensions of drawable CUI space in characters
+
+
+
+
+
+### _draw_widgets
+
+```python
+def _draw_widgets(self)
 ```
 
 Function that draws all of the widgets to the screen
@@ -1048,10 +1126,10 @@ Function that draws all of the widgets to the screen
 
 
 
-### draw_status_bars
+### _draw_status_bars
 
 ```python
-def draw_status_bars(self, stdscr, height, width)
+def _draw_status_bars(self, stdscr, height, width)
 ```
 
 Draws status bar and title bar
@@ -1071,10 +1149,10 @@ Draws status bar and title bar
 
 
 
-### display_window_warning
+### _display_window_warning
 
 ```python
-def display_window_warning(self, stdscr, error_info)
+def _display_window_warning(self, stdscr, error_info)
 ```
 
 Function that prints some basic error info if there is an error with the CUI
@@ -1093,10 +1171,10 @@ Function that prints some basic error info if there is an error with the CUI
 
 
 
-### handle_key_presses
+### _handle_key_presses
 
 ```python
-def handle_key_presses(self, key_pressed)
+def _handle_key_presses(self, key_pressed)
 ```
 
 Function that handles all main loop key presses.
@@ -1114,10 +1192,10 @@ Function that handles all main loop key presses.
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self, stdscr)
+def _draw(self, stdscr)
 ```
 
 Main CUI draw loop called by start()

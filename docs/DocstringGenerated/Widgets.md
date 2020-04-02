@@ -26,22 +26,22 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
  Class  | Doc
 -----|-----
- Widget | Top Level Widget Base Class
+ Widget(py_cui.ui.UIElement) | Top Level Widget Base Class
  Label(Widget) | The most basic subclass of Widget.
  BlockLabel(Widget) | A Variation of the label widget that renders a block of text.
- ScrollMenu(Widget) | A scroll menu widget.
+ ScrollMenu(Widge | A scroll menu widget.
  CheckBoxMenu(ScrollMenu) | Extension of ScrollMenu that allows for multiple items to be selected at once.
  Button(Widget) | Basic button widget.
- TextBox(Widget) | Widget for entering small single lines of text
- ScrollTextBlock(Widget) | Widget for editing large multi-line blocks of text
+ TextBox(Widge | Widget for entering small single lines of text
+ ScrollTextBlock(Widge | Widget for editing large multi-line blocks of text
 
 
 
 
-## Widget
+## Widget(py_cui.ui.UIElement)
 
 ```python
-class Widget
+class Widget(py_cui.ui.UIElement)
 ```
 
 Top Level Widget Base Class
@@ -56,40 +56,28 @@ and setting status bar text.
 
  Attribute  | Type  | Doc
 -----|----------|-----
- id  |  int | Id of the widget
- title  |  str | Widget title
- grid  |  py_cui.grid.Grid | The parent grid object of the widget
- renderer  |  py_cui.renderer.Renderer | The renderer object that draws the widget
- row, column  |  int | row and column position of the widget
- row_span, column_span  |  int | number of rows or columns spanned by the widget
- padx, pady  |  int | Padding size in terminal characters
- start_x, start_y  |  int | The position on the terminal of the top left corner of the widget
- width, height  |  int | The width/height of the widget
- color  |  int | Color code combination
- selected_color  |  int | color code combination for when widget is selected
- selected  |  bool | Flag that says if widget is selected
- is_selectable  |  bool | Flag that says if a widget can be selected
- help_text  |  str | text displayed in status bar when selected
- key_commands  |  dict | Dictionary mapping key codes to functions
- text_color_rules  |  list of py_cui.ColorRule | color rules to load into renderer when drawing widget
+ _grid  |  py_cui.grid.Grid | The parent grid object of the widget
+ _row, _column  |  int | row and column position of the widget
+ _row_span, _column_span  |  int | number of rows or columns spanned by the widget
+ _selectable  |  bool | Flag that says if a widget can be selected
+ _key_commands  |  dict | Dictionary mapping key codes to functions
+ _text_color_rules  |  List[py_cui.ColorRule] | color rules to load into renderer when drawing widget
 
 #### Methods
 
  Method  | Doc
 -----|-----
- set_focus_text | Function that sets the text of the status bar on focus for a particular widget
  add_key_command | Maps a keycode to a function that will be executed when in focus mode
+ update_key_command | Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
  add_text_color_rule | Forces renderer to draw text using given color if text_condition_function returns True
- set_standard_color | Sets the standard color for the widget
- set_selected_color | Sets the selected color for the widget
- assign_renderer | Function that assigns a renderer object to the widget
- get_absolute_position | Gets the absolute position of the widget in characters
- get_absolute_dims | Gets the absolute dimensions of the widget in characters
- is_row_col_inside | Checks if a particular row + column is inside the widget area
- update_height_width | Function that refreshes position and dimensons on resize.
- get_help_text | Returns help text
- handle_key_press | Base class function that handles all assigned key presses.
- draw | Base class draw class that checks if renderer is valid.
+ get_absolute_start_pos | Gets the absolute position of the widget in characters. Override of base class function
+ get_absolute_stop_pos | Gets the absolute dimensions of the widget in characters. Override of base class function
+ get_grid_cell | Gets widget row, column in grid
+ get_grid_cell_spans | Gets widget row span, column span in grid
+ is_selectable | Checks if the widget is selectable
+ _is_row_col_inside | Checks if a particular row + column is inside the widget area
+ _handle_key_press | Base class function that handles all assigned key presses.
+ _draw | Base class draw class that checks if renderer is valid.
 
 
 
@@ -97,33 +85,15 @@ and setting status bar text.
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, selectable = True)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True)
 ```
 
-Constructor for base widget class
+Initializer for base widget class
 
 
 
-
-
-
-
-### set_focus_text
-
-```python
-def set_focus_text(self, text)
-```
-
-Function that sets the text of the status bar on focus for a particular widget
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | text to write to status bar when in focus mode.
+Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+and color rules and key commands
 
 
 
@@ -136,6 +106,28 @@ def add_key_command(self, key, command)
 ```
 
 Maps a keycode to a function that will be executed when in focus mode
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ key  |  py_cui.keys.KEY | ascii keycode used to map the key
+ command  |  function without args | a non-argument function or lambda function to execute if in focus mode and key is pressed
+
+
+
+
+
+### update_key_command
+
+```python
+def update_key_command(self, key, command)
+```
+
+Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
 
 
 
@@ -170,91 +162,20 @@ Forces renderer to draw text using given color if text_condition_function return
  color  |  int | a supported py_cui color value
  rule_type  |  string | A supported color rule type
  match_type='line'  |  str | sets match type. Can be 'line', 'regex', or 'region'
- region  |  [int, int] | A specified region to color if using match_type='region'
+ region=[0,1]  |  [int, int] | A specified region to color if using match_type='region'
  include_whitespace  |  bool | if false, strip string before checking for match
 
 
 
 
 
-### set_standard_color
+### get_absolute_start_pos
 
 ```python
-def set_standard_color(self, color)
+def get_absolute_start_pos(self)
 ```
 
-Sets the standard color for the widget
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- color  |  int | Color code for widegt
-
-
-
-
-
-### set_selected_color
-
-```python
-def set_selected_color(self, color)
-```
-
-Sets the selected color for the widget
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- color  |  int | Color code for widegt when selected
-
-
-
-
-
-### assign_renderer
-
-```python
-def assign_renderer(self, renderer)
-```
-
-Function that assigns a renderer object to the widget
-
-
-
-(Meant for internal usage only)
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- renderer  |  py_cui.renderer.Renderer | Renderer for drawing widget
-
-#### Raises
-
- Error  | Type  | Doc
------|----------|-----
- error  |  PyCUIError | If parameter is not a initialized renderer.
-
-
-
-
-
-### get_absolute_position
-
-```python
-def get_absolute_position(self)
-```
-
-Gets the absolute position of the widget in characters
+Gets the absolute position of the widget in characters. Override of base class function
 
 
 
@@ -269,13 +190,13 @@ Gets the absolute position of the widget in characters
 
 
 
-### get_absolute_dims
+### get_absolute_stop_pos
 
 ```python
-def get_absolute_dims(self)
+def get_absolute_stop_pos(self)
 ```
 
-Gets the absolute dimensions of the widget in characters
+Gets the absolute dimensions of the widget in characters. Override of base class function
 
 
 
@@ -290,10 +211,73 @@ Gets the absolute dimensions of the widget in characters
 
 
 
-### is_row_col_inside
+### get_grid_cell
 
 ```python
-def is_row_col_inside(self, row, col)
+def get_grid_cell(self)
+```
+
+Gets widget row, column in grid
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ row, column  |  int | Initial row and column placement for widget in grid
+
+
+
+
+
+### get_grid_cell_spans
+
+```python
+def get_grid_cell_spans(self)
+```
+
+Gets widget row span, column span in grid
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ row_span, column_span  |  int | Initial row span and column span placement for widget in grid
+
+
+
+
+
+### is_selectable
+
+```python
+def is_selectable(self)
+```
+
+Checks if the widget is selectable
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ selectable  |  bool | True if selectable, false otherwise
+
+
+
+
+
+### _is_row_col_inside
+
+```python
+def _is_row_col_inside(self, row, col)
 ```
 
 Checks if a particular row + column is inside the widget area
@@ -317,54 +301,17 @@ Checks if a particular row + column is inside the widget area
 
 
 
-### update_height_width
+### _handle_key_press
 
 ```python
-def update_height_width(self)
-```
-
-Function that refreshes position and dimensons on resize.
-
-
-
-If necessary, make sure required widget attributes updated here as well.
-
-
-
-
-
-### get_help_text
-
-```python
-def get_help_text(self)
-```
-
-Returns help text
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- help_text  |  str | Status bar text
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Base class function that handles all assigned key presses.
 
 
 
-When overwriting this function, make sure to add a super().handle_key_press(key_pressed) call,
+When overwriting this function, make sure to add a super()._handle_key_press(key_pressed) call,
 as this is required for user defined key command support
 
 
@@ -378,17 +325,18 @@ as this is required for user defined key command support
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Base class draw class that checks if renderer is valid.
 
 
 
-Should be called with super().draw() in overrides
+Should be called with super()._draw() in overrides.
+Also intializes color rules, so if not called color rules will not be applied
 
 
 
@@ -421,7 +369,7 @@ Simply displays one centered row of text. Has no unique attributes or methods
  Method  | Doc
 -----|-----
  toggle_border | Function that gives option to draw border around label
- draw | Override base draw class.
+ _draw | Override base draw class.
 
 
 
@@ -429,10 +377,10 @@ Simply displays one centered row of text. Has no unique attributes or methods
 ### __init__
 
 ```python
-def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady)
+def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, logger)
 ```
 
-Constructor for Label
+Initalizer for Label widget
 
 
 
@@ -454,10 +402,10 @@ Function that gives option to draw border around label
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override base draw class.
@@ -496,7 +444,7 @@ A Variation of the label widget that renders a block of text.
  Method  | Doc
 -----|-----
  toggle_border | Function that gives option to draw border around label
- draw | Override base draw class.
+ _draw | Override base draw class.
 
 
 
@@ -504,10 +452,10 @@ A Variation of the label widget that renders a block of text.
 ### __init__
 
 ```python
-def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center)
+def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center, logger)
 ```
 
-
+Initializer for blocklabel widget
 
 
 
@@ -529,16 +477,17 @@ Function that gives option to draw border around label
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override base draw class.
 
 
 
+Center text and draw it
 
 
 
@@ -547,42 +496,22 @@ Override base draw class.
 
 
 
-## ScrollMenu(Widget)
+## ScrollMenu(Widge
 
 ```python
-class ScrollMenu(Widget)
+class ScrollMenu(Widget, py_cui.ui.MenuImplementation)
 ```
 
 A scroll menu widget.
 
 
 
-Allows for creating a scrollable list of items of which one is selectable.
-Analogous to a RadioButton
-
-
-#### Attributes
-
- Attribute  | Type  | Doc
------|----------|-----
- top_view  |  int | the uppermost menu element in view
- selected_item  |  int | the currently highlighted menu item
- view_items  |  list of str | list of menu items
-
 #### Methods
 
  Method  | Doc
 -----|-----
- clear | Clears all items from the Scroll Menu
- scroll_up | Function that scrolls the view up in the scroll menu
- scroll_down | Function that scrolls the view down in the scroll menu
- add_item | Adds an item to the menu.
- add_item_list | Adds a list of items to the scroll menu.
- remove_selected_item | Function that removes the selected item from the scroll menu.
- get_item_list | Function that gets list of items in a scroll menu
- get | Function that gets the selected item from the scroll menu
- handle_key_press | Override base class function.
- draw | Overrides base class draw function
+ _handle_key_press | Override base class function.
+ _draw | Overrides base class draw function
 
 
 
@@ -590,10 +519,10 @@ Analogous to a RadioButton
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
 ```
 
-Constructor for scroll menu
+Initializer for scroll menu. calls superclass initializers and sets help text
 
 
 
@@ -601,150 +530,10 @@ Constructor for scroll menu
 
 
 
-### clear
-
-```python
-def clear(self)
-```
-
-Clears all items from the Scroll Menu
-
-
-
-
-
-
-
-### scroll_up
+### _handle_key_press
 
 ```python
-def scroll_up(self)
-```
-
-Function that scrolls the view up in the scroll menu
-
-
-
-
-
-
-
-### scroll_down
-
-```python
-def scroll_down(self)
-```
-
-Function that scrolls the view down in the scroll menu
-
-
-
-
-
-
-
-### add_item
-
-```python
-def add_item(self, item_text)
-```
-
-Adds an item to the menu.
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- item_text  |  str | The text for the item
-
-
-
-
-
-### add_item_list
-
-```python
-def add_item_list(self, item_list)
-```
-
-Adds a list of items to the scroll menu.
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- item_list  |  list of str | list of strings to add as items to the scrollmenu
-
-
-
-
-
-### remove_selected_item
-
-```python
-def remove_selected_item(self)
-```
-
-Function that removes the selected item from the scroll menu.
-
-
-
-
-
-
-
-### get_item_list
-
-```python
-def get_item_list(self)
-```
-
-Function that gets list of items in a scroll menu
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- item_list  |  list of str | list of items in the scrollmenu
-
-
-
-
-
-### get
-
-```python
-def get(self)
-```
-
-Function that gets the selected item from the scroll menu
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- item  |  str | selected item, or None if there are no items in the menu
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override base class function.
@@ -764,10 +553,10 @@ UP_ARROW scrolls up, DOWN_ARROW scrolls down.
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Overrides base class draw function
@@ -807,7 +596,7 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
  add_item_list | Adds list of items to the checkbox
  get | Gets list of selected items from the checkbox
  mark_item_as_checked | Function that marks an item as selected
- handle_key_press | Override of key presses.
+ _handle_key_press | Override of key presses.
 
 
 
@@ -815,10 +604,10 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, checked_char)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char)
 ```
 
-
+Initializer for CheckBoxMenu Widget. Builds on ScrollMenu
 
 
 
@@ -910,10 +699,10 @@ Function that marks an item as selected
 
 
 
-### handle_key_press
+### _handle_key_press
 
 ```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of key presses.
@@ -960,8 +749,8 @@ Allows for running a command function on Enter
 
  Method  | Doc
 -----|-----
- handle_key_press | Override of base class, adds ENTER listener that runs the button's command
- draw | Override of base class draw function
+ _handle_key_press | Override of base class, adds ENTER listener that runs the button's command
+ _draw | Override of base class draw function
 
 
 
@@ -969,9 +758,10 @@ Allows for running a command function on Enter
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, command)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, command)
 ```
 
+Initializer for Button Widget
 
 
 
@@ -979,11 +769,10 @@ def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pa
 
 
 
-
-### handle_key_press
+### _handle_key_press
 
 ```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base class, adds ENTER listener that runs the button's command
@@ -1001,10 +790,10 @@ Override of base class, adds ENTER listener that runs the button's command
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override of base class draw function
@@ -1018,45 +807,23 @@ Override of base class draw function
 
 
 
-## TextBox(Widget)
+## TextBox(Widge
 
 ```python
-class TextBox(Widget)
+class TextBox(Widget, py_cui.ui.TextBoxImplementation)
 ```
 
 Widget for entering small single lines of text
 
 
 
-
-#### Attributes
-
- Attribute  | Type  | Doc
------|----------|-----
- text  |  str | The text in the text box
- cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
- cursor_text_pos  |  int | the cursor position relative to the text
- cursor_max_left, cursor_max_right  |  int | The cursor bounds of the text box
- viewport_width  |  int | The width of the textbox viewport
- password  |  bool | Toggle to display password characters or text
-
 #### Methods
 
  Method  | Doc
 -----|-----
  update_height_width | Need to update all cursor positions on resize
- set_text | Sets the value of the text. Overwrites existing text
- get | Gets value of the text in the textbox
- clear | Clears the text in the textbox
- move_left | Shifts the cursor the the left. Internal use only
- move_right | Shifts the cursor the the right. Internal use only
- insert_char | Inserts char at cursor position.
- jump_to_start | Jumps to the start of the textbox
- jump_to_end | Jumps to the end to the textbox
- erase_char | Erases character at textbox cursor
- delete_char | Deletes character to right of texbox cursor
- handle_key_press | Override of base handle key press function
- draw | Override of base draw function
+ _handle_key_press | Override of base handle key press function
+ _draw | Override of base draw function
 
 
 
@@ -1064,10 +831,10 @@ Widget for entering small single lines of text
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text, password)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text, password)
 ```
 
-
+Initializer for TextBox widget. Uses TextBoxImplementation as base
 
 
 
@@ -1089,173 +856,10 @@ Need to update all cursor positions on resize
 
 
 
-### set_text
+### _handle_key_press
 
 ```python
-def set_text(self, text)
-```
-
-Sets the value of the text. Overwrites existing text
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | The text to write to the textbox
-
-
-
-
-
-### get
-
-```python
-def get(self)
-```
-
-Gets value of the text in the textbox
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- text  |  str | The current textbox test
-
-
-
-
-
-### clear
-
-```python
-def clear(self)
-```
-
-Clears the text in the textbox
-
-
-
-
-
-
-
-### move_left
-
-```python
-def move_left(self)
-```
-
-Shifts the cursor the the left. Internal use only
-
-
-
-
-
-
-
-### move_right
-
-```python
-def move_right(self)
-```
-
-Shifts the cursor the the right. Internal use only
-
-
-
-
-
-
-
-### insert_char
-
-```python
-def insert_char(self, key_pressed)
-```
-
-Inserts char at cursor position.
-
-
-
-Internal use only
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- key_pressed  |  int | key code of key pressed
-
-
-
-
-
-### jump_to_start
-
-```python
-def jump_to_start(self)
-```
-
-Jumps to the start of the textbox
-
-
-
-
-
-
-
-### jump_to_end
-
-```python
-def jump_to_end(self)
-```
-
-Jumps to the end to the textbox
-
-
-
-
-
-
-
-### erase_char
-
-```python
-def erase_char(self)
-```
-
-Erases character at textbox cursor
-
-
-
-
-
-
-
-### delete_char
-
-```python
-def delete_char(self)
-```
-
-Deletes character to right of texbox cursor
-
-
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base handle key press function
@@ -1273,10 +877,10 @@ Override of base handle key press function
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override of base draw function
@@ -1290,52 +894,23 @@ Override of base draw function
 
 
 
-## ScrollTextBlock(Widget)
+## ScrollTextBlock(Widge
 
 ```python
-class ScrollTextBlock(Widget)
+class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation)
 ```
 
 Widget for editing large multi-line blocks of text
 
 
 
-
-#### Attributes
-
- Attribute  | Type  | Doc
------|----------|-----
- text_lines  |  list of str | The lines of text in the text box
- cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
- cursor_text_pos_x, cursor_text_pos_y  |  int | the cursor position relative to the text
- cursor_max_left, cursor_max_right  |  int | The cursor bounds of the text box
- cursor_max_up, cursor_max_down  |  int | The cursor bounds of the text box
- viewport_x_start, viewport_y_start  |  int | upper left corner of the viewport
- viewport_width  |  int | The width of the textbox viewport
-
 #### Methods
 
  Method  | Doc
 -----|-----
  update_height_width | Function that updates the position of the text and cursor on resize
- get | Gets all of the text in the textblock and returns it
- write | Function used for writing text to the text block
- clear | Function that clears the text block
- get_current_line | Returns the line on which the cursor currently resides
- set_text | Function that sets the text for the textblock.
- set_text_line | Function that sets the current line's text.
- move_left | Function that moves the cursor/text position one location to the left
- move_right | Function that moves the cursor/text position one location to the right
- move_up | Function that moves the cursor/text position one location up
- move_down | Function that moves the cursor/text position one location down
- handle_newline | Function that handles recieving newline characters in the text
- handle_backspace | Function that handles recieving backspace characters in the text
- handle_home | Function that handles recieving a home keypress
- handle_end | Function that handles recieving an end keypress
- handle_delete | Function that handles recieving a delete keypress
- insert_char | Function that handles recieving a character
- handle_key_press | Override of base class handle key press function
- draw | Override of base class draw function
+ _handle_key_press | Override of base class handle key press function
+ _draw | Override of base class draw function
 
 
 
@@ -1343,10 +918,10 @@ Widget for editing large multi-line blocks of text
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, initial_text)
+def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text)
 ```
 
-
+Initializer for TextBlock Widget. Uses TextBlockImplementation as base
 
 
 
@@ -1368,280 +943,10 @@ Function that updates the position of the text and cursor on resize
 
 
 
-### get
+### _handle_key_press
 
 ```python
-def get(self)
-```
-
-Gets all of the text in the textblock and returns it
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- text  |  str | The current text in the text block
-
-
-
-
-
-### write
-
-```python
-def write(self, text)
-```
-
-Function used for writing text to the text block
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | Text to write to the text block
-
-
-
-
-
-### clear
-
-```python
-def clear(self)
-```
-
-Function that clears the text block
-
-
-
-
-
-
-
-### get_current_line
-
-```python
-def get_current_line(self)
-```
-
-Returns the line on which the cursor currently resides
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- current_line  |  str | The current line of text that the cursor is on
-
-
-
-
-
-### set_text
-
-```python
-def set_text(self, text)
-```
-
-Function that sets the text for the textblock.
-
-
-
-Note that this will overwrite any existing text
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | text to write into text block
-
-
-
-
-
-### set_text_line
-
-```python
-def set_text_line(self, text)
-```
-
-Function that sets the current line's text.
-
-
-
-Meant only for internal use
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | text line to write into text block
-
-
-
-
-
-### move_left
-
-```python
-def move_left(self)
-```
-
-Function that moves the cursor/text position one location to the left
-
-
-
-
-
-
-
-### move_right
-
-```python
-def move_right(self)
-```
-
-Function that moves the cursor/text position one location to the right
-
-
-
-
-
-
-
-### move_up
-
-```python
-def move_up(self)
-```
-
-Function that moves the cursor/text position one location up
-
-
-
-
-
-
-
-### move_down
-
-```python
-def move_down(self)
-```
-
-Function that moves the cursor/text position one location down
-
-
-
-
-
-
-
-### handle_newline
-
-```python
-def handle_newline(self)
-```
-
-Function that handles recieving newline characters in the text
-
-
-
-
-
-
-
-### handle_backspace
-
-```python
-def handle_backspace(self)
-```
-
-Function that handles recieving backspace characters in the text
-
-
-
-
-
-
-
-### handle_home
-
-```python
-def handle_home(self)
-```
-
-Function that handles recieving a home keypress
-
-
-
-
-
-
-
-### handle_end
-
-```python
-def handle_end(self)
-```
-
-Function that handles recieving an end keypress
-
-
-
-
-
-
-
-### handle_delete
-
-```python
-def handle_delete(self)
-```
-
-Function that handles recieving a delete keypress
-
-
-
-
-
-
-
-### insert_char
-
-```python
-def insert_char(self, key_pressed)
-```
-
-Function that handles recieving a character
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- key_pressed  |  int | key code of key pressed
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base class handle key press function
@@ -1659,10 +964,10 @@ Override of base class handle key press function
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override of base class draw function

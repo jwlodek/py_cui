@@ -42,9 +42,9 @@ Class representing a text color rendering rule
 
  Method  | Doc
 -----|-----
- check_match | Checks if the color rule matches a line
- generate_fragments_regex | Splits text into fragments based on regular expression
- split_text_on_region | Splits text into fragments based on region
+ _check_match | Checks if the color rule matches a line
+ _generate_fragments_regex | Splits text into fragments based on regular expression
+ _split_text_on_region | Splits text into fragments based on region
  generate_fragments | Splits text into fragments if matched line to regex
 
 
@@ -53,7 +53,7 @@ Class representing a text color rendering rule
 ### __init__
 
 ```python
-def __init__(self, regex, color, rule_type, match_type, region, include_whitespace)
+def __init__(self, regex, color, rule_type, match_type, region, include_whitespace, logger)
 ```
 
 Constructor for ColorRule object
@@ -76,10 +76,10 @@ Constructor for ColorRule object
 
 
 
-### check_match
+### _check_match
 
 ```python
-def check_match(self, line)
+def _check_match(self, line)
 ```
 
 Checks if the color rule matches a line
@@ -103,10 +103,10 @@ Checks if the color rule matches a line
 
 
 
-### generate_fragments_regex
+### _generate_fragments_regex
 
 ```python
-def generate_fragments_regex(self, widget, render_text)
+def _generate_fragments_regex(self, widget, render_text)
 ```
 
 Splits text into fragments based on regular expression
@@ -131,10 +131,10 @@ Splits text into fragments based on regular expression
 
 
 
-### split_text_on_region
+### _split_text_on_region
 
 ```python
-def split_text_on_region(self, widget, render_text)
+def _split_text_on_region(self, widget, render_text)
 ```
 
 Splits text into fragments based on region
@@ -182,7 +182,7 @@ Splits text into fragments if matched line to regex
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- fragments  |  list of lists of [str, color] | the render text split into fragments of strings paired with colors
+ fragments  |  List[List[str, color]] | the render text split into fragments of strings paired with colors
  matched  |  bool | Boolean output saying if a match was found in the line.
 
 

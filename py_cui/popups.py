@@ -7,10 +7,11 @@
 # required library imports
 import curses
 import py_cui
+import py_cui.ui
 import py_cui.errors
 
 
-class Popup:
+class Popup(py_cui.ui.UIElement):
     """Base CUI popup class.
 
     Contains constructor and initial definitions for key_press and draw
@@ -19,51 +20,75 @@ class Popup:
 
     Attributes
     ----------
-    root : py_cui.PyCUI
+    _root : py_cui.PyCUI
         Root CUI window
-    title : str
-        Popup title
-    text : str
+    _text : str
         Popup message text
-    color : int
-        PyCUI color value
-    renderer : py_cui.renderer.Renderer
-        Renderer for drawing the popup
-    start_x, start_y : int
-        top left corner of the popup
-    stop_x, stop_y : int
-        bottom right corner of the popup
-    height, width : int
-        The dimensions of the popup
-    padx, pady : int
-        The padding on either side of the popup
-    selected : bool
+    _selected : bool
         Always true. Used by the renderer to highlight popup
+    _close_keys : List[int]
+        List of keycodes used to close popup
     """
 
 
-    def __init__(self, root, title, text, color, renderer):
-        """Constructor for popup class
+    def __init__(self, root, title, text, color, renderer, logger):
+        """Initializer for main popup class. Calls UIElement intialier, and sets some initial values
         """
 
-        self.root = root
-        self.title = title
-        self.text = text
-        self.color = color
-        self.start_x = int(self.root.width / 4)
-        self.start_y = int(self.root.height / 3)
-        self.stop_x = int(3 * self.root.width / 4)
-        self.stop_y = int(2 * self.root.height / 3)
-        self.height = self.stop_y - self.start_y
-        self.width = self.stop_x - self.start_x
-        self.padx = 1
-        self.pady = 0
-        self.renderer = renderer
-        self.selected = True
-        self.close_keys = [py_cui.keys.KEY_ESCAPE]
+        super().__init__(0, title, renderer, logger)
+        self._root         = root
+        self._text         = text
+        self._selected     = True
+        self._close_keys   = [py_cui.keys.KEY_ESCAPE]
+        self.update_height_width()
+
+    
+    def _increment_counter(self):
+        """Function that increments an internal counter
+        """
+
+        pass
 
 
-    def handle_key_press(self, key_pressed):
+    def set_text(self, text):
+        """Sets popup text (message)
+
+        Parameters
+        ----------
+        text : str
+            The new popup text
+        """
+
+        self._text = text
+
+
+    def get_absolute_start_pos(self):
+        """Override of base class, computes position based on root dimensions
+        
+        Returns
+        -------
+        start_x, start_y : int
+            The coords of the upper-left corner of the popup
+        """
+
+        root_height, root_width = self._root.get_absolute_size()
+        return int(root_width / 4), int(root_height / 3)
+
+
+    def get_absolute_stop_pos(self):
+        """Override of base class, computes position based on root dimensions
+        
+        Returns
+        -------
+        stop_x, stop_y : int
+            The coords of the lower-right corner of the popup
+        """
+
+        root_height, root_width = self._root.get_absolute_size()
+        return (int(3 * root_width / 4)), (int(2 * root_height / 3))
+
+
+    def _handle_key_press(self, key_pressed):
         """Handles key presses when popup is open
 
         By default, only closes popup when Escape is pressed
@@ -74,51 +99,50 @@ class Popup:
             The ascii code for the key that was pressed
         """
 
-        if key_pressed in self.close_keys:
-            self.root.close_popup()
+        if key_pressed in self._close_keys:
+            self._root.close_popup()
 
 
-    def draw(self):
+    def _draw(self):
         """Function that uses renderer to draw the popup
 
         Can be implemented by subclass. Base draw function will draw the title and text in a bordered box
         """
 
-        self.renderer.set_color_mode(self.color)
-        target_y = int(self.stop_y - self.start_y / 2)
-        self.renderer.set_color_rules([])
-        self.renderer.set_bold()
-        self.renderer.draw_border(self, with_title=False)
-        self.renderer.draw_text(self, self.title, target_y - 2, centered=True, selected=True)
-        self.renderer.draw_text(self, self.text,  target_y,     centered=True, selected=True)
-        self.renderer.unset_color_mode(self.color)
-        self.renderer.unset_bold()
-        self.renderer.reset_cursor(self)
+        super()._draw()
+        target_y = int(self._stop_y - self._start_y / 2)
+        self._renderer.set_color_rules([])
+        self._renderer._set_bold()
+        self._renderer.draw_border(self, with_title=False)
+        self._renderer.draw_text(  self, self._title, target_y - 2, centered=True, selected=True)
+        self._renderer.draw_text(  self, self._text,  target_y,     centered=True, selected=True)
+        self._renderer.unset_color_mode(self._color)
+        self._renderer._unset_bold()
+        self._renderer.reset_cursor(self)
 
 
 
 class MessagePopup(Popup):
     """Class representing a simple message popup
-
-    Attributes
-    ----------
-    close_keys : list of int
-        list of key codes that can be used to close the popup
     """
 
-    def __init__(self, root, title, text, color, renderer):
-        """Constructor for MessagePopup
+    def __init__(self, root, title, text, color, renderer, logger):
+        """Initializer for MessagePopup
         """
 
-        super().__init__(root, title, text, color, renderer)
-        self.close_keys = [py_cui.keys.KEY_ENTER, py_cui.keys.KEY_ESCAPE, py_cui.keys.KEY_SPACE, py_cui.keys.KEY_BACKSPACE, py_cui.keys.KEY_DELETE]
+        super().__init__(root, title, text, color, renderer, logger)
+        self._close_keys = [ py_cui.keys.KEY_ENTER, 
+                            py_cui.keys.KEY_ESCAPE, 
+                            py_cui.keys.KEY_SPACE, 
+                            py_cui.keys.KEY_BACKSPACE, 
+                            py_cui.keys.KEY_DELETE]
 
 
-    def draw(self):
+    def _draw(self):
         """Draw function for MessagePopup. Calls superclass draw()
         """
 
-        super().draw()
+        super()._draw()
 
 
 class YesNoPopup(Popup):
@@ -126,19 +150,19 @@ class YesNoPopup(Popup):
 
     Attributes
     ----------
-    command : function, 1 boolean parameter
+    _command : function, 1 boolean parameter
         Function that takes one boolean parameter. Called with True if yes, called with False if no.
     """
 
-    def __init__(self, root, title, text, color, command, renderer):
-        """Constructor for YesNoPopup
+    def __init__(self, root, title, text, color, command, renderer, logger):
+        """Initializer for YesNoPopup
         """
 
-        super().__init__(root, title, text, color, renderer)
-        self.command = command
+        super().__init__(root, title, text, color, renderer, logger)
+        self._command = command
 
 
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
         """Handle key press overwrite from superclass
 
         Parameters
@@ -147,173 +171,58 @@ class YesNoPopup(Popup):
             key code of key pressed
         """
 
-        super().handle_key_press(key_pressed)
+        super()._handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_Y_LOWER or key_pressed == py_cui.keys.KEY_Y_UPPER:
-            self.ret_val = True
+            ret_val = True
             valid_pressed = True
         elif key_pressed == py_cui.keys.KEY_N_UPPER or key_pressed == py_cui.keys.KEY_N_LOWER:
-            self.ret_val = False
+            ret_val = False
             valid_pressed = True
 
         if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                self.command(self.ret_val)
+            self._root.close_popup()
+            if self._command is not None:
+                self._command(ret_val)
             else:
-                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
+                self._root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
 
-    def draw(self):
+    def _draw(self):
         """Uses base class draw function
         """
 
-        super().draw()
+        super()._draw()
 
 
-class TextBoxPopup(Popup):
+class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
     """Class representing a textbox popup
 
     Attributes
     ----------
-    text : str
-        The text in the text box
-    command : function
+    _command : function
         The command to run when enter is pressed
-    cursor_x, cursor_y : int
-        The absolute positions of the cursor in the terminal window
-    cursor_text_pos : int
-        the cursor position relative to the text
-    cursor_max_left, cursor_max_right : int
-        The cursor bounds of the text box
-    viewport_width : int
-        The width of the textbox viewport
-    password : bool
-        If set, replace all characters with *
     """
 
-    def __init__(self, root, title, color, command, renderer, password):
-        super().__init__(root, title, '', color, renderer)
-        self.text = ''
-        self.command = command
-        self.cursor_x = self.start_x + 2 + self.padx
-        self.cursor_text_pos = 0
-        self.cursor_max_left = self.cursor_x
-        self.cursor_max_right = self.start_x + self.width - 1 -self.pady
-        self.cursor_y = self.start_y + int(self.height / 2) + 1
-        self.viewport_width = self.cursor_max_right - self.cursor_max_left
-        self.password = password
-
-
-    def set_text(self, text):
-        """Sets the value of the text. Overwrites existing text
-
-        Parameters
-        ----------
-        text : str
-            The text to write to the textbox
+    def __init__(self, root, title, color, command, renderer, password, logger):
+        """Initializer for textbox popup. Uses TextBoxImplementation as base
         """
 
-        self.text = text
-        if self.cursor_text_pos > len(self.text):
-            diff = self.cursor_text_pos - len(self.text)
-            self.cursor_text_pos = len(self.text)
-            self.cursor_x = self.cursor_x - diff
+        Popup.__init__(self, root, title, '', color, renderer, logger)
+        py_cui.ui.TextBoxImplementation.__init__(self, '', password, logger)
+        padx, pady              = self.get_padding()
+        start_x, start_y        = self.get_start_position()
+        height, width           = self.get_absolute_dimensions()
+        self._command           = command
+        self._cursor_text_pos   = 0
+        self._cursor_x          = start_x + 2 + padx
+        self._cursor_max_left   = self._cursor_x
+        self._cursor_max_right  = start_x + width - 1 - pady
+        self._cursor_y          = start_y + int(height / 2) + 1
+        self._viewport_width    = self._cursor_max_right - self._cursor_max_left
 
 
-    def get(self):
-        """Gets value of the text in the textbox
-
-        Returns
-        -------
-        text : str
-            The current textbox test
-        """
-
-        return self.text
-
-
-    def clear(self):
-        """Clears the text in the textbox
-        """
-
-        self.cursor_x = self.cursor_max_left
-        self.cursor_text_pos = 0
-        self.text = ''
-
-
-    def move_left(self):
-        """Shifts the cursor the the left. Internal use only
-        """
-
-        if  self.cursor_text_pos > 0:
-            if self.cursor_x > self.cursor_max_left:
-                self.cursor_x = self.cursor_x - 1
-            self.cursor_text_pos = self.cursor_text_pos - 1
-
-
-    def move_right(self):
-        """Shifts the cursor the the right. Internal use only
-        """
-
-        if self.cursor_text_pos < len(self.text):
-            if self.cursor_x < self.cursor_max_right:
-                self.cursor_x = self.cursor_x + 1
-            self.cursor_text_pos = self.cursor_text_pos + 1
-
-
-    def insert_char(self, key_pressed):
-        """Inserts char at cursor position. Internal use only
-
-        Parameters
-        ----------
-        key_pressed : int
-            key code of key pressed
-        """
-
-        self.text = self.text[:self.cursor_text_pos] + chr(key_pressed) + self.text[self.cursor_text_pos:]
-        if len(self.text) < self.viewport_width:
-            self.cursor_x = self.cursor_x + 1
-        self.cursor_text_pos = self.cursor_text_pos + 1
-
-
-    def jump_to_start(self):
-        """Jumps to the start of the textbox
-        """
-
-        self.cursor_x = self.start_x + self.padx + 2
-        self.cursor_text_pos = 0
-
-
-    def jump_to_end(self):
-        """Jumps to the end to the textbox
-        """
-
-        self.cursor_text_pos = len(self.text)
-        self.cursor_x = self.start_x + self.padx + 2 + self.cursor_text_pos
-
-
-    def erase_char(self):
-        """Erases character at textbox cursor
-        """
-
-        if self.cursor_text_pos > 0:
-            self.text = self.text[:self.cursor_text_pos - 1] + self.text[self.cursor_text_pos:]
-            if len(self.text) < self.width - 2 * self.padx - 4:
-                self.cursor_x = self.cursor_x - 1
-            self.cursor_text_pos = self.cursor_text_pos - 1
-
-    
-    def delete_char(self):
-        """Deletes character to right of texbox cursor
-        """
-
-        if self.cursor_text_pos < len(self.text):
-            self.text = self.text[:self.cursor_text_pos] + self.text[self.cursor_text_pos + 1:]
-
-
-
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
 
         Parameters
@@ -322,130 +231,87 @@ class TextBoxPopup(Popup):
             key code of key pressed
         """
 
-        super().handle_key_press(key_pressed)
+        super()._handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
-            self.ret_val = self.text
+            self._ret_val = self._text
             valid_pressed = True
 
         if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                self.command(self.ret_val)
+            self._root.close_popup()
+            if self._command is not None:
+                self._command(self._ret_val)
             else:
-                self.root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
+                self._root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
 
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
-            self.move_left()
+            self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
-            self.move_right()
+            self._move_right()
         elif key_pressed == py_cui.keys.KEY_BACKSPACE:
-            self.erase_char()
+            self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
-            self.delete_char()
+            self._delete_char()
         elif key_pressed == py_cui.keys.KEY_HOME:
-            self.jump_to_start()
+            self._jump_to_start()
         elif key_pressed == py_cui.keys.KEY_END:
-            self.jump_to_end()
+            self._jump_to_end()
         elif key_pressed > 31 and key_pressed < 128:
-            self.insert_char(key_pressed)
+            self._insert_char(key_pressed)
 
 
-    def draw(self):
+    def _draw(self):
         """Override of base draw function
         """
 
-        self.renderer.set_color_mode(self.color)
-        self.renderer.set_color_rules([])
-        self.renderer.draw_text(self, self.title, self.cursor_y - 2, bordered=False, selected=True)
-        self.renderer.draw_border(self, fill=False, with_title=False)
-        render_text = self.text
-        if len(self.text) > self.width - 2 * self.padx - 4:
-            end = len(self.text) - (self.width - 2 * self.padx - 4)
-            if self.cursor_text_pos < end:
-                render_text = self.text[self.cursor_text_pos:self.cursor_text_pos + (self.width - 2 * self.padx - 4)]
+        self._renderer.set_color_mode(self._color)
+        self._renderer.set_color_rules([])
+        self._renderer.draw_text(self, self._title, self._cursor_y - 2, bordered=False, selected=True)
+        self._renderer.draw_border(self, fill=False, with_title=False)
+        render_text = self._text
+        if len(self._text) >self._viewport_width:
+            end = len(self._text) - (self._viewport_width)
+            if self._cursor_text_pos < end:
+                render_text = self._text[self._cursor_text_pos:self._cursor_text_pos + (self._viewport_width)]
             else:
-                render_text = self.text[end:]
-        if self.password:
+                render_text = self._text[end:]
+        if self._password:
             temp = '*' * len(render_text)
             render_text = temp
-        self.renderer.draw_text(self, render_text, self.cursor_y, selected=self.selected)
+        self._renderer.draw_text(self, render_text, self._cursor_y, selected=self._selected)
 
-        if self.selected:
-            self.renderer.draw_cursor(self.cursor_y, self.cursor_x)
+        if self._selected:
+            self._renderer.draw_cursor(self._cursor_y, self._cursor_x)
         else:
-            self.renderer.reset_cursor(self, fill=False)
-        self.renderer.unset_color_mode(self.color)
+            self._renderer.reset_cursor(self, fill=False)
+        self._renderer.unset_color_mode(self._color)
 
 
-class MenuPopup(Popup):
+class MenuPopup(Popup, py_cui.ui.MenuImplementation):
     """A scroll menu popup.
 
     Allows for popup with several menu items to select from
 
     Attributes
     ----------
-    top_view : int
-        the uppermost menu element in view
-    selected_item : int
-        the currently highlighted menu item
-    view_items : list of str
-        list of menu items
-    command : function
+    _command : function
         a function that takes a single string parameter, run when ENTER pressed
-    run_command_if_none : bool
+    _run_command_if_none : bool
         Runs command even if there are no menu items (passes None)
     """
 
-    def __init__(self, root, items, title, color, command, renderer, run_command_if_none):
-        """Constructor for MenuPopup
+    def __init__(self, root, items, title, color, command, renderer, logger, run_command_if_none):
+        """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
-        super().__init__(root, title, '', color, renderer)
-        self.top_view = 0
-        self.selected_item = 0
-        self.view_items = items
-        self.command = command
-        self.run_command_if_none = run_command_if_none
+        Popup.__init__(self, root, title, '', color, renderer, logger)
+        py_cui.ui.MenuImplementation.__init__(self, logger)
+        self.add_item_list(items)
+        self._command              = command
+        self._run_command_if_none  = run_command_if_none
 
 
-    def scroll_up(self):
-        """Function that scrolls the view up in the scroll menu
-        """
-
-        if self.selected:
-            if self.top_view > 0:
-                self.top_view = self.top_view - 1
-            if self.selected_item > 0:
-                self.selected_item = self.selected_item - 1
-
-
-    def scroll_down(self):
-        """Function that scrolls the view down in the scroll menu
-        """
-
-        if self.selected:
-            if self.selected_item < len(self.view_items) - 1:
-                self.selected_item = self.selected_item + 1
-            if self.selected_item > self.top_view + self.height - (2 * self.pady) - 3:
-                self.top_view = self.top_view + 1
-
-
-    def get(self):
-        """Function that gets the selected item from the scroll menu
-
-        Returns
-        -------
-        item : str
-            selected item, or None if there are no items in the menu
-        """
-
-        if len(self.view_items) > 0:
-            return self.view_items[self.selected_item]
-        return None
-
-
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
 
         Enter key runs command, Escape key closes menu
@@ -456,52 +322,53 @@ class MenuPopup(Popup):
             key code of key pressed
         """
 
-        super().handle_key_press(key_pressed)
+        super()._handle_key_press(key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
-            self.ret_val = self.get()
+            ret_val = self.get()
             valid_pressed = True
         elif key_pressed == py_cui.keys.KEY_ESCAPE:
-            self.ret_val = None
+            ret_val = None
             valid_pressed = True
 
         if valid_pressed:
-            self.root.close_popup()
-            if self.command is not None:
-                if self.ret_val is not None or self.run_command_if_none:
-                    self.command(self.ret_val)
+            self._root.close_popup()
+            if self._command is not None:
+                if ret_val is not None or self._run_command_if_none:
+                    self._command(ret_val)
             else:
-                self.root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
+                self._root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
 
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
-            self.scroll_up()
+            self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            self.scroll_down()
+            viewport_height = self._height - (2 * self._pady) - 3
+            self._scroll_down(viewport_height)
 
 
-    def draw(self):
+    def _draw(self):
         """Overrides base class draw function
         """
 
-        self.renderer.set_color_mode(self.color)
-        self.renderer.draw_border(self)
-        self.renderer.set_color_rules([])
-        counter = self.pady + 1
+        self._renderer.set_color_mode(self._color)
+        self._renderer.draw_border(self)
+        self._renderer.set_color_rules([])
+        counter = self._pady + 1
         line_counter = 0
-        for line in self.view_items:
-            if line_counter < self.top_view:
+        for line in self._view_items:
+            if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:
-                if counter >= self.height - self.pady - 1:
+                if counter >= self._height - self._pady - 1:
                     break
-                if line_counter == self.selected_item:
-                    self.renderer.draw_text(self, line, self.start_y + counter, selected=True)
+                if line_counter == self.get_selected_item():
+                    self._renderer.draw_text(self, line, self._start_y + counter, selected=True)
                 else:
-                    self.renderer.draw_text(self, line, self.start_y + counter)
+                    self._renderer.draw_text(self, line, self._start_y + counter)
                 counter = counter + 1
                 line_counter = line_counter + 1
-        self.renderer.unset_color_mode(self.color)
-        self.renderer.reset_cursor(self)
+        self._renderer.unset_color_mode(self._color)
+        self._renderer.reset_cursor(self)
 
 
 class LoadingIconPopup(Popup):
@@ -511,25 +378,25 @@ class LoadingIconPopup(Popup):
 
     Attributes
     ----------
-    loading_icons : list of str
+    _loading_icons : list of str
         Animation frames for loading icon
-    icon_counter : int
+    _icon_counter : int
         Current frame of animation
-    message : str
+    _message : str
         Loading message
     """
 
-    def __init__(self, root, title, message, color, renderer):
-        """Constructor for LoadingIconPopup
+    def __init__(self, root, title, message, color, renderer, logger):
+        """Initializer for LoadingIconPopup
         """
 
-        super().__init__(root, title, '{} ... \\'.format(message), color, renderer)
-        self.loading_icons = ['\\', '|', '/', '-']
-        self.icon_counter = 0
-        self.message = message
+        super().__init__(root, title, '{} ... \\'.format(message), color, renderer, logger)
+        self._loading_icons = ['\\', '|', '/', '-']
+        self._icon_counter = 0
+        self._message = message
 
 
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
         """Override of base class function.
 
         Loading icon popups cannot be cancelled, so we wish to avoid default behavior
@@ -543,15 +410,17 @@ class LoadingIconPopup(Popup):
         pass
 
 
-    def draw(self):
+    def _draw(self):
         """Overrides base draw function
         """
 
-        self.text = '{} ... {}'.format(self.message, self.loading_icons[self.icon_counter])
-        self.icon_counter = self.icon_counter + 1
-        if self.icon_counter == len(self.loading_icons):
-            self.icon_counter = 0
-        super().draw()
+        self._text = '{} ... {}'.format(self._message, self._loading_icons[self._icon_counter])
+        self._icon_counter = self._icon_counter + 1
+        if self._icon_counter == len(self._loading_icons):
+            self._icon_counter = 0
+        
+        # Use Superclass draw after new text is computed
+        super()._draw()
 
 
 class LoadingBarPopup(Popup):
@@ -567,18 +436,18 @@ class LoadingBarPopup(Popup):
         counter for completed items
     """
 
-    def __init__(self, root, title, num_items, color, renderer):
-        """Constructor for LoadingBarPopup
+    def __init__(self, root, title, num_items, color, renderer, logger):
+        """Initializer for LoadingBarPopup
         """
 
-        super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer)
-        self.num_items = num_items
-        self.loading_icons = ['\\', '|', '/', '-']
-        self.icon_counter = 0
-        self.completed_items = 0
+        super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer, logger)
+        self._num_items          = num_items
+        self._loading_icons      = ['\\', '|', '/', '-']
+        self._icon_counter       = 0
+        self._completed_items    = 0
 
 
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
         """Override of base class function.
 
         Loading icon popups cannot be cancelled, so we wish to avoid default behavior
@@ -591,28 +460,40 @@ class LoadingBarPopup(Popup):
 
         pass
 
+    def _increment_counter(self):
+        """Function that increments an internal counter
+        """
 
-    def draw(self):
+        self._completed_items += 1
+
+
+    def _draw(self):
         """Override of base draw function
         """
 
-        width = self.stop_x - self.start_x
+        width = self._stop_x - self._start_x
         bar_width = 2 * int(width / 3)
-        items_per_bar_block = self.num_items / bar_width
-        bar_blocks_per_item = bar_width / self.num_items
+        items_per_bar_block = self._num_items / bar_width
+        bar_blocks_per_item = bar_width / self._num_items
 
-        if self.completed_items == self.num_items:
-            self.root.stop_loading_popup()
+        if self._completed_items == self._num_items:
+            self._root.stop_loading_popup()
 
         if items_per_bar_block >= 1:
-            completed_blocks = int(self.completed_items / items_per_bar_block)
+            completed_blocks = int(self._completed_items / items_per_bar_block)
         else:
-            completed_blocks = int(bar_blocks_per_item * self.completed_items)
+            completed_blocks = int(bar_blocks_per_item * self._completed_items)
 
         non_completed_blocks = bar_width - completed_blocks
-        self.icon_counter = self.icon_counter + 1
-        if self.icon_counter == len(self.loading_icons):
-            self.icon_counter = 0
+        self._icon_counter = self._icon_counter + 1
+        if self._icon_counter == len(self._loading_icons):
+            self._icon_counter = 0
 
-        self.text = '{}{} ({}/{}) {}'.format('#' * completed_blocks, '-' * non_completed_blocks, self.completed_items, self.num_items, self.loading_icons[self.icon_counter])
-        super().draw()
+        self.set_text('{}{} ({}/{}) {}'.format( '#' * completed_blocks, 
+                                                '-' * non_completed_blocks, 
+                                                self._completed_items, 
+                                                self._num_items, 
+                                                self._loading_icons[self._icon_counter]))
+        
+        # Use Superclass draw after new text is computed
+        super()._draw()
