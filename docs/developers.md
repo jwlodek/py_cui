@@ -2,101 +2,127 @@
 
 This page contains information on writing new widgets and popups, as well as anything else required for developers and contributors for py_cui.
 
+### Developer tools
+
+There are several tools provided to `py_cui` developers to aid with debugging. Frst and formost is logging, which can be enabled with:
+
+```
+root.enable_logging()
+```
+To add log messages, you will need a logger object, which for most classes is passed from the root `PyCUI` instance. Once you have a logger, you can make it write messages with:
+
+```
+logger.debug()
+logger.warn()
+logger.error()
+```
+
+as is the case with the built in `logging` module.
+
 ### Adding a new Widget
 
 We will walk through the steps of adding a new widget to py_cui (in this case a scroll menu) in order to demonstrate this process.
 
+**Step One - Write an implementation**
 
-**Step One - Extend the Widget Class**
+To begin, we need to consider what we will need for our widget to do. For this, we will add a subclass to `UIImplementation`. We will add this subclass to `py_cui/ui.py`. In our case, for a scroll menu, we need to be able to scroll up and down, and we will need some variables to represent the current items, the selected item, and the viewport. We will also add some basic getter and setters for these variables.
 
-Your first step when writing a new widget is to create a class in `py_cui/widgets.py` that extends the base `Widget` class. For our `ScrollMenu` example:
+Below is the `MenuImplementation` class. note that it takes a logger object instance as a parameter that it passes to its `UIImplementation` superclass.
+
+```python
+class MenuImplementation(UIImplementation):
+
+    def __init__(self, logger):
+        super().__init__(logger)
+        self._top_view         = 0
+        self._selected_item    = 0
+        self._view_items       = []
+
+    def clear(self):
+        self._view_items = []
+        self._selected_item = 0
+        self._top_view = 0
+        self._logger.debug('Clearing menu')
+
+    def get_selected_item(self):
+        return self._selected_item
+
+    def set_selected_item(self, selected_item):
+        self._selected_item = selected_item
+
+    def _scroll_up(self):
+        if self._top_view > 0 and self._selected_item == self._top_view:
+            self._top_view = self._top_view - 1
+        if self._selected_item > 0:
+            self._selected_item = self._selected_item - 1
+
+        self._logger.debug('Scrolling up to item {}'.format(self._selected_item))
+
+    def _scroll_down(self, viewport_height):
+        if self._selected_item < len(self._view_items) - 1:
+            self._selected_item = self._selected_item + 1
+        if self._selected_item > self._top_view + viewport_height:
+            self._top_view = self._top_view + 1
+
+        self._logger.debug('Scrolling down to item {}'.format(self._selected_item))
+
+    def add_item(self, item_text):
+        self._logger.debug('Adding item {} to menu'.format(item_text))
+        self._view_items.append(item_text)
+
+
+    def add_item_list(self, item_list):
+        self._logger.debug('Adding item list {} to menu'.format(str(item_list)))
+        for item in item_list:
+            self.add_item(item)
+
+    def remove_selected_item(self):
+        if len(self._view_items) == 0:
+            return
+        self._logger.debug('Removing {}'.format(self._view_items[self._selected_item]))
+        del self._view_items[self._selected_item]
+        if self._selected_item >= len(self._view_items):
+            self._selected_item = self._selected_item - 1
+
+    def get_item_list(self):
+        return self._view_items
+
+    def get(self):
+        if len(self._view_items) > 0:
+            return self._view_items[self._selected_item]
+        return None
+```
+
+The reason we separate any widget ui-agnostic logic into a seperate class is because we want to reuse this logic if we wish to create other UI elements that share similar characteristics but are not widgets (ex. popups).
+
+**Step Two - Extend the Widget Class**
+
+Your next step when writing a new widget is to create a class in `py_cui/widgets.py` that extends the base `Widget` class, as well as the implementation class we just constructed. We call the superclass initializers, and we add override functions for `_draw` and `_handle_key_press`.
+
+For our `ScrollMenu` example:
 
 ```Python
-class ScrollMenu(Widget):
+class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
-        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger):
+        Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+        py_cui.ui.MenuImplementation.__init__(self, logger)
 
-    def handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed):
 
         super().handle_key_press(key_pressed)
 
-    def draw(self):
+    def _draw(self):
 
         super().draw()
 ```
-The `handle_key_press` and `draw` functions must be extended for your new widget. You may leave the `handle_key_press` as above, if you don't require any keybindings for the widget. The `draw` function must extended, as the base class does no drawing itself, instead just setting up color rules.
-
-**Step Two - Add additional class variables**
-
-Next, add any variables that your widget may require on top of the base `Widget` class variables. In our case, it will be the selected item index, a list of menu items, and an integer representing the top item visible (in case the menu scrolls down). We also add some functions for getting and setting these variables.
-
-```Python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady):
-    super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady)
-    self.top_view = 0
-    self.selected_item = 0
-    self.view_items = []
-
-
-def clear(self):
-    """ Clears all items from the Scroll Menu """
-
-    self.view_items = []
-    self.selected_item = 0
-    self.top_view = 0
-
-
-def add_item_list(self, item_list):
-
-    for item in item_list:
-        self.add_item(item)
-
-
-def remove_selected_item(self):
-
-    if len(self.view_items) == 0:
-        return
-    del self.view_items[self.selected_item]
-    if self.selected_item >= len(self.view_items):
-        self.selected_item = self.selected_item - 1
-
-
-def get_item_list(self):
-
-    return self.view_items
-
-
-def get(self):
-
-    if len(self.view_items) > 0:
-        return self.view_items[self.selected_item]
-    return None
-```
+The `_handle_key_press` and `_draw` functions must be extended for your new widget. You may leave the `_handle_key_press` as above, if you don't require any keybindings for the widget. The `_draw` function must extended, as the base class does no drawing itself, instead just setting up color rules.
 
 **Step 3 - Add Key Bindings**
 
 Next, add any default key bindings you wish to have for the widget when in focus mode. In the case of the scroll menu, we wish for the arrow keys to scroll up and down, so we extend the `handle_key_press` function:
 ```Python
-def scroll_up(self):
-
-    if self.selected:
-        if self.top_view > 0:
-            self.top_view = self.top_view - 1
-        if self.selected_item > 0:
-            self.selected_item = self.selected_item - 1
-
-
-def scroll_down(self):
-
-    if self.selected:
-        if self.selected_item < len(self.view_items) - 1:
-            self.selected_item = self.selected_item + 1
-        if self.selected_item > self.top_view + self.height - (2 * self.pady) - 3:
-            self.top_view = self.top_view + 1
-
-
-def handle_key_press(self, key_pressed):
+def _handle_key_press(self, key_pressed):
 
     super().handle_key_press(key_pressed)
     if key_pressed == py_cui.keys.KEY_UP_ARROW:
@@ -104,60 +130,55 @@ def handle_key_press(self, key_pressed):
     if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
         self.scroll_down()
 ```
-Note that the way default key bindings are added are simply `if` statements, which happen after the `super()` call. The `scroll_up()` and `scroll_down()` functions simply contain the logic for editing the viewport for the menu.
+Note that the way default key bindings are added are simply `if` statements, which happen after the `super()` call. The `_scroll_up()` and `_scroll_down()` functions simply contain the logic for editing the viewport for the menu, and should have been implemented in the `MenuImplementation` superclass.
 
 **Step 4 - implement the Draw function**
 
-In the draw function, you must use the `self.renderer` object to render your widget to the screen. In our case, we want a border around the menu widget, and we also want to draw menu items that are within our viewport. The key renderer functions we will use are:
+In the draw function, you must use the `self._renderer` object to render your widget to the screen. In our case, we want a border around the menu widget, and we also want to draw menu items that are within our viewport. The key renderer functions we will use are:
 ```Python
-self.renderer.draw_border(self)
+self._renderer.draw_border(self)
 ```
 which will draw a border around the widget space, and 
 ```Python
-self.renderer.draw_text(self, text, y_position)
+self._renderer.draw_text(self, text, y_position)
 ```
 which will draw the text in the y_position. For our scroll menu, we would write the following:
 ```Python
-def draw(self):
+def _draw(self):
 
-    super().draw()
-    # sets the color mode
-    self.renderer.set_color_mode(self.color)
-    # draws border around widget
-    self.renderer.draw_border(self)
-    # will store the current y-position
-    counter = self.pady + 1
+    super()._draw()
+    self._renderer.set_color_mode(self._color)
+    self._renderer.draw_border(self)
+    counter = self._pady + 1
     line_counter = 0
-    for line in self.view_items:
-        # Until we reach viewport start, increment counter
-        if line_counter < self.top_view:
+    for line in self._view_items:
+        if line_counter < self._top_view:
             line_counter = line_counter + 1
         else:
-            if counter >= self.height - self.pady - 1:
+            if counter >= self._height - self._pady - 1:
                 break
-            if line_counter == self.selected_item:
-                self.renderer.draw_text(self, line, self.start_y + counter, selected=True)
+            if line_counter == self._selected_item:
+                self._renderer.draw_text(self, line, self._start_y + counter, selected=True)
             else:
-                self.renderer.draw_text(self, line, self.start_y + counter)
+                self._renderer.draw_text(self, line, self._start_y + counter)
             counter = counter + 1
             line_counter = line_counter + 1
-    # reset default colors
-    self.renderer.unset_color_mode(self.color)
-    # reset cursor should be called at the end of every draw function
-    self.renderer.reset_cursor(self)
+    self._renderer.unset_color_mode(self._color)
+    self._renderer.reset_cursor(self)
 ```
 
-**Step 5 - add a function to `__init__.py` to add the widget**
+**Step 5 - add a function to `PyCUI` class to add the widget**
 
-Finally, add a function to `__init__.py` that will add the widget to the CUI. In our case we write the following:
+Finally, add a function to the `PyCUI` class in `__init__.py` that will add the widget to the CUI. In our case we write the following:
 ```Python
 def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
 
-    id = 'Widget{}'.format(len(self.widgets.keys()))
-    new_scroll_menu = widgets.ScrollMenu(id, title, self.grid, row, column, row_span, column_span, padx, pady)
-    self.widgets[id] = new_scroll_menu
-    if self.selected_widget is None:
+    id = 'Widget{}'.format(len(self.get_widgets().keys()))
+    new_scroll_menu = widgets.ScrollMenu(id, title, self._grid, row, column, row_span, column_span, padx, pady, self._logger)
+    self._widgets[id] = new_scroll_menu
+    if self._selected_widget is None:
         self.set_selected_widget(id)
+    self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
     return new_scroll_menu
 ```
 The function must:

@@ -141,7 +141,7 @@ class PopupExample:
     # TEXTBOX POPUP
 
     def reset_title(self, new_title):
-        self.master.title = new_title
+        self.master.set_title(new_title)
 
 
     def show_text_box(self):
@@ -167,8 +167,8 @@ class PopupExample:
         elif new_color == "MAGENTA":
             color = py_cui.MAGENTA_ON_BLACK
         for key in self.master.widgets.keys():
-            if isinstance(self.master.widgets[key], py_cui.widgets.Button):
-                self.master.widgets[key].color = color
+            if isinstance(self.master.get_widgets()[key], py_cui.widgets.Button):
+                self.master.get_widgets()[key].set_color(color)
 
     def show_menu_popup_fun(self):
         """ Opens scroll menu for selecting button colors """

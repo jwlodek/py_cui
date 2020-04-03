@@ -2,20 +2,22 @@
 
 ### Primary Author
 
-[Jakub Wlodek](https://github.com/jwlodek)
+[Jakub Wlodek (jwlodek)](https://github.com/jwlodek)
 
 Created on August 12, 2019
 
 ### Contributing Authors
 
-[Maciej Wlodek](https://github.com/maciejwlodek)  
-[telday](https://github.com/telday)
+[Maciej Wlodek (maciejwlodek)](https://github.com/maciejwlodek)  
+[Ellis Wright (telday)](https://github.com/telday)
+[Aaron Pierce (aaronpierce)](https://github.com/aaronpierce)
+[Caleb Reese (cptbldbrd)](https://github.com/cptbldbrd)
 
 ### License
 
 BSD 3-Clause License
 
-Copyright (c) 2019, Jakub Wlodek
+Copyright (c) 2019 - 2020, Jakub Wlodek
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

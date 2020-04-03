@@ -26,7 +26,7 @@ cd py_cui
 pytest
 ```
 
-These tests are also run on Travis-CI each time a new commit is pushed to the upstream repository.
+These tests are also run using Github actions each time a new commit is pushed to the upstream repository.
 
 ### Running Examples
 

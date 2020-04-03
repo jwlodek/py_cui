@@ -1,6 +1,6 @@
 # Using colors in a py_cui
 
-Colors in `py_cui` based interfaces are handled wither by widget level color choices, or by text color rules. In the case of widget coloring, you may set the `Widget.color` attribute to one of the supported color pairs. Color rules on the other hand are assigned to widgets, and relate to the text drawn within the widget. 
+Colors in `py_cui` based interfaces are handled by widget level color choices, or by text color rules. In the case of widget coloring, you may use the `Widget.set_color` function, and pass in one of the supported color pairs. Color rules on the other hand are assigned to widgets, and relate to the text drawn within the widget. 
 
 ### Supported Colors
 

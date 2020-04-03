@@ -80,6 +80,7 @@ create an instance of this class, and then add cells + widgets to it.
  keybindings  |  list of py_cui.keybinding.KeyBinding | list of keybindings to check against in the main CUI loop
  height, width  |  int | height of the terminal in characters, width of terminal in characters
  exit_key  |  key_code | a key code for a key that exits the CUI
+ simulated_terminal  |  List[int] | Dimensions for an alternative simulated terminal (used for testing)
 
 #### Methods
 
@@ -109,8 +110,8 @@ create an instance of this class, and then add cells + widgets to it.
  _get_widgets_by_row | Gets all widgets in a specific row
  _get_widgets_by_col | Gets all widgets in a specific column
  _check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
- get_selected_widget |
- set_selected_widget | Function that sets the selected cell for the CUI
+ get_selected_widget | Function that gets currently selected widget
+ set_selected_widget | Function that sets the selected widget for the CUI
  lose_focus | Function that forces py_cui out of focus mode.
  move_focus | Moves focus mode to different widget
  add_key_command | Function that adds a keybinding to the CUI when in overview mode
@@ -162,6 +163,14 @@ Function enables logging for py_cui library
 
 
 
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ log_file_path  |  str | The target log filepath. Default 'py_cui_log.txt
+ logging_level  |  int | Default logging level = logging.DEBUG
+
+
 
 
 
@@ -180,7 +189,7 @@ Gets widget set object from current widgets.
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- new_widget_set  |  py_cui.widget_set.WidgetSet | Widget set collected from widgets currently added to the py_cui
+ current_widget_set  |  py_cui.widget_set.WidgetSet | Widget set collected from widgets currently added to the py_cui
 
 
 
@@ -748,9 +757,16 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 def get_selected_widget(self)
 ```
 
+Function that gets currently selected widget
 
 
 
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ selected_widget  |  py_cui.widgets.Widget | Reference to currently selected widget object
 
 
 
@@ -762,7 +778,7 @@ def get_selected_widget(self)
 def set_selected_widget(self, widget_id)
 ```
 
-Function that sets the selected cell for the CUI
+Function that sets the selected widget for the CUI
 
 
 
@@ -771,7 +787,7 @@ Function that sets the selected cell for the CUI
 
  Parameter  | Type  | Doc
 -----|----------|-----
- widget_id  |  str | the id of the widget
+ widget_id  |  str | the id of the widget to select
 
 
 

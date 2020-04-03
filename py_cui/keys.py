@@ -122,6 +122,9 @@ KEY_Z_UPPER     = get_ascii_from_char('Z')
 # Pressing backspace returns 8 on windows?
 if platform == 'win32':
     KEY_BACKSPACE   = 8
+# Adds support for 'delete/backspace' key on OSX
+elif platform == 'darwin':
+    KEY_BACKSPACE   = 127
 else:
     KEY_BACKSPACE   = curses.KEY_BACKSPACE
 

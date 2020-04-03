@@ -2,7 +2,7 @@
     <img src="assets/py_cui_logo.png">
 </p>
 
-# py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master)
+# py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master) [![Downloads](https://pepy.tech/badge/py-cui)](https://pepy.tech/project/py-cui) [![PyPI version](https://badge.fury.io/py/py-cui.svg)](https://badge.fury.io/py/py-cui) ![](https://img.shields.io/github/license/jwlodek/py_cui.svg)
 
 A **py**thon library for creating **c**ommand line **u**ser **i**nterfaces.
 
