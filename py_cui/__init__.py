@@ -227,9 +227,13 @@ class PyCUI:
             self._keybindings  = new_widget_set._keybindings
             
             if self._simulated_terminal is None:
-                term_size = shutil.get_terminal_size()
-                height  = term_size.lines
-                width   = term_size.columns
+                if self._stdscr is None:
+                    term_size = shutil.get_terminal_size()
+                    height  = term_size.lines
+                    width   = term_size.columns
+                else:
+                    # Use curses termsize when possible to fix resize bug on windows.
+                    height, width = self._stdscr.getmaxyx()
             else:
                 height  = self._simulated_terminal[0]
                 width   = self._simulated_terminal[1]
