@@ -23,16 +23,13 @@
 
 # py_cui
 
-
-### What is py_cui?
-
 `py_cui` is a python library meant to simplify writing command line user interfaces in python. It relies on the `curses` module, which is traditionally a unix-specific python module, however, you may use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
 
-The main advantage `py_cui` has over traditional command line user interfaces is that it relies on widgets and a grid layout manager like most traditional Graphical User Interfaces. You may define a grid size, and then drop predefined widgets onto it into specific grid locations. Widgets can also be stretched accross multiple grid rows and columns. If you've ever made a Tkinter GUI, you will feel right at home.
+The main advantage `py_cui` has over typical text-based user interface builders is that it relies on widgets and a grid layout manager like most traditional graphical user interfaces. You may define a grid size, and then drop predefined widgets onto it into specific grid locations. Widgets can also be stretched accross multiple grid rows and columns. If you've ever made a Tkinter GUI, you will feel right at home.
 
 If you would like to contribute, feel free to make an issue or pull request after reading through the `CONTRIBUTING.md` file.
 
-### Installation
+## Installation
 
 You may install `py_cui` via pip (use `pip3` if python 2 and 3 are installed side by side)
 ```
@@ -55,7 +52,7 @@ pip install .
 ```
 If you would like to try it out without installing, first make sure that `curses` is installed (`windows-curses` if on windows), and then copy one of the example files into the top directory. You may then simply run it with `python3`.
 
-### PyCUI Examples
+## Examples
 
 Below are some screenshots/gifs of programs written with py_cui. Additional (simpler) examples are available in the `examples/` directory of this repository.
 
@@ -77,7 +74,7 @@ Below are some screenshots/gifs of programs written with py_cui. Additional (sim
     <img src="docs/assets/pyautogit-demo.gif">
 </p>
 
-### Writing a PyCUI
+## Writing a PyCUI
 
 Basic usage of `py_cui` starts with creating a PyCUI object, and specifiying it's grid size. Keep in mind that grid cell height and width will be measured in terminal characters, not pixels, so there is a lower limit on legal grid size, and heights will be smaller values than widths. Create this object with:
 ```
@@ -97,7 +94,7 @@ root.start()
 
 `py_cui` has support for custom key bindings for both the overview mode and focused mode, popup windows and prompts, color rendering rules, and several useful widgets. For more details on writing `py_cui` based interfaces, be sure to check on the examples and the documentation [here](https://jwlodek.github.io/py_cui-docs).
 
-### Using a PyCUI
+## Using a PyCUI
 
 There are some basic rules that apply to all `py_cui` based interfaces. There are three key operating modes - overview mode, focus mode, and popup mode. 
 
@@ -113,7 +110,7 @@ When in focus mode, you enter into a particular widget (For example a text box.)
 
 Popup mode simply displays a popup over the rest of the UI. Each popup type behaves slightly differently. For example, you may exit an info popup mode by pressing `Space`, `Enter`, or `Escape`, while a loading popup will remain onscreen until whatever operation is being run is terminated.
 
-### Unit Tests
+## Unit Tests
 
 `py_cui` unit tests are written for `pytest`. Make sure `pytest` is installed, and simply run
 ```
@@ -121,7 +118,7 @@ pytest
 ```
 in the root directory to run all unit tests.
 
-### Powered by py_cui
+## Powered by py_cui
 
 Below is a table of python projects developed with the help of `py_cui`. If you've made something, feel free to make a pull request to add it!
 
@@ -133,7 +130,7 @@ Project | Description
 [tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
 [hue-tui](https://github.com/channel-42/hue-tui) | A CUI controlling for Philips Hue lights.
 
-### License
+## License
 
 BSD 3-Clause License
 
