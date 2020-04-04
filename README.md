@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-    <p><strong>A library for creating CUI/TUI interfaces with pre-built widgets in python.</strong></p>
+    <p><strong><br/>A library for creating CUI/TUI interfaces with pre-built widgets in python.</strong></p>
     <p>Easily build text-based user interfaces on both Linux and Windows.</p>
     <a href="#">
         <img src="https://travis-ci.org/jwlodek/py_cui.svg?branch=master" alt="Automated Test+Build Status">
