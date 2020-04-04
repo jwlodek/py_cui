@@ -6,7 +6,7 @@
     <p><strong><br/>A library for creating CUI/TUI interfaces with pre-built widgets in python.</strong></p>
     <p>Easily build text-based user interfaces on both Linux and Windows.</p>
     <a href="#">
-        <img src="https://travis-ci.org/jwlodek/py_cui.svg?branch=master" alt="Automated Test+Build Status">
+        <img src="https://github.com/jwlodek/py_cui/workflows/tests/badge.svg?branch=master" alt="Automated Test+Build Status">
     </a>
     <a href="https://pepy.tech/project/py-cui">
         <img src="https://pepy.tech/badge/py-cui" alt="Download Counter">
