@@ -1,10 +1,28 @@
-<p align="center">
-    <img src="https://raw.githubusercontent.com/jwlodek/py_cui/master/docs/assets/py_cui_logo.png">
-</p>
+<div align="center">
+    <img src="docs/assets/py_cui_logo_new.svg" alt="PyCUI" width=300px>
+</div>
 
-# py_cui ![](https://travis-ci.org/jwlodek/py_cui.svg?branch=master) [![Downloads](https://pepy.tech/badge/py-cui)](https://pepy.tech/project/py-cui) [![PyPI version](https://badge.fury.io/py/py-cui.svg)](https://badge.fury.io/py/py-cui) ![](https://img.shields.io/github/license/jwlodek/py_cui.svg)
+<div align="center">
+    <p><strong>A library for creating CUI/TUI interfaces with pre-built widgets in python.</strong></p>
+    <p>Easily build text-based user interfaces on both Linux and Windows.</p>
+    <a href="#">
+        <img src="https://travis-ci.org/jwlodek/py_cui.svg?branch=master" alt="Automated Test+Build Status">
+    </a>
+    <a href="https://pepy.tech/project/py-cui">
+        <img src="https://pepy.tech/badge/py-cui" alt="Download Counter">
+    </a>
+    <a href="https://badge.fury.io/py/py-cui">
+        <img src="https://badge.fury.io/py/py-cui.svg" alt="PyPI Version">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/github/license/jwlodek/py_cui.svg" alt="License">
+    </a>
+</div>
 
-A **py**thon library for creating **c**ommand line **u**ser **i**nterfaces.
+---
+
+# py_cui
+
 
 ### What is py_cui?
 
