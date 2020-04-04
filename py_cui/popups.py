@@ -210,10 +210,18 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
 
         Popup.__init__(self, root, title, '', color, renderer, logger)
         py_cui.ui.TextBoxImplementation.__init__(self, '', password, logger)
+        self._command           = command
+        self.update_height_width()
+
+
+    def update_height_width(self):
+        """Need to update all cursor positions on resize
+        """
+
+        super().update_height_width()
         padx, pady              = self.get_padding()
         start_x, start_y        = self.get_start_position()
         height, width           = self.get_absolute_dimensions()
-        self._command           = command
         self._cursor_text_pos   = 0
         self._cursor_x          = start_x + 2 + padx
         self._cursor_max_left   = self._cursor_x

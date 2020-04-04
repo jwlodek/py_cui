@@ -1119,6 +1119,8 @@ class PyCUI:
         self._grid.update_grid_height_width(self._height, self._width)
         for widget_id in self._widgets.keys():
             self._widgets[widget_id].update_height_width()
+        if self._popup is not None:
+            self._popup.update_height_width()
 
 
     def get_absolute_size(self):
@@ -1322,15 +1324,15 @@ class PyCUI:
                 # Handle keypresses
                 self._handle_key_presses(key_pressed)
 
-                try:
-                    # Draw status/title bar, and all widgets. Selected widget will be bolded.
-                    self._draw_status_bars(stdscr, height, width)
-                    self._draw_widgets()
-                    # draw the popup if required
-                    if self._popup is not None:
-                        self._popup._draw()
-                except Exception as e:
-                    self._display_window_warning(stdscr, str(e))
+                #try:
+                # Draw status/title bar, and all widgets. Selected widget will be bolded.
+                self._draw_status_bars(stdscr, height, width)
+                self._draw_widgets()
+                # draw the popup if required
+                if self._popup is not None:
+                    self._popup._draw()
+                #except Exception as e:
+                #    self._display_window_warning(stdscr, str(e))
 
                 # Refresh the screen
                 stdscr.refresh()
