@@ -40,6 +40,7 @@ class Popup(py_cui.ui.UIElement):
         self._text         = text
         self._selected     = True
         self._close_keys   = [py_cui.keys.KEY_ESCAPE]
+        self._color        = color
         self.update_height_width()
 
     
@@ -113,6 +114,7 @@ class Popup(py_cui.ui.UIElement):
         target_y = int(self._stop_y - self._start_y / 2)
         self._renderer.set_color_rules([])
         self._renderer._set_bold()
+        self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self, with_title=False)
         self._renderer.draw_text(  self, self._title, target_y - 2, centered=True, selected=True)
         self._renderer.draw_text(  self, self._text,  target_y,     centered=True, selected=True)
