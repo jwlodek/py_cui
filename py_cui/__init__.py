@@ -1313,7 +1313,11 @@ class PyCUI:
                 # Resize the grid and the widgets if there was a resize operation
                 if key_pressed == curses.KEY_RESIZE:
                     self._logger.debug('Resizing CUI to new dimensions {} by {}'.format(height, width))
-                    self._refresh_height_width(height, width)
+                    try:
+                        self._refresh_height_width(height, width)
+                    except py_cui.errors.PyCUIOutOfBoundsError as e:
+                        self._logger.debug('Resized terminal too small')
+                        self._display_window_warning(stdscr, str(e))
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:
@@ -1324,15 +1328,19 @@ class PyCUI:
                 # Handle keypresses
                 self._handle_key_presses(key_pressed)
 
-                #try:
-                # Draw status/title bar, and all widgets. Selected widget will be bolded.
-                self._draw_status_bars(stdscr, height, width)
-                self._draw_widgets()
-                # draw the popup if required
-                if self._popup is not None:
-                    self._popup._draw()
-                #except Exception as e:
-                #    self._display_window_warning(stdscr, str(e))
+                try:
+                    # Draw status/title bar, and all widgets. Selected widget will be bolded.
+                    self._draw_status_bars(stdscr, height, width)
+                    self._draw_widgets()
+                    # draw the popup if required
+                    if self._popup is not None:
+                        self._popup._draw()
+                except curses.error as e:
+                    self._logger.debug('Curses error while drawing TUI')
+                    self._display_window_warning(stdscr, str(e))
+                except py_cui.errors.PyCUIOutOfBoundsError as e:
+                    self._logger.debug('Resized terminal too small')
+                    self._display_window_warning(stdscr, str(e))
 
                 # Refresh the screen
                 stdscr.refresh()
