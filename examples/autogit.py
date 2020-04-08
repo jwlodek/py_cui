@@ -106,11 +106,9 @@ class AutoGitCUI:
         logo = logo +  "/_/    \\_\\____/   |_|  \\____/ \\_____|_____|  |_|   \n\n\n"
         logo = logo + "Powered by the py_cui Python Command Line UI Library:\n\n"
         logo = logo + "https://github.com/jwlodek/py_cui\n\n"
-        logo = logo + "Documentation available online here: \n\n"
-        logo = logo + "Video utorial available here:\n\n"
-        logo = logo + "Tutorial building CUI interfaces with py_cui here: \n\n"
+        logo = logo + "Documentation available online here: https://jwlodek.github.io/py_cui\n\n"
         logo = logo + "Star me on Github!\n\n"
-        logo = logo + "Copyright (c) 2019 Jakub Wlodek\n\n"
+        logo = logo + "Copyright (c) 2019-2020 Jakub Wlodek\n\n"
         return logo
 
 

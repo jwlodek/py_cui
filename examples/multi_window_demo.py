@@ -14,11 +14,14 @@ class MultiWindowDemo:
         # Root PyCUI window
         self.root = root
 
-        # Add a button the the CUI
-        self.root.add_button('Open 2nd Window', 1, 1, command = self.open_set_B)
-
         # Collect current CUI configuration as a widget set object
-        self.widget_set_A = self.root.get_widget_set()
+        self.widget_set_A = self.root.create_new_widget_set(3,3)
+
+        # Add a button the the CUI
+        self.widget_set_A.add_button('Open 2nd Window', 1, 1, command = self.open_set_B)
+
+        # apply the initial widget set
+        self.root.apply_widget_set(self.widget_set_A)
 
         # Create a second widget set (window). This one will have a 5x5 grid, not 3x3 like the original CUI
         self.widget_set_B = self.root.create_new_widget_set(5, 5)
