@@ -665,7 +665,7 @@ class MenuImplementation(UIImplementation):
             return
         self._logger.debug('Removing {}'.format(self._view_items[self._selected_item]))
         del self._view_items[self._selected_item]
-        if self._selected_item >= len(self._view_items):
+        if self._selected_item >= len(self._view_items) and self._selected_item > 0:
             self._selected_item = self._selected_item - 1
 
 
