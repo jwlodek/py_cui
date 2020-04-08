@@ -8,6 +8,7 @@
 import sys
 import os
 import time
+import copy
 import shutil       # We use shutil for getting the terminal dimensions
 import threading    # Threading is used for loading icon popups
 import logging      # Use logging library for debug purposes
@@ -192,23 +193,6 @@ class PyCUI:
             self._logger.debug('Initialized logger')
         except PermissionError as e:
             print('Failed to initialize logger: {}'.format(str(e)))
-
-
-    def get_widget_set(self):
-        """Gets widget set object from current widgets.
-
-        Returns
-        -------
-        current_widget_set : py_cui.widget_set.WidgetSet
-            Widget set collected from widgets currently added to the py_cui
-        """
-
-        new_widget_set              = widget_set.WidgetSet(self._grid._num_rows, self._grid._num_columns, self._logger)
-        new_widget_set.grid         = self._grid
-        new_widget_set.widgets      = self._widgets
-        new_widget_set.keybindings  = self._keybindings
-        self._logger.debug('Created widget set from current CUI')
-        return new_widget_set
 
 
     def apply_widget_set(self, new_widget_set):
@@ -737,76 +721,114 @@ class PyCUI:
         return new_button
 
 
-    def _get_widgets_by_row(self, row):
-        """Gets all widgets in a specific row
+    def _get_horizontal_neighbors(self, widget, direction):
+        """Gets all horizontal (left, right) neighbor widgets
 
         Parameters
         ----------
-        row : int
-            Grid row
+        widget : py_cui.widgets.Widget
+            The currently selected widget
+        direction : py_cui.keys.KEY*
+            must be an arrow key value
 
         Returns
         -------
-        widget_list : list[Widget]
-            A list of the widgets in the given row
+        id_list : list[]
+            A list of the neighbor widget ids
         """
 
-        widget_list = []
-        id_list     = []
-        _, num_cols = self._grid.get_dimensions()
+        if not direction in py_cui.keys.ARROW_KEYS:
+            return None
 
-        for i in range(0, num_cols):
-            for widget_id in self._widgets.keys():
-                if self._widgets[widget_id]._is_row_col_inside(row, i) and self._widgets[widget_id] not in widget_list:
-                    widget_list.append(self._widgets[widget_id])
-                    id_list.append(widget_id)
-
-        self._logger.info('Found wigets with ids {} in row {}'.format(id_list, row))
-        return widget_list
-
-
-    def _get_widgets_by_col(self, col):
-        """Gets all widgets in a specific column
-
-        Parameters
-        ----------
-        col : int
-            Grid column
-
-        Returns
-        -------
-        widget_list : list[Widget]
-            A list of the widgets in the given column
-        """
-
-        widget_list = []
-        id_list     = []
-        num_rows, _ = self._grid.get_dimensions()
-
-        for i in range(0, num_rows):
-            for widget_id in self._widgets:
-                if self._widgets[widget_id]._is_row_col_inside(i, col) and self._widgets[widget_id] not in widget_list:
-                    widget_list.append(self._widgets[widget_id])
-                    id_list.append(widget_id)
+        _,          num_cols    = self._grid.get_dimensions()
+        row_start,  col_start   = widget.get_grid_cell()
+        row_span,   col_span    = widget.get_grid_cell_spans()
+        id_list                 = []
         
-        self._logger.info('Found wigets with ids {} in column {}'.format(id_list, col))
-        return widget_list
+        if direction == py_cui.keys.KEY_LEFT_ARROW:
+            col_range_start = 0
+            col_range_stop = col_start
+        else:
+            col_range_start = col_start + col_span
+            col_range_stop = num_cols
+
+        for col in range(col_range_start, col_range_stop):
+            for row in range(row_start, row_start + row_span):
+                for widget_id in self.get_widgets().keys():
+                    if self.get_widgets()[widget_id]._is_row_col_inside(row, col) and widget_id not in id_list:
+                        id_list.append(widget_id)
+
+        if direction == py_cui.keys.KEY_LEFT_ARROW:
+            id_list.reverse()
+
+        self._logger.info('Neighbors with ids {} for cell {},{} span {},{}'.format(
+                                                                                id_list,
+                                                                                row_start,
+                                                                                col_start,
+                                                                                row_span,
+                                                                                col_span))
+        return id_list
+
+
+    def _get_vertical_neighbors(self, widget, direction):
+        """Gets all vertical (up, down) neighbor widgets
+
+        Parameters
+        ----------
+        widget : py_cui.widgets.Widget
+            The currently selected widget
+        direction : py_cui.keys.KEY*
+            must be an arrow key value
+
+        Returns
+        -------
+        id_list : list[]
+            A list of the neighbor widget ids
+        """
+
+        if not direction in py_cui.keys.ARROW_KEYS:
+            return None
+
+        num_rows,   _           = self._grid.get_dimensions()
+        row_start,  col_start   = widget.get_grid_cell()
+        row_span,   col_span    = widget.get_grid_cell_spans()
+        id_list                 = []
+        
+        if direction == py_cui.keys.KEY_UP_ARROW:
+            row_range_start = 0
+            row_range_stop = row_start
+        else:
+            row_range_start = row_start + row_span
+            row_range_stop = num_rows
+
+        for row in range(row_range_start, row_range_stop):
+            for col in range(col_start, col_start + col_span):
+                for widget_id in self.get_widgets().keys():
+                    if self.get_widgets()[widget_id]._is_row_col_inside(row, col) and widget_id not in id_list:
+                        id_list.append(widget_id)
+
+        if direction == py_cui.keys.KEY_UP_ARROW:
+            id_list.reverse()
+
+        self._logger.info('Neighbors with ids {} for cell {},{} span {},{}'.format(
+                                                                                id_list,
+                                                                                row_start,
+                                                                                col_start,
+                                                                                row_span,
+                                                                                col_span))
+        return id_list
 
 
     # CUI status functions. Used to switch between widgets, set the mode, and
     # identify neighbors for overview mode
 
-    def _check_if_neighbor_exists(self, row, column, direction):
+    def _check_if_neighbor_exists(self, direction):
         """Function that checks if widget has neighbor in specified cell.
 
         Used for navigating CUI, as arrow keys find the immediate neighbor
 
         Parameters
         ----------
-        row : int
-            row of current widget
-        column : int
-            column of current widget
         direction : py_cui.keys.KEY_*
             The direction in which to search
 
@@ -816,33 +838,20 @@ class PyCUI:
             The widget neighbor ID if found, None otherwise
         """
 
-        start_widget = self._selected_widget
+        start_widget                = self.get_widgets()[self._selected_widget]
 
         # Find all the widgets in the given row or column
+        neighbors = []
         if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
-            widgets = [w.get_id() for w in self._get_widgets_by_col(column)]
-            vertical = True
+            neighbors = self._get_vertical_neighbors(start_widget, direction)
         elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
-            widgets = [w.get_id() for w in self._get_widgets_by_row(row)]
-            vertical = False
-        else:
+            neighbors = self._get_horizontal_neighbors(start_widget, direction)
+
+        if len(neighbors) == 0:
             return None
 
-        if vertical:
-            widgets = sorted(widgets, key=lambda x: self._widgets[x].get_grid_cell()[1])
-        else:
-            widgets = sorted(widgets, key=lambda x: self._widgets[x].get_grid_cell()[0])
-
-        # Find the widget and move from there
-        current_index = widgets.index(start_widget)
-        if direction == py_cui.keys.KEY_UP_ARROW or direction == py_cui.keys.KEY_LEFT_ARROW:
-            current_index -= 1
-        elif direction == py_cui.keys.KEY_DOWN_ARROW or direction == py_cui.keys.KEY_RIGHT_ARROW:
-            current_index += 1
-
-        if current_index >= len(widgets) or current_index < 0:
-            return None
-        return widgets[current_index]
+        # We select the best match to jump to (first neighbor)
+        return neighbors[0]
 
 
     def get_selected_widget(self):
@@ -874,7 +883,7 @@ class PyCUI:
             self._logger.info('Setting selected widget to ID {}'.format(widget_id))
             self._selected_widget = widget_id
         else:
-            self._logger.warn('New selected widget ID does not exist among current widgets.')
+            self._logger.warn('Widget w/ ID {} does not exist among current widgets.'.format(widget_id))
 
 
     def lose_focus(self):
@@ -1213,7 +1222,7 @@ class PyCUI:
 
         # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
         if self._selected_widget is None:
-            self._logger.warn('Missing selected widget.')
+            self._logger.warn('Missing selected widget')
             return
 
         selected_widget = self.get_widgets()[self._selected_widget]
@@ -1257,8 +1266,7 @@ class PyCUI:
             # If not in focus mode, use the arrow py_cui.keys to move around the selectable widgets.
             neighbor = None
             if key_pressed in py_cui.keys.ARROW_KEYS:
-                row, col = selected_widget.get_grid_cell()
-                neighbor = self._check_if_neighbor_exists(row, col, key_pressed)
+                neighbor = self._check_if_neighbor_exists(key_pressed)
             if neighbor is not None:
                 self.set_selected_widget(neighbor)
                 self._logger.debug('Navigated to neighbor widget {}'.format(self.get_widgets()[self._selected_widget].get_title()))

@@ -87,7 +87,6 @@ create an instance of this class, and then add cells + widgets to it.
  Method  | Doc
 -----|-----
  enable_logging | Function enables logging for py_cui library
- get_widget_set | Gets widget set object from current widgets.
  apply_widget_set | Function that replaces all widgets in a py_cui with those of a different widget set
  create_new_widget_set | Function that is used to create additional widget sets
  start | Function that starts the CUI
@@ -107,8 +106,8 @@ create an instance of this class, and then add cells + widgets to it.
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
- _get_widgets_by_row | Gets all widgets in a specific row
- _get_widgets_by_col | Gets all widgets in a specific column
+ _get_horizontal_neighbors | Gets all horizontal (left, right) neighbor widgets
+ _get_vertical_neighbors | Gets all vertical (up, down) neighbor widgets
  _check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
  get_selected_widget | Function that gets currently selected widget
  set_selected_widget | Function that sets the selected widget for the CUI
@@ -169,27 +168,6 @@ Function enables logging for py_cui library
 -----|----------|-----
  log_file_path  |  str | The target log filepath. Default 'py_cui_log.txt
  logging_level  |  int | Default logging level = logging.DEBUG
-
-
-
-
-
-### get_widget_set
-
-```python
-def get_widget_set(self)
-```
-
-Gets widget set object from current widgets.
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- current_widget_set  |  py_cui.widget_set.WidgetSet | Widget set collected from widgets currently added to the py_cui
 
 
 
@@ -666,13 +644,13 @@ Function that adds a new button to the CUI grid
 
 
 
-### _get_widgets_by_row
+### _get_horizontal_neighbors
 
 ```python
-def _get_widgets_by_row(self, row)
+def _get_horizontal_neighbors(self, widget, direction)
 ```
 
-Gets all widgets in a specific row
+Gets all horizontal (left, right) neighbor widgets
 
 
 
@@ -681,25 +659,26 @@ Gets all widgets in a specific row
 
  Parameter  | Type  | Doc
 -----|----------|-----
- row  |  int | Grid row
+ widget  |  py_cui.widgets.Widget | The currently selected widget
+ direction  |  py_cui.keys.KEY* | must be an arrow key value
 
 #### Returns
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- widget_list  |  list[Widget] | A list of the widgets in the given row
+ id_list  |  list[] | A list of the neighbor widget ids
 
 
 
 
 
-### _get_widgets_by_col
+### _get_vertical_neighbors
 
 ```python
-def _get_widgets_by_col(self, col)
+def _get_vertical_neighbors(self, widget, direction)
 ```
 
-Gets all widgets in a specific column
+Gets all vertical (up, down) neighbor widgets
 
 
 
@@ -708,13 +687,14 @@ Gets all widgets in a specific column
 
  Parameter  | Type  | Doc
 -----|----------|-----
- col  |  int | Grid column
+ widget  |  py_cui.widgets.Widget | The currently selected widget
+ direction  |  py_cui.keys.KEY* | must be an arrow key value
 
 #### Returns
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- widget_list  |  list[Widget] | A list of the widgets in the given column
+ id_list  |  list[] | A list of the neighbor widget ids
 
 
 
@@ -723,7 +703,7 @@ Gets all widgets in a specific column
 ### _check_if_neighbor_exists
 
 ```python
-def _check_if_neighbor_exists(self, row, column, direction)
+def _check_if_neighbor_exists(self, direction)
 ```
 
 Function that checks if widget has neighbor in specified cell.
@@ -737,8 +717,6 @@ Used for navigating CUI, as arrow keys find the immediate neighbor
 
  Parameter  | Type  | Doc
 -----|----------|-----
- row  |  int | row of current widget
- column  |  int | column of current widget
  direction  |  py_cui.keys.KEY_* | The direction in which to search
 
 #### Returns

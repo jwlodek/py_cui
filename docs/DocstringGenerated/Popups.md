@@ -343,6 +343,7 @@ Class representing a textbox popup
 
  Method  | Doc
 -----|-----
+ update_height_width | Need to update all cursor positions on resize
  _handle_key_press | Override of base handle key press function
  _draw | Override of base draw function
 
@@ -356,6 +357,20 @@ def __init__(self, root, title, color, command, renderer, password, logger)
 ```
 
 Initializer for textbox popup. Uses TextBoxImplementation as base
+
+
+
+
+
+
+
+### update_height_width
+
+```python
+def update_height_width(self)
+```
+
+Need to update all cursor positions on resize
 
 
 
