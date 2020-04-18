@@ -9,9 +9,9 @@ Created on August 12, 2019
 ### Contributing Authors
 
 [Maciej Wlodek (maciejwlodek)](https://github.com/maciejwlodek)  
-[Ellis Wright (telday)](https://github.com/telday)
-[Aaron Pierce (aaronpierce)](https://github.com/aaronpierce)
-[Caleb Reese (cptbldbrd)](https://github.com/cptbldbrd)
+[Ellis Wright (telday)](https://github.com/telday)  
+[Aaron Pierce (aaronpierce)](https://github.com/aaronpierce)  
+[Caleb Reese (cptbldbrd)](https://github.com/cptbldbrd)  
 
 ### License
 
