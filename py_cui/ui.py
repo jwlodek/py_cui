@@ -560,6 +560,7 @@ class MenuImplementation(UIImplementation):
         super().__init__(logger)
         self._top_view         = 0
         self._selected_item    = 0
+        self._page_scroll_len  = 5
         self._view_items       = []
 
 
@@ -628,6 +629,40 @@ class MenuImplementation(UIImplementation):
             self._top_view = self._top_view + 1
 
         self._logger.debug('Scrolling down to item {}'.format(self._selected_item))
+
+
+    def _jump_up(self):
+        """Function for jumping up menu several spots at a time
+        """
+
+        for _ in range(self._page_scroll_len):
+            self._scroll_up()
+
+
+    def _jump_down(self, viewport_height):
+        """Function for jumping down the menu several spots at a time
+        """
+
+        for _ in range(self._page_scroll_len):
+            self._scroll_down(viewport_height)
+
+
+    def _jump_to_top(self):
+        """Function that jumps to the top of the menu
+        """
+
+        self._top_view      = 0
+        self._selected_item = 0
+
+
+    def _jump_to_bottom(self, viewport_height):
+        """Function that jumps to the bottom of the menu
+        """
+
+        self._selected_item = len(self._view_items) - 1
+        self._top_view = self._selected_item - viewport_height
+        if self._top_view < 0:
+            self._top_view = 0
 
 
     def add_item(self, item_text):
