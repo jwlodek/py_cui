@@ -33,7 +33,7 @@ import py_cui.debug
 
 
 # Version number
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
