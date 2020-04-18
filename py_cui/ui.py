@@ -641,6 +641,11 @@ class MenuImplementation(UIImplementation):
 
     def _jump_down(self, viewport_height):
         """Function for jumping down the menu several spots at a time
+
+        Parameters
+        ----------
+        viewport_height : int
+            The number of visible viewport items
         """
 
         for _ in range(self._page_scroll_len):
@@ -657,6 +662,11 @@ class MenuImplementation(UIImplementation):
 
     def _jump_to_bottom(self, viewport_height):
         """Function that jumps to the bottom of the menu
+
+        Parameters
+        ----------
+        viewport_height : int
+            The number of visible viewport items
         """
 
         self._selected_item = len(self._view_items) - 1
