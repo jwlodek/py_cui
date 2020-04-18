@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/jwlodek/py_cui/master/docs/assets/py_cui_logo_new.svg" alt="PyCUI" width=300px>
+    <img src="docs/assets/py_cui_logo_new.svg" alt="PyCUI" width=300px>
 </div>
 
 <div align="center">
