@@ -6,6 +6,7 @@
 
 import py_cui
 import os
+import logging
 
 class SimpleTodoList:
 
@@ -139,5 +140,6 @@ class SimpleTodoList:
 # Create the CUI, pass it to the wrapper object, and start it
 root = py_cui.PyCUI(8, 6)
 root.set_title('CUI TODO List')
+root.enable_logging(logging_level=logging.DEBUG)
 s = SimpleTodoList(root)
 root.start()

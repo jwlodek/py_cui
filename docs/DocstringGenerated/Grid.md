@@ -33,19 +33,20 @@ Class representing the CUI grid
 
  Attribute  | Type  | Doc
 -----|----------|-----
- num_rows  |  int | Number of grid rows
- num_columns  |  int | Number of grid columns
- height  |  int | The height in characters of the terminal window
- width  |  int | The width in characters of the terminal window
- offset_y  |  int | The number of additional characters found by height mod rows
- offset_x  |  int | The number of additional characters found by width mod columns
- row_height  |  int | The number of characters in a single grid row
- column_width  |  int | The number of characters in a single grid column
+ _num_rows, _num_columns  |  int | Number of grid rows and columns
+ _height, _width  |  int | The height, width in characters of the terminal window
+ _offset_y, _offset_x  |  int | The number of additional characters found by height mod rows and width mod columns
+ _row_height, _column_width  |  int | The number of characters in a single grid row, column
+ _logger  |  py_cui.debug.PyCUILogger | logger object for maintaining debug messages
 
 #### Methods
 
  Method  | Doc
 -----|-----
+ get_dimensions | Gets dimensions in rows/columns
+ get_dimensions_absolute | Gets dimensions of grid in terminal characters
+ get_offsets | Gets leftover characters for x and y
+ get_cell_dimensions | Gets size in characters of single (row, column) cell location
  set_num_rows | Sets the grid row size
  set_num_cols | Sets the grid column size
  update_grid_height_width | Update grid height and width. Allows for on-the-fly size editing
@@ -56,7 +57,7 @@ Class representing the CUI grid
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_columns, height, width)
+def __init__(self, num_rows, num_columns, height, width, logger)
 ```
 
 Constructor for the Grid class
@@ -72,6 +73,94 @@ Constructor for the Grid class
  num_columns  |  int | Number of grid columns
  height  |  int | The height in characters of the terminal window
  width  |  int | The width in characters of the terminal window
+
+
+
+
+
+### get_dimensions
+
+```python
+def get_dimensions(self)
+```
+
+Gets dimensions in rows/columns
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ num_rows  |  int | size of grid in rows
+ num_cols  |  int | size of grid in columns
+
+
+
+
+
+### get_dimensions_absolute
+
+```python
+def get_dimensions_absolute(self)
+```
+
+Gets dimensions of grid in terminal characters
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ height  |  int | height in characters
+ width  |  int | width in characters
+
+
+
+
+
+### get_offsets
+
+```python
+def get_offsets(self)
+```
+
+Gets leftover characters for x and y
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ offset_x  |  int | leftover chars in x direction
+ offset_y  |  int | leftover chars in y direction
+
+
+
+
+
+### get_cell_dimensions
+
+```python
+def get_cell_dimensions(self)
+```
+
+Gets size in characters of single (row, column) cell location
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ row_height  |  int | height of row in characters
+ column_width  |  int | width of column in characters
 
 
 

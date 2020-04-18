@@ -16,7 +16,7 @@ setuptools.setup(
     description='A widget and grid based framework for building command line user interfaces in python.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.0.3',
+    version='0.1.0',
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
@@ -24,7 +24,7 @@ setuptools.setup(
     install_requires=required_libs,
     url='https://github.com/jwlodek/py_cui',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         
         'Programming Language :: Python :: 3.2',

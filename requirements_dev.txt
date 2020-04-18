@@ -1,1 +1,3 @@
 pytest
+pytest-cov
+windows-curses ; platform_system=="Windows"

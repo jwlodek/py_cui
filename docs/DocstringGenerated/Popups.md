@@ -11,21 +11,21 @@ File containing classes for all popups used by py_cui
 
  Class  | Doc
 -----|-----
- Popup | Base CUI popup class.
+ Popup(py_cui.ui.UIElement) | Base CUI popup class.
  MessagePopup(Popup) | Class representing a simple message popup
  YesNoPopup(Popup) | Class for Yes/No popup. Extends Popup
- TextBoxPopup(Popup) | Class representing a textbox popup
- MenuPopup(Popup) | A scroll menu popup.
+ TextBoxPopup(Popu | Class representing a textbox popup
+ MenuPopup(Popu | A scroll menu popup.
  LoadingIconPopup(Popup) | Loading icon popup class
  LoadingBarPopup(Popup) | Class for Loading Bar Popup
 
 
 
 
-## Popup
+## Popup(py_cui.ui.UIElement)
 
 ```python
-class Popup
+class Popup(py_cui.ui.UIElement)
 ```
 
 Base CUI popup class.
@@ -41,23 +41,21 @@ frame
 
  Attribute  | Type  | Doc
 -----|----------|-----
- root  |  py_cui.PyCUI | Root CUI window
- title  |  str | Popup title
- text  |  str | Popup message text
- color  |  int | PyCUI color value
- renderer  |  py_cui.renderer.Renderer | Renderer for drawing the popup
- start_x, start_y  |  int | top left corner of the popup
- stop_x, stop_y  |  int | bottom right corner of the popup
- height, width  |  int | The dimensions of the popup
- padx, pady  |  int | The padding on either side of the popup
- selected  |  bool | Always true. Used by the renderer to highlight popup
+ _root  |  py_cui.PyCUI | Root CUI window
+ _text  |  str | Popup message text
+ _selected  |  bool | Always true. Used by the renderer to highlight popup
+ _close_keys  |  List[int] | List of keycodes used to close popup
 
 #### Methods
 
  Method  | Doc
 -----|-----
- handle_key_press | Handles key presses when popup is open
- draw | Function that uses renderer to draw the popup
+ _increment_counter | Function that increments an internal counter
+ set_text | Sets popup text (message)
+ get_absolute_start_pos | Override of base class, computes position based on root dimensions
+ get_absolute_stop_pos | Override of base class, computes position based on root dimensions
+ _handle_key_press | Handles key presses when popup is open
+ _draw | Function that uses renderer to draw the popup
 
 
 
@@ -65,10 +63,10 @@ frame
 ### __init__
 
 ```python
-def __init__(self, root, title, text, color, renderer)
+def __init__(self, root, title, text, color, renderer, logger)
 ```
 
-Constructor for popup class
+Initializer for main popup class. Calls UIElement intialier, and sets some initial values
 
 
 
@@ -76,10 +74,87 @@ Constructor for popup class
 
 
 
-### handle_key_press
+### _increment_counter
 
 ```python
-def handle_key_press(self, key_pressed)
+def _increment_counter(self)
+```
+
+Function that increments an internal counter
+
+
+
+
+
+
+
+### set_text
+
+```python
+def set_text(self, text)
+```
+
+Sets popup text (message)
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ text  |  str | The new popup text
+
+
+
+
+
+### get_absolute_start_pos
+
+```python
+def get_absolute_start_pos(self)
+```
+
+Override of base class, computes position based on root dimensions
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ start_x, start_y  |  int | The coords of the upper-left corner of the popup
+
+
+
+
+
+### get_absolute_stop_pos
+
+```python
+def get_absolute_stop_pos(self)
+```
+
+Override of base class, computes position based on root dimensions
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ stop_x, stop_y  |  int | The coords of the lower-right corner of the popup
+
+
+
+
+
+### _handle_key_press
+
+```python
+def _handle_key_press(self, key_pressed)
 ```
 
 Handles key presses when popup is open
@@ -99,10 +174,10 @@ By default, only closes popup when Escape is pressed
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Function that uses renderer to draw the popup
@@ -128,18 +203,11 @@ Class representing a simple message popup
 
 
 
-
-#### Attributes
-
- Attribute  | Type  | Doc
------|----------|-----
- close_keys  |  list of int | list of key codes that can be used to close the popup
-
 #### Methods
 
  Method  | Doc
 -----|-----
- draw | Draw function for MessagePopup. Calls superclass draw()
+ _draw | Draw function for MessagePopup. Calls superclass draw()
 
 
 
@@ -147,10 +215,10 @@ Class representing a simple message popup
 ### __init__
 
 ```python
-def __init__(self, root, title, text, color, renderer)
+def __init__(self, root, title, text, color, renderer, logger)
 ```
 
-Constructor for MessagePopup
+Initializer for MessagePopup
 
 
 
@@ -158,10 +226,10 @@ Constructor for MessagePopup
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Draw function for MessagePopup. Calls superclass draw()
@@ -190,14 +258,14 @@ Class for Yes/No popup. Extends Popup
 
  Attribute  | Type  | Doc
 -----|----------|-----
- command  |  function, 1 boolean parameter | Function that takes one boolean parameter. Called with True if yes, called with False if no.
+ _command  |  function, 1 boolean parameter | Function that takes one boolean parameter. Called with True if yes, called with False if no.
 
 #### Methods
 
  Method  | Doc
 -----|-----
- handle_key_press | Handle key press overwrite from superclass
- draw | Uses base class draw function
+ _handle_key_press | Handle key press overwrite from superclass
+ _draw | Uses base class draw function
 
 
 
@@ -205,10 +273,10 @@ Class for Yes/No popup. Extends Popup
 ### __init__
 
 ```python
-def __init__(self, root, title, text, color, command, renderer)
+def __init__(self, root, title, text, color, command, renderer, logger)
 ```
 
-Constructor for YesNoPopup
+Initializer for YesNoPopup
 
 
 
@@ -216,10 +284,10 @@ Constructor for YesNoPopup
 
 
 
-### handle_key_press
+### _handle_key_press
 
 ```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Handle key press overwrite from superclass
@@ -237,10 +305,10 @@ Handle key press overwrite from superclass
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Uses base class draw function
@@ -254,10 +322,10 @@ Uses base class draw function
 
 
 
-## TextBoxPopup(Popup)
+## TextBoxPopup(Popu
 
 ```python
-class TextBoxPopup(Popup)
+class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation)
 ```
 
 Class representing a textbox popup
@@ -269,30 +337,15 @@ Class representing a textbox popup
 
  Attribute  | Type  | Doc
 -----|----------|-----
- text  |  str | The text in the text box
- command  |  function | The command to run when enter is pressed
- cursor_x, cursor_y  |  int | The absolute positions of the cursor in the terminal window
- cursor_text_pos  |  int | the cursor position relative to the text
- cursor_max_left, cursor_max_right  |  int | The cursor bounds of the text box
- viewport_width  |  int | The width of the textbox viewport
- password  |  bool | If set, replace all characters with *
+ _command  |  function | The command to run when enter is pressed
 
 #### Methods
 
  Method  | Doc
 -----|-----
- set_text | Sets the value of the text. Overwrites existing text
- get | Gets value of the text in the textbox
- clear | Clears the text in the textbox
- move_left | Shifts the cursor the the left. Internal use only
- move_right | Shifts the cursor the the right. Internal use only
- insert_char | Inserts char at cursor position. Internal use only
- jump_to_start | Jumps to the start of the textbox
- jump_to_end | Jumps to the end to the textbox
- erase_char | Erases character at textbox cursor
- delete_char | Deletes character to right of texbox cursor
- handle_key_press | Override of base handle key press function
- draw | Override of base draw function
+ update_height_width | Need to update all cursor positions on resize
+ _handle_key_press | Override of base handle key press function
+ _draw | Override of base draw function
 
 
 
@@ -300,9 +353,10 @@ Class representing a textbox popup
 ### __init__
 
 ```python
-def __init__(self, root, title, color, command, renderer, password)
+def __init__(self, root, title, color, command, renderer, password, logger)
 ```
 
+Initializer for textbox popup. Uses TextBoxImplementation as base
 
 
 
@@ -310,172 +364,24 @@ def __init__(self, root, title, color, command, renderer, password)
 
 
 
-
-### set_text
+### update_height_width
 
 ```python
-def set_text(self, text)
+def update_height_width(self)
 ```
 
-Sets the value of the text. Overwrites existing text
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | The text to write to the textbox
+Need to update all cursor positions on resize
 
 
 
 
 
-### get
+
+
+### _handle_key_press
 
 ```python
-def get(self)
-```
-
-Gets value of the text in the textbox
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- text  |  str | The current textbox test
-
-
-
-
-
-### clear
-
-```python
-def clear(self)
-```
-
-Clears the text in the textbox
-
-
-
-
-
-
-
-### move_left
-
-```python
-def move_left(self)
-```
-
-Shifts the cursor the the left. Internal use only
-
-
-
-
-
-
-
-### move_right
-
-```python
-def move_right(self)
-```
-
-Shifts the cursor the the right. Internal use only
-
-
-
-
-
-
-
-### insert_char
-
-```python
-def insert_char(self, key_pressed)
-```
-
-Inserts char at cursor position. Internal use only
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- key_pressed  |  int | key code of key pressed
-
-
-
-
-
-### jump_to_start
-
-```python
-def jump_to_start(self)
-```
-
-Jumps to the start of the textbox
-
-
-
-
-
-
-
-### jump_to_end
-
-```python
-def jump_to_end(self)
-```
-
-Jumps to the end to the textbox
-
-
-
-
-
-
-
-### erase_char
-
-```python
-def erase_char(self)
-```
-
-Erases character at textbox cursor
-
-
-
-
-
-
-
-### delete_char
-
-```python
-def delete_char(self)
-```
-
-Deletes character to right of texbox cursor
-
-
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base handle key press function
@@ -493,10 +399,10 @@ Override of base handle key press function
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Override of base draw function
@@ -510,10 +416,10 @@ Override of base draw function
 
 
 
-## MenuPopup(Popup)
+## MenuPopup(Popu
 
 ```python
-class MenuPopup(Popup)
+class MenuPopup(Popup, py_cui.ui.MenuImplementation)
 ```
 
 A scroll menu popup.
@@ -527,21 +433,15 @@ Allows for popup with several menu items to select from
 
  Attribute  | Type  | Doc
 -----|----------|-----
- top_view  |  int | the uppermost menu element in view
- selected_item  |  int | the currently highlighted menu item
- view_items  |  list of str | list of menu items
- command  |  function | a function that takes a single string parameter, run when ENTER pressed
- run_command_if_none  |  bool | Runs command even if there are no menu items (passes None)
+ _command  |  function | a function that takes a single string parameter, run when ENTER pressed
+ _run_command_if_none  |  bool | Runs command even if there are no menu items (passes None)
 
 #### Methods
 
  Method  | Doc
 -----|-----
- scroll_up | Function that scrolls the view up in the scroll menu
- scroll_down | Function that scrolls the view down in the scroll menu
- get | Function that gets the selected item from the scroll menu
- handle_key_press | Override of base handle key press function
- draw | Overrides base class draw function
+ _handle_key_press | Override of base handle key press function
+ _draw | Overrides base class draw function
 
 
 
@@ -549,10 +449,10 @@ Allows for popup with several menu items to select from
 ### __init__
 
 ```python
-def __init__(self, root, items, title, color, command, renderer, run_command_if_none)
+def __init__(self, root, items, title, color, command, renderer, logger, run_command_if_none)
 ```
 
-Constructor for MenuPopup
+Initializer for MenuPopup. Uses MenuImplementation as base
 
 
 
@@ -560,59 +460,10 @@ Constructor for MenuPopup
 
 
 
-### scroll_up
-
-```python
-def scroll_up(self)
-```
-
-Function that scrolls the view up in the scroll menu
-
-
-
-
-
-
-
-### scroll_down
+### _handle_key_press
 
 ```python
-def scroll_down(self)
-```
-
-Function that scrolls the view down in the scroll menu
-
-
-
-
-
-
-
-### get
-
-```python
-def get(self)
-```
-
-Function that gets the selected item from the scroll menu
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- item  |  str | selected item, or None if there are no items in the menu
-
-
-
-
-
-### handle_key_press
-
-```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base handle key press function
@@ -632,10 +483,10 @@ Enter key runs command, Escape key closes menu
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Overrides base class draw function
@@ -666,16 +517,16 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 
  Attribute  | Type  | Doc
 -----|----------|-----
- loading_icons  |  list of str | Animation frames for loading icon
- icon_counter  |  int | Current frame of animation
- message  |  str | Loading message
+ _loading_icons  |  list of str | Animation frames for loading icon
+ _icon_counter  |  int | Current frame of animation
+ _message  |  str | Loading message
 
 #### Methods
 
  Method  | Doc
 -----|-----
- handle_key_press | Override of base class function.
- draw | Overrides base draw function
+ _handle_key_press | Override of base class function.
+ _draw | Overrides base draw function
 
 
 
@@ -683,10 +534,10 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 ### __init__
 
 ```python
-def __init__(self, root, title, message, color, renderer)
+def __init__(self, root, title, message, color, renderer, logger)
 ```
 
-Constructor for LoadingIconPopup
+Initializer for LoadingIconPopup
 
 
 
@@ -694,10 +545,10 @@ Constructor for LoadingIconPopup
 
 
 
-### handle_key_press
+### _handle_key_press
 
 ```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base class function.
@@ -717,10 +568,10 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 
 
 
-### draw
+### _draw
 
 ```python
-def draw(self)
+def _draw(self)
 ```
 
 Overrides base draw function
@@ -758,8 +609,9 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 
  Method  | Doc
 -----|-----
- handle_key_press | Override of base class function.
- draw | Override of base draw function
+ _handle_key_press | Override of base class function.
+ _increment_counter | Function that increments an internal counter
+ _draw | Override of base draw function
 
 
 
@@ -767,10 +619,10 @@ MUST BE USED WITH A FORM OF ASYNC/THREADING
 ### __init__
 
 ```python
-def __init__(self, root, title, num_items, color, renderer)
+def __init__(self, root, title, num_items, color, renderer, logger)
 ```
 
-Constructor for LoadingBarPopup
+Initializer for LoadingBarPopup
 
 
 
@@ -778,10 +630,10 @@ Constructor for LoadingBarPopup
 
 
 
-### handle_key_press
+### _handle_key_press
 
 ```python
-def handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed)
 ```
 
 Override of base class function.
@@ -801,10 +653,24 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 
 
 
-### draw
+### _increment_counter
 
 ```python
-def draw(self)
+def _increment_counter(self)
+```
+
+Function that increments an internal counter
+
+
+
+
+
+
+
+### _draw
+
+```python
+def _draw(self)
 ```
 
 Override of base draw function

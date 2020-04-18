@@ -45,6 +45,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  Method  | Doc
 -----|-----
  set_selected_widget | Function that sets the selected cell for the CUI
+ get_widgets | Function that gets current set of widgets
  add_key_command | Function that adds a keybinding to the CUI when in overview mode
  add_scroll_menu | Function that adds a new scroll menu to the CUI grid
  add_checkbox_menu | Function that adds a new checkbox menu to the CUI grid
@@ -60,7 +61,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_cols)
+def __init__(self, num_rows, num_cols, logger, simulated_terminal=None)
 ```
 
 Constructor for WidgetSet
@@ -87,6 +88,27 @@ Function that sets the selected cell for the CUI
  Parameter  | Type  | Doc
 -----|----------|-----
  cell_title  |  str | the title of the cell
+
+
+
+
+
+### get_widgets
+
+```python
+def get_widgets(self)
+```
+
+Function that gets current set of widgets
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ widgets  |  dict of str -> widget | dictionary mapping widget IDs to object instances
 
 
 
@@ -141,7 +163,7 @@ Function that adds a new scroll menu to the CUI grid
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- ScrollMenu | Unknown | A reference to the created scroll menu object.
+ new_scroll_menu  |  ScrollMenu | A reference to the created scroll menu object.
 
 
 
@@ -204,6 +226,7 @@ Function that adds a new text box to the CUI grid
  padx=1  |  int | number of padding characters in the x direction
  pady=0  |  int | number of padding characters in the y direction
  initial_text=''  |  str | Initial text for the textbox
+ password=False  |  bool | Toggle to show '*' instead of characters.
 
 #### Returns
 

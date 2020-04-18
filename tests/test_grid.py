@@ -2,22 +2,25 @@ import pytest
 
 import py_cui.grid as grid
 import py_cui.errors as err
+import py_cui.debug as dbg
 
+logger = dbg.PyCUILogger('PYCUI TEST')
 
-test_grid_A = grid.Grid(3, 3, 800, 600)
-
-test_grid_B = grid.Grid(1, 1, 10, 10)
-
-test_grid_C = grid.Grid(5, 5, 100, 150)
+test_grid_A = grid.Grid(3, 3, 800,  600, logger)
+test_grid_B = grid.Grid(1, 1, 10,   10,  logger)
+test_grid_C = grid.Grid(5, 5, 100,  150, logger)
 
 
 def test_init():
-    assert test_grid_A.row_height == 266
-    assert test_grid_A.column_width == 200
-    assert test_grid_B.row_height == 10
-    assert test_grid_B.column_width == 10
-    assert test_grid_C.row_height == 20
-    assert test_grid_C.column_width == 30
+    row_height, col_width = test_grid_A.get_cell_dimensions()
+    assert row_height   == 266
+    assert col_width    == 200
+    row_height, col_width = test_grid_B.get_cell_dimensions()
+    assert row_height   == 10
+    assert col_width    == 10
+    row_height, col_width = test_grid_C.get_cell_dimensions()
+    assert row_height   == 20
+    assert col_width    == 30
 
 
 def test_set_num_rows_illegal():
@@ -30,8 +33,9 @@ def test_set_num_rows_illegal():
 
 def test_set_num_rows_legal():
     test_grid_C.set_num_rows(10)
-    assert test_grid_C.row_height == 10
-    assert test_grid_C.column_width == 30
+    row_height, col_width = test_grid_C.get_cell_dimensions()
+    assert row_height   == 10
+    assert col_width    == 30
 
 
 def test_set_num_cols_illegal():
@@ -44,7 +48,8 @@ def test_set_num_cols_illegal():
 
 def test_set_num_cols_legal():
     test_grid_C.set_num_cols(10)
-    assert test_grid_C.column_width == 15
+    _, col_width = test_grid_C.get_cell_dimensions()
+    assert col_width == 15
 
 
 def test_update_height_width_illegal_1():
@@ -65,5 +70,6 @@ def test_update_height_width_illegal_2():
 
 def test_update_height_width_legal():
     test_grid_A.update_grid_height_width(300, 900)
-    assert test_grid_A.column_width == 300
-    assert test_grid_A.row_height == 100
+    row_height, col_width = test_grid_A.get_cell_dimensions()
+    assert col_width  == 300
+    assert row_height == 100
