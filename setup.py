@@ -24,7 +24,7 @@ setuptools.setup(
     install_requires=required_libs,
     url='https://github.com/jwlodek/py_cui',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         
         'Programming Language :: Python :: 3.2',
