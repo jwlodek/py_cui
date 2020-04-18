@@ -39,7 +39,7 @@ __version__ = '0.1.0'
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
 # create these values as pairs of the bat to be selected.
 # Format is FOREGROUND_ON_BACKGROUND
-# TODO add more color options
+# TODO add more color options (maybe should be moved to colors module)
 WHITE_ON_BLACK      = 1
 BLACK_ON_GREEN      = 2
 BLACK_ON_WHITE      = 3
