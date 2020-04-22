@@ -14,7 +14,7 @@ Quick summary of pull request...
 * Issue 1
 * Issue 2
 
-**Optinally, what changes should join this PR**
+**Optionally, what changes should join this PR**
 
 * Change Docs
 ...
