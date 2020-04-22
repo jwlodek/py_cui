@@ -576,7 +576,7 @@ class MenuImplementation(UIImplementation):
 
 
 
-    def get_selected_item(self):
+    def get_selected_item_index(self):
         """Gets the currently selected item
 
         Returns
@@ -588,7 +588,7 @@ class MenuImplementation(UIImplementation):
         return self._selected_item
 
 
-    def set_selected_item(self, selected_item):
+    def set_selected_item_index(self, selected_item):
         """Sets the currently selected item
 
         Parameters
@@ -675,17 +675,17 @@ class MenuImplementation(UIImplementation):
             self._top_view = 0
 
 
-    def add_item(self, item_text):
+    def add_item(self, item):
         """Adds an item to the menu.
 
         Parameters
         ----------
-        item_text : str
-            The text for the item
+        item : Object
+            Object to add to the menu. Must have implemented __str__ function
         """
 
-        self._logger.debug('Adding item {} to menu'.format(item_text))
-        self._view_items.append(item_text)
+        self._logger.debug('Adding item {} to menu'.format(str(item)))
+        self._view_items.append(item)
 
 
     def add_item_list(self, item_list):
@@ -693,8 +693,8 @@ class MenuImplementation(UIImplementation):
 
         Parameters
         ----------
-        item_list : list of str
-            list of strings to add as items to the scrollmenu
+        item_list : list of Object
+            list of objects to add as items to the scrollmenu
         """
 
         self._logger.debug('Adding item list {} to menu'.format(str(item_list)))
@@ -708,9 +708,27 @@ class MenuImplementation(UIImplementation):
 
         if len(self._view_items) == 0:
             return
-        self._logger.debug('Removing {}'.format(self._view_items[self._selected_item]))
+        self._logger.debug('Removing {}'.format(str(self._view_items[self._selected_item])))
         del self._view_items[self._selected_item]
         if self._selected_item >= len(self._view_items) and self._selected_item > 0:
+            self._selected_item = self._selected_item - 1
+
+
+    def remove_item(self, item):
+        """Function that removes a specific item from the menu
+
+        Parameters
+        ----------
+        item : Object
+            Reference of item to remove
+        """
+
+        if len(self._view_items) == 0 or item not in self._view_items:
+            return
+        self._logger.debug('Removing {}'.format(str(item)))
+        i_index = self._view_items.index(item)
+        del self._view_items[i_index]
+        if self._selected_item >= i_index:
             self._selected_item = self._selected_item - 1
 
 
@@ -738,6 +756,72 @@ class MenuImplementation(UIImplementation):
         if len(self._view_items) > 0:
             return self._view_items[self._selected_item]
         return None
+
+
+class CheckBoxMenuImplementation(MenuImplementation):
+    """Class representing checkbox menu ui implementation
+    
+    Attributes
+    ----------
+    _selected_item_dict : dict of object -> bool
+        stores each object and maps to its current selected status
+    _checked_char : char
+        Character to mark checked items
+    """
+
+    def __init__(self, logger, checked_char):
+        """Initializer for the checkbox menu implementation
+        """
+
+        super().__init__(logger)
+        self._selected_item_dict = {}
+        self._checked_char       = checked_char
+
+
+    def add_item(self, item):
+        """Extends base class function, item is added and marked as unchecked to start
+        
+        Parameters
+        ----------
+        item : object
+            The item being added
+        """
+
+        super().add_item(item)
+        self._selected_item_dict[item] = False
+
+
+    def remove_selected_item(self):
+        """Removes selected item from item list and selected item dictionary
+        """
+
+        del self._selected_item_dict[self.get()]
+        super().remove_selected_item()
+
+
+    def remove_item(self, item):
+        """Removes item from item list and selected item dict
+
+        Parameters
+        ----------
+        item : object
+            Item to remove from menu
+        """
+
+        del self._selected_item_dict[item]
+        super().remove_item(item)
+
+
+    def mark_item_as_checked(self, item):
+        """Function that marks an item as selected
+
+        Parameters
+        ----------
+        item : object
+            Mark item as checked
+        """
+
+        self._selected_item_dict[item] = not self._selected_item_dict[item]
 
 
 class TextBlockImplementation(UIImplementation):

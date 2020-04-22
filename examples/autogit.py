@@ -273,7 +273,7 @@ class AutoGitCUI:
                     break
                 selected_branch = selected_branch + 1
 
-            remote = self.git_remotes_menu.get_selected_item()
+            remote = self.git_remotes_menu.get_selected_item_index()
             proc = Popen(['git', 'remote'], stdout=PIPE, stderr=PIPE)
             out, _ = proc.communicate()
             out = out.decode().splitlines()
@@ -286,7 +286,7 @@ class AutoGitCUI:
             self.git_commits_menu.clear()
             self.git_commits_menu.add_item_list(out)
 
-            selected_file = self.add_files_menu.get_selected_item()
+            selected_file = self.add_files_menu.get_selected_item_index()
             proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
             out, _ = proc.communicate()
             out = out.decode().splitlines()

@@ -371,7 +371,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
             else:
                 if counter >= self._height - self._pady - 1:
                     break
-                if line_counter == self.get_selected_item():
+                if line_counter == self.get_selected_item_index():
                     self._renderer.draw_text(self, line, self._start_y + counter, selected=True)
                 else:
                     self._renderer.draw_text(self, line, self._start_y + counter)
