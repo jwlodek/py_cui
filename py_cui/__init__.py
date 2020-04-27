@@ -721,6 +721,33 @@ class PyCUI:
         return new_button
 
 
+    def get_widget_at_position(self, x, y):
+        """Returns containing widget for character position
+
+        Parameters
+        ----------
+        x : int
+            Horizontal character position
+        y : int
+            Vertical character position, top down
+        
+        Returns
+        -------
+        in_widget : UIElement
+            Widget or popup that is within the position None if nothing
+        """
+
+        if self._popup is not None and self._popup._contains_position(x, y):
+            return self._popup
+        elif self._popup is None:
+            for widget_id in self.get_widgets().keys():
+                if self.get_widgets()[widget_id]._contains_position(x, y):
+                    return self.get_widgets()[widget_id]
+        return None
+
+
+
+
     def _get_horizontal_neighbors(self, widget, direction):
         """Gets all horizontal (left, right) neighbor widgets
 
@@ -1330,6 +1357,16 @@ class PyCUI:
                     except py_cui.errors.PyCUIOutOfBoundsError as e:
                         self._logger.debug('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
+                
+                elif key_pressed == curses.KEY_MOUSE:
+                    self._logger.debug('Detected mouse click')
+                    _, x, y, _, _ = curses.getmouse()
+                    in_widget = self.get_widget_at_position(x, y)
+                    if in_widget is not None and self._in_focused_mode:
+                        # TODO - Add mouse click handling on UI element level
+                        pass
+                    elif in_widget is not None and not self._in_focused_mode:
+                        self.move_focus(in_widget)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:

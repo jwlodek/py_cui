@@ -317,6 +317,28 @@ class UIElement:
             raise py_cui.errors.PyCUIError('Invalid renderer, must be of type py_cui.renderer.Renderer')
 
 
+    def _contains_position(self, x, y):
+        """Checks if character position is within element.
+
+        Parameters
+        ----------
+        x : int
+            X coordinate to check
+        y : int
+            Y coordinate to check
+
+        Returns
+        -------
+        contains : bool
+            True if (x,y) is within the element, false otherwise
+        """
+
+        within_x = self._start_x <= x and self._start_x + self._width >= x
+        within_y = self._start_y <= y and self._start_y + self._width >= y
+        return within_x and within_y
+        
+
+
 class UIImplementation:
     """Base class for ui implementations.
 
