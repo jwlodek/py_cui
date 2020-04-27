@@ -937,11 +937,16 @@ class PyCUI:
         """
 
         self.lose_focus()
-        self.set_selected_widget(widget.get_id())
-        widget.set_selected(True)
-        self._in_focused_mode = True
-        self.status_bar.set_text(widget.get_help_text())
-        self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
+        # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
+        if self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
+            widget.command()
+            self._logger.debug('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
+        else:
+            self.set_selected_widget(widget.get_id())
+            widget.set_selected(True)
+            self._in_focused_mode = True
+            self.status_bar.set_text(widget.get_help_text())
+            self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
 
 
     def add_key_command(self, key, command):
@@ -1270,19 +1275,7 @@ class PyCUI:
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         elif self._popup is None:
             if key_pressed == py_cui.keys.KEY_ENTER and self._selected_widget is not None and selected_widget.is_selectable():
-                self._in_focused_mode = True
-                selected_widget.set_selected(True)
-                self._logger.debug('Focused on widget {}'.format(selected_widget.get_title()))
-
-                # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
-                if self._auto_focus_buttons and isinstance(selected_widget, widgets.Button):
-                    self._in_focused_mode = False
-                    selected_widget.set_selected(False)
-                    if selected_widget.command is not None:
-                        self._logger.debug('Autofocus button detected, running command {}'.format(selected_widget.command.__name__))
-                        selected_widget.command()
-                else:
-                    self.status_bar.set_text(selected_widget.get_help_text())
+                self.move_focus(selected_widget)
     
             for key in self._keybindings.keys():
                 if key_pressed == key:
@@ -1319,6 +1312,9 @@ class PyCUI:
         # Clear and refresh the screen for a blank canvas
         stdscr.clear()
         stdscr.refresh()
+        curses.mousemask(curses.BUTTON1_CLICKED)
+        #stdscr.nodelay(False)
+        stdscr.keypad(True)
 
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
@@ -1358,15 +1354,19 @@ class PyCUI:
                         self._logger.debug('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
                 
+                # Here we handle mouse clicke events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.debug('Detected mouse click')
                     _, x, y, _, _ = curses.getmouse()
-                    in_widget = self.get_widget_at_position(x, y)
-                    if in_widget is not None and self._in_focused_mode:
+                    in_element = self.get_widget_at_position(x, y)
+
+                    # In first case, we click inside already selected widget, pass click for processing
+                    if in_element is not None and in_element.is_selected():
                         # TODO - Add mouse click handling on UI element level
                         pass
-                    elif in_widget is not None and not self._in_focused_mode:
-                        self.move_focus(in_widget)
+                    # Otherwise, if not a popup, select the clicked on widget
+                    elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
+                        self.move_focus(in_element)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:

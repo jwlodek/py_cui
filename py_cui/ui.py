@@ -334,7 +334,7 @@ class UIElement:
         """
 
         within_x = self._start_x <= x and self._start_x + self._width >= x
-        within_y = self._start_y <= y and self._start_y + self._width >= y
+        within_y = self._start_y <= y and self._start_y + self._height >= y
         return within_x and within_y
         
 
