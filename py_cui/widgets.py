@@ -465,6 +465,23 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         self.set_help_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
 
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        viewport_top = self._start_y + self._pady + 1
+        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+            elem_clicked = y - viewport_top + self._top_view
+            self.set_selected_item_index(elem_clicked)
+            self.mark_item_as_checked(self._view_items[elem_clicked])
+
+
     def _handle_key_press(self, key_pressed):
         """Override of key presses.
 
@@ -743,7 +760,6 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
                 else:
                     self._cursor_x = self._cursor_max_left + len(line)
                     self._cursor_text_pos_x = len(line)
-
 
 
     def _handle_key_press(self, key_pressed):
