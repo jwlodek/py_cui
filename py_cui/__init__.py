@@ -1312,7 +1312,7 @@ class PyCUI:
         # Clear and refresh the screen for a blank canvas
         stdscr.clear()
         stdscr.refresh()
-        curses.mousemask(curses.BUTTON1_CLICKED)
+        curses.mousemask(curses.ALL_MOUSE_EVENTS)
         #stdscr.nodelay(False)
         stdscr.keypad(True)
 
@@ -1362,11 +1362,11 @@ class PyCUI:
 
                     # In first case, we click inside already selected widget, pass click for processing
                     if in_element is not None and in_element.is_selected():
-                        # TODO - Add mouse click handling on UI element level
-                        pass
+                        in_element._handle_mouse_press(x, y)
                     # Otherwise, if not a popup, select the clicked on widget
                     elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
                         self.move_focus(in_element)
+                        in_element._handle_mouse_press(x, y)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:

@@ -47,18 +47,19 @@ class UIElement:
         """Initializer for UIElement base class
         """
 
-        self._id       = id
-        self._title    = title
-        self._padx     = 1
-        self._pady     = 0
+        self._id                        = id
+        self._title                     = title
+        self._padx                      = 1
+        self._pady                      = 0
         self._start_x,  self._stop_y    = 0, 0
         self._stop_x,   self._start_y   = 0, 0
         self._height,   self._width     = 0, 0
-        self._color    = py_cui.WHITE_ON_BLACK
-        self._selected = False
-        self._renderer = renderer
-        self._logger   = logger
-        self._help_text = ''
+        self._color                     = py_cui.WHITE_ON_BLACK
+        self._mouse_press_handler       = None
+        self._selected                  = False
+        self._renderer                  = renderer
+        self._logger                    = logger
+        self._help_text                 = ''
 
 
     def get_absolute_start_pos(self):
@@ -285,7 +286,25 @@ class UIElement:
 
         pass
 
-    
+
+    def add_mouse_press_handler(self, mouse_press_handler_func):
+        """Sets a mouse press handler function
+
+        mouse_press_handler_func : function / lambda function
+            Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
+        """
+
+        self._mouse_press_handler = mouse_press_handler_func
+
+
+    def _handle_mouse_press(self, x, y):
+        """Can be implemented by subclass. Used to handle mouse presses
+        """
+
+        if self._mouse_press_handler is not None:
+            self._mouse_press_handler(x, y)
+
+
     def _draw(self):
         """Must be implemented by subclasses. Uses renderer to draw element to terminal
         """

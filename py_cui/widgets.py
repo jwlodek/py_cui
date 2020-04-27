@@ -375,6 +375,22 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self.set_help_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
 
 
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        viewport_top = self._start_y + self._pady + 1
+        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+            elem_clicked = y - viewport_top + self._top_view
+            self.set_selected_item_index(elem_clicked)
+
+
     def _handle_key_press(self, key_pressed):
         """Override base class function.
 
@@ -591,6 +607,27 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
 
 
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
+            if x <= len(self._text) + self._cursor_max_left:
+                old_text_pos = self._cursor_text_pos
+                old_cursor_x = self._cursor_x
+                self._cursor_x = x
+                self._cursor_text_pos = old_text_pos + (x - old_cursor_x)
+            else:
+                self._cursor_x = self._cursor_max_left + len(self._text)
+                self._cursor_text_pos = len(self._text)
+
+
     def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
 
@@ -676,6 +713,37 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self._cursor_max_right   = self._start_x + self._width - self._padx - 1
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
         self._viewport_height    = self._cursor_max_down  - self._cursor_max_up
+
+
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+        
+        super()._handle_mouse_press(x, y)
+        if y >= self._cursor_max_up and y <= self._cursor_max_down: 
+            if x >= self._cursor_max_left and x <= self._cursor_max_right:
+                line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
+                if len(self._text_lines) < line_clicked_index:
+                    self._cursor_text_pos_y = len(self._text_lines)
+                    self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
+                else:
+                    self._cursor_text_pos_y = line_clicked_index
+                    self._cursor_y = y
+                line = self._text_lines[line_clicked_index]
+                if x <= len(line) + self._cursor_max_left:
+                    old_text_pos = self._cursor_text_pos_x
+                    old_cursor_x = self._cursor_x
+                    self._cursor_x = x
+                    self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
+                else:
+                    self._cursor_x = self._cursor_max_left + len(line)
+                    self._cursor_text_pos_x = len(line)
+
 
 
     def _handle_key_press(self, key_pressed):
