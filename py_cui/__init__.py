@@ -143,7 +143,7 @@ class PyCUI:
         self._height                = self._height - 4
 
         # Add status and title bar
-        self._title_bar             = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
+        self.title_bar              = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
         exit_key_char               = py_cui.keys.get_char_from_ascii(exit_key)
         self._init_status_bar_text  = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(exit_key_char)
         self.status_bar             = py_cui.statusbar.StatusBar(self._init_status_bar_text, BLACK_ON_WHITE)
@@ -1216,10 +1216,10 @@ class PyCUI:
             stdscr.addstr(  height + 3, 0, fit_text(width, self.status_bar.get_text()))
             stdscr.attroff( curses.color_pair(self.status_bar.get_color()))
 
-        if self._title_bar is not None:
-            stdscr.attron(  curses.color_pair(self._title_bar.get_color()))
+        if self.title_bar is not None:
+            stdscr.attron(  curses.color_pair(self.title_bar.get_color()))
             stdscr.addstr(  0, 0, fit_text(width, self._title, center=True))
-            stdscr.attroff( curses.color_pair(self._title_bar.get_color()))
+            stdscr.attroff( curses.color_pair(self.title_bar.get_color()))
 
 
     def _display_window_warning(self, stdscr, error_info):
