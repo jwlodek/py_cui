@@ -15,7 +15,7 @@ def test_create():
     test_cui = py_cui.PyCUI(4, 5, simulated_terminal=[30, 100])
     assert test_cui._height == 26
     assert test_cui._width == 100
-    assert test_cui._title_bar.get_text().strip() == 'PyCUI Window'
+    assert test_cui.title_bar.get_text().strip() == 'PyCUI Window'
     assert test_cui._simulated_terminal == [30, 100]
     assert test_cui._exit_key == py_cui.keys.KEY_Q_LOWER
 

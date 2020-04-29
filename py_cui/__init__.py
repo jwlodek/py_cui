@@ -667,8 +667,8 @@ class PyCUI:
                                                     column_span, 
                                                     padx, 
                                                     pady, 
-                                                    self._logger, 
-                                                    center)
+                                                    center,
+                                                    self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
