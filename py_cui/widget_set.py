@@ -2,7 +2,7 @@
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
-@author: Jakub Wlodek  
+@author: Jakub Wlodek
 @created: 05-Oct-2019
 """
 
@@ -36,9 +36,9 @@ class WidgetSet:
 
         self._widgets      = {}
         self._keybindings  = {}
-        
+
         self._simulated_terminal = simulated_terminal
-        
+
         if self._simulated_terminal is None:
             term_size = shutil.get_terminal_size()
             height = term_size.lines
@@ -123,15 +123,15 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scroll_menu     = widgets.ScrollMenu(   id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
+        new_scroll_menu     = widgets.ScrollMenu(   id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
                                                     self._logger)
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
@@ -169,16 +169,16 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_checkbox_menu   = widgets.CheckBoxMenu(  id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
-                                                    self._logger, 
+        new_checkbox_menu   = widgets.CheckBoxMenu(  id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
+                                                    self._logger,
                                                     checked_char)
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
@@ -218,15 +218,15 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_box        = widgets.TextBox(   id, 
-                                                title, 
-                                                self._grid, 
-                                                row, column, 
-                                                row_span, 
-                                                column_span, 
-                                                padx, pady, 
-                                                self._logger, 
-                                                initial_text, 
+        new_text_box        = widgets.TextBox(   id,
+                                                title,
+                                                self._grid,
+                                                row, column,
+                                                row_span,
+                                                column_span,
+                                                padx, pady,
+                                                self._logger,
+                                                initial_text,
                                                 password)
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
@@ -264,16 +264,16 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_block      = widgets.ScrollTextBlock(   id, 
-                                                        title, 
-                                                        self._grid, 
-                                                        row, 
-                                                        column, 
-                                                        row_span, 
-                                                        column_span, 
-                                                        padx, 
-                                                        pady, 
-                                                        self._logger, 
+        new_text_block      = widgets.ScrollTextBlock(   id,
+                                                        title,
+                                                        self._grid,
+                                                        row,
+                                                        column,
+                                                        row_span,
+                                                        column_span,
+                                                        padx,
+                                                        pady,
+                                                        self._logger,
                                                         initial_text)
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
@@ -309,15 +309,15 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.Label( id, 
-                                            title, 
-                                            self._grid, 
-                                            row, 
-                                            column, 
-                                            row_span, 
-                                            column_span, 
-                                            padx, 
-                                            pady, 
+        new_label           = widgets.Label( id,
+                                            title,
+                                            self._grid,
+                                            row,
+                                            column,
+                                            row_span,
+                                            column_span,
+                                            padx,
+                                            pady,
                                             self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
@@ -353,16 +353,16 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.BlockLabel(    id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
-                                                    center, 
+        new_label           = widgets.BlockLabel(    id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
+                                                    center,
                                                     self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
@@ -398,19 +398,21 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_button          = widgets.Button(    id, 
-                                                title, 
-                                                self._grid, 
-                                                row, 
-                                                column, 
-                                                row_span, 
-                                                column_span, 
-                                                padx, 
-                                                pady, 
-                                                self._logger, 
+        new_button          = widgets.Button(    id,
+                                                title,
+                                                self._grid,
+                                                row,
+                                                column,
+                                                row_span,
+                                                column_span,
+                                                padx,
+                                                pady,
+                                                self._logger,
                                                 command)
         self._widgets[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
+
+

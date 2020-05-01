@@ -1,6 +1,6 @@
 """A python library for creating command line based user interfaces.
 
-@author:    Jakub Wlodek  
+@author:    Jakub Wlodek
 @created:   12-Aug-2019
 """
 
@@ -209,7 +209,7 @@ class PyCUI:
             self._widgets      = new_widget_set._widgets
             self._grid         = new_widget_set._grid
             self._keybindings  = new_widget_set._keybindings
-            
+
             if self._simulated_terminal is None:
                 if self._stdscr is None:
                     term_size = shutil.get_terminal_size()
@@ -223,7 +223,7 @@ class PyCUI:
                 width   = self._simulated_terminal[1]
 
             height  = height - 4
-            
+
             self._refresh_height_width(height, width)
             if self._stdscr is not None:
                 self._initialize_widget_renderer()
@@ -244,7 +244,7 @@ class PyCUI:
             row count for new widget set
         num_cols : int
             column count for new widget set
-        
+
         Returns
         -------
         new_widget_set : py_cui.widget_set.WidgetSet
@@ -428,15 +428,15 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scroll_menu     = widgets.ScrollMenu(   id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
+        new_scroll_menu     = widgets.ScrollMenu(   id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
                                                     self._logger)
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
@@ -474,16 +474,16 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_checkbox_menu   = widgets.CheckBoxMenu( id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
-                                                    self._logger, 
+        new_checkbox_menu   = widgets.CheckBoxMenu( id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
+                                                    self._logger,
                                                     checked_char)
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
@@ -523,15 +523,15 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_box        = widgets.TextBox(  id, 
-                                                title, 
-                                                self._grid, 
-                                                row, column, 
-                                                row_span, 
-                                                column_span, 
-                                                padx, pady, 
-                                                self._logger, 
-                                                initial_text, 
+        new_text_box        = widgets.TextBox(  id,
+                                                title,
+                                                self._grid,
+                                                row, column,
+                                                row_span,
+                                                column_span,
+                                                padx, pady,
+                                                self._logger,
+                                                initial_text,
                                                 password)
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
@@ -569,16 +569,16 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_block      = widgets.ScrollTextBlock(  id, 
-                                                        title, 
-                                                        self._grid, 
-                                                        row, 
-                                                        column, 
-                                                        row_span, 
-                                                        column_span, 
-                                                        padx, 
-                                                        pady, 
-                                                        self._logger, 
+        new_text_block      = widgets.ScrollTextBlock(  id,
+                                                        title,
+                                                        self._grid,
+                                                        row,
+                                                        column,
+                                                        row_span,
+                                                        column_span,
+                                                        padx,
+                                                        pady,
+                                                        self._logger,
                                                         initial_text)
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
@@ -614,15 +614,15 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.Label(id, 
-                                            title, 
-                                            self._grid, 
-                                            row, 
-                                            column, 
-                                            row_span, 
-                                            column_span, 
-                                            padx, 
-                                            pady, 
+        new_label           = widgets.Label(id,
+                                            title,
+                                            self._grid,
+                                            row,
+                                            column,
+                                            row_span,
+                                            column_span,
+                                            padx,
+                                            pady,
                                             self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
@@ -658,15 +658,15 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.BlockLabel(   id, 
-                                                    title, 
-                                                    self._grid, 
-                                                    row, 
-                                                    column, 
-                                                    row_span, 
-                                                    column_span, 
-                                                    padx, 
-                                                    pady, 
+        new_label           = widgets.BlockLabel(   id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
                                                     center,
                                                     self._logger)
         self._widgets[id]  = new_label
@@ -703,16 +703,16 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_button          = widgets.Button(   id, 
-                                                title, 
-                                                self._grid, 
-                                                row, 
-                                                column, 
-                                                row_span, 
-                                                column_span, 
-                                                padx, 
-                                                pady, 
-                                                self._logger, 
+        new_button          = widgets.Button(   id,
+                                                title,
+                                                self._grid,
+                                                row,
+                                                column,
+                                                row_span,
+                                                column_span,
+                                                padx,
+                                                pady,
+                                                self._logger,
                                                 command)
         self._widgets[id]  = new_button
         if self._selected_widget is None:
@@ -720,6 +720,59 @@ class PyCUI:
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
 
+    def add_slider(self, title, row, column, row_span=1,
+                   column_span=1, padx=1, pady=0,
+                   min_val=0, max_val=100, step=1, init_val=0):
+        """Function that adds a new label to the CUI grid
+
+        Parameters
+        ----------
+        title : str
+            The title of the label
+        row : int
+            The row value, from the top down
+        column : int
+            The column value from the top down
+        row_span=1 : int
+            The number of rows to span accross
+        column_span=1 : int
+            the number of columns to span accross
+        padx=1 : int
+            number of padding characters in the x direction
+        pady=0 : int
+            number of padding characters in the y direction
+        min_val = 0 int
+            min value of the slider
+        max_val = 0 int
+            max value of the slider
+        step = 0 int
+            step to incremento or decrement
+        init_val = 0 int
+            initial value of the slider
+
+
+        Returns
+        -------
+        new_slider : Slider
+            A reference to the created slider object.
+        """
+
+        id = 'Widget{}'.format(len(self._widgets.keys()))
+        new_slider = widgets.Slider(id,
+                                    title,
+                                    self._grid,
+                                    row,
+                                    column,
+                                    row_span,
+                                    column_span,
+                                    padx,
+                                    pady,
+                                    self._logger,
+                                    min_val, max_val, step, init_val)
+        self._widgets[id] = new_slider
+        self._logger.debug('Adding widget {} w/ ID {} of type {}'
+                           .format(title, id, str(type(new_slider))))
+        return new_slider
 
     def get_widget_at_position(self, x, y):
         """Returns containing widget for character position
@@ -730,7 +783,7 @@ class PyCUI:
             Horizontal character position
         y : int
             Vertical character position, top down
-        
+
         Returns
         -------
         in_widget : UIElement
@@ -771,7 +824,7 @@ class PyCUI:
         row_start,  col_start   = widget.get_grid_cell()
         row_span,   col_span    = widget.get_grid_cell_spans()
         id_list                 = []
-        
+
         if direction == py_cui.keys.KEY_LEFT_ARROW:
             col_range_start = 0
             col_range_stop = col_start
@@ -820,7 +873,7 @@ class PyCUI:
         row_start,  col_start   = widget.get_grid_cell()
         row_span,   col_span    = widget.get_grid_cell_spans()
         id_list                 = []
-        
+
         if direction == py_cui.keys.KEY_UP_ARROW:
             row_range_start = 0
             row_range_stop = row_start
@@ -1088,7 +1141,7 @@ class PyCUI:
 
         if callback is not None:
             self._post_loading_callback = callback
-        
+
         color         = WHITE_ON_BLACK
         self._loading = True
         self._popup   = py_cui.popups.LoadingIconPopup(self, title, message, color, self._renderer, self._logger)
@@ -1112,7 +1165,7 @@ class PyCUI:
 
         if callback is not None:
             self._post_loading_callback = callback
-        
+
         color         = WHITE_ON_BLACK
         self._loading = True
         self._popup   = py_cui.popups.LoadingBarPopup(self, title, num_items, color, self._renderer, self._logger)
@@ -1276,7 +1329,7 @@ class PyCUI:
         elif self._popup is None:
             if key_pressed == py_cui.keys.KEY_ENTER and self._selected_widget is not None and selected_widget.is_selectable():
                 self.move_focus(selected_widget)
-    
+
             for key in self._keybindings.keys():
                 if key_pressed == key:
                     command = self._keybindings[key]
@@ -1353,7 +1406,7 @@ class PyCUI:
                     except py_cui.errors.PyCUIOutOfBoundsError as e:
                         self._logger.debug('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
-                
+
                 # Here we handle mouse clicke events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.debug('Detected mouse click')
@@ -1405,11 +1458,10 @@ class PyCUI:
                 else:
                     self._logger.debug('Waiting for next keypress')
                     key_pressed = stdscr.getch()
-            
+
             except KeyboardInterrupt:
                 self._logger.debug('Detect Keyboard Interrupt, Exiting...')
                 self._stopped = True
-
 
         stdscr.clear()
         stdscr.refresh()
