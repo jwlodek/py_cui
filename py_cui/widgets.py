@@ -11,11 +11,12 @@ This file contains classes for:
 * Button
 * TextBox
 * Text Block
+* Slider
 
 Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
 
-@author:    Jakub Wlodek  
+@author:    Jakub Wlodek
 @created:   12-Aug-2019
 """
 
@@ -59,12 +60,12 @@ class Widget(py_cui.ui.UIElement):
         super().__init__(id, title, None, logger)
         if grid is None:
             raise py_cui.errors.PyCUIMissingParentError("Cannot add widget to NoneType")
-        
+
         self._grid = grid
         grid_rows, grid_cols = self._grid.get_dimensions()
         if (grid_cols < column + column_span) or (grid_rows < row + row_span):
             raise py_cui.errors.PyCUIOutOfBoundsError("Target grid too small for widget {}".format(title))
-        
+
         self._row          = row
         self._column       = column
         self._row_span     = row_span
@@ -142,7 +143,7 @@ class Widget(py_cui.ui.UIElement):
         y_adjust                = self._row
         offset_x, offset_y      = self._grid.get_offsets()
         row_height, col_width   = self._grid.get_cell_dimensions()
-        
+
         if self._column > offset_x:
             x_adjust = offset_x
         if self._row > offset_y:
@@ -168,17 +169,17 @@ class Widget(py_cui.ui.UIElement):
 
         width   = col_width     * self._column_span
         height  = row_height    * self._row_span
-        
+
         counter = self._row
         while counter < offset_y and (counter - self._row) < self._row_span:
             height  = height    + 1
             counter = counter   + 1
-        
+
         counter = self._column
         while counter < offset_x and (counter - self._column) < self._column_span:
             width   = width     + 1
             counter = counter   + 1
-        
+
         return width + self._start_x, height + self._start_y
 
 
@@ -416,7 +417,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             self._jump_up()
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
-        
+
 
 
     def _draw(self):
@@ -690,7 +691,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         if self._password:
             temp = '*' * len(render_text)
             render_text = temp
-            
+
         self._renderer.draw_text(self, render_text, self._cursor_y, selected=self._selected)
         if self._selected:
             self._renderer.draw_cursor(self._cursor_y, self._cursor_x)
@@ -740,9 +741,9 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         x, y : int
             Coordinates of mouse press
         """
-        
+
         super()._handle_mouse_press(x, y)
-        if y >= self._cursor_max_up and y <= self._cursor_max_down: 
+        if y >= self._cursor_max_up and y <= self._cursor_max_down:
             if x >= self._cursor_max_left and x <= self._cursor_max_right:
                 line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
                 if len(self._text_lines) < line_clicked_index:
@@ -819,3 +820,5 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         else:
             self._renderer.reset_cursor(self)
         self._renderer.unset_color_mode(self._color)
+
+

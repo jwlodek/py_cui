@@ -114,7 +114,7 @@ class UIElement:
 
     def get_id(self):
         """Gets the element ID
-        
+
         Returns
         -------
         id : int
@@ -126,7 +126,7 @@ class UIElement:
 
     def get_title(self):
         """Getter for ui element title
-        
+
         Returns
         -------
         title : str
@@ -138,7 +138,7 @@ class UIElement:
 
     def get_padding(self):
         """Gets ui element padding on in characters
-        
+
         Returns
         -------
         padx, pady : int, int
@@ -162,7 +162,7 @@ class UIElement:
 
     def get_stop_position(self):
         """Gets coords of lower right corner
-        
+
         Returns
         -------
         stop_x, stop_y : int, int
@@ -355,7 +355,7 @@ class UIElement:
         within_x = self._start_x <= x and self._start_x + self._width >= x
         within_y = self._start_y <= y and self._start_y + self._height >= y
         return within_x and within_y
-        
+
 
 
 class UIImplementation:
@@ -427,7 +427,7 @@ class TextBoxImplementation(UIImplementation):
 
     def get_cursor_text_pos(self):
         """Gets current position of cursor relative to text
-        
+
         Returns
         -------
         cursor_text_pos : int
@@ -801,7 +801,7 @@ class MenuImplementation(UIImplementation):
 
 class CheckBoxMenuImplementation(MenuImplementation):
     """Class representing checkbox menu ui implementation
-    
+
     Attributes
     ----------
     _selected_item_dict : dict of object -> bool
@@ -821,7 +821,7 @@ class CheckBoxMenuImplementation(MenuImplementation):
 
     def add_item(self, item):
         """Extends base class function, item is added and marked as unchecked to start
-        
+
         Parameters
         ----------
         item : object
@@ -867,7 +867,7 @@ class CheckBoxMenuImplementation(MenuImplementation):
 
 class TextBlockImplementation(UIImplementation):
     """Base class for TextBlockImplementation
-    
+
     Contains all logic required for a textblock ui element to function.
     Currently only implemented in widget form, though popup form is possible.
 
@@ -1133,7 +1133,7 @@ class TextBlockImplementation(UIImplementation):
     def _move_down(self):
         """Function that moves the cursor/text position one location down
         """
-        
+
         if self._cursor_text_pos_y < len(self._text_lines) - 1:
             if self._cursor_y < self._cursor_max_down:
                 self._cursor_y = self._cursor_y + 1
@@ -1144,7 +1144,7 @@ class TextBlockImplementation(UIImplementation):
                 temp = len(self._text_lines[self._cursor_text_pos_y])
                 self._cursor_x = self._cursor_x - (self._cursor_text_pos_x - temp)
                 self._cursor_text_pos_x = temp
-        
+
         self._logger.debug('Moved cursor down to line {}'.format(self._cursor_text_pos_y))
 
 
