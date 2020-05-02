@@ -48,8 +48,8 @@ def test_min_value_fail():
 
 
 def test_max_value():
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2, 1, 0,
-                                      logger, 10, 220, 5, 30)
+    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
+                                      1, 0, logger, 10, 220, 5, 30)
     idx = 0
     while idx < 100:
         print(idx)
@@ -87,6 +87,6 @@ def test_change_step():
 
 
 def test_wrong_inital_value():
-    with pytest.raises(Exception):
+    with pytest.raises(py_cui.errors.PyCUIInvalidValue):
         slider.SliderWidget('id', 'slider', grid_test, 1,
                             1, 1, 2, 1, 0, logger, 10, 90, 4, 165)

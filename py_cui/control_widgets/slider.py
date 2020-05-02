@@ -5,6 +5,20 @@ import py_cui.popups
 
 class SliderImplementation(py_cui.ui.UIImplementation):
 
+    _bar_char = '#'
+
+    def __init__(self, min_val, max_val, init_val, step):
+
+        self._min_val = min_val
+        self._max_val = max_val
+        self._cur_val = init_val
+        self._step = step
+
+        if self._cur_val < self._min_val or self._cur_val > self._max_val:
+            raise py_cui.errors.PyCUIInvalidValue(
+                'initial value must be between {} and {}'
+                .format(self._min_val, self._max_val))
+
     def set_bar_char(self,char):
         self._bar_char = char
 
@@ -48,23 +62,17 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         Current value of the slider
 
     """
-    _bar_char = '#'
 
     def __init__(self, id, title, grid, row, column, row_span, column_span,
                  padx, pady, logger, min_val, max_val, step, init_val):
 
-        super().__init__(id, title, grid, row, column,
-                         row_span, column_span, padx, pady, logger,
-                         selectable=True)
+        SliderImplementation.__init__(self, min_val, max_val, init_val, step)
 
-        self._min_val = min_val
-        self._max_val = max_val
-        self._cur_val = init_val
-        self._step = step
+        py_cui.widgets.Widget.__init__(self, id, title, grid, row, column,
+                                       row_span, column_span, padx,
+                                       pady, logger, selectable=True)
 
-        if self._cur_val < self._min_val or self._cur_val > self._max_val:
-            raise Exception('initial value must be between {} and {}'
-                            .format(self._min_val, self._max_val))
+
 
     def _draw(self):
 
@@ -72,6 +80,10 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._renderer.set_color_mode(self._color)
         target_y = self._start_y + int(self._height / 2)
 
+        # this block depends on the draw, but if equal for popup
+        # can be moved to SliderImplementation
+
+        # --
         # simple normalize width:
         # ratio between screen bar width and bar interval
         fact = (self._max_val - self._min_val) / (self._width - 4)
@@ -79,8 +91,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         _len = int((self._cur_val - self._min_val) / fact)
         # append percentual
         _bar_length = _len - len(str(self._max_val))
-
         _bar = " " + self._bar_char * _bar_length + str(self._cur_val)
+        # --
 
         self._renderer.draw_text(self,
                                  _bar,
