@@ -6,11 +6,13 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 @created: 05-Oct-2019
 """
 
-# TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
+# TODO: Should create an initial widget set in PyCUI class that widgets are
+# added to by default.
 
 import shutil
 import py_cui.widgets as widgets
 import py_cui.grid as grid
+import py_cui.control_widgets.slider as slider
 
 
 class WidgetSet:
@@ -123,16 +125,16 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scroll_menu     = widgets.ScrollMenu(   id,
-                                                    title,
-                                                    self._grid,
-                                                    row,
-                                                    column,
-                                                    row_span,
-                                                    column_span,
-                                                    padx,
-                                                    pady,
-                                                    self._logger)
+        new_scroll_menu     = widgets.ScrollMenu(id,
+                                                 title,
+                                                 self._grid,
+                                                 row,
+                                                 column,
+                                                 row_span,
+                                                 column_span,
+                                                 padx,
+                                                 pady,
+                                                 self._logger)
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -169,17 +171,17 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_checkbox_menu   = widgets.CheckBoxMenu(  id,
-                                                    title,
-                                                    self._grid,
-                                                    row,
-                                                    column,
-                                                    row_span,
-                                                    column_span,
-                                                    padx,
-                                                    pady,
-                                                    self._logger,
-                                                    checked_char)
+        new_checkbox_menu   = widgets.CheckBoxMenu(id,
+                                                   title,
+                                                   self._grid,
+                                                   row,
+                                                   column,
+                                                   row_span,
+                                                   column_span,
+                                                   padx,
+                                                   pady,
+                                                   self._logger,
+                                                   checked_char)
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -218,16 +220,16 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_box        = widgets.TextBox(   id,
-                                                title,
-                                                self._grid,
-                                                row, column,
-                                                row_span,
-                                                column_span,
-                                                padx, pady,
-                                                self._logger,
-                                                initial_text,
-                                                password)
+        new_text_box        = widgets.TextBox(id,
+                                              title,
+                                              self._grid,
+                                              row, column,
+                                              row_span,
+                                              column_span,
+                                              padx, pady,
+                                              self._logger,
+                                              initial_text,
+                                              password)
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -264,17 +266,17 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_block      = widgets.ScrollTextBlock(   id,
-                                                        title,
-                                                        self._grid,
-                                                        row,
-                                                        column,
-                                                        row_span,
-                                                        column_span,
-                                                        padx,
-                                                        pady,
-                                                        self._logger,
-                                                        initial_text)
+        new_text_block      = widgets.ScrollTextBlock(id,
+                                                      title,
+                                                      self._grid,
+                                                      row,
+                                                      column,
+                                                      row_span,
+                                                      column_span,
+                                                      padx,
+                                                      pady,
+                                                      self._logger,
+                                                      initial_text)
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -309,7 +311,7 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.Label( id,
+        new_label           = widgets.Label(id,
                                             title,
                                             self._grid,
                                             row,
@@ -353,17 +355,17 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.BlockLabel(    id,
-                                                    title,
-                                                    self._grid,
-                                                    row,
-                                                    column,
-                                                    row_span,
-                                                    column_span,
-                                                    padx,
-                                                    pady,
-                                                    center,
-                                                    self._logger)
+        new_label           = widgets.BlockLabel(id,
+                                                 title,
+                                                 self._grid,
+                                                 row,
+                                                 column,
+                                                 row_span,
+                                                 column_span,
+                                                 padx,
+                                                 pady,
+                                                 center,
+                                                 self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
@@ -398,17 +400,17 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_button          = widgets.Button(    id,
-                                                title,
-                                                self._grid,
-                                                row,
-                                                column,
-                                                row_span,
-                                                column_span,
-                                                padx,
-                                                pady,
-                                                self._logger,
-                                                command)
+        new_button          = widgets.Button(id,
+                                             title,
+                                             self._grid,
+                                             row,
+                                             column,
+                                             row_span,
+                                             column_span,
+                                             padx,
+                                             pady,
+                                             self._logger,
+                                             command)
         self._widgets[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -416,3 +418,59 @@ class WidgetSet:
         return new_button
 
 
+    def add_slider(self, title, row, column, row_span=1,
+                   column_span=1, padx=1, pady=0,
+                   min_val=0, max_val=100, step=1, init_val=0):
+        """Function that adds a new label to the CUI grid
+
+        Parameters
+        ----------
+        title : str
+            The title of the label
+        row : int
+            The row value, from the top down
+        column : int
+            The column value from the top down
+        row_span=1 : int
+            The number of rows to span accross
+        column_span=1 : int
+            the number of columns to span accross
+        padx=1 : int
+            number of padding characters in the x direction
+        pady=0 : int
+            number of padding characters in the y direction
+        min_val = 0 int
+            min value of the slider
+        max_val = 0 int
+            max value of the slider
+        step = 0 int
+            step to incremento or decrement
+        init_val = 0 int
+            initial value of the slider
+
+
+        Returns
+        -------
+        new_slider : Slider
+            A reference to the created slider object.
+        """
+
+        id = 'Widget{}'.format(len(self._widgets.keys()))
+        new_slider = slider.SliderWidget(id,
+                                         title,
+                                         self._grid,
+                                         row,
+                                         column,
+                                         row_span,
+                                         column_span,
+                                         padx,
+                                         pady,
+                                         self._logger,
+                                         min_val,
+                                         max_val,
+                                         step,
+                                         init_val)
+        self._widgets[id] = new_slider
+        self._logger.debug('Adding widget {} w/ ID {} of type {}'
+                           .format(title, id, str(type(new_slider))))
+        return new_slider
