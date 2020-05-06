@@ -1,14 +1,18 @@
-import pytest
+import pytest # noqa
+
 import py_cui
 import py_cui.keys
+
 
 def test_fit_text():
     out = py_cui.fit_text(7, 'Hello World')
     assert out == 'He...'
 
+
 def test_fit_text_center():
     out = py_cui.fit_text(10, 'HI', center=True)
     assert out == '   HI    '
+
 
 # Define a test CUI with a 30 by 100 simulated terminal
 def test_create():
@@ -48,6 +52,7 @@ def test_add_checkbox_menu():
     row, col = widget.get_grid_cell()
     assert row == 1
     assert col == 1
+
 
 def test_add_label():
     test_cui = py_cui.PyCUI(4, 5, simulated_terminal=[30, 100])

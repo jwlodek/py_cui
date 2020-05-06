@@ -1,4 +1,4 @@
-import pytest
+import pytest # noqa
 
 import py_cui.grid as grid
 import py_cui.errors as err
@@ -13,14 +13,14 @@ test_grid_C = grid.Grid(5, 5, 100,  150, logger)
 
 def test_init():
     row_height, col_width = test_grid_A.get_cell_dimensions()
-    assert row_height   == 266
-    assert col_width    == 200
+    assert row_height == 266
+    assert col_width == 200
     row_height, col_width = test_grid_B.get_cell_dimensions()
-    assert row_height   == 10
-    assert col_width    == 10
+    assert row_height == 10
+    assert col_width == 10
     row_height, col_width = test_grid_C.get_cell_dimensions()
-    assert row_height   == 20
-    assert col_width    == 30
+    assert row_height == 20
+    assert col_width == 30
 
 
 def test_set_num_rows_illegal():
@@ -34,8 +34,8 @@ def test_set_num_rows_illegal():
 def test_set_num_rows_legal():
     test_grid_C.set_num_rows(10)
     row_height, col_width = test_grid_C.get_cell_dimensions()
-    assert row_height   == 10
-    assert col_width    == 30
+    assert row_height == 10
+    assert col_width == 30
 
 
 def test_set_num_cols_illegal():
@@ -64,12 +64,12 @@ def test_update_height_width_illegal_2():
     try:
         test_grid_C.update_grid_height_width(30, 15)
         assert False
-    except:
+    except err.PyCUIOutOfBoundsError:
         assert True
 
 
 def test_update_height_width_legal():
     test_grid_A.update_grid_height_width(300, 900)
     row_height, col_width = test_grid_A.get_cell_dimensions()
-    assert col_width  == 300
+    assert col_width == 300
     assert row_height == 100

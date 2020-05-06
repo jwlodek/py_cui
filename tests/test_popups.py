@@ -1,6 +1,6 @@
-import pytest
+import pytest # noqa
 
-import py_cui
+import py_cui # noqa
 
 
 # TODO

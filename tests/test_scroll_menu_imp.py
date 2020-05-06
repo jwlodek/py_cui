@@ -1,4 +1,4 @@
-import pytest
+import pytest # noqa
 
 import py_cui
 import py_cui.debug as dbg
@@ -7,10 +7,11 @@ logger = dbg.PyCUILogger('PYCUI TEST')
 
 grid_test = py_cui.grid.Grid(10, 10, 100, 100, logger)
 
-scroll = py_cui.widgets.ScrollMenu('1', 'Scroll', grid_test, 0, 0, 1, 1, 1, 0, logger)
+scroll = py_cui.widgets.ScrollMenu('1', 'Scroll', grid_test,
+                                   0, 0, 1, 1, 1, 0, logger)
 scroll.selected = True
 
-elems = ["Elem0","Elem1","Elem2","Elem3","Elem4"]
+elems = ["Elem0", "Elem1", "Elem2", "Elem3", "Elem4"]
 
 
 def test_add_item_list():
