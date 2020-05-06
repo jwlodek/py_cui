@@ -1,8 +1,8 @@
 """Module containing the py_cui renderer. It is used to draw all of the onscreen ui_elements and items.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
 
 import curses
 import py_cui

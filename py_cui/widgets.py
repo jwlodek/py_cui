@@ -14,10 +14,10 @@ This file contains classes for:
 
 Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
 
 
 import curses

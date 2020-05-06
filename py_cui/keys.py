@@ -1,8 +1,9 @@
 """Module containing constants and helper functions for dealing with keys.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
+
 
 from sys import platform
 import curses

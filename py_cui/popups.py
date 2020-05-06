@@ -1,8 +1,9 @@
 """File containing classes for all popups used by py_cui
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
+
 
 # required library imports
 import curses

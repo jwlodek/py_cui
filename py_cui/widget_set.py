@@ -1,10 +1,10 @@
 """File containing class that abstracts a collection of widgets.
 
 It can be used to swap between collections of widgets (screens) in a py_cui
-
-@author: Jakub Wlodek  
-@created: 05-Oct-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
 
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
 

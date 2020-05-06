@@ -3,6 +3,10 @@
 Contains base UI element class, along with UI implementation agnostic UI element classes.
 """
 
+# Author:    Jakub Wlodek
+# Created:   19-Mar-2020
+
+
 import py_cui
 import py_cui.errors
 import py_cui.colors
@@ -290,6 +294,8 @@ class UIElement:
     def add_mouse_press_handler(self, mouse_press_handler_func):
         """Sets a mouse press handler function
 
+        Parameters
+        ----------
         mouse_press_handler_func : function / lambda function
             Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
         """
@@ -299,6 +305,11 @@ class UIElement:
 
     def _handle_mouse_press(self, x, y):
         """Can be implemented by subclass. Used to handle mouse presses
+
+        Parameters
+        ----------
+        x, y : int, int
+            Coordinates of the mouse press event.
         """
 
         if self._mouse_press_handler is not None:

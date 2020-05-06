@@ -1,8 +1,12 @@
-"""A python library for creating command line based user interfaces.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
+"""A python library for intuitively creating CUI/TUI interfaces with pre-built widgets.
 """
+
+#
+# Author:   Jakub Wlodek
+# Created:  12-Aug-2019
+# Docs:     https://jwlodek.github.io/py_cui-docs
+# License:  BSD-3-Clause (New/Revised)
+#
 
 # Some python core library imports
 import sys
