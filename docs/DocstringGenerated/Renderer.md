@@ -4,9 +4,6 @@ Module containing the py_cui renderer. It is used to draw all of the onscreen ui
 
 
 
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
-
 #### Classes
 
  Class  | Doc

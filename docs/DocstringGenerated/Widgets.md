@@ -19,9 +19,6 @@ This file contains classes for:
 Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
 
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
-
 #### Classes
 
  Class  | Doc
@@ -29,11 +26,11 @@ file and extending the base Widget class, or if appropriate one of the other cor
  Widget(py_cui.ui.UIElement) | Top Level Widget Base Class
  Label(Widget) | The most basic subclass of Widget.
  BlockLabel(Widget) | A Variation of the label widget that renders a block of text.
- ScrollMenu(Widge | A scroll menu widget.
- CheckBoxMenu(ScrollMenu) | Extension of ScrollMenu that allows for multiple items to be selected at once.
+ ScrollMenu(Widget, py_cui.ui.MenuImplementation) | A scroll menu widget.
+ CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation) | Extension of ScrollMenu that allows for multiple items to be selected at once.
  Button(Widget) | Basic button widget.
- TextBox(Widge | Widget for entering small single lines of text
- ScrollTextBlock(Widge | Widget for editing large multi-line blocks of text
+ TextBox(Widget, py_cui.ui.TextBoxImplementation) | Widget for entering small single lines of text
+ ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation) | Widget for editing large multi-line blocks of text
 
 
 
@@ -496,7 +493,7 @@ Center text and draw it
 
 
 
-## ScrollMenu(Widge
+## ScrollMenu(Widget, py_cui.ui.MenuImplementation)
 
 ```python
 class ScrollMenu(Widget, py_cui.ui.MenuImplementation)
@@ -510,6 +507,7 @@ A scroll menu widget.
 
  Method  | Doc
 -----|-----
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override base class function.
  _draw | Overrides base class draw function
 
@@ -525,6 +523,27 @@ def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pa
 Initializer for scroll menu. calls superclass initializers and sets help text
 
 
+
+
+
+
+
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x, y)
+```
+
+Override of base class function, handles mouse press in menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int | Coordinates of mouse press
 
 
 
@@ -570,10 +589,10 @@ Overrides base class draw function
 
 
 
-## CheckBoxMenu(ScrollMenu)
+## CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation)
 
 ```python
-class CheckBoxMenu(ScrollMenu)
+class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation)
 ```
 
 Extension of ScrollMenu that allows for multiple items to be selected at once.
@@ -592,11 +611,9 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
 
  Method  | Doc
 -----|-----
- add_item | Adds item to Checkbox
- add_item_list | Adds list of items to the checkbox
- get | Gets list of selected items from the checkbox
- mark_item_as_checked | Function that marks an item as selected
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override of key presses.
+ _draw | Overrides base class draw function
 
 
 
@@ -607,7 +624,7 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
 def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char)
 ```
 
-Initializer for CheckBoxMenu Widget. Builds on ScrollMenu
+Initializer for CheckBoxMenu Widget
 
 
 
@@ -615,13 +632,13 @@ Initializer for CheckBoxMenu Widget. Builds on ScrollMenu
 
 
 
-### add_item
+### _handle_mouse_press
 
 ```python
-def add_item(self, item_text)
+def _handle_mouse_press(self, x, y)
 ```
 
-Adds item to Checkbox
+Override of base class function, handles mouse press in menu
 
 
 
@@ -630,70 +647,7 @@ Adds item to Checkbox
 
  Parameter  | Type  | Doc
 -----|----------|-----
- item_text  |  str | Menu item to add
-
-
-
-
-
-### add_item_list
-
-```python
-def add_item_list(self, item_list)
-```
-
-Adds list of items to the checkbox
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- item_list  |  list of str | Menu item list to add
-
-
-
-
-
-### get
-
-```python
-def get(self)
-```
-
-Gets list of selected items from the checkbox
-
-
-
-
-#### Returns
-
- Return Variable  | Type  | Doc
------|----------|-----
- selected_items  |  list of str | list of checked items
-
-
-
-
-
-### mark_item_as_checked
-
-```python
-def mark_item_as_checked(self, text)
-```
-
-Function that marks an item as selected
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- text  |  str | Mark item with text = text as checked
+ x, y  |  int | Coordinates of mouse press
 
 
 
@@ -718,6 +672,20 @@ Adds Enter command to toggle selection
  Parameter  | Type  | Doc
 -----|----------|-----
  key_pressed  |  int | key code of pressed key
+
+
+
+
+
+### _draw
+
+```python
+def _draw(self)
+```
+
+Overrides base class draw function
+
+
 
 
 
@@ -807,7 +775,7 @@ Override of base class draw function
 
 
 
-## TextBox(Widge
+## TextBox(Widget, py_cui.ui.TextBoxImplementation)
 
 ```python
 class TextBox(Widget, py_cui.ui.TextBoxImplementation)
@@ -822,6 +790,7 @@ Widget for entering small single lines of text
  Method  | Doc
 -----|-----
  update_height_width | Need to update all cursor positions on resize
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override of base handle key press function
  _draw | Override of base draw function
 
@@ -851,6 +820,27 @@ def update_height_width(self)
 Need to update all cursor positions on resize
 
 
+
+
+
+
+
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x, y)
+```
+
+Override of base class function, handles mouse press in menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int | Coordinates of mouse press
 
 
 
@@ -894,7 +884,7 @@ Override of base draw function
 
 
 
-## ScrollTextBlock(Widge
+## ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation)
 
 ```python
 class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation)
@@ -909,6 +899,7 @@ Widget for editing large multi-line blocks of text
  Method  | Doc
 -----|-----
  update_height_width | Function that updates the position of the text and cursor on resize
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override of base class handle key press function
  _draw | Override of base class draw function
 
@@ -938,6 +929,27 @@ def update_height_width(self)
 Function that updates the position of the text and cursor on resize
 
 
+
+
+
+
+
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x, y)
+```
+
+Override of base class function, handles mouse press in menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int | Coordinates of mouse press
 
 
 

@@ -1,11 +1,8 @@
 # py_cui
 
-A python library for creating command line based user interfaces.
+A python library for intuitively creating CUI/TUI interfaces with pre-built widgets.
 
 
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 
 #### Classes
 
@@ -106,6 +103,7 @@ create an instance of this class, and then add cells + widgets to it.
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
+ get_widget_at_position | Returns containing widget for character position
  _get_horizontal_neighbors | Gets all horizontal (left, right) neighbor widgets
  _get_vertical_neighbors | Gets all vertical (up, down) neighbor widgets
  _check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
@@ -639,6 +637,34 @@ Function that adds a new button to the CUI grid
  Return Variable  | Type  | Doc
 -----|----------|-----
  new_button  |  Button | A reference to the created button object.
+
+
+
+
+
+### get_widget_at_position
+
+```python
+def get_widget_at_position(self, x, y)
+```
+
+Returns containing widget for character position
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x  |  int | Horizontal character position
+ y  |  int | Vertical character position, top down
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ in_widget  |  UIElement | Widget or popup that is within the position None if nothing
 
 
 

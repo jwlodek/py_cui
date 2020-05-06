@@ -14,6 +14,7 @@ Contains base UI element class, along with UI implementation agnostic UI element
  UIImplementation | Base class for ui implementations.
  TextBoxImplementation(UIImplementation) | UI implementation for a single-row textbox input
  MenuImplementation(UIImplementation) | A scrollable menu UI element
+ CheckBoxMenuImplementation(MenuImplementation) | Class representing checkbox menu ui implementation
  TextBlockImplementation(UIImplementation) | Base class for TextBlockImplementation
 
 
@@ -76,8 +77,11 @@ class contains all links to the CUI engine.
  set_help_text | Sets status bar help text
  set_focus_text | Sets status bar focus text. Legacy function, overridden by set_focus_text
  _handle_key_press | Must be implemented by subclass. Used to handle keypresses
+ add_mouse_press_handler | Sets a mouse press handler function
+ _handle_mouse_press | Can be implemented by subclass. Used to handle mouse presses
  _draw | Must be implemented by subclasses. Uses renderer to draw element to terminal
  _assign_renderer | Function that assigns a renderer object to the element
+ _contains_position | Checks if character position is within element.
 
 
 
@@ -490,6 +494,48 @@ Must be implemented by subclass. Used to handle keypresses
 
 
 
+### add_mouse_press_handler
+
+```python
+def add_mouse_press_handler(self, mouse_press_handler_func)
+```
+
+Sets a mouse press handler function
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ mouse_press_handler_func  |  function / lambda function | Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
+
+
+
+
+
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x, y)
+```
+
+Can be implemented by subclass. Used to handle mouse presses
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int, int | Coordinates of the mouse press event.
+
+
+
+
+
 ### _draw
 
 ```python
@@ -528,6 +574,34 @@ Function that assigns a renderer object to the element
  Error  | Type  | Doc
 -----|----------|-----
  error  |  PyCUIError | If parameter is not an initialized renderer.
+
+
+
+
+
+### _contains_position
+
+```python
+def _contains_position(self, x, y)
+```
+
+Checks if character position is within element.
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x  |  int | X coordinate to check
+ y  |  int | Y coordinate to check
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ contains  |  bool | True if (x,y) is within the element, false otherwise
 
 
 
@@ -933,13 +1007,18 @@ Analogous to a RadioButton
  Method  | Doc
 -----|-----
  clear | Clears all items from the Scroll Menu
- get_selected_item | Gets the currently selected item
- set_selected_item | Sets the currently selected item
+ get_selected_item_index | Gets the currently selected item
+ set_selected_item_index | Sets the currently selected item
  _scroll_up | Function that scrolls the view up in the scroll menu
  _scroll_down | Function that scrolls the view down in the scroll menu
+ _jump_up | Function for jumping up menu several spots at a time
+ _jump_down | Function for jumping down the menu several spots at a time
+ _jump_to_top | Function that jumps to the top of the menu
+ _jump_to_bottom | Function that jumps to the bottom of the menu
  add_item | Adds an item to the menu.
  add_item_list | Adds a list of items to the scroll menu.
  remove_selected_item | Function that removes the selected item from the scroll menu.
+ remove_item | Function that removes a specific item from the menu
  get_item_list | Function that gets list of items in a scroll menu
  get | Function that gets the selected item from the scroll menu
 
@@ -974,10 +1053,10 @@ Clears all items from the Scroll Menu
 
 
 
-### get_selected_item
+### get_selected_item_index
 
 ```python
-def get_selected_item(self)
+def get_selected_item_index(self)
 ```
 
 Gets the currently selected item
@@ -995,10 +1074,10 @@ Gets the currently selected item
 
 
 
-### set_selected_item
+### set_selected_item_index
 
 ```python
-def set_selected_item(self, selected_item)
+def set_selected_item_index(self, selected_item)
 ```
 
 Sets the currently selected item
@@ -1053,10 +1132,80 @@ TODO: Viewport height should be calculated internally, and not rely on a paramet
 
 
 
+### _jump_up
+
+```python
+def _jump_up(self)
+```
+
+Function for jumping up menu several spots at a time
+
+
+
+
+
+
+
+### _jump_down
+
+```python
+def _jump_down(self, viewport_height)
+```
+
+Function for jumping down the menu several spots at a time
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ viewport_height  |  int | The number of visible viewport items
+
+
+
+
+
+### _jump_to_top
+
+```python
+def _jump_to_top(self)
+```
+
+Function that jumps to the top of the menu
+
+
+
+
+
+
+
+### _jump_to_bottom
+
+```python
+def _jump_to_bottom(self, viewport_height)
+```
+
+Function that jumps to the bottom of the menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ viewport_height  |  int | The number of visible viewport items
+
+
+
+
+
 ### add_item
 
 ```python
-def add_item(self, item_text)
+def add_item(self, item)
 ```
 
 Adds an item to the menu.
@@ -1068,7 +1217,7 @@ Adds an item to the menu.
 
  Parameter  | Type  | Doc
 -----|----------|-----
- item_text  |  str | The text for the item
+ item  |  Object | Object to add to the menu. Must have implemented __str__ function
 
 
 
@@ -1089,7 +1238,7 @@ Adds a list of items to the scroll menu.
 
  Parameter  | Type  | Doc
 -----|----------|-----
- item_list  |  list of str | list of strings to add as items to the scrollmenu
+ item_list  |  list of Object | list of objects to add as items to the scrollmenu
 
 
 
@@ -1104,6 +1253,27 @@ def remove_selected_item(self)
 Function that removes the selected item from the scroll menu.
 
 
+
+
+
+
+
+### remove_item
+
+```python
+def remove_item(self, item)
+```
+
+Function that removes a specific item from the menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  Object | Reference of item to remove
 
 
 
@@ -1146,6 +1316,130 @@ Function that gets the selected item from the scroll menu
  Return Variable  | Type  | Doc
 -----|----------|-----
  item  |  str | selected item, or None if there are no items in the menu
+
+
+
+
+
+
+
+
+## CheckBoxMenuImplementation(MenuImplementation)
+
+```python
+class CheckBoxMenuImplementation(MenuImplementation)
+```
+
+Class representing checkbox menu ui implementation
+
+
+
+
+#### Attributes
+
+ Attribute  | Type  | Doc
+-----|----------|-----
+ _selected_item_dict  |  dict of object -> bool | stores each object and maps to its current selected status
+ _checked_char  |  char | Character to mark checked items
+
+#### Methods
+
+ Method  | Doc
+-----|-----
+ add_item | Extends base class function, item is added and marked as unchecked to start
+ remove_selected_item | Removes selected item from item list and selected item dictionary
+ remove_item | Removes item from item list and selected item dict
+ mark_item_as_checked | Function that marks an item as selected
+
+
+
+
+### __init__
+
+```python
+def __init__(self, logger, checked_char)
+```
+
+Initializer for the checkbox menu implementation
+
+
+
+
+
+
+
+### add_item
+
+```python
+def add_item(self, item)
+```
+
+Extends base class function, item is added and marked as unchecked to start
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  object | The item being added
+
+
+
+
+
+### remove_selected_item
+
+```python
+def remove_selected_item(self)
+```
+
+Removes selected item from item list and selected item dictionary
+
+
+
+
+
+
+
+### remove_item
+
+```python
+def remove_item(self, item)
+```
+
+Removes item from item list and selected item dict
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  object | Item to remove from menu
+
+
+
+
+
+### mark_item_as_checked
+
+```python
+def mark_item_as_checked(self, item)
+```
+
+Function that marks an item as selected
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  object | Mark item as checked
 
 
 
