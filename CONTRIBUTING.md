@@ -5,6 +5,10 @@ I'll welcome anyone wanting to contribute to the development of `py_cui`. If you
 
 Before you create a pull request, here are some things to keep in mind:
 
+### Follow branch ettiquette
+
+I try to keep the master branch roughly equivalent to the most recent release, minus minor documentation changes and bug hotfixes. The primary development occurs on the `VERSION_NUMBER-develop` branch, where `VERSION_NUMBER` is the next release version for the library. You may make pull requests to master, but keep in mind I may ask you to move them to the development branch.
+
 #### Don't break backwards compatibility
 
 In some extreme cases there may be exceptions to this, but in general I would like to retain compatibility with any previous programs written with `py_cui`. I would like to avoid a situation where projects are locked to a certain release because a new feature broke an existing one. I have already written many interfaces that I use day to day, and I would like to keep using them without dealing with multiple versions of the library. Generally, if with your changes the examples in this repository won't run without fixes, I will probably ask you to change your PR so that they do. Compatibility with older python versions is also recommended, as currently `py_cui` supports as far back as 3.2, but likely this will move to a newer version soon.

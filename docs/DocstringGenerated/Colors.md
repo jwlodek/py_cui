@@ -4,9 +4,6 @@ File containing color rule class and any color-rendering related functions
 
 
 
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
-
 #### Classes
 
  Class  | Doc

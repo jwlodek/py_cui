@@ -14,10 +14,10 @@ This file contains classes for:
 
 Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
 
 
 import curses
@@ -375,6 +375,22 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self.set_help_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
 
 
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        viewport_top = self._start_y + self._pady + 1
+        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+            elem_clicked = y - viewport_top + self._top_view
+            self.set_selected_item_index(elem_clicked)
+
+
     def _handle_key_press(self, key_pressed):
         """Override base class function.
 
@@ -387,10 +403,20 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         """
 
         super()._handle_key_press(key_pressed)
+        viewport_height = self.get_viewport_height()
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            self._scroll_down(self.get_viewport_height())
+            self._scroll_down(viewport_height)
+        if key_pressed == py_cui.keys.KEY_HOME:
+            self._jump_to_top()
+        if key_pressed == py_cui.keys.KEY_END:
+            self._jump_to_bottom(viewport_height)
+        if key_pressed == py_cui.keys.KEY_PAGE_UP:
+            self._jump_up()
+        if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
+            self._jump_down(viewport_height)
+        
 
 
     def _draw(self):
@@ -402,7 +428,8 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self._renderer.draw_border(self)
         counter = self._pady + 1
         line_counter = 0
-        for line in self._view_items:
+        for item in self._view_items:
+            line = str(item)
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:
@@ -418,7 +445,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self._renderer.reset_cursor(self)
 
 
-class CheckBoxMenu(ScrollMenu):
+class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
     """Extension of ScrollMenu that allows for multiple items to be selected at once.
 
     Attributes
@@ -430,73 +457,29 @@ class CheckBoxMenu(ScrollMenu):
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char):
-        """Initializer for CheckBoxMenu Widget. Builds on ScrollMenu
+        """Initializer for CheckBoxMenu Widget
         """
 
-        super().__init__(id, title, grid, row, column, row_span, column_span, padx, pady, logger)
-        self.selected_item_list = []
-        self.checked_char       = checked_char
+        Widget.__init__(self,id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+        py_cui.ui.CheckBoxMenuImplementation.__init__(self, logger, checked_char)
         self.set_help_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
 
-    def add_item(self, item_text):
-        """Adds item to Checkbox
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
 
         Parameters
         ----------
-        item_text : str
-            Menu item to add
+        x, y : int
+            Coordinates of mouse press
         """
 
-        item_text = '[ ] - ' + item_text
-        super().add_item(item_text)
-
-
-    def add_item_list(self, item_list):
-        """Adds list of items to the checkbox
-
-        Parameters
-        ----------
-        item_list : list of str
-            Menu item list to add
-        """
-
-        for item in item_list:
-            self.add_item(item)
-
-
-    def get(self):
-        """Gets list of selected items from the checkbox
-
-        Returns
-        -------
-        selected_items : list of str
-            list of checked items
-        """
-
-        ret = []
-        for item in self.selected_item_list:
-            ret.append(item[6:])
-        return ret
-
-
-    def mark_item_as_checked(self, text):
-        """Function that marks an item as selected
-
-        Parameters
-        ----------
-        text : str
-            Mark item with text = text as checked
-        """
-
-        if '[ ] - {}'.format(text) in self._view_items:
-            item_index_of = self._view_items.index('[ ] - {}'.format(text))
-            self._view_items[item_index_of] = '[{}] - '.format(self.checked_char) + self._view_items[item_index_of][6:]
-            self.selected_item_list.append(text)
-        elif '[{}] - {}'.format(self.checked_char, text) in self._view_items:
-            item_index_of = self._view_items.index('[{}] - {}'.format(self.checked_char, text))
-            self._view_items[item_index_of] = '[ ] - ' + self._view_items[item_index_of][6:]
-            self.selected_item_list.remove(text)
+        super()._handle_mouse_press(x, y)
+        viewport_top = self._start_y + self._pady + 1
+        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+            elem_clicked = y - viewport_top + self._top_view
+            self.set_selected_item_index(elem_clicked)
+            self.mark_item_as_checked(self._view_items[elem_clicked])
 
 
     def _handle_key_press(self, key_pressed):
@@ -511,14 +494,51 @@ class CheckBoxMenu(ScrollMenu):
             key code of pressed key
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
+        viewport_height = self.get_viewport_height()
+        if key_pressed == py_cui.keys.KEY_UP_ARROW:
+            self._scroll_up()
+        if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
+            self._scroll_down(viewport_height)
+        if key_pressed == py_cui.keys.KEY_HOME:
+            self._jump_to_top()
+        if key_pressed == py_cui.keys.KEY_END:
+            self._jump_to_bottom(viewport_height)
+        if key_pressed == py_cui.keys.KEY_PAGE_UP:
+            self._jump_up()
+        if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
+            self._jump_down(viewport_height)
         if key_pressed == py_cui.keys.KEY_ENTER:
-            if super().get() in self.selected_item_list:
-                self.selected_item_list.remove(super().get())
-                self._view_items[self._selected_item] = '[ ] - ' + self._view_items[self._selected_item][6:]
+            self.mark_item_as_checked(self.get())
+
+
+    def _draw(self):
+        """Overrides base class draw function
+        """
+
+        Widget._draw(self)
+        self._renderer.set_color_mode(self._color)
+        self._renderer.draw_border(self)
+        counter = self._pady + 1
+        line_counter = 0
+        for item in self._view_items:
+            if self._selected_item_dict[item]:
+                line = '[{}] - {}'.format(self._checked_char, str(item))
             else:
-                self._view_items[self._selected_item] = '[{}] - '.format(self.checked_char) + self._view_items[self._selected_item][6:]
-                self.selected_item_list.append(self._view_items[self._selected_item])
+                line = '[ ] - {}'.format(str(item))
+            if line_counter < self._top_view:
+                line_counter = line_counter + 1
+            else:
+                if counter >= self._height - self._pady - 1:
+                    break
+                if line_counter == self._selected_item:
+                    self._renderer.draw_text(self, line, self._start_y + counter, selected=True)
+                else:
+                    self._renderer.draw_text(self, line, self._start_y + counter)
+                counter = counter + 1
+                line_counter = line_counter + 1
+        self._renderer.unset_color_mode(self._color)
+        self._renderer.reset_cursor(self)
 
 
 
@@ -602,6 +622,27 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self._cursor_max_right   = start_x + width - padx - 1
         self._cursor_y           = start_y + int(height / 2) + 1
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
+
+
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
+            if x <= len(self._text) + self._cursor_max_left:
+                old_text_pos = self._cursor_text_pos
+                old_cursor_x = self._cursor_x
+                self._cursor_x = x
+                self._cursor_text_pos = old_text_pos + (x - old_cursor_x)
+            else:
+                self._cursor_x = self._cursor_max_left + len(self._text)
+                self._cursor_text_pos = len(self._text)
 
 
     def _handle_key_press(self, key_pressed):
@@ -689,6 +730,36 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self._cursor_max_right   = self._start_x + self._width - self._padx - 1
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
         self._viewport_height    = self._cursor_max_down  - self._cursor_max_up
+
+
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+        
+        super()._handle_mouse_press(x, y)
+        if y >= self._cursor_max_up and y <= self._cursor_max_down: 
+            if x >= self._cursor_max_left and x <= self._cursor_max_right:
+                line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
+                if len(self._text_lines) < line_clicked_index:
+                    self._cursor_text_pos_y = len(self._text_lines)
+                    self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
+                else:
+                    self._cursor_text_pos_y = line_clicked_index
+                    self._cursor_y = y
+                line = self._text_lines[line_clicked_index]
+                if x <= len(line) + self._cursor_max_left:
+                    old_text_pos = self._cursor_text_pos_x
+                    old_cursor_x = self._cursor_x
+                    self._cursor_x = x
+                    self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
+                else:
+                    self._cursor_x = self._cursor_max_left + len(line)
+                    self._cursor_text_pos_x = len(line)
 
 
     def _handle_key_press(self, key_pressed):

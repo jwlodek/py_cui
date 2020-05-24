@@ -1,8 +1,8 @@
 """File containing color rule class and any color-rendering related functions
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
 """
+
+# Author:    Jakub Wlodek
+# Created:   12-Aug-2019
 
 
 import py_cui

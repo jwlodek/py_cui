@@ -15,3 +15,4 @@ npdoc2md/
 ecui/
 .coverage
 py_cui_log.txt
+venv/

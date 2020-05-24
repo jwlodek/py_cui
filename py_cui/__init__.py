@@ -1,8 +1,12 @@
-"""A python library for creating command line based user interfaces.
-
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
+"""A python library for intuitively creating CUI/TUI interfaces with pre-built widgets.
 """
+
+#
+# Author:   Jakub Wlodek
+# Created:  12-Aug-2019
+# Docs:     https://jwlodek.github.io/py_cui-docs
+# License:  BSD-3-Clause (New/Revised)
+#
 
 # Some python core library imports
 import sys
@@ -33,7 +37,7 @@ import py_cui.debug
 
 
 # Version number
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -143,7 +147,7 @@ class PyCUI:
         self._height                = self._height - 4
 
         # Add status and title bar
-        self._title_bar             = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
+        self.title_bar              = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
         exit_key_char               = py_cui.keys.get_char_from_ascii(exit_key)
         self._init_status_bar_text  = 'Press - {} - to exit. Arrow Keys to move between widgets. Enter to enter focus mode.'.format(exit_key_char)
         self.status_bar             = py_cui.statusbar.StatusBar(self._init_status_bar_text, BLACK_ON_WHITE)
@@ -667,8 +671,8 @@ class PyCUI:
                                                     column_span, 
                                                     padx, 
                                                     pady, 
-                                                    self._logger, 
-                                                    center)
+                                                    center,
+                                                    self._logger)
         self._widgets[id]  = new_label
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
@@ -719,6 +723,33 @@ class PyCUI:
             self.set_selected_widget(id)
         self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
+
+
+    def get_widget_at_position(self, x, y):
+        """Returns containing widget for character position
+
+        Parameters
+        ----------
+        x : int
+            Horizontal character position
+        y : int
+            Vertical character position, top down
+        
+        Returns
+        -------
+        in_widget : UIElement
+            Widget or popup that is within the position None if nothing
+        """
+
+        if self._popup is not None and self._popup._contains_position(x, y):
+            return self._popup
+        elif self._popup is None:
+            for widget_id in self.get_widgets().keys():
+                if self.get_widgets()[widget_id]._contains_position(x, y):
+                    return self.get_widgets()[widget_id]
+        return None
+
+
 
 
     def _get_horizontal_neighbors(self, widget, direction):
@@ -910,11 +941,16 @@ class PyCUI:
         """
 
         self.lose_focus()
-        self.set_selected_widget(widget.get_id())
-        widget.set_selected(True)
-        self._in_focused_mode = True
-        self.status_bar.set_text(widget.get_help_text())
-        self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
+        # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
+        if self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
+            widget.command()
+            self._logger.debug('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
+        else:
+            self.set_selected_widget(widget.get_id())
+            widget.set_selected(True)
+            self._in_focused_mode = True
+            self.status_bar.set_text(widget.get_help_text())
+            self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
 
 
     def add_key_command(self, key, command):
@@ -1184,10 +1220,10 @@ class PyCUI:
             stdscr.addstr(  height + 3, 0, fit_text(width, self.status_bar.get_text()))
             stdscr.attroff( curses.color_pair(self.status_bar.get_color()))
 
-        if self._title_bar is not None:
-            stdscr.attron(  curses.color_pair(self._title_bar.get_color()))
+        if self.title_bar is not None:
+            stdscr.attron(  curses.color_pair(self.title_bar.get_color()))
             stdscr.addstr(  0, 0, fit_text(width, self._title, center=True))
-            stdscr.attroff( curses.color_pair(self._title_bar.get_color()))
+            stdscr.attroff( curses.color_pair(self.title_bar.get_color()))
 
 
     def _display_window_warning(self, stdscr, error_info):
@@ -1243,19 +1279,7 @@ class PyCUI:
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
         elif self._popup is None:
             if key_pressed == py_cui.keys.KEY_ENTER and self._selected_widget is not None and selected_widget.is_selectable():
-                self._in_focused_mode = True
-                selected_widget.set_selected(True)
-                self._logger.debug('Focused on widget {}'.format(selected_widget.get_title()))
-
-                # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
-                if self._auto_focus_buttons and isinstance(selected_widget, widgets.Button):
-                    self._in_focused_mode = False
-                    selected_widget.set_selected(False)
-                    if selected_widget.command is not None:
-                        self._logger.debug('Autofocus button detected, running command {}'.format(selected_widget.command.__name__))
-                        selected_widget.command()
-                else:
-                    self.status_bar.set_text(selected_widget.get_help_text())
+                self.move_focus(selected_widget)
     
             for key in self._keybindings.keys():
                 if key_pressed == key:
@@ -1292,6 +1316,9 @@ class PyCUI:
         # Clear and refresh the screen for a blank canvas
         stdscr.clear()
         stdscr.refresh()
+        curses.mousemask(curses.ALL_MOUSE_EVENTS)
+        #stdscr.nodelay(False)
+        stdscr.keypad(True)
 
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
@@ -1330,6 +1357,20 @@ class PyCUI:
                     except py_cui.errors.PyCUIOutOfBoundsError as e:
                         self._logger.debug('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
+                
+                # Here we handle mouse clicke events globally, or pass them to the UI element to handle
+                elif key_pressed == curses.KEY_MOUSE:
+                    self._logger.debug('Detected mouse click')
+                    _, x, y, _, _ = curses.getmouse()
+                    in_element = self.get_widget_at_position(x, y)
+
+                    # In first case, we click inside already selected widget, pass click for processing
+                    if in_element is not None and in_element.is_selected():
+                        in_element._handle_mouse_press(x, y)
+                    # Otherwise, if not a popup, select the clicked on widget
+                    elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
+                        self.move_focus(in_element)
+                        in_element._handle_mouse_press(x, y)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:

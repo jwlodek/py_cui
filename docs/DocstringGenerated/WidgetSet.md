@@ -6,9 +6,6 @@ File containing class that abstracts a collection of widgets.
 
 It can be used to swap between collections of widgets (screens) in a py_cui
 
-@author: Jakub Wlodek  
-@created: 05-Oct-2019
-
 #### Classes
 
  Class  | Doc

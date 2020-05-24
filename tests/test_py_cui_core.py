@@ -1,21 +1,25 @@
-import pytest
+import pytest # noqa
+
 import py_cui
 import py_cui.keys
+
 
 def test_fit_text():
     out = py_cui.fit_text(7, 'Hello World')
     assert out == 'He...'
 
+
 def test_fit_text_center():
     out = py_cui.fit_text(10, 'HI', center=True)
     assert out == '   HI    '
+
 
 # Define a test CUI with a 30 by 100 simulated terminal
 def test_create():
     test_cui = py_cui.PyCUI(4, 5, simulated_terminal=[30, 100])
     assert test_cui._height == 26
     assert test_cui._width == 100
-    assert test_cui._title_bar.get_text().strip() == 'PyCUI Window'
+    assert test_cui.title_bar.get_text().strip() == 'PyCUI Window'
     assert test_cui._simulated_terminal == [30, 100]
     assert test_cui._exit_key == py_cui.keys.KEY_Q_LOWER
 
@@ -48,6 +52,7 @@ def test_add_checkbox_menu():
     row, col = widget.get_grid_cell()
     assert row == 1
     assert col == 1
+
 
 def test_add_label():
     test_cui = py_cui.PyCUI(4, 5, simulated_terminal=[30, 100])

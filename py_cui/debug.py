@@ -1,6 +1,9 @@
 """Module containing py_cui logging utilities
 """
 
+# Author:    Jakub Wlodek
+# Created:   18-Mar-2020
+
 import os
 import logging
 import inspect

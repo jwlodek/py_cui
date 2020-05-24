@@ -3,6 +3,10 @@
 Contains base UI element class, along with UI implementation agnostic UI element classes.
 """
 
+# Author:    Jakub Wlodek
+# Created:   19-Mar-2020
+
+
 import py_cui
 import py_cui.errors
 import py_cui.colors
@@ -47,18 +51,19 @@ class UIElement:
         """Initializer for UIElement base class
         """
 
-        self._id       = id
-        self._title    = title
-        self._padx     = 1
-        self._pady     = 0
+        self._id                        = id
+        self._title                     = title
+        self._padx                      = 1
+        self._pady                      = 0
         self._start_x,  self._stop_y    = 0, 0
         self._stop_x,   self._start_y   = 0, 0
         self._height,   self._width     = 0, 0
-        self._color    = py_cui.WHITE_ON_BLACK
-        self._selected = False
-        self._renderer = renderer
-        self._logger   = logger
-        self._help_text = ''
+        self._color                     = py_cui.WHITE_ON_BLACK
+        self._mouse_press_handler       = None
+        self._selected                  = False
+        self._renderer                  = renderer
+        self._logger                    = logger
+        self._help_text                 = ''
 
 
     def get_absolute_start_pos(self):
@@ -285,7 +290,32 @@ class UIElement:
 
         pass
 
-    
+
+    def add_mouse_press_handler(self, mouse_press_handler_func):
+        """Sets a mouse press handler function
+
+        Parameters
+        ----------
+        mouse_press_handler_func : function / lambda function
+            Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
+        """
+
+        self._mouse_press_handler = mouse_press_handler_func
+
+
+    def _handle_mouse_press(self, x, y):
+        """Can be implemented by subclass. Used to handle mouse presses
+
+        Parameters
+        ----------
+        x, y : int, int
+            Coordinates of the mouse press event.
+        """
+
+        if self._mouse_press_handler is not None:
+            self._mouse_press_handler(x, y)
+
+
     def _draw(self):
         """Must be implemented by subclasses. Uses renderer to draw element to terminal
         """
@@ -315,6 +345,28 @@ class UIElement:
             raise py_cui.errors.PyCUIError('Renderer already assigned for the element')
         else:
             raise py_cui.errors.PyCUIError('Invalid renderer, must be of type py_cui.renderer.Renderer')
+
+
+    def _contains_position(self, x, y):
+        """Checks if character position is within element.
+
+        Parameters
+        ----------
+        x : int
+            X coordinate to check
+        y : int
+            Y coordinate to check
+
+        Returns
+        -------
+        contains : bool
+            True if (x,y) is within the element, false otherwise
+        """
+
+        within_x = self._start_x <= x and self._start_x + self._width >= x
+        within_y = self._start_y <= y and self._start_y + self._height >= y
+        return within_x and within_y
+        
 
 
 class UIImplementation:
@@ -560,6 +612,7 @@ class MenuImplementation(UIImplementation):
         super().__init__(logger)
         self._top_view         = 0
         self._selected_item    = 0
+        self._page_scroll_len  = 5
         self._view_items       = []
 
 
@@ -575,7 +628,7 @@ class MenuImplementation(UIImplementation):
 
 
 
-    def get_selected_item(self):
+    def get_selected_item_index(self):
         """Gets the currently selected item
 
         Returns
@@ -587,7 +640,7 @@ class MenuImplementation(UIImplementation):
         return self._selected_item
 
 
-    def set_selected_item(self, selected_item):
+    def set_selected_item_index(self, selected_item):
         """Sets the currently selected item
 
         Parameters
@@ -630,17 +683,61 @@ class MenuImplementation(UIImplementation):
         self._logger.debug('Scrolling down to item {}'.format(self._selected_item))
 
 
-    def add_item(self, item_text):
+    def _jump_up(self):
+        """Function for jumping up menu several spots at a time
+        """
+
+        for _ in range(self._page_scroll_len):
+            self._scroll_up()
+
+
+    def _jump_down(self, viewport_height):
+        """Function for jumping down the menu several spots at a time
+
+        Parameters
+        ----------
+        viewport_height : int
+            The number of visible viewport items
+        """
+
+        for _ in range(self._page_scroll_len):
+            self._scroll_down(viewport_height)
+
+
+    def _jump_to_top(self):
+        """Function that jumps to the top of the menu
+        """
+
+        self._top_view      = 0
+        self._selected_item = 0
+
+
+    def _jump_to_bottom(self, viewport_height):
+        """Function that jumps to the bottom of the menu
+
+        Parameters
+        ----------
+        viewport_height : int
+            The number of visible viewport items
+        """
+
+        self._selected_item = len(self._view_items) - 1
+        self._top_view = self._selected_item - viewport_height
+        if self._top_view < 0:
+            self._top_view = 0
+
+
+    def add_item(self, item):
         """Adds an item to the menu.
 
         Parameters
         ----------
-        item_text : str
-            The text for the item
+        item : Object
+            Object to add to the menu. Must have implemented __str__ function
         """
 
-        self._logger.debug('Adding item {} to menu'.format(item_text))
-        self._view_items.append(item_text)
+        self._logger.debug('Adding item {} to menu'.format(str(item)))
+        self._view_items.append(item)
 
 
     def add_item_list(self, item_list):
@@ -648,8 +745,8 @@ class MenuImplementation(UIImplementation):
 
         Parameters
         ----------
-        item_list : list of str
-            list of strings to add as items to the scrollmenu
+        item_list : list of Object
+            list of objects to add as items to the scrollmenu
         """
 
         self._logger.debug('Adding item list {} to menu'.format(str(item_list)))
@@ -663,9 +760,27 @@ class MenuImplementation(UIImplementation):
 
         if len(self._view_items) == 0:
             return
-        self._logger.debug('Removing {}'.format(self._view_items[self._selected_item]))
+        self._logger.debug('Removing {}'.format(str(self._view_items[self._selected_item])))
         del self._view_items[self._selected_item]
         if self._selected_item >= len(self._view_items) and self._selected_item > 0:
+            self._selected_item = self._selected_item - 1
+
+
+    def remove_item(self, item):
+        """Function that removes a specific item from the menu
+
+        Parameters
+        ----------
+        item : Object
+            Reference of item to remove
+        """
+
+        if len(self._view_items) == 0 or item not in self._view_items:
+            return
+        self._logger.debug('Removing {}'.format(str(item)))
+        i_index = self._view_items.index(item)
+        del self._view_items[i_index]
+        if self._selected_item >= i_index:
             self._selected_item = self._selected_item - 1
 
 
@@ -693,6 +808,72 @@ class MenuImplementation(UIImplementation):
         if len(self._view_items) > 0:
             return self._view_items[self._selected_item]
         return None
+
+
+class CheckBoxMenuImplementation(MenuImplementation):
+    """Class representing checkbox menu ui implementation
+    
+    Attributes
+    ----------
+    _selected_item_dict : dict of object -> bool
+        stores each object and maps to its current selected status
+    _checked_char : char
+        Character to mark checked items
+    """
+
+    def __init__(self, logger, checked_char):
+        """Initializer for the checkbox menu implementation
+        """
+
+        super().__init__(logger)
+        self._selected_item_dict = {}
+        self._checked_char       = checked_char
+
+
+    def add_item(self, item):
+        """Extends base class function, item is added and marked as unchecked to start
+        
+        Parameters
+        ----------
+        item : object
+            The item being added
+        """
+
+        super().add_item(item)
+        self._selected_item_dict[item] = False
+
+
+    def remove_selected_item(self):
+        """Removes selected item from item list and selected item dictionary
+        """
+
+        del self._selected_item_dict[self.get()]
+        super().remove_selected_item()
+
+
+    def remove_item(self, item):
+        """Removes item from item list and selected item dict
+
+        Parameters
+        ----------
+        item : object
+            Item to remove from menu
+        """
+
+        del self._selected_item_dict[item]
+        super().remove_item(item)
+
+
+    def mark_item_as_checked(self, item):
+        """Function that marks an item as selected
+
+        Parameters
+        ----------
+        item : object
+            Mark item as checked
+        """
+
+        self._selected_item_dict[item] = not self._selected_item_dict[item]
 
 
 class TextBlockImplementation(UIImplementation):

@@ -4,9 +4,6 @@ File containing classes for all popups used by py_cui
 
 
 
-@author:    Jakub Wlodek  
-@created:   12-Aug-2019
-
 #### Classes
 
  Class  | Doc
@@ -14,8 +11,8 @@ File containing classes for all popups used by py_cui
  Popup(py_cui.ui.UIElement) | Base CUI popup class.
  MessagePopup(Popup) | Class representing a simple message popup
  YesNoPopup(Popup) | Class for Yes/No popup. Extends Popup
- TextBoxPopup(Popu | Class representing a textbox popup
- MenuPopup(Popu | A scroll menu popup.
+ TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation) | Class representing a textbox popup
+ MenuPopup(Popup, py_cui.ui.MenuImplementation) | A scroll menu popup.
  LoadingIconPopup(Popup) | Loading icon popup class
  LoadingBarPopup(Popup) | Class for Loading Bar Popup
 
@@ -322,7 +319,7 @@ Uses base class draw function
 
 
 
-## TextBoxPopup(Popu
+## TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation)
 
 ```python
 class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation)
@@ -416,7 +413,7 @@ Override of base draw function
 
 
 
-## MenuPopup(Popu
+## MenuPopup(Popup, py_cui.ui.MenuImplementation)
 
 ```python
 class MenuPopup(Popup, py_cui.ui.MenuImplementation)
