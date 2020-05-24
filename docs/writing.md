@@ -25,6 +25,8 @@ root.start()
 **Step 2 - Add your widgets**
 
 Next, we want to add widgets to the CUI. We will add 3 scroll menus to represent our lists of TODO, In Progress, and Done, a text field for adding new items for now.
+In more complex programs, you may use any object with an implemented `__str__` function to pass to a scroll menu, but in this example, we will simply input strings representing 
+the different tasks in our list.
 
 ```Python
 import py_cui

@@ -11,7 +11,10 @@ nav:
         - Popups: popups.md
         - Keys: keybindings.md
         - Writing a PyCUI step-by-step: writing.md
-    - Classes and Functions:
+        - For PyCUI Developers: developers.md
+        - Examples: examples.md
+        - About: about.md
+    - API Docstring Docs:
         - PyCUI: DocstringGenerated/PyCui.md
         - Grid: DocstringGenerated/Grid.md
         - UI: DocstringGenerated/Ui.md
@@ -21,7 +24,4 @@ nav:
         - Widget Sets: DocstringGenerated/WidgetSet.md
         - Renderer: DocstringGenerated/Renderer.md
         - Keys: DocstringGenerated/Keys.md
-    - For PyCUI Developers: developers.md
-    - Examples: examples.md
-    - About: about.md
 theme: readthedocs
