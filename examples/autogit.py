@@ -238,6 +238,7 @@ class AutoGitCUI:
 
 
     def open_git_diff(self):
+
         target = self.add_files_menu.get()[3:]
         self.diff_text_block.title = '{} File Diff'.format(target)
         proc = Popen(['git', 'diff', target], stdout=PIPE, stderr=PIPE)
@@ -295,20 +296,20 @@ class AutoGitCUI:
 
             if preserve_selected:
                 if len(self.branch_menu.get_item_list()) > selected_branch:
-                    self.branch_menu.set_selected_item(selected_branch)
+                    self.branch_menu.set_selected_item_index(selected_branch)
                 if len(self.git_remotes_menu.get_item_list()) > remote:
                     self.git_remotes_menu.selected_item = remote
                 if len(self.add_files_menu.get_item_list()) > selected_file:
-                    self.add_files_menu.set_selected_item(selected_file)
+                    self.add_files_menu.set_selected_item_index(selected_file)
 
-        except:
+        except FileNotFoundError:
             self.root.show_warning_popup('Git Failed', 'Unable to get git status, please check git installation')
 
 
     def fetch_branch(self):
         try:
             target = self.branch_menu.get()[2:]
-            remote = self.remote_menu.get()
+            remote = self.git_remotes_menu.get()
             proc = Popen(['git', 'pull', remote, target, target])
             out, _ = proc.communicate()
             res = proc.returncode
@@ -342,5 +343,14 @@ def parse_args():
 dir = parse_args()
 root = py_cui.PyCUI(9, 8)
 root.toggle_unicode_borders()
+
 frame = AutoGitCUI(root, dir)
+
+# Since we want to have git changes updated as needed, we set a refresh
+# timeout to 3 seconds. Also, we need to get an updated git status for each
+# refresh, so we add a per-draw-call update funciton
+root.set_refresh_timeout(1)
+root.set_on_draw_update_func(lambda : frame.refresh_git_status(preserve_selected=True))
+
+# Start our CUI
 root.start()
