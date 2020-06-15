@@ -11,7 +11,7 @@ import py_cui.colors
 
 class Renderer:
     """Main renderer class used for drawing ui_elements to the terminal.
-    
+
     Has helper functions for drawing the borders, cursor,
     and text required for the cui. All of the functions supplied by the renderer class should only be used internally.
 
@@ -114,7 +114,7 @@ class Renderer:
 
     def reset_cursor(self, ui_element, fill=True):
         """Positions the cursor at the bottom right of the selected element
-        
+
         Parameters
         ----------
         ui_element : py_cui.ui.UIElement
@@ -126,7 +126,7 @@ class Renderer:
         padx, pady       = ui_element.get_padding()
         start_x, start_y = ui_element.get_start_position()
         height, width    = ui_element.get_absolute_dimensions()
-        
+
         if fill:
             cursor_y = start_y + height - pady - 1
             cursor_x = start_x + width - 2 * padx + 1
@@ -141,7 +141,7 @@ class Renderer:
 
     def draw_cursor(self, cursor_y, cursor_x):
         """Draws the cursor at a particular location
-        
+
         Parameters
         ----------
         cursor_x, cursor_y : int
@@ -206,22 +206,22 @@ class Renderer:
         title         = ui_element.get_title()
 
         if not with_title or (len(title) + 4 >= width - 2 * padx):
-            render_text = '{}{}{}'.format(  self._border_characters['UP_LEFT'], 
-                                            self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx), 
+            render_text = '{}{}{}'.format(  self._border_characters['UP_LEFT'],
+                                            self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx),
                                             self._border_characters['UP_RIGHT'])
             self._stdscr.addstr(y, start_x + padx, render_text)
         else:
-            render_text = '{}{} {} {}{}'.format(self._border_characters['UP_LEFT'], 
-                                                2 * self._border_characters['HORIZONTAL'], 
-                                                title, 
-                                                self._border_characters['HORIZONTAL'] * (width - 6 - 2 * padx - len(title)), 
+            render_text = '{}{} {} {}{}'.format(self._border_characters['UP_LEFT'],
+                                                2 * self._border_characters['HORIZONTAL'],
+                                                title,
+                                                self._border_characters['HORIZONTAL'] * (width - 6 - 2 * padx - len(title)),
                                                 self._border_characters['UP_RIGHT'])
             self._stdscr.addstr(y, start_x + padx, render_text)
 
 
     def _draw_border_bottom(self, ui_element, y):
         """Internal function for drawing bottom of border
-        
+
         Parameters
         ----------
         ui_element : py_cui.ui.UIElement
@@ -234,15 +234,15 @@ class Renderer:
         start_x, _    = ui_element.get_start_position()
         _, width      = ui_element.get_absolute_dimensions()
 
-        render_text = '{}{}{}'.format(  self._border_characters['DOWN_LEFT'], 
-                                        self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx), 
+        render_text = '{}{}{}'.format(  self._border_characters['DOWN_LEFT'],
+                                        self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx),
                                         self._border_characters['DOWN_RIGHT'])
         self._stdscr.addstr(y, start_x + padx, render_text)
 
 
     def _draw_blank_row(self, ui_element, y):
         """Internal function for drawing a blank row
-        
+
         Parameters
         ----------
         ui_element : py_cui.ui.UIElement
@@ -255,15 +255,15 @@ class Renderer:
         start_x, _    = ui_element.get_start_position()
         _, width      = ui_element.get_absolute_dimensions()
 
-        render_text = '{}{}{}'.format(  self._border_characters['VERTICAL'], 
-                                        ' ' * (width - 2 - 2 * padx), 
+        render_text = '{}{}{}'.format(  self._border_characters['VERTICAL'],
+                                        ' ' * (width - 2 - 2 * padx),
                                         self._border_characters['VERTICAL'])
         self._stdscr.addstr(y, start_x + padx, render_text)
 
 
     def _get_render_text(self, ui_element, line, centered, bordered, start_pos):
         """Internal function that computes the scope of the text that should be drawn
-        
+
         Parameters
         ----------
         ui_element : py_cui.ui.UIElement
@@ -293,10 +293,10 @@ class Renderer:
 
         if len(line) - start_pos < render_text_length:
             if centered:
-                render_text = '{}'.format(  line[start_pos:].center(render_text_length, 
+                render_text = '{}'.format(  line[start_pos:].center(render_text_length,
                                             ' '))
             else:
-                render_text = '{}{}'.format(line[start_pos:], 
+                render_text = '{}{}'.format(line[start_pos:],
                                             ' ' * (render_text_length - len(line[start_pos:])))
         else:
             render_text = line[start_pos:start_pos + render_text_length]
@@ -307,7 +307,7 @@ class Renderer:
 
     def _generate_text_color_fragments(self, ui_element, line, render_text):
         """Function that applies color rules to text, dividing them if match is found
-        
+
         Parameters
         ----------
         ui_element : py_cui.ui.UIElement
@@ -316,7 +316,7 @@ class Renderer:
             the line of text being drawn
         render_text : str
             The text shortened to fit within given space
-        
+
         Returns
         -------
         fragments : list of [int, str]
