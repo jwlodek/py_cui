@@ -203,6 +203,11 @@ class PyCUI:
         ----------
         new_widget_set : WidgetSet
             The new widget set to switch to
+
+        Raises
+        ------
+        TypeError
+            If input is not of type WidgetSet
         """
 
         if isinstance(new_widget_set, widget_set.WidgetSet):
