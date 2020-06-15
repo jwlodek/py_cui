@@ -154,7 +154,7 @@ class PyCUI:
         self._border_characters     = None
         self._stdscr                = None
         self._widgets               = {}
-        self._refresh_timeout       = None
+        self._refresh_timeout       = -1
 
         # Variables for determining selected widget/focus mode
         self._selected_widget       = None
@@ -166,10 +166,13 @@ class PyCUI:
         self._loading               = False
         self._stopped               = False
         self._post_loading_callback = None
+        self._on_draw_update_func   = None
 
         # Top level keybindings. Exit key is 'q' by default
         self._keybindings  = {}
         self._exit_key     = exit_key
+        self._forward_cycle_key = py_cui.keys.KEY_CTRL_LEFT
+        self._reverse_cycle_key = py_cui.keys.KEY_CTRL_RIGHT
 
         # Callback to fire when CUI is stopped.
         self._on_stop = None
@@ -184,7 +187,35 @@ class PyCUI:
             Number of seconds to wait before refreshing the CUI
         """
 
-        self._refresh_timeout = timeout
+        # We want the refresh timeout in milliseconds as an integer
+        self._refresh_timeout = int(timeout * 1000)
+
+
+    def set_on_draw_update_func(self, update_function):
+        """Adds a function that is fired during each draw call of the CUI
+
+        Parameters
+        ----------
+        update_function : function
+            A no-argument or lambda function that is fired at the start of each draw call
+        """
+
+        self._on_draw_update_func = update_function
+
+
+    def set_widget_cycle_key(self, forward_cycle_key=None, reverse_cycle_key=None):
+        """Assigns a key for automatically cycling through widgets in both focus and overview modes
+
+        Parameters
+        ----------
+        widget_cycle_key : py_cui.keys.KEY
+            Key code for key to cycle through widgets
+        """
+
+        if forward_cycle_key is not None:
+            self._forward_cycle_key = forward_cycle_key
+        if reverse_cycle_key is not None:
+            self._reverse_cycle_key = reverse_cycle_key
 
 
     def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG):
@@ -267,7 +298,8 @@ class PyCUI:
         """
 
         # Use current logging object and simulated terminal for sub-widget sets
-        return py_cui.widget_set.WidgetSet(num_rows, num_cols, self._logger, simulated_terminal=self._simulated_terminal)
+        return py_cui.widget_set.WidgetSet(num_rows, num_cols, self._logger, 
+                                            simulated_terminal=self._simulated_terminal)
 
 
     # ----------------------------------------------#
@@ -359,10 +391,10 @@ class PyCUI:
         """Function for toggling unicode based border rendering
         """
 
-        if self._border_characters is None:
+        if self._border_characters is None or self._border_characters['UP_LEFT'] == '+':
             self.set_widget_border_characters('\u256d', '\u256e', '\u2570', '\u256f', '\u2500', '\u2502')
         else:
-            self._border_characters = None
+            self.set_widget_border_characters('+', '+', '+', '+', '-', '|')
 
 
     def set_widget_border_characters(self, upper_left_corner, upper_right_corner, lower_left_corner, lower_right_corner, horizontal, vertical):
@@ -988,7 +1020,7 @@ class PyCUI:
             self._logger.info('lose_focus: Not currently in focus mode')
 
 
-    def move_focus(self, widget):
+    def move_focus(self, widget, auto_press_buttons=True):
         """Moves focus mode to different widget
 
         Parameters
@@ -998,16 +1030,50 @@ class PyCUI:
         """
 
         self.lose_focus()
+        self.set_selected_widget(widget.get_id())
         # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
-        if self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
+        if self._auto_focus_buttons and auto_press_buttons and isinstance(widget, py_cui.widgets.Button):
             widget.command()
             self._logger.debug('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
+        elif self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
+            self.status_bar.set_text(self._init_status_bar_text)
         else:
-            self.set_selected_widget(widget.get_id())
             widget.set_selected(True)
             self._in_focused_mode = True
             self.status_bar.set_text(widget.get_help_text())
-            self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
+        self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
+
+
+    def _cycle_widgets(self, reverse=False):
+        """Function that is fired if cycle key is pressed to move to next widget
+
+        Parameters
+        ----------
+        reverse : bool
+            Default false. If true, cycle widgets in reverse order.
+        """
+
+        num_widgets = len(self.get_widgets().keys())
+        current_widget_num = int(self._selected_widget.split('Widget')[1])
+
+        if not reverse:
+            next_widget_num = current_widget_num + 1
+            if next_widget_num == num_widgets:
+                next_widget_num = 0
+            cycle_key = self._forward_cycle_key
+        else:
+            next_widget_num = current_widget_num - 1
+            if next_widget_num < 0:
+                next_widget_num = num_widgets - 1
+            cycle_key = self._reverse_cycle_key
+
+        current_widget_id = 'Widget{}'.format(current_widget_num)
+        next_widget_id = 'Widget{}'.format(next_widget_num)
+        if self._in_focused_mode and cycle_key in self.get_widgets()[current_widget_id]._key_commands.keys():
+            # In the event that we are focusing on a widget with that key defined, we do not cycle.
+            pass
+        else:
+            self.move_focus(self.get_widgets()[next_widget_id], auto_press_buttons=False)
 
 
     def add_key_command(self, key, command):
@@ -1380,8 +1446,9 @@ class PyCUI:
         self._initialize_widget_renderer()
         
         # If user specified a refresh timeout, apply it here
-        if self._refresh_timeout is not None:
+        if self._refresh_timeout > 0:
             self._stdscr.timeout(self._refresh_timeout)
+        #self._stdscr.timeout(1000)
 
         # If user sets non-default border characters, update them here
         if self._border_characters is not None:
@@ -1406,6 +1473,12 @@ class PyCUI:
                     width   = self._simulated_terminal[1]
 
                 height          = height - 4
+
+                # If the user defined an update function to fire on each draw call,
+                # Run it here. This can of course be also handled user-side
+                # through a separate thread.
+                if self._on_draw_update_func is not None:
+                    self._on_draw_update_func()
 
                 # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
                 # Resize the grid and the widgets if there was a resize operation
@@ -1436,6 +1509,12 @@ class PyCUI:
                     self._logger.debug('Firing post-loading callback function {}'.format(self._post_loading_callback.__name__))
                     self._post_loading_callback()
                     self._post_loading_callback = None
+
+                # Handle widget cycling
+                if key_pressed == self._forward_cycle_key:
+                    self._cycle_widgets()
+                elif key_pressed == self._reverse_cycle_key:
+                    self._cycle_widgets(reverse=True)
 
                 # Handle keypresses
                 self._handle_key_presses(key_pressed)
