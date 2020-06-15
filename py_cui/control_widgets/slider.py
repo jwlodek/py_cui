@@ -20,7 +20,10 @@ class SliderImplementation(py_cui.ui.UIImplementation):
                 .format(self._min_val, self._max_val))
 
 
-    def set_bar_char(self,char):
+    def set_bar_char(self, char):
+        """Updates the character used to represent the slider bar
+        """
+        
         self._bar_char = char
 
 
