@@ -34,27 +34,11 @@ import py_cui.widget_set as widget_set
 import py_cui.keys
 import py_cui.popups
 import py_cui.debug
+from py_cui.colors import *
 
 
 # Version number
-__version__ = '0.1.1'
-
-
-# Curses color configuration - curses colors automatically work as pairs, so it was easiest to
-# create these values as pairs of the bat to be selected.
-# Format is FOREGROUND_ON_BACKGROUND
-# TODO add more color options (maybe should be moved to colors module)
-WHITE_ON_BLACK      = 1
-BLACK_ON_GREEN      = 2
-BLACK_ON_WHITE      = 3
-WHITE_ON_RED        = 4
-YELLOW_ON_BLACK     = 5
-RED_ON_BLACK        = 6
-CYAN_ON_BLACK       = 7
-MAGENTA_ON_BLACK    = 8
-GREEN_ON_BLACK      = 9
-BLUE_ON_BLACK       = 10
-
+__version__ = '0.1.2'
 
 
 def fit_text(width, text, center=False):
@@ -161,6 +145,7 @@ class PyCUI:
         self._border_characters     = None
         self._stdscr                = None
         self._widgets               = {}
+        self._refresh_timeout       = None
 
         # Variables for determining selected widget/focus mode
         self._selected_widget       = None
@@ -179,6 +164,18 @@ class PyCUI:
 
         # Callback to fire when CUI is stopped.
         self._on_stop = None
+
+
+    def set_refresh_timeout(self, timeout):
+        """Sets the CUI auto-refresh timeout to a number of seconds.
+
+        Parameters
+        ----------
+        timeout : int
+            Number of seconds to wait before refreshing the CUI
+        """
+
+        self._refresh_timeout = timeout
 
 
     def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG):
@@ -324,18 +321,12 @@ class PyCUI:
         """Function for initialzing curses colors. Called when CUI is first created.
         """
 
-        # Start colors in curses
+        # Start colors in curses.
+        # For each color pair in color map, initialize color combination.
         curses.start_color()
-        curses.init_pair(WHITE_ON_BLACK,    curses.COLOR_WHITE,     curses.COLOR_BLACK)
-        curses.init_pair(BLACK_ON_GREEN,    curses.COLOR_BLACK,     curses.COLOR_GREEN)
-        curses.init_pair(BLACK_ON_WHITE,    curses.COLOR_BLACK,     curses.COLOR_WHITE)
-        curses.init_pair(WHITE_ON_RED,      curses.COLOR_WHITE,     curses.COLOR_RED)
-        curses.init_pair(YELLOW_ON_BLACK,   curses.COLOR_YELLOW,    curses.COLOR_BLACK)
-        curses.init_pair(RED_ON_BLACK,      curses.COLOR_RED,       curses.COLOR_BLACK)
-        curses.init_pair(CYAN_ON_BLACK,     curses.COLOR_CYAN,      curses.COLOR_BLACK)
-        curses.init_pair(MAGENTA_ON_BLACK,  curses.COLOR_MAGENTA,   curses.COLOR_BLACK)
-        curses.init_pair(GREEN_ON_BLACK,    curses.COLOR_GREEN,     curses.COLOR_BLACK)
-        curses.init_pair(BLUE_ON_BLACK,     curses.COLOR_BLUE,      curses.COLOR_BLACK)
+        for color_pair in py_cui.colors._COLOR_MAP.keys():
+            fg_color, bg_color = py_cui.colors._COLOR_MAP[color_pair]
+            curses.init_pair(color_pair, fg_color, bg_color)
 
 
     def _initialize_widget_renderer(self):
@@ -1323,6 +1314,10 @@ class PyCUI:
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
         self._initialize_widget_renderer()
+        
+        # If user specified a refresh timeout, apply it here
+        if self._refresh_timeout is not None:
+            self._stdscr.timeout(self._refresh_timeout)
 
         # If user sets non-default border characters, update them here
         if self._border_characters is not None:
@@ -1337,7 +1332,7 @@ class PyCUI:
                     break
 
                 # Initialization and size adjustment
-                stdscr.clear()
+                stdscr.erase()
 
                 # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
                 if self._simulated_terminal is None:
@@ -1415,7 +1410,7 @@ class PyCUI:
                 self._stopped = True
 
 
-        stdscr.clear()
+        stdscr.erase()
         stdscr.refresh()
         curses.endwin()
         if self._on_stop is not None:
