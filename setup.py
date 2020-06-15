@@ -20,7 +20,7 @@ setuptools.setup(
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
-    packages=['py_cui'],
+    packages=setuptools.find_packages(exclude=['docs','tests', 'examples', 'venv']),
     install_requires=required_libs,
     url='https://github.com/jwlodek/py_cui',
     classifiers=[
