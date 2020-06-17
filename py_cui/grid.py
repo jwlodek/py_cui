@@ -7,7 +7,7 @@ The grid is currently the only supported layout manager for py_cui
 # Created:   12-Aug-2019
 
 
-import py_cui.errors
+import py_cui
 
 
 class Grid:

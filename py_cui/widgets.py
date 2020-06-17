@@ -75,6 +75,8 @@ class Widget(py_cui.ui.UIElement):
         self._selectable       = selectable
         self._key_commands     = {}
         self._text_color_rules = []
+        self._default_color = py_cui.WHITE_ON_BLACK
+        self._border_color = self._default_color
         self.update_height_width()
 
 

@@ -318,7 +318,7 @@ class AutoGitCUI:
                 return
             self.refresh_git_status(preserve_selected=True)
             self.root.show_message_popup('Success', 'Checked out branch {}'.format(target))
-        except:
+        except FileNotFoundError:
             self.root.show_warning_popup('Git Failed', 'Unable to checkout branch, please check git installation')
 
     def push_branch(self):

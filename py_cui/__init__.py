@@ -25,16 +25,16 @@ import curses
 
 
 # py_cui imports
-import py_cui.grid as grid
-import py_cui.statusbar as statusbar
-import py_cui.renderer as renderer
-import py_cui.errors
-import py_cui.widgets as widgets
-import py_cui.widget_set as widget_set
-import py_cui.control_widgets.slider as slider
+import py_cui
 import py_cui.keys
+import py_cui.statusbar
+import py_cui.widgets
+from py_cui.control_widgets import *
+import py_cui.widget_set
 import py_cui.popups
+import py_cui.renderer
 import py_cui.debug
+import py_cui.errors
 from py_cui.colors import *
 
 
@@ -149,7 +149,7 @@ class PyCUI:
                                                        name='py_cui')
 
         # Initialize grid, renderer, and widget dict
-        self._grid                  = grid.Grid(num_rows, num_cols, self._height, self._width, self._logger)
+        self._grid                  = py_cui.grid.Grid(num_rows, num_cols, self._height, self._width, self._logger)
         self._renderer              = None
         self._border_characters     = None
         self._stdscr                = None
@@ -250,7 +250,7 @@ class PyCUI:
             If input is not of type WidgetSet
         """
 
-        if isinstance(new_widget_set, widget_set.WidgetSet):
+        if isinstance(new_widget_set, py_cui.widget_set.WidgetSet):
             self.lose_focus()
             self._widgets      = new_widget_set._widgets
             self._grid         = new_widget_set._grid
@@ -380,7 +380,7 @@ class PyCUI:
         """
 
         if self._renderer is None:
-            self._renderer = renderer.Renderer(self, self._stdscr, self._logger)
+            self._renderer = py_cui.renderer.Renderer(self, self._stdscr, self._logger)
         for widget_id in self._widgets.keys():
             self._widgets[widget_id]._assign_renderer(self._renderer)
         if self._popup is not None:
@@ -468,7 +468,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scroll_menu     = widgets.ScrollMenu(id,
+        new_scroll_menu     = py_cui.widgets.ScrollMenu(id,
                                                  title,
                                                  self._grid,
                                                  row,
@@ -514,7 +514,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_checkbox_menu   = widgets.CheckBoxMenu(id,
+        new_checkbox_menu   = py_cui.widgets.CheckBoxMenu(id,
                                                    title,
                                                    self._grid,
                                                    row,
@@ -563,7 +563,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_box        = widgets.TextBox(id,
+        new_text_box        = py_cui.widgets.TextBox(id,
                                               title,
                                               self._grid,
                                               row, column,
@@ -609,7 +609,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_block      = widgets.ScrollTextBlock(id,
+        new_text_block      = py_cui.widgets.ScrollTextBlock(id,
                                                       title,
                                                       self._grid,
                                                       row,
@@ -654,7 +654,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.Label(id,
+        new_label           = py_cui.widgets.Label(id,
                                             title,
                                             self._grid,
                                             row,
@@ -698,7 +698,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = widgets.BlockLabel(id,
+        new_label           = py_cui.widgets.BlockLabel(id,
                                                  title,
                                                  self._grid,
                                                  row,
@@ -743,7 +743,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_button          = widgets.Button(id,
+        new_button          = py_cui.widgets.Button(id,
                                              title,
                                              self._grid,
                                              row,
@@ -798,20 +798,20 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_slider = slider.SliderWidget(id,
-                                         title,
-                                         self._grid,
-                                         row,
-                                         column,
-                                         row_span,
-                                         column_span,
-                                         padx,
-                                         pady,
-                                         self._logger,
-                                         min_val,
-                                         max_val,
-                                         step,
-                                         init_val)
+        new_slider = py_cui.control_widgets.slider.SliderWidget(id,
+                                                                title,
+                                                                self._grid,
+                                                                row,
+                                                                column,
+                                                                row_span,
+                                                                column_span,
+                                                                padx,
+                                                                pady,
+                                                                self._logger,
+                                                                min_val,
+                                                                max_val,
+                                                                step,
+                                                                init_val)
         self._widgets[id] = new_slider
         self._logger.debug('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
