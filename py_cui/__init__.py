@@ -29,13 +29,15 @@ import py_cui
 import py_cui.keys
 import py_cui.statusbar
 import py_cui.widgets
-from py_cui.control_widgets import *
+import py_cui.control_widgets
 import py_cui.widget_set
 import py_cui.popups
 import py_cui.renderer
 import py_cui.debug
 import py_cui.errors
 from py_cui.colors import *
+import py_cui.dialog_widgets
+import py_cui.control_widgets
 
 
 # Version number
@@ -1245,6 +1247,12 @@ class PyCUI:
         self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
+    def show_form_popup(self, title, fields, passwd_fields=[], required=[], callback=None):
+        self._popup = py_cui.dialog_widgets.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        if callback is not None:
+            self._popup.set_on_submit_action(callback)
+
+
     def increment_loading_bar(self):
         """Increments progress bar if loading bar popup is open
         """
@@ -1526,11 +1534,11 @@ class PyCUI:
                     # draw the popup if required
                     if self._popup is not None:
                         self._popup._draw()
-                except curses.error as e:
-                    self._logger.debug('Curses error while drawing TUI')
-                    self._display_window_warning(stdscr, str(e))
+                #except curses.error as e:
+                #    self._logger.error('Curses error while drawing TUI')
+                #    self._display_window_warning(stdscr, str(e))
                 except py_cui.errors.PyCUIOutOfBoundsError as e:
-                    self._logger.debug('Resized terminal too small')
+                    self._logger.error('Resized terminal too small')
                     self._display_window_warning(stdscr, str(e))
 
                 # Refresh the screen
