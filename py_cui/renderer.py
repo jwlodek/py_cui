@@ -354,8 +354,8 @@ class Renderer:
         """
 
         padx, _       = ui_element.get_padding()
-        _, width      = ui_element.get_absolute_dimensions()
         start_x, _    = ui_element.get_start_position()
+        stop_x, _     = ui_element.get_stop_position()
 
         render_text = self._get_render_text(ui_element, line, centered, bordered, start_pos)
         current_start_x = start_x + padx
@@ -390,7 +390,7 @@ class Renderer:
             self._set_bold()
 
         if bordered:
-            self._stdscr.addstr(y, start_x + width - 2 * padx, self._border_characters['VERTICAL'])
+            self._stdscr.addstr(y, stop_x - padx - 1, self._border_characters['VERTICAL'])
 
         if ui_element.is_selected():
             self._unset_bold()
