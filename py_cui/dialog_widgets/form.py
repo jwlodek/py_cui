@@ -353,7 +353,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
 
         self._form_fields = []
         for i, field in enumerate(fields):
-            self._logger.error(i)
+            #self._logger.error(i)
             init_text = ''
             if field in fields_init_text:
                 init_text = fields_init_text[field]
@@ -464,7 +464,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                 self._form_fields[self.get_selected_form_index()].set_selected(True)
             elif key_pressed == py_cui.keys.KEY_ENTER:
                 if self.is_submission_valid():
-                    self._logger.error(str(self.get()))
+                    #self._logger.error(str(self.get()))
                     self._on_submit_action(self.get())
                     self._root.close_popup()
                 else:
@@ -482,6 +482,26 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                     self._form_fields[self.get_selected_form_index()]._handle_key_press(key_pressed)
         else:
             self._internal_popup._handle_key_press(key_pressed)
+
+
+    def _handle_mouse_press(self, x, y):
+        """Override of base class function
+
+        Simply enters the appropriate field when mouse is pressed on it
+
+        Parameters
+        ----------
+        x, y : int, int
+            Coordinates of the mouse press
+        """
+
+        super()._handle_mouse_press(x, y)
+        for i, field in enumerate(self._form_fields):
+            if field._contains_position(x, y):
+                self._form_fields[self.get_selected_form_index()].set_selected(False)
+                self.set_selected_form_index(i)
+                self._form_fields[self.get_selected_form_index()].set_selected(True)
+                break
 
 
     def _draw(self):
