@@ -137,7 +137,7 @@ class WidgetSet:
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
         return new_scroll_menu
 
 
@@ -184,7 +184,7 @@ class WidgetSet:
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_checkbox_menu))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_checkbox_menu))))
         return new_checkbox_menu
 
 
@@ -232,7 +232,7 @@ class WidgetSet:
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_box))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_box))))
         return new_text_box
 
 
@@ -279,7 +279,7 @@ class WidgetSet:
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_block))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_block))))
         return new_text_block
 
 
@@ -321,7 +321,7 @@ class WidgetSet:
                                             pady,
                                             self._logger)
         self._widgets[id]  = new_label
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -366,7 +366,7 @@ class WidgetSet:
                                                  center,
                                                  self._logger)
         self._widgets[id]  = new_label
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -413,7 +413,7 @@ class WidgetSet:
         self._widgets[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
 
 
@@ -470,6 +470,6 @@ class WidgetSet:
                                          step,
                                          init_val)
         self._widgets[id] = new_slider
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'
+        self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
         return new_slider

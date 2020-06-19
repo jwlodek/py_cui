@@ -233,7 +233,7 @@ class PyCUI:
 
         try:
             py_cui.debug._enable_logging(self._logger, filename=log_file_path, logging_level=logging_level)
-            self._logger.debug('Initialized logger')
+            self._logger.info('Initialized logger')
         except PermissionError as e:
             print('Failed to initialize logger: {}'.format(str(e)))
 
@@ -314,7 +314,7 @@ class PyCUI:
         """Function that starts the CUI
         """
 
-        self._logger.debug('Starting {} CUI'.format(self._title))
+        self._logger.info('Starting {} CUI'.format(self._title))
         curses.wrapper(self._draw)
 
 
@@ -324,7 +324,7 @@ class PyCUI:
         Callback must be a no arg method
         """
 
-        self._logger.debug('Stopping CUI')
+        self._logger.info('Stopping CUI')
         self._stopped = True
 
 
@@ -426,7 +426,7 @@ class PyCUI:
             'HORIZONTAL': horizontal,
             'VERTICAL': vertical
         }
-        self._logger.debug('Set border_characters to {}'.format(self._border_characters))
+        self._logger.info('Set border_characters to {}'.format(self._border_characters))
 
 
     def get_widgets(self):
@@ -483,7 +483,7 @@ class PyCUI:
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
         return new_scroll_menu
 
 
@@ -530,7 +530,7 @@ class PyCUI:
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_checkbox_menu))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_checkbox_menu))))
         return new_checkbox_menu
 
 
@@ -578,7 +578,7 @@ class PyCUI:
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_box))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_box))))
         return new_text_box
 
 
@@ -625,7 +625,7 @@ class PyCUI:
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_block))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_text_block))))
         return new_text_block
 
 
@@ -667,7 +667,7 @@ class PyCUI:
                                             pady,
                                             self._logger)
         self._widgets[id]  = new_label
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -712,7 +712,7 @@ class PyCUI:
                                                  center,
                                                  self._logger)
         self._widgets[id]  = new_label
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
 
 
@@ -759,7 +759,7 @@ class PyCUI:
         self._widgets[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
+        self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
 
     def add_slider(self, title, row, column, row_span=1,
@@ -815,7 +815,7 @@ class PyCUI:
                                                                 step,
                                                                 init_val)
         self._widgets[id] = new_slider
-        self._logger.debug('Adding widget {} w/ ID {} of type {}'
+        self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
         return new_slider
 
@@ -1036,14 +1036,14 @@ class PyCUI:
         # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
         if self._auto_focus_buttons and auto_press_buttons and isinstance(widget, py_cui.widgets.Button):
             widget.command()
-            self._logger.debug('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
+            self._logger.info('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
         elif self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
             self.status_bar.set_text(self._init_status_bar_text)
         else:
             widget.set_selected(True)
             self._in_focused_mode = True
             self.status_bar.set_text(widget.get_help_text())
-        self._logger.debug('Moved focus to widget {}'.format(widget.get_title()))
+        self._logger.info('Moved focus to widget {}'.format(widget.get_title()))
 
 
     def _cycle_widgets(self, reverse=False):
@@ -1106,7 +1106,7 @@ class PyCUI:
 
         color       = WHITE_ON_BLACK
         self._popup = py_cui.popups.MessagePopup(self, title, text, color, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_warning_popup(self, title, text):
@@ -1122,7 +1122,7 @@ class PyCUI:
 
         color       = YELLOW_ON_BLACK
         self._popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_error_popup(self, title, text):
@@ -1138,7 +1138,7 @@ class PyCUI:
 
         color       = RED_ON_BLACK
         self._popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_yes_no_popup(self, title, command):
@@ -1156,7 +1156,7 @@ class PyCUI:
 
         color       = WHITE_ON_BLACK
         self._popup = py_cui.popups.YesNoPopup(self, title + '- (y/n)', 'Yes - (y), No - (n)', color, command, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_text_box_popup(self, title, command, password=False):
@@ -1176,7 +1176,7 @@ class PyCUI:
 
         color       = WHITE_ON_BLACK
         self._popup = py_cui.popups.TextBoxPopup(self, title, color, command, self._renderer, password, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
@@ -1198,7 +1198,7 @@ class PyCUI:
 
         color       = WHITE_ON_BLACK
         self._popup = py_cui.popups.MenuPopup(self, menu_items, title, color, command, self._renderer, self._logger, run_command_if_none)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_loading_icon_popup(self, title, message, callback=None):
@@ -1220,7 +1220,7 @@ class PyCUI:
         color         = WHITE_ON_BLACK
         self._loading = True
         self._popup   = py_cui.popups.LoadingIconPopup(self, title, message, color, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_loading_bar_popup(self, title, num_items, callback=None):
@@ -1244,7 +1244,7 @@ class PyCUI:
         color         = WHITE_ON_BLACK
         self._loading = True
         self._popup   = py_cui.popups.LoadingBarPopup(self, title, num_items, color, self._renderer, self._logger)
-        self._logger.debug('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
+        self._logger.info('Opened {} popup with title {}'.format(str(type(self._popup)), self._popup.get_title()))
 
 
     def show_form_popup(self, title, fields, passwd_fields=[], required=[], callback=None):
@@ -1327,7 +1327,7 @@ class PyCUI:
         if self._selected_widget is not None:
             self.get_widgets()[self._selected_widget]._draw()
 
-        self._logger.debug('Drew widgets')
+        self._logger.info('Drew widgets')
 
 
 
@@ -1373,7 +1373,7 @@ class PyCUI:
         stdscr.addstr(2, 0, 'Most likely terminal dimensions are too small.')
         stdscr.attroff(curses.color_pair(RED_ON_BLACK))
         stdscr.refresh()
-        self._logger.debug('Encountered error -> {}'.format(error_info))
+        self._logger.info('Encountered error -> {}'.format(error_info))
 
 
     def _handle_key_presses(self, key_pressed):
@@ -1399,10 +1399,10 @@ class PyCUI:
                 self.status_bar.set_text(self._init_status_bar_text)
                 self._in_focused_mode = False
                 selected_widget.set_selected(False)
-                self._logger.debug('Exiting focus mode on widget {}'.format(selected_widget.get_title()))
+                self._logger.info('Exiting focus mode on widget {}'.format(selected_widget.get_title()))
             else:
                 # widget handles remaining py_cui.keys
-                self._logger.debug('Widget {} handling {} key'.format(selected_widget.get_title(), key_pressed))
+                self._logger.info('Widget {} handling {} key'.format(selected_widget.get_title(), key_pressed))
                 selected_widget._handle_key_press(key_pressed)
 
         # Otherwise, barring a popup, we are in overview mode, meaning that arrow py_cui.keys move between widgets, and Enter key starts focus mode
@@ -1413,7 +1413,7 @@ class PyCUI:
             for key in self._keybindings.keys():
                 if key_pressed == key:
                     command = self._keybindings[key]
-                    self._logger.debug('Detected binding for key {}, running command {}'.format(key_pressed, command.__name__))
+                    self._logger.info('Detected binding for key {}, running command {}'.format(key_pressed, command.__name__))
                     command()
 
             # If not in focus mode, use the arrow py_cui.keys to move around the selectable widgets.
@@ -1422,11 +1422,11 @@ class PyCUI:
                 neighbor = self._check_if_neighbor_exists(key_pressed)
             if neighbor is not None:
                 self.set_selected_widget(neighbor)
-                self._logger.debug('Navigated to neighbor widget {}'.format(self.get_widgets()[self._selected_widget].get_title()))
+                self._logger.info('Navigated to neighbor widget {}'.format(self.get_widgets()[self._selected_widget].get_title()))
 
         # if we have a popup, that takes key control from both overview and focus mode
         elif self._popup is not None:
-            self._logger.debug('Popup {} handling key {}'.format(self._popup.get_title(), key_pressed))
+            self._logger.info('Popup {} handling key {}'.format(self._popup.get_title(), key_pressed))
             self._popup._handle_key_press(key_pressed)
 
 
@@ -1491,16 +1491,16 @@ class PyCUI:
                 # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
                 # Resize the grid and the widgets if there was a resize operation
                 if key_pressed == curses.KEY_RESIZE:
-                    self._logger.debug('Resizing CUI to new dimensions {} by {}'.format(height, width))
+                    self._logger.info('Resizing CUI to new dimensions {} by {}'.format(height, width))
                     try:
                         self._refresh_height_width(height, width)
                     except py_cui.errors.PyCUIOutOfBoundsError as e:
-                        self._logger.debug('Resized terminal too small')
+                        self._logger.info('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
 
                 # Here we handle mouse clicke events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
-                    self._logger.debug('Detected mouse click')
+                    self._logger.info('Detected mouse click')
                     _, x, y, _, _ = curses.getmouse()
                     in_element = self.get_widget_at_position(x, y)
 
@@ -1514,7 +1514,7 @@ class PyCUI:
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:
-                    self._logger.debug('Firing post-loading callback function {}'.format(self._post_loading_callback.__name__))
+                    self._logger.info('Firing post-loading callback function {}'.format(self._post_loading_callback.__name__))
                     self._post_loading_callback()
                     self._post_loading_callback = None
 
@@ -1553,11 +1553,11 @@ class PyCUI:
                 elif self._stopped:
                     key_pressed = self._exit_key
                 else:
-                    self._logger.debug('Waiting for next keypress')
+                    self._logger.info('Waiting for next keypress')
                     key_pressed = stdscr.getch()
 
             except KeyboardInterrupt:
-                self._logger.debug('Detect Keyboard Interrupt, Exiting...')
+                self._logger.info('Detect Keyboard Interrupt, Exiting...')
                 self._stopped = True
 
 
@@ -1565,7 +1565,7 @@ class PyCUI:
         stdscr.refresh()
         curses.endwin()
         if self._on_stop is not None:
-            self._logger.debug('Firing onstop function {}'.format(self._on_stop.__name__))
+            self._logger.info('Firing onstop function {}'.format(self._on_stop.__name__))
             self._on_stop()
 
 

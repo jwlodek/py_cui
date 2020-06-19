@@ -130,7 +130,7 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        super().debug(debug_text)
+        super().info(debug_text)
 
 
     def debug(self, text):
