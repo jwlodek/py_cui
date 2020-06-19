@@ -21,7 +21,7 @@ class App:
 
 
 root = py_cui.PyCUI(3, 3)
-root.enable_logging(logging_level=logging.ERROR)
+#root.enable_logging(logging_level=logging.ERROR)
 root.toggle_unicode_borders()
 app = App(root)
 root.start()

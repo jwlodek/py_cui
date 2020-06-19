@@ -819,7 +819,7 @@ class PyCUI:
                            .format(title, id, str(type(new_slider))))
         return new_slider
 
-    def get_widget_at_position(self, x, y):
+    def get_element_at_position(self, x, y):
         """Returns containing widget for character position
 
         Parameters
@@ -1498,11 +1498,11 @@ class PyCUI:
                         self._logger.info('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
 
-                # Here we handle mouse clicke events globally, or pass them to the UI element to handle
+                # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
                     _, x, y, _, _ = curses.getmouse()
-                    in_element = self.get_widget_at_position(x, y)
+                    in_element = self.get_element_at_position(x, y)
 
                     # In first case, we click inside already selected widget, pass click for processing
                     if in_element is not None and in_element.is_selected():
@@ -1534,9 +1534,9 @@ class PyCUI:
                     # draw the popup if required
                     if self._popup is not None:
                         self._popup._draw()
-                #except curses.error as e:
-                #    self._logger.error('Curses error while drawing TUI')
-                #    self._display_window_warning(stdscr, str(e))
+                except curses.error as e:
+                    self._logger.error('Curses error while drawing TUI')
+                    self._display_window_warning(stdscr, str(e))
                 except py_cui.errors.PyCUIOutOfBoundsError as e:
                     self._logger.error('Resized terminal too small')
                     self._display_window_warning(stdscr, str(e))

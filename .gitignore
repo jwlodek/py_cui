@@ -16,3 +16,4 @@ ecui/
 .coverage
 py_cui_log.txt
 venv/
+.pytest_cache/

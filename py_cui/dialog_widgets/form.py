@@ -465,8 +465,8 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
             elif key_pressed == py_cui.keys.KEY_ENTER:
                 if self.is_submission_valid():
                     #self._logger.error(str(self.get()))
-                    self._on_submit_action(self.get())
                     self._root.close_popup()
+                    self._on_submit_action(self.get())
                 else:
                     self._internal_popup = InternalFormPopup(self,
                                                              self._root, 
