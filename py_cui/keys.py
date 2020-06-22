@@ -51,12 +51,27 @@ KEY_ESCAPE      = 27
 KEY_SPACE       = get_ascii_from_char(' ')
 KEY_DELETE      = curses.KEY_DC
 KEY_TAB         = get_ascii_from_char('\t')
+
+# Arrow Keys
 KEY_UP_ARROW    = curses.KEY_UP
 KEY_DOWN_ARROW  = curses.KEY_DOWN
 KEY_LEFT_ARROW  = curses.KEY_LEFT
 KEY_RIGHT_ARROW = curses.KEY_RIGHT
-KEY_PAGE_UP     = curses.KEY_PPAGE
-KEY_PAGE_DOWN   = curses.KEY_NPAGE
+
+# Modified arrow keys
+KEY_SHIFT_LEFT  = 393
+KEY_SHIFT_RIGHT = 402
+KEY_SHIFT_UP = 337
+KEY_SHIFT_DOWN = 336
+KEY_CTRL_LEFT   = 560
+KEY_CTRL_RIGHT  = 545
+KEY_CTRL_UP = 566
+KEY_CTRL_DOWN = 525
+
+ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]
+
+
+# Function Keys
 KEY_F1          = curses.KEY_F1
 KEY_F2          = curses.KEY_F2
 KEY_F3          = curses.KEY_F3
@@ -65,8 +80,14 @@ KEY_F5          = curses.KEY_F5
 KEY_F6          = curses.KEY_F6
 KEY_F7          = curses.KEY_F7
 KEY_F8          = curses.KEY_F8
+
+
+# Page navigation keys
+KEY_PAGE_UP     = curses.KEY_PPAGE
+KEY_PAGE_DOWN   = curses.KEY_NPAGE
 KEY_HOME        = curses.KEY_HOME
 KEY_END         = curses.KEY_END
+
 
 # Standard letter keys
 KEY_A_LOWER     = get_ascii_from_char('a')
@@ -96,6 +117,7 @@ KEY_X_LOWER     = get_ascii_from_char('x')
 KEY_Y_LOWER     = get_ascii_from_char('y')
 KEY_Z_LOWER     = get_ascii_from_char('z')
 
+
 # Shift modified (Uppercase) letters
 KEY_A_UPPER     = get_ascii_from_char('A')
 KEY_B_UPPER     = get_ascii_from_char('B')
@@ -124,15 +146,11 @@ KEY_X_UPPER     = get_ascii_from_char('X')
 KEY_Y_UPPER     = get_ascii_from_char('Y')
 KEY_Z_UPPER     = get_ascii_from_char('Z')
 
-# Modified arrow keys
-KEY_SHIFT_LEFT  = 393
-KEY_SHIFT_RIGHT = 402
-KEY_SHIFT_UP = 337
-KEY_SHIFT_DOWN = 336
-KEY_CTRL_LEFT   = 560
-KEY_CTRL_RIGHT  = 545
-KEY_CTRL_UP = 566
-KEY_CTRL_DOWN = 525
+
+LOWERCASE_LETTER_KEYS = list(range(97, 123))
+UPPERCASE_LETTER_KEYS = list(range(65, 91))
+LETTER_KEYS = UPPERCASE_LETTER_KEYS + LOWERCASE_LETTER_KEYS
+
 
 # Control Keys
 KEY_CTRL_A      = 1
@@ -162,6 +180,7 @@ KEY_CTRL_X      = 24
 KEY_CTRL_Y      = 25
 KEY_CTRL_Z      = 26
 
+
 # Alt-modified keys
 KEY_ALT_A       = 97
 KEY_ALT_B       = 98
@@ -190,6 +209,7 @@ KEY_ALT_X       = 120
 KEY_ALT_Y       = 121
 KEY_ALT_Z       = 122
 
+
 # Function keys
 KEY_F0          = curses.KEY_F0
 KEY_F1          = curses.KEY_F1
@@ -206,6 +226,22 @@ KEY_F11         = curses.KEY_F11
 KEY_F12         = curses.KEY_F12
 
 
+# Number keys
+KEY_0 = get_ascii_from_char('0')
+KEY_1 = get_ascii_from_char('1')
+KEY_2 = get_ascii_from_char('2')
+KEY_3 = get_ascii_from_char('3')
+KEY_4 = get_ascii_from_char('4')
+KEY_5 = get_ascii_from_char('5')
+KEY_6 = get_ascii_from_char('6')
+KEY_7 = get_ascii_from_char('7')
+KEY_8 = get_ascii_from_char('8')
+KEY_9 = get_ascii_from_char('9')
+
+# Array storing number keys
+NUMBER_KEYS = [KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
+ALPHANUMERIC_KEYS = LETTER_KEYS + NUMBER_KEYS
+
 # Pressing backspace returns 8 on windows?
 if platform == 'win32':
     KEY_BACKSPACE   = 8
@@ -215,5 +251,3 @@ elif platform == 'darwin':
 else:
     KEY_BACKSPACE   = curses.KEY_BACKSPACE
 
-
-ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]

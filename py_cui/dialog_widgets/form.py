@@ -6,6 +6,10 @@ import py_cui.widgets
 import py_cui.popups
 
 
+class DuplicateFormKeyError(Exception):
+    pass
+
+
 class FormField(py_cui.ui.TextBoxImplementation):
     """Class containing basic logic of a field in a form
 
@@ -348,6 +352,8 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
     def __init__(self, root, fields, passwd_fields, required_fields, fields_init_text, title, color, renderer, logger):
 
         self._num_fields = len(fields)
+        if self._num_fields != len(set(fields)):
+            raise DuplicateFormKeyError('PyCUI forms cannot have duplicate fields.')
 
         py_cui.popups.Popup.__init__(self, root, title, '', color, renderer, logger)
 
