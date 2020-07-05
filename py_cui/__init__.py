@@ -1248,6 +1248,24 @@ class PyCUI:
 
 
     def show_form_popup(self, title, fields, passwd_fields=[], required=[], callback=None):
+        """Shows form popup.
+
+        Used for inputting several fields worth of values
+
+        Paramters
+        ---------
+        title : str
+            Message title
+        fields : List[str]
+            Names of each individual field
+        passwd_fields : List[str]
+            Field names that should have characters hidden
+        required : List[str]
+            Fields that are required before submission
+        callback=None : Function
+            If not none, fired after loading is completed. Must be a no-arg function
+        """
+
         self._popup = py_cui.dialog_widgets.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
         if callback is not None:
             self._popup.set_on_submit_action(callback)

@@ -1,11 +1,11 @@
 # widgets
 
-File contatining all core widget classes for py_cui.
+Module contatining all core widget classes for py_cui.
 
 
 
 Widgets are the basic building blocks of a user interface made with py_cui.
-This file contains classes for:
+This module contains classes for:
 
 * Base Widget class
 * Label
@@ -15,8 +15,9 @@ This file contains classes for:
 * Button
 * TextBox
 * Text Block
+* Slider
 
-Additional widgets should be added in as additional_widgets/$WIDGET_NAME.py, importing this
+Additional widgets should be added in appropriate sub-modules, importing this
 file and extending the base Widget class, or if appropriate one of the other core widgets.
 
 #### Classes

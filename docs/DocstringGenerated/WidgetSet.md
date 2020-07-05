@@ -51,6 +51,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
+ add_slider | Function that adds a new label to the CUI grid
 
 
 
@@ -365,6 +366,43 @@ Function that adds a new button to the CUI grid
  Return Variable  | Type  | Doc
 -----|----------|-----
  new_button  |  Button | A reference to the created button object.
+
+
+
+
+
+### add_slider
+
+```python
+def add_slider(self, title, row, column, row_span=1
+```
+
+Function that adds a new label to the CUI grid
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ title  |  str | The title of the label
+ row  |  int | The row value, from the top down
+ column  |  int | The column value from the top down
+ row_span=1  |  int | The number of rows to span accross
+ column_span=1  |  int | the number of columns to span accross
+ padx=1  |  int | number of padding characters in the x direction
+ pady=0  |  int | number of padding characters in the y direction
+ Unknown | min_val = 0 int | min value of the slider
+ Unknown | max_val = 0 int | max value of the slider
+ Unknown | step = 0 int | step to incremento or decrement
+ Unknown | init_val = 0 int | initial value of the slider
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ new_slider  |  Slider | A reference to the created slider object.
 
 
 

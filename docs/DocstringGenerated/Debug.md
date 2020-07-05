@@ -23,7 +23,7 @@ Module containing py_cui logging utilities
 ### _enable_logging
 
 ```python
-def _enable_logging(logger, filename='py_cui_log.txt', logging_level=logging.DEBUG)
+def _enable_logging(logger, replace_log_file=True, filename='py_cui_log.txt', logging_level=logging.DEBUG)
 ```
 
 Function that creates basic logging configuration for selected logger
