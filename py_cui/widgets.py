@@ -109,7 +109,7 @@ class Widget(py_cui.ui.UIElement):
             self.add_key_command(key, command)
 
 
-    def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False):
+    def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False, selected_color=None):
         """Forces renderer to draw text using given color if text_condition_function returns True
 
         Parameters
@@ -128,7 +128,11 @@ class Widget(py_cui.ui.UIElement):
             if false, strip string before checking for match
         """
 
-        new_color_rule = py_cui.colors.ColorRule(regex, color, rule_type, match_type, region, include_whitespace, self._logger)
+        selected = color
+        if selected_color is not None:
+            selected = selected_color
+
+        new_color_rule = py_cui.colors.ColorRule(regex, color, selected, rule_type, match_type, region, include_whitespace, self._logger)
         self._text_color_rules.append(new_color_rule)
 
 
@@ -207,6 +211,18 @@ class Widget(py_cui.ui.UIElement):
         """
 
         return self._row_span, self._column_span
+
+
+    def set_selectable(self, selectable):
+        """Setter for widget selectablility
+
+        Paramters
+        ---------
+        selectable : bool
+            Widget selectable if true, otherwise not
+        """
+
+        self._selectable = selectable
 
 
     def is_selectable(self):

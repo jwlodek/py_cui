@@ -167,7 +167,7 @@ class ColorRule:
         Flag to determine whether to strip whitespace before matching.
     """
 
-    def __init__(self, regex, color, rule_type, match_type, region, include_whitespace, logger):
+    def __init__(self, regex, color, selected_color, rule_type, match_type, region, include_whitespace, logger):
         """Constructor for ColorRule object
             
         Parameters
@@ -176,6 +176,8 @@ class ColorRule:
             A python 're' module string
         color : int
             A valid color value. Ex. py_cui.WHITE_ON_BLACK
+        selected_color : int
+            Color to use if rule matched but selected modifier is applied
         rule_type : str
             String representing rule type. ['startswith', 'endswith', 'notstartswith', 'notendswith', 'contains']
         match_type : str
@@ -188,6 +190,7 @@ class ColorRule:
         
         self._regex            = regex
         self._color            = color
+        self._selected_color   = selected_color
         self._rule_type        = rule_type
         self._match_type       = match_type
         self._region           = region
@@ -239,7 +242,7 @@ class ColorRule:
         return False
 
 
-    def _generate_fragments_regex(self, widget, render_text):
+    def _generate_fragments_regex(self, widget, render_text, selected):
         """Splits text into fragments based on regular expression
         
         Parameters
@@ -261,15 +264,23 @@ class ColorRule:
         for match in matches:
             temp = current_render_text.split(match, 1)
             if len(temp) == 2:
-                fragments.append([temp[0], widget.get_color()])
-                fragments.append([match, self._color])
+                if selected:
+                    fragments.append([temp[0], widget.get_selected_color()])
+                    fragments.append([match, self._selected_color])
+                else:
+                    fragments.append([temp[0], widget.get_color()])
+                    fragments.append([match, self._color])
                 current_render_text = temp[1]
-        fragments.append([current_render_text, widget.get_color()])
+
+        if selected:
+            fragments.append([current_render_text, widget.get_selected_color()])
+        else:
+            fragments.append([current_render_text, widget.get_color()])
 
         return fragments
 
 
-    def _split_text_on_region(self, widget, render_text):
+    def _split_text_on_region(self, widget, render_text, selected):
         """Splits text into fragments based on region
         
         Parameters
@@ -286,19 +297,32 @@ class ColorRule:
         """
 
         fragments = []
+        
         if self._region is None or len(render_text) < self._region[0]:
-            return [[render_text, widget.get_color()]]
+            if selected:
+                return [[render_text, widget.get_selected_color()]]
+            else:
+                return [[render_text, widget.get_color()]]
         elif len(render_text) < self._region[1]:
             self._region[1] = len(render_text)
+        
         if self._region[0] != 0:
-            fragments.append([render_text[0:self._region[0]], widget.get_color()])
-        fragments.append([render_text[self._region[0]:self._region[1]], self._color])
-        fragments.append([render_text[self._region[1]:], widget.get_color()])
+            if selected:
+                fragments.append([render_text[0:self._region[0]], widget.get_selected_color()])
+            else:
+                fragments.append([render_text[0:self._region[0]], widget.get_color()])
+        
+        if selected:
+            fragments.append([render_text[self._region[0]:self._region[1]], self._selected_color])
+            fragments.append([render_text[self._region[1]:], widget.get_selected_color()])
+        else:
+            fragments.append([render_text[self._region[0]:self._region[1]], self._color])
+            fragments.append([render_text[self._region[1]:], widget.get_color()])
 
         return fragments
 
 
-    def generate_fragments(self, widget, line, render_text):
+    def generate_fragments(self, widget, line, render_text, selected=False):
         """Splits text into fragments if matched line to regex
         
         Parameters
@@ -319,16 +343,22 @@ class ColorRule:
         """
 
         match       = self._check_match(line)
-        fragments   = [[render_text, widget.get_color()]]
+        if selected:
+            fragments = [[render_text, widget.get_selected_color()]]
+        else:
+            fragments = [[render_text, widget.get_color()]]
         
         if match:
 
             if self._match_type == 'line':
-                fragments = [[render_text, self._color]]
+                if selected:
+                    fragments = [[render_text, self._selected_color]]
+                else:
+                    fragments = [[render_text, self._color]]
             elif self._match_type == 'regex':
-                fragments = self._generate_fragments_regex(widget, render_text)
+                fragments = self._generate_fragments_regex(widget, render_text, selected)
             elif self._match_type == 'region':
-                fragments = self._split_text_on_region(widget, render_text)
+                fragments = self._split_text_on_region(widget, render_text, selected)
         
             self._logger.info('Generated fragments: {}'.format(fragments))
         
