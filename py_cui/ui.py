@@ -59,6 +59,8 @@ class UIElement:
         self._stop_x,   self._start_y   = 0, 0
         self._height,   self._width     = 0, 0
         self._color                     = py_cui.WHITE_ON_BLACK
+        self._border_color              = self._color
+        self._selected_color            = self._color
         self._mouse_press_handler       = None
         self._selected                  = False
         self._renderer                  = renderer
@@ -188,6 +190,30 @@ class UIElement:
         return self._color
 
 
+    def get_border_color(self):
+        """Gets current element border color
+
+        Returns
+        -------
+        color : int
+            color code for combination
+        """
+
+        return self._border_color
+
+
+    def get_selected_color(self):
+        """Gets current selected item color
+
+        Returns
+        -------
+        color : int
+            color code for combination
+        """
+
+        return self._selected_color
+
+
     def is_selected(self):
         """Get selected status
 
@@ -245,7 +271,35 @@ class UIElement:
             New color pair key code
         """
 
+        if self._border_color == self._color:
+            self._border_color = color
+        if self._selected_color == self._color:
+            self._selected_color = color
         self._color = color
+
+
+    def set_border_color(self, color):
+        """Sets element border color
+
+        Parameters
+        ----------
+        color : int
+            New color pair key code
+        """
+
+        self._border_color = color
+
+
+    def set_selected_color(self, color):
+        """Sets element sected color
+
+        Parameters
+        ----------
+        color : int
+            New color pair key code
+        """
+
+        self._selected_color = color
 
 
     def set_selected(self, selected):
