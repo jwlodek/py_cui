@@ -46,6 +46,7 @@ class AutoGitCUI:
 
         # Create the add files menu. Add color rules to color first characters based on git status
         self.add_files_menu = self.root.add_scroll_menu('Add Files', 0, 0, row_span=2, column_span=2)
+        self.add_files_menu.set_border_color(py_cui.RED_ON_BLACK)
         self.add_files_menu.add_text_color_rule(' ', py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule('?', py_cui.RED_ON_BLACK, 'startswith', match_type='region', region=[0,3], include_whitespace=True)
         self.add_files_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,3], include_whitespace=True)
@@ -53,12 +54,14 @@ class AutoGitCUI:
 
         # Remotes menu
         self.git_remotes_menu =self.root.add_scroll_menu('Git Remotes', 2, 0, row_span=2, column_span=2)
+        self.git_remotes_menu.set_selected_color(py_cui.BLACK_ON_WHITE)
 
         # Branches menu
         self.branch_menu = self.root.add_scroll_menu('Git Branches', 4, 0, row_span=2, column_span=2)
 
         # Commits menu
         self.git_commits_menu = self.root.add_scroll_menu('Recent Commits', 6, 0, row_span=2, column_span=2)
+        self.git_commits_menu.set_selected_color(py_cui.BLACK_ON_WHITE)
 
         # Initialize the menus with current repo git info
         self.refresh_git_status()
@@ -86,7 +89,10 @@ class AutoGitCUI:
 
         # Enter will show commit diff
         self.git_commits_menu.add_key_command(py_cui.keys.KEY_ENTER, self.show_git_commit_diff)
-        self.git_commits_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 'notstartswith', match_type='region', region=[0,7], include_whitespace=True)
+        self.git_commits_menu.add_text_color_rule(' ', py_cui.GREEN_ON_BLACK, 
+                                                  'notstartswith', match_type='region', 
+                                                  region=[0,7], include_whitespace=True,
+                                                  selected_color=py_cui.GREEN_ON_WHITE)
 
         # Enter will checkout 
         self.branch_menu.add_key_command(py_cui.keys.KEY_ENTER, self.checkout_branch)
@@ -349,8 +355,8 @@ frame = AutoGitCUI(root, dir)
 # Since we want to have git changes updated as needed, we set a refresh
 # timeout to 3 seconds. Also, we need to get an updated git status for each
 # refresh, so we add a per-draw-call update funciton
-root.set_refresh_timeout(1)
-root.set_on_draw_update_func(lambda : frame.refresh_git_status(preserve_selected=True))
+#root.set_refresh_timeout(1)
+#root.set_on_draw_update_func(lambda : frame.refresh_git_status(preserve_selected=True))
 
 # Start our CUI
 root.start()
