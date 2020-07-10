@@ -17,3 +17,4 @@ ecui/
 py_cui_log.txt
 venv/
 .pytest_cache/
+demo.py

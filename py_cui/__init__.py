@@ -1405,7 +1405,6 @@ class PyCUI:
 
         # Selected widget represents which widget is being hovered over, though not necessarily in focus mode
         if self._selected_widget is None:
-            self._logger.warn('Missing selected widget')
             return
 
         selected_widget = self.get_widgets()[self._selected_widget]
