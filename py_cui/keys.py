@@ -61,25 +61,36 @@ KEY_RIGHT_ARROW = curses.KEY_RIGHT
 # Modified arrow keys
 KEY_SHIFT_LEFT  = 393
 KEY_SHIFT_RIGHT = 402
-KEY_SHIFT_UP = 337
-KEY_SHIFT_DOWN = 336
-KEY_CTRL_LEFT   = 560
-KEY_CTRL_RIGHT  = 545
-KEY_CTRL_UP = 566
-KEY_CTRL_DOWN = 525
+KEY_SHIFT_UP    = 337
+KEY_SHIFT_DOWN  = 336
+
+if platform == 'linux' or platform == 'darwin':
+    
+    # Modified arrow keys
+    KEY_SHIFT_LEFT  = 393
+    KEY_SHIFT_RIGHT = 402
+    KEY_SHIFT_UP    = 337
+    KEY_SHIFT_DOWN  = 336
+    
+    KEY_CTRL_LEFT   = 560
+    KEY_CTRL_RIGHT  = 545
+    KEY_CTRL_UP     = 566
+    KEY_CTRL_DOWN   = 525
+
+elif platform == 'win32':
+
+    KEY_SHIFT_LEFT  = 391
+    KEY_SHIFT_RIGHT = 400
+    KEY_SHIFT_UP    = 547
+    KEY_SHIFT_DOWN  = 548
+    
+    KEY_CTRL_LEFT   = 443
+    KEY_CTRL_RIGHT  = 444
+    KEY_CTRL_UP     = 480
+    KEY_CTRL_DOWN   = 481
+
 
 ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]
-
-
-# Function Keys
-KEY_F1          = curses.KEY_F1
-KEY_F2          = curses.KEY_F2
-KEY_F3          = curses.KEY_F3
-KEY_F4          = curses.KEY_F4
-KEY_F5          = curses.KEY_F5
-KEY_F6          = curses.KEY_F6
-KEY_F7          = curses.KEY_F7
-KEY_F8          = curses.KEY_F8
 
 
 # Page navigation keys
@@ -180,35 +191,39 @@ KEY_CTRL_X      = 24
 KEY_CTRL_Y      = 25
 KEY_CTRL_Z      = 26
 
+CTRL_MODIFIED_LETTERS = list(range(1,27))
+
+_ALT_MODIFIER = 0
+if platform == 'win32':
+    _ALT_MODIFIER = 320
 
 # Alt-modified keys
-KEY_ALT_A       = 97
-KEY_ALT_B       = 98
-KEY_ALT_C       = 99
-KEY_ALT_D       = 100
-KEY_ALT_E       = 101
-KEY_ALT_F       = 102
-KEY_ALT_G       = 103
-KEY_ALT_H       = 104
-KEY_ALT_I       = 105
-KEY_ALT_J       = 106
-KEY_ALT_K       = 107
-KEY_ALT_L       = 108
-KEY_ALT_M       = 109
-KEY_ALT_N       = 110
-KEY_ALT_O       = 111
-KEY_ALT_P       = 112
-KEY_ALT_Q       = 113
-KEY_ALT_R       = 114
-KEY_ALT_S       = 115
-KEY_ALT_T       = 116
-KEY_ALT_U       = 117
-KEY_ALT_V       = 118
-KEY_ALT_W       = 119
-KEY_ALT_X       = 120
-KEY_ALT_Y       = 121
-KEY_ALT_Z       = 122
-
+KEY_ALT_A       = 97 + _ALT_MODIFIER
+KEY_ALT_B       = 98 + _ALT_MODIFIER
+KEY_ALT_C       = 99 + _ALT_MODIFIER
+KEY_ALT_D       = 100 + _ALT_MODIFIER
+KEY_ALT_E       = 101 + _ALT_MODIFIER
+KEY_ALT_F       = 102 + _ALT_MODIFIER
+KEY_ALT_G       = 103 + _ALT_MODIFIER
+KEY_ALT_H       = 104 + _ALT_MODIFIER
+KEY_ALT_I       = 105 + _ALT_MODIFIER
+KEY_ALT_J       = 106 + _ALT_MODIFIER
+KEY_ALT_K       = 107 + _ALT_MODIFIER
+KEY_ALT_L       = 108 + _ALT_MODIFIER
+KEY_ALT_M       = 109 + _ALT_MODIFIER
+KEY_ALT_N       = 110 + _ALT_MODIFIER
+KEY_ALT_O       = 111 + _ALT_MODIFIER
+KEY_ALT_P       = 112 + _ALT_MODIFIER
+KEY_ALT_Q       = 113 + _ALT_MODIFIER
+KEY_ALT_R       = 114 + _ALT_MODIFIER
+KEY_ALT_S       = 115 + _ALT_MODIFIER
+KEY_ALT_T       = 116 + _ALT_MODIFIER
+KEY_ALT_U       = 117 + _ALT_MODIFIER
+KEY_ALT_V       = 118 + _ALT_MODIFIER
+KEY_ALT_W       = 119 + _ALT_MODIFIER
+KEY_ALT_X       = 120 + _ALT_MODIFIER
+KEY_ALT_Y       = 121 + _ALT_MODIFIER
+KEY_ALT_Z       = 122 + _ALT_MODIFIER
 
 # Function keys
 KEY_F0          = curses.KEY_F0

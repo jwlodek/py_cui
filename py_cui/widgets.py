@@ -355,6 +355,19 @@ class BlockLabel(Widget):
         self._draw_border  = False
 
 
+    def set_title(self, title):
+        """Override of base class, splits title into lines for rendering line by line.
+
+        Parameters
+        ----------
+        title : str
+            The new title for the block label object.
+        """
+
+        self._title = title
+        self._lines = title.splitlines()
+
+
     def toggle_border(self):
         """Function that gives option to draw border around label
         """
