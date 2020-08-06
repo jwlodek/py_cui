@@ -58,11 +58,6 @@ KEY_DOWN_ARROW  = curses.KEY_DOWN
 KEY_LEFT_ARROW  = curses.KEY_LEFT
 KEY_RIGHT_ARROW = curses.KEY_RIGHT
 
-# Modified arrow keys
-KEY_SHIFT_LEFT  = 393
-KEY_SHIFT_RIGHT = 402
-KEY_SHIFT_UP    = 337
-KEY_SHIFT_DOWN  = 336
 
 if platform == 'linux' or platform == 'darwin':
     
