@@ -780,10 +780,12 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
                 if len(self._text_lines) < line_clicked_index:
                     self._cursor_text_pos_y = len(self._text_lines)
                     self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
+                    line = self._text_lines[len(self._text_lines) - 1]
                 else:
                     self._cursor_text_pos_y = line_clicked_index
                     self._cursor_y = y
-                line = self._text_lines[line_clicked_index]
+                    line = self._text_lines[line_clicked_index]
+                
                 if x <= len(line) + self._cursor_max_left:
                     old_text_pos = self._cursor_text_pos_x
                     old_cursor_x = self._cursor_x
