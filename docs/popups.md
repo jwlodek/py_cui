@@ -1,6 +1,6 @@
 # Popups
 
-This page contains information regarding all popups supported by `py_cui`. Please see the `popups_example.py` in the `examples/` directory in the repository.
+This page contains information regarding all popups supported by `py_cui`. Please see the `popups_example.py` in the `examples/` directory in the repository. In general, `py_cui` popups are handled by using callback functions. A popup is opened with a special `show` method, and then upon some user action a callback function is fired, with some specified input parameters.
 
 ### Message/Warning/Error Popup
 

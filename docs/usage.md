@@ -8,7 +8,7 @@ Each `py_cui` based interface has three operation modes: overview mode, focus mo
 
 **Overview Mode**
 
-In overview mode, you use your arrow keys to navigate between widgets. While in overview mode you may also press buttons by hovering over them and pressing Enter, or you may enter focus mode on a widget by hovering over it and pressing Enter. In addition, any keybindings you add to the root `PyCUI` object will be accessible while in overview mode. Also while in overview mode, by default the `q` key is used to quit.
+In overview mode, you use your arrow keys to navigate between widgets. While in overview mode you may also press buttons by hovering over them and pressing Enter, or you may enter focus mode on a widget by hovering over it and pressing Enter. In addition, any keybindings you add to the root `PyCUI` object will be accessible while in overview mode. Also while in overview mode, by default the `q` key is used to quit. To cycle through widgets you can also use Ctrl + Left/Right arrow keys.
 
 **Focus mode**
 

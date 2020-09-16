@@ -59,7 +59,16 @@ root.start()
 
 ### Supported Keys
 
-Below is a table of all keys supported by `py_cui`. Each key is accessed within your program with `py_cui.keys.YOUR_KEY_CODE`. There are some differences in the way keycodes are handled on win32 vs. UNIX, though this is abstracted away by py_cui.
+There are many supported keys in `py_cui`. These include alpha-numeric keys (in both uppercase and lowercase), as well as those keys with `Ctrl` and `Alt` modifiers. These can be accessed with (using the letter x as an example):
+
+* `py_cui.keys.KEY_X_LOWER` - Lowercase `X` key
+* `py_cui.keys.KEY_X_UPPER` - Uppercase `X` key (`Shift + x`)
+* `py_cui.keys.KEY_CTRL_X` - Control key modified `X` (`Ctrl + x`)
+* `py_cui.keys.KEY_ALT_X` - Alt key modified `X` (`Alt + x`)
+
+In the case of numeric keys, there is no upper/lower distinction.
+
+In addition, `py_cui` supports several non alpha-numeric keys, as described in the below table.
 
 Key Code | Key Presses
 ---------|------------
@@ -72,6 +81,14 @@ KEY_UP_ARROW   | Up Arrow Key
 KEY_DOWN_ARROW | Down Arrow Key
 KEY_LEFT_ARROW | Left Arrow Key
 KEY_RIGHT_ARROW | Right Arrow Key
+KEY_SHIFT_LEFT  | Shift Modified Left
+KEY_SHIFT_RIGHT | Shift Modified Right
+KEY_SHIFT_UP    | Shift Modified Up
+KEY_SHIFT_DOWN  | Shift Modified Down
+KEY_CTRL_LEFT   | Ctrl Modified Left
+KEY_CTRL_RIGHT  | Ctrl Modified Right
+KEY_CTRL_UP     | Ctrl Modified Up
+KEY_CTRL_DOWN   | Ctrl Modified Down
 KEY_PAGE_UP    | Page Up Key
 KEY_PAGE_DOWN  | Page Down Key
 KEY_F1         | F1 Function Key
@@ -84,56 +101,6 @@ KEY_F7         | F7 Function Key
 KEY_F8         | F8 Function Key
 KEY_HOME       | Home Key
 KEY_END        | End Key
-KEY_A_LOWER    | a Key
-KEY_B_LOWER    | b Key
-KEY_C_LOWER    | c Key
-KEY_D_LOWER    | d Key
-KEY_E_LOWER    | e Key
-KEY_F_LOWER    | f Key
-KEY_G_LOWER    | g Key
-KEY_H_LOWER    | h Key
-KEY_I_LOWER    | i Key
-KEY_J_LOWER    | j Key
-KEY_K_LOWER    | k Key
-KEY_L_LOWER    | l Key
-KEY_M_LOWER    | m Key
-KEY_N_LOWER    | n Key
-KEY_O_LOWER    | o Key
-KEY_P_LOWER    | p Key
-KEY_Q_LOWER    | q Key
-KEY_R_LOWER    | r Key
-KEY_S_LOWER    | s Key
-KEY_T_LOWER    | t Key
-KEY_U_LOWER    | u Key
-KEY_V_LOWER    | v Key
-KEY_W_LOWER    | w Key
-KEY_X_LOWER    | x Key
-KEY_Y_LOWER    | y Key
-KEY_Z_LOWER    | z Key
-KEY_A_UPPER    | a Key + Shift Key
-KEY_B_UPPER    | b Key + Shift Key
-KEY_C_UPPER    | c Key + Shift Key
-KEY_D_UPPER    | d Key + Shift Key
-KEY_E_UPPER    | e Key + Shift Key
-KEY_F_UPPER    | f Key + Shift Key
-KEY_G_UPPER    | g Key + Shift Key
-KEY_H_UPPER    | h Key + Shift Key
-KEY_I_UPPER    | i Key + Shift Key
-KEY_J_UPPER    | j Key + Shift Key
-KEY_K_UPPER    | k Key + Shift Key
-KEY_L_UPPER    | l Key + Shift Key
-KEY_M_UPPER    | m Key + Shift Key
-KEY_N_UPPER    | n Key + Shift Key
-KEY_O_UPPER    | o Key + Shift Key
-KEY_P_UPPER    | p Key + Shift Key
-KEY_Q_UPPER    | q Key + Shift Key
-KEY_R_UPPER    | r Key + Shift Key
-KEY_S_UPPER    | s Key + Shift Key
-KEY_T_UPPER    | t Key + Shift Key
-KEY_U_UPPER    | u Key + Shift Key
-KEY_V_UPPER    | v Key + Shift Key
-KEY_W_UPPER    | w Key + Shift Key
-KEY_X_UPPER    | x Key + Shift Key
-KEY_Y_UPPER    | y Key + Shift Key
-KEY_Z_UPPER    | z Key + Shift Key
 KEY_BACKSPACE | Backspace Key
+
+There are also abstractions provided by `py_cui` for considering sets of keys. For example `py_cui.keys.ARROW_KEYS` is a list of key codes for each arrow key. These abstractions are useful for applying a key command for each key in a set of keys.

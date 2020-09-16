@@ -6,7 +6,7 @@ pip install py_cui
 ```
 and the library should install along with all dependancies. If you are working on a machine where `pip` defaults to the `Python 2` version, replace `pip` with `pip3`.
 
-There is no Python 2 support for `py_cui`, you will need a version of Python 3.4+ in order to use it. It may function with lower versions of Python 3, but it has not been tested on them.
+There is no Python 2 support for `py_cui`, you will need a version of Python 3.4+ in order to use it. It may function with older versions of Python 3, but it has not been tested on them.
 
 Alternatively, if you wish to avoid using pip, you may install from this repository:
 

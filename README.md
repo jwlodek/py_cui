@@ -54,7 +54,7 @@ If you would like to try it out without installing, first make sure that `curses
 
 ## Examples
 
-Below are some screenshots/gifs of programs written with py_cui. Additional (simpler) examples are available in the `examples/` directory of this repository.
+Below are some screenshots and gifs of programs written with py_cui. Additional (simpler) examples are available in the `examples/` directory of this repository.
 
 **py_cui_2048 - A command line version of the classic 2048 game**
 
@@ -129,6 +129,7 @@ Project | Description
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
 [tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
 [hue-tui](https://github.com/channel-42/hue-tui) | A CUI controlling for Philips Hue lights.
+[mini-radio-player](https://github.com/wdog/mini-radio-player-pycui) | A terminal based radio interface for linux.
 
 ## License
 

@@ -17,6 +17,9 @@ class SimpleTodoList:
 
 # Create the CUI with 7 rows 6 columns, pass it to the wrapper object, and start it
 root = py_cui.PyCUI(7, 6)
+
+# If we want to use unicode box characters, we toggle them on here.
+root.toggle_unicode_borders()
 root.set_title('CUI TODO List')
 s = SimpleTodoList(root)
 root.start()
@@ -38,9 +41,9 @@ class SimpleTodoList:
         self.master = master
 
         # The scrolled list cells that will contain our tasks in each of the three categories
-        self.todo_scroll_cell =         self.master.add_scroll_menu('TODO',         0, 0, row_span=6, column_span=2)
-        self.in_progress_scroll_cell =  self.master.add_scroll_menu('In Progress',  0, 2, row_span=7, column_span=2)
-        self.done_scroll_cell =         self.master.add_scroll_menu('Done',         0, 4, row_span=7, column_span=2)
+        self.todo_scroll_cell = self.master.add_scroll_menu('TODO', 0, 0, row_span=6, column_span=2)
+        self.in_progress_scroll_cell = self.master.add_scroll_menu('In Progress', 0, 2, row_span=7, column_span=2)
+        self.done_scroll_cell = self.master.add_scroll_menu('Done', 0, 4, row_span=7, column_span=2)
 
         # Textbox for entering new items
         self.new_todo_textbox = self.master.add_text_box('TODO Item', 6, 0, column_span=2)
@@ -67,17 +70,17 @@ class SimpleTodoList:
         self.master = master
 
         # The scrolled list cells that will contain our tasks in each of the three categories
-        self.todo_scroll_cell =         self.master.add_scroll_menu('TODO',         0, 0, row_span=6, column_span=2)
-        self.in_progress_scroll_cell =  self.master.add_scroll_menu('In Progress',  0, 2, row_span=7, column_span=2)
-        self.done_scroll_cell =         self.master.add_scroll_menu('Done',         0, 4, row_span=7, column_span=2)
+        self.todo_scroll_cell = self.master.add_scroll_menu('TODO', 0, 0, row_span=6, column_span=2)
+        self.in_progress_scroll_cell = self.master.add_scroll_menu('In Progress', 0, 2, row_span=7, column_span=2)
+        self.done_scroll_cell = self.master.add_scroll_menu('Done',  0, 4, row_span=7, column_span=2)
 
         # Textbox for entering new items
         self.new_todo_textbox = self.master.add_text_box('TODO Item', 6, 0, column_span=2)
 
-        self.new_todo_textbox.add_key_command(          py_cui.keys.KEY_ENTER, self.add_item)
-        self.todo_scroll_cell.add_key_command(          py_cui.keys.KEY_ENTER, self.mark_as_in_progress)
-        self.in_progress_scroll_cell.add_key_command(   py_cui.keys.KEY_ENTER, self.mark_as_done)
-        self.done_scroll_cell.add_key_command(          py_cui.keys.KEY_ENTER, self.remove_item)
+        self.new_todo_textbox.add_key_command(py_cui.keys.KEY_ENTER, self.add_item)
+        self.todo_scroll_cell.add_key_command(py_cui.keys.KEY_ENTER, self.mark_as_in_progress)
+        self.in_progress_scroll_cell.add_key_command(py_cui.keys.KEY_ENTER, self.mark_as_done)
+        self.done_scroll_cell.add_key_command(py_cui.keys.KEY_ENTER, self.remove_item)
 
     def add_item(self):
         """ Add a todo item """

@@ -4,22 +4,36 @@ Colors in `py_cui` based interfaces are handled by widget level color choices, o
 
 ### Supported Colors
 
-All colors in the `py_cui` library are represented as pairs, a foreground and background color. Below is a list of supported color pairs:
+All colors in the `py_cui` library are represented as pairs, a foreground and background color. Below is a list of supported colors:
 
-Color Pair | Foreground (Text) Color | Background Color
-----------------|-|-
-WHITE_ON_BLACK   | WHITE | BLACK
-BLACK_ON_GREEN   |BLACK |GREEN
-BLACK_ON_WHITE   |BLACK | WHITE
-WHITE_ON_RED     |WHITE|RED
-YELLOW_ON_BLACK  |YELLOW |BLACK
-RED_ON_BLACK     |RED|BLACK
-CYAN_ON_BLACK    |CYAN|BLACK
-MAGENTA_ON_BLACK |MAGENTA|BLACK
-GREEN_ON_BLACK   |GREEN|BLACK
-BLUE_ON_BLACK    |BLUE|BLACK
+* Black
+* White
+* Red
+* Green
+* Blue
+* Magenta
+* Yellow
+* Cyan
+
+Each of these colors can either be a foreground or background color, in any combination. To access a specific color pair, use py_cui.FOREGROUND_ON_BACKGROUND.
+For example, a simple white on black classic terminal color would be `py_cui.WHITE_ON_BLACK`. This is also the default color for all UI elements.
+
+### UI Element Color Customization
+
+You may set three individual color attributes for UI elements, in addition to more complex color rules described below. You may set the following:
+
+* Border Color
+* Text Color
+* Selected Text Color
+
+Overall UI color is applied by default to all three attributes, unless one is specifically set. Use the dedicated getter/setter methods for UI element
+objects to adjust these attributes.
 
 ### Using Color Rules
+
+In addition to setting the default color for certain UI elements, in many cases it is important to gain a more fine control over
+widget coloration, and color rules aim to achive this by allowing for defining color logic depending on matches against regular
+expressions.
 
 There are several possible color rules that can be added to a py_cui widget, and these are classified under:
 
@@ -60,3 +74,8 @@ For this color rule, all lines that don't start with a `?` will have their first
 self.text_block.add_text_color_rule('@.*@', py_cui.CYAN_ON_BLACK, 'contains', match_type='regex')
 ```
 The above color rule will color all matches of @ ... @ cyan in the text of the textblock.
+
+In addition, if your widget uses selected text and you wish for it to apply a different color in that case, an additional parameter is 
+passed into the `add_text_color_rule` function, namely: `selected_color=py_cui.GREEN_ON_WHITE`, specifying the color of the match 
+in the event that text is selected. This is important, for example, for color rules applied to scroll menus, since the current position in
+the menu is rendered as "selected" text.

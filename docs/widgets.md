@@ -1,6 +1,6 @@
 # Widgets
 
-Below are details on each widget supported by `py_cui` including how to add them to a CUI, draw behavior, and default keybindings. Please take a look at `Classes and Functions` section of these docs to see function/attribute information.
+Below are details on each widget supported by `py_cui` including how to add them to a CUI, draw behavior, and default keybindings. Please take a look at the extended API documentation section on widgets to see function/attribute information.
 
 ### Label
 
