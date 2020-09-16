@@ -29,55 +29,55 @@ def test_dummy_grid():
 def test_get_render_text_A():
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_A,
-                                                      False, False, 0)
+                                                      False, False, False, 0)
     assert render_fragment[0][0] == "Hello wo"
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_A,
-                                                      True, False, 0)
+                                                      True, False, False, 0)
     assert render_fragment[0][0] == "Hello wo"
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_A,
-                                                      False, True, 0)
+                                                      False, True, False, 0)
     assert render_fragment[0][0] == "Hell"
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_A,
-                                                      True, True, 0)
+                                                      True, True, False, 0)
     assert render_fragment[0][0] == "Hell"
 
 
 def test_get_render_text_B():
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_B,
-                                                      False, False, 0)
+                                                      False, False, False, 0)
     assert render_fragment[0][0] == "     Tes"
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_B,
-                                                      True, False, 0)
+                                                      True, False, False, 0)
     assert render_fragment[0][0] == "     Tes"
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_B,
-                                                      False, True, 0)
+                                                      False, True, False, 0)
     assert render_fragment[0][0] == "    "
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_B,
-                                                      True, True, 0)
+                                                      True, True,False,  0)
     assert render_fragment[0][0] == "    "
 
 
 def test_get_render_text_C():
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_C,
-                                                      False, False, 0)
+                                                      False, False, False, 0)
     assert render_fragment[0][0] == "Hi      "
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_C,
-                                                      True, False, 0)
+                                                      True, False, False, 0)
     assert render_fragment[0][0] == "   Hi   "
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_C,
-                                                      False, True, 0)
+                                                      False, True, False, 0)
     assert render_fragment[0][0] == "Hi  "
     render_fragment = dummy_renderer._get_render_text(dummy_widget,
                                                       test_string_C,
-                                                      True, True, 0)
+                                                      True, True, False, 0)
     assert render_fragment[0][0] == " Hi "

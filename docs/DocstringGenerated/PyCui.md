@@ -61,8 +61,8 @@ Base CUI class
 
 
 
-Main user interface class for py_cui. To create a user interface, you must first
-create an instance of this class, and then add cells + widgets to it.
+Main user interface class for py_cui. To create a user interface, you must
+first create an instance of this class, and then add cells + widgets to it.
 
 
 #### Attributes
@@ -83,6 +83,9 @@ create an instance of this class, and then add cells + widgets to it.
 
  Method  | Doc
 -----|-----
+ set_refresh_timeout | Sets the CUI auto-refresh timeout to a number of seconds.
+ set_on_draw_update_func | Adds a function that is fired during each draw call of the CUI
+ set_widget_cycle_key | Assigns a key for automatically cycling through widgets in both focus and overview modes
  enable_logging | Function enables logging for py_cui library
  apply_widget_set | Function that replaces all widgets in a py_cui with those of a different widget set
  create_new_widget_set | Function that is used to create additional widget sets
@@ -103,7 +106,8 @@ create an instance of this class, and then add cells + widgets to it.
  add_label | Function that adds a new label to the CUI grid
  add_block_label | Function that adds a new block label to the CUI grid
  add_button | Function that adds a new button to the CUI grid
- get_widget_at_position | Returns containing widget for character position
+ add_slider | Function that adds a new label to the CUI grid
+ get_element_at_position | Returns containing widget for character position
  _get_horizontal_neighbors | Gets all horizontal (left, right) neighbor widgets
  _get_vertical_neighbors | Gets all vertical (up, down) neighbor widgets
  _check_if_neighbor_exists | Function that checks if widget has neighbor in specified cell.
@@ -111,6 +115,7 @@ create an instance of this class, and then add cells + widgets to it.
  set_selected_widget | Function that sets the selected widget for the CUI
  lose_focus | Function that forces py_cui out of focus mode.
  move_focus | Moves focus mode to different widget
+ _cycle_widgets | Function that is fired if cycle key is pressed to move to next widget
  add_key_command | Function that adds a keybinding to the CUI when in overview mode
  show_message_popup | Shows a message popup
  show_warning_popup | Shows a warning popup
@@ -120,6 +125,7 @@ create an instance of this class, and then add cells + widgets to it.
  show_menu_popup | Shows a menu popup.
  show_loading_icon_popup | Shows a loading icon popup
  show_loading_bar_popup | Shows loading bar popup.
+ show_form_popup | Shows form popup.
  increment_loading_bar | Increments progress bar if loading bar popup is open
  stop_loading_popup | Leaves loading state, and closes popup.
  close_popup | Closes the popup, and resets focus
@@ -138,12 +144,75 @@ create an instance of this class, and then add cells + widgets to it.
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_cols, auto_focus_buttons=True, exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal=None)
+def __init__(self, num_rows, num_cols, auto_focus_buttons=True
 ```
 
 Constructor for PyCUI class
 
 
+
+
+
+
+
+### set_refresh_timeout
+
+```python
+def set_refresh_timeout(self, timeout)
+```
+
+Sets the CUI auto-refresh timeout to a number of seconds.
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ timeout  |  int | Number of seconds to wait before refreshing the CUI
+
+
+
+
+
+### set_on_draw_update_func
+
+```python
+def set_on_draw_update_func(self, update_function)
+```
+
+Adds a function that is fired during each draw call of the CUI
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ update_function  |  function | A no-argument or lambda function that is fired at the start of each draw call
+
+
+
+
+
+### set_widget_cycle_key
+
+```python
+def set_widget_cycle_key(self, forward_cycle_key=None, reverse_cycle_key=None)
+```
+
+Assigns a key for automatically cycling through widgets in both focus and overview modes
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ widget_cycle_key  |  py_cui.keys.KEY | Key code for key to cycle through widgets
 
 
 
@@ -187,6 +256,12 @@ Function that replaces all widgets in a py_cui with those of a different widget 
  Parameter  | Type  | Doc
 -----|----------|-----
  new_widget_set  |  WidgetSet | The new widget set to switch to
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
+ Unknown | TypeError | If input is not of type WidgetSet
 
 
 
@@ -408,7 +483,7 @@ Function that gets current set of widgets
 ### add_scroll_menu
 
 ```python
-def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0)
+def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0)
 ```
 
 Function that adds a new scroll menu to the CUI grid
@@ -642,10 +717,47 @@ Function that adds a new button to the CUI grid
 
 
 
-### get_widget_at_position
+### add_slider
 
 ```python
-def get_widget_at_position(self, x, y)
+def add_slider(self, title, row, column, row_span=1
+```
+
+Function that adds a new label to the CUI grid
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ title  |  str | The title of the label
+ row  |  int | The row value, from the top down
+ column  |  int | The column value from the top down
+ row_span=1  |  int | The number of rows to span accross
+ column_span=1  |  int | the number of columns to span accross
+ padx=1  |  int | number of padding characters in the x direction
+ pady=0  |  int | number of padding characters in the y direction
+ Unknown | min_val = 0 int | min value of the slider
+ Unknown | max_val = 0 int | max value of the slider
+ Unknown | step = 0 int | step to incremento or decrement
+ Unknown | init_val = 0 int | initial value of the slider
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ new_slider  |  Slider | A reference to the created slider object.
+
+
+
+
+
+### get_element_at_position
+
+```python
+def get_element_at_position(self, x, y)
 ```
 
 Returns containing widget for character position
@@ -816,7 +928,7 @@ After popup is called, focus is lost
 ### move_focus
 
 ```python
-def move_focus(self, widget)
+def move_focus(self, widget, auto_press_buttons=True)
 ```
 
 Moves focus mode to different widget
@@ -829,6 +941,27 @@ Moves focus mode to different widget
  Parameter  | Type  | Doc
 -----|----------|-----
  widget  |  Widget | The widget object we want to move focus to.
+
+
+
+
+
+### _cycle_widgets
+
+```python
+def _cycle_widgets(self, reverse=False)
+```
+
+Function that is fired if cycle key is pressed to move to next widget
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ reverse  |  bool | Default false. If true, cycle widgets in reverse order.
 
 
 
@@ -1040,6 +1173,35 @@ Use 'increment_loading_bar' to show progress
  title  |  str | Message title
  num_items  |  int | Number of items to iterate through for loading
  callback=None  |  Function | If not none, fired after loading is completed. Must be a no-arg function
+
+
+
+
+
+### show_form_popup
+
+```python
+def show_form_popup(self, title, fields, passwd_fields=[], required=[], callback=None)
+```
+
+Shows form popup.
+
+
+
+Used for inputting several fields worth of values
+
+Paramters
+---------
+title : str
+Message title
+fields : List[str]
+Names of each individual field
+passwd_fields : List[str]
+Field names that should have characters hidden
+required : List[str]
+Fields that are required before submission
+callback=None : Function
+If not none, fired after loading is completed. Must be a no-arg function
 
 
 

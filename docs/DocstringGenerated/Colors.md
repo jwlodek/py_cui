@@ -1,6 +1,6 @@
 # colors
 
-File containing color rule class and any color-rendering related functions
+Module containing color rule class and any color-rendering related functions and variables
 
 
 

@@ -16,19 +16,19 @@ dummy_grid = py_cui.grid.Grid(3, 3, 30, 30, logger)
 dummy_widget = py_cui.widgets.Widget('1', 'Test', dummy_grid,
                                      1, 1, 1, 1, 1, 0, logger)
 
-color_rule_A = ColorRule('@.*@', py_cui.RED_ON_BLACK,
+color_rule_A = ColorRule('@.*@', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
                          'contains', 'regex', None, False, logger)
 
-color_rule_B = ColorRule('Test', py_cui.RED_ON_BLACK,
+color_rule_B = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
                          'startswith', 'line', None, False, logger)
 
-color_rule_C = ColorRule('Space', py_cui.RED_ON_BLACK,
+color_rule_C = ColorRule('Space', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
                          'endswith', 'regex', None,   False, logger)
 
-color_rule_D = ColorRule('Test', py_cui.RED_ON_BLACK,
+color_rule_D = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
                          'notstartswith', 'region', [3, 5], False, logger)
 
-color_rule_E = ColorRule('Test', py_cui.RED_ON_BLACK,
+color_rule_E = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
                          'notendswith', 'line', None, False, logger)
 
 
