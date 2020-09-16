@@ -68,11 +68,15 @@ class contains all links to the CUI engine.
  get_start_position | Gets coords of upper left corner
  get_stop_position | Gets coords of lower right corner
  get_color | Gets current element color
+ get_border_color | Gets current element border color
+ get_selected_color | Gets current selected item color
  is_selected | Get selected status
  get_renderer | Gets reference to renderer object
  get_help_text | Returns current help text
  set_title | Function that sets the widget title.
  set_color | Sets element default color
+ set_border_color | Sets element border color
+ set_selected_color | Sets element sected color
  set_selected | Marks the UI element as selected or not selected
  set_help_text | Sets status bar help text
  set_focus_text | Sets status bar focus text. Legacy function, overridden by set_focus_text
@@ -312,6 +316,48 @@ Gets current element color
 
 
 
+### get_border_color
+
+```python
+def get_border_color(self)
+```
+
+Gets current element border color
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ color  |  int | color code for combination
+
+
+
+
+
+### get_selected_color
+
+```python
+def get_selected_color(self)
+```
+
+Gets current selected item color
+
+
+
+
+#### Returns
+
+ Return Variable  | Type  | Doc
+-----|----------|-----
+ color  |  int | color code for combination
+
+
+
+
+
 ### is_selected
 
 ```python
@@ -403,6 +449,48 @@ def set_color(self, color)
 ```
 
 Sets element default color
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ color  |  int | New color pair key code
+
+
+
+
+
+### set_border_color
+
+```python
+def set_border_color(self, color)
+```
+
+Sets element border color
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ color  |  int | New color pair key code
+
+
+
+
+
+### set_selected_color
+
+```python
+def set_selected_color(self, color)
+```
+
+Sets element sected color
 
 
 

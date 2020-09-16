@@ -72,6 +72,7 @@ and setting status bar text.
  get_absolute_stop_pos | Gets the absolute dimensions of the widget in characters. Override of base class function
  get_grid_cell | Gets widget row, column in grid
  get_grid_cell_spans | Gets widget row span, column span in grid
+ set_selectable | Setter for widget selectablility
  is_selectable | Checks if the widget is selectable
  _is_row_col_inside | Checks if a particular row + column is inside the widget area
  _handle_key_press | Base class function that handles all assigned key presses.
@@ -144,7 +145,7 @@ Maps a keycode to a function that will be executed when in focus mode, if key is
 ### add_text_color_rule
 
 ```python
-def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False)
+def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False, selected_color=None)
 ```
 
 Forces renderer to draw text using given color if text_condition_function returns True
@@ -246,6 +247,25 @@ Gets widget row span, column span in grid
  Return Variable  | Type  | Doc
 -----|----------|-----
  row_span, column_span  |  int | Initial row span and column span placement for widget in grid
+
+
+
+
+
+### set_selectable
+
+```python
+def set_selectable(self, selectable)
+```
+
+Setter for widget selectablility
+
+
+
+Paramters
+---------
+selectable : bool
+Widget selectable if true, otherwise not
 
 
 
@@ -441,6 +461,7 @@ A Variation of the label widget that renders a block of text.
 
  Method  | Doc
 -----|-----
+ set_title | Override of base class, splits title into lines for rendering line by line.
  toggle_border | Function that gives option to draw border around label
  _draw | Override base draw class.
 
@@ -456,6 +477,27 @@ def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, p
 Initializer for blocklabel widget
 
 
+
+
+
+
+
+### set_title
+
+```python
+def set_title(self, title)
+```
+
+Override of base class, splits title into lines for rendering line by line.
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ title  |  str | The new title for the block label object.
 
 
 

@@ -320,7 +320,7 @@ Internal function for drawing a blank row
 ### _get_render_text
 
 ```python
-def _get_render_text(self, ui_element, line, centered, bordered, start_pos)
+def _get_render_text(self, ui_element, line, centered, bordered, selected, start_pos)
 ```
 
 Internal function that computes the scope of the text that should be drawn
@@ -351,7 +351,7 @@ Internal function that computes the scope of the text that should be drawn
 ### _generate_text_color_fragments
 
 ```python
-def _generate_text_color_fragments(self, ui_element, line, render_text)
+def _generate_text_color_fragments(self, ui_element, line, render_text, selected)
 ```
 
 Function that applies color rules to text, dividing them if match is found

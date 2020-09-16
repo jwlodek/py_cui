@@ -8,7 +8,7 @@ Form widget for py_cui. Allows for giving user several fillable text fields in o
 
  Class  | Doc
 -----|-----
- DuplicateFormKeyError(Exception) |
+ DuplicateFormKeyError(Exception) | Error thrown when a duplicate form field key is passed
  FormField(py_cui.ui.TextBoxImplementation) | Class containing basic logic of a field in a form
  FormFieldElement(py_cui.ui.UIElement, FormField) | Extension of UI element representing an individual field in the form
  FormImplementation(py_cui.ui.UIImplementation) | Main implementation class for the form widget/popup
@@ -25,7 +25,7 @@ Form widget for py_cui. Allows for giving user several fillable text fields in o
 class DuplicateFormKeyError(Exception)
 ```
 
-
+Error thrown when a duplicate form field key is passed
 
 
 

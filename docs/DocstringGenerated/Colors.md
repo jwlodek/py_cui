@@ -50,7 +50,7 @@ Class representing a text color rendering rule
 ### __init__
 
 ```python
-def __init__(self, regex, color, rule_type, match_type, region, include_whitespace, logger)
+def __init__(self, regex, color, selected_color, rule_type, match_type, region, include_whitespace, logger)
 ```
 
 Constructor for ColorRule object
@@ -64,6 +64,7 @@ Constructor for ColorRule object
 -----|----------|-----
  regex  |  str | A python 're' module string
  color  |  int | A valid color value. Ex. py_cui.WHITE_ON_BLACK
+ selected_color  |  int | Color to use if rule matched but selected modifier is applied
  rule_type  |  str | String representing rule type. ['startswith', 'endswith', 'notstartswith', 'notendswith', 'contains']
  match_type  |  str | String representing the match type. ['line', 'regex', 'region']
  region  |  [int, int] | Start and end positions for the coloring, None if match_type != 'region'
@@ -103,7 +104,7 @@ Checks if the color rule matches a line
 ### _generate_fragments_regex
 
 ```python
-def _generate_fragments_regex(self, widget, render_text)
+def _generate_fragments_regex(self, widget, render_text, selected)
 ```
 
 Splits text into fragments based on regular expression
@@ -131,7 +132,7 @@ Splits text into fragments based on regular expression
 ### _split_text_on_region
 
 ```python
-def _split_text_on_region(self, widget, render_text)
+def _split_text_on_region(self, widget, render_text, selected)
 ```
 
 Splits text into fragments based on region
@@ -159,7 +160,7 @@ Splits text into fragments based on region
 ### generate_fragments
 
 ```python
-def generate_fragments(self, widget, line, render_text)
+def generate_fragments(self, widget, line, render_text, selected=False)
 ```
 
 Splits text into fragments if matched line to regex
