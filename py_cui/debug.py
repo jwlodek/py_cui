@@ -10,7 +10,7 @@ import inspect
 import py_cui
 
 
-def _enable_logging(logger, filename='py_cui_log.txt', logging_level=logging.DEBUG):
+def _enable_logging(logger, replace_log_file=True, filename='py_cui_log.txt', logging_level=logging.DEBUG):
     """Function that creates basic logging configuration for selected logger
 
     Parameters
@@ -31,6 +31,9 @@ def _enable_logging(logger, filename='py_cui_log.txt', logging_level=logging.DEB
     """
 
     abs_path = os.path.abspath(filename)
+    if replace_log_file and os.path.exists(abs_path):
+        os.remove(abs_path)
+
     if not os.access(os.path.dirname(abs_path), os.W_OK):
         raise PermissionError('You do not have permission to create py_cui.log file.')
 
@@ -127,7 +130,7 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        super().debug(debug_text)
+        super().info(debug_text)
 
 
     def debug(self, text):

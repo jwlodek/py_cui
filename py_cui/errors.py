@@ -6,6 +6,7 @@
 
 # TODO - expand this
 
+
 class PyCUIOutOfBoundsError(Exception):
     """Error for when widget or text goes off of the py_cui grid
     """
@@ -29,6 +30,13 @@ class PyCUIMissingParentError(Exception):
 
 class PyCUIMissingChildError(Exception):
     """Error for when child widget is None or invalid
+    """
+
+    pass
+
+
+class PyCUIInvalidValue(Exception):
+    """Error when a values passed is not valid or doeas not match requirements
     """
 
     pass

@@ -7,7 +7,7 @@ The grid is currently the only supported layout manager for py_cui
 # Created:   12-Aug-2019
 
 
-import py_cui.errors
+import py_cui
 
 
 class Grid:
@@ -124,7 +124,7 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self._logger.debug('Updating row count and height')
+        self._logger.info('Updating row count and height')
         if (3 * num_rows) >= self._height:
             raise py_cui.errors.PyCUIOutOfBoundsError
         self._num_rows = num_rows
@@ -145,7 +145,7 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self._logger.debug('Updating column count and width')
+        self._logger.info('Updating column count and width')
         if (3 * num_columns) >= self._width:
             raise py_cui.errors.PyCUIOutOfBoundsError
         
@@ -169,11 +169,11 @@ class Grid:
             If the size of the terminal window is too small
         """
 
-        self._logger.debug('Updating grid height and width')
+        self._logger.info('Updating grid height and width')
         self._height = height
         self._width  = width
 
-        self._logger.debug('Checking height width based on terminal dimensions')
+        self._logger.info('Checking height width based on terminal dimensions')
         if (3 * self._num_columns) >= self._width:
             raise py_cui.errors.PyCUIOutOfBoundsError
 
@@ -184,4 +184,4 @@ class Grid:
         self._column_width   = int(self._width    / self._num_columns)
         self._offset_x       = self._width    % self._num_columns
         self._offset_y       = self._height   % self._num_rows
-        self._logger.debug('Updated grid. Cell dims: {}x{}, Offsets {},{}'.format(self._row_height, self._column_width, self._offset_x, self._offset_y))
+        self._logger.info('Updated grid. Cell dims: {}x{}, Offsets {},{}'.format(self._row_height, self._column_width, self._offset_x, self._offset_y))
