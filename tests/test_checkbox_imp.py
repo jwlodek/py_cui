@@ -1,22 +1,12 @@
 import pytest # noqa
 
 import py_cui
-import py_cui.debug as dbg
-
-logger = dbg.PyCUILogger('PYCUI TEST')
-
-grid_test = py_cui.grid.Grid(10, 10, 100, 100, logger)
-
-scroll = py_cui.widgets.CheckBoxMenu('1', 'Scroll',
-                                     grid_test,
-                                     0, 0, 1, 1, 1, 0, logger, 'X')
-
-scroll.selected = True
 
 elems = ["Elem0", "Elem1", "Elem2", "Elem3", "Elem4"]
 
 
-def test_add_item_list():
+def test_add_item_list(CHECKBOXMENU):
+    scroll = CHECKBOXMENU
     scroll.add_item_list(elems)
     counter = 0
     for item in scroll.get_item_list():
@@ -29,7 +19,8 @@ def test_add_item_list():
     scroll.clear()
 
 
-def test_mark_item():
+def test_mark_item(CHECKBOXMENU):
+    scroll = CHECKBOXMENU
     scroll.add_item_list(elems)
     scroll.set_selected_item_index(1)
     assert scroll.get() == "Elem1"

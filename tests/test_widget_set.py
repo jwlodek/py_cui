@@ -1,21 +1,17 @@
 import pytest # noqa
 import py_cui
-from py_cui.widget_set import WidgetSet
-
-import py_cui.debug as dbg
-
-logger = dbg.PyCUILogger('widget_set.WidgetSet TEST')
 
 
-def test_create():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+
+def test_create(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     assert test_widget_set._simulated_terminal == [30, 100]
     assert test_widget_set._height == 26
     assert test_widget_set._width == 100
 
 
-def test_add_scroll_menu():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_scroll_menu(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_scroll_menu('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -29,8 +25,8 @@ def test_add_scroll_menu():
     assert col == 1
 
 
-def test_add_checkbox_menu():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_checkbox_menu(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_checkbox_menu('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -44,8 +40,8 @@ def test_add_checkbox_menu():
     assert col == 1
 
 
-def test_add_label():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_label(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_label('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -59,8 +55,8 @@ def test_add_label():
     assert col == 1
 
 
-def test_add_block_label():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_block_label(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_block_label('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -74,8 +70,8 @@ def test_add_block_label():
     assert col == 1
 
 
-def test_add_text_box():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_text_box(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_text_box('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -89,8 +85,8 @@ def test_add_text_box():
     assert col == 1
 
 
-def test_add_button():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_button(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_button('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():
@@ -104,8 +100,8 @@ def test_add_button():
     assert col == 1
 
 
-def test_add_text_block():
-    test_widget_set = WidgetSet(4, 5, logger, simulated_terminal=[30, 100])
+def test_add_text_block(WIDGETSET):
+    test_widget_set = WIDGETSET(4, 5, 30, 100)
     test_widget_set.add_text_block('Demo', 1, 1)
     assert len(test_widget_set.get_widgets().keys()) == 1
     for key in test_widget_set.get_widgets().keys():

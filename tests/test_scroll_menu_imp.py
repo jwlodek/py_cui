@@ -1,20 +1,13 @@
 import pytest # noqa
 
 import py_cui
-import py_cui.debug as dbg
 
-logger = dbg.PyCUILogger('PYCUI TEST')
-
-grid_test = py_cui.grid.Grid(10, 10, 100, 100, logger)
-
-scroll = py_cui.widgets.ScrollMenu('1', 'Scroll', grid_test,
-                                   0, 0, 1, 1, 1, 0, logger)
-scroll.selected = True
 
 elems = ["Elem0", "Elem1", "Elem2", "Elem3", "Elem4"]
 
 
-def test_add_item_list():
+def test_add_item_list(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     counter = 0
     for item in scroll.get_item_list():
@@ -25,7 +18,8 @@ def test_add_item_list():
     scroll.clear()
 
 
-def test_scroll_up():
+def test_scroll_up(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll._scroll_up()
     assert scroll.get_selected_item_index() == 0
@@ -38,7 +32,8 @@ def test_scroll_up():
     scroll.clear()
 
 
-def test_scroll_down():
+def test_scroll_down(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll._scroll_down(scroll.get_viewport_height())
     assert scroll.get_selected_item_index() == 1
@@ -51,7 +46,8 @@ def test_scroll_down():
     scroll.clear()
 
 
-def test_empty_scroll_menu():
+def test_empty_scroll_menu(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.clear()
     assert scroll.get() is None
     assert scroll.get_selected_item_index() == 0
@@ -61,7 +57,8 @@ def test_empty_scroll_menu():
     assert scroll.get_selected_item_index() == 0 and scroll.get() is None
 
 
-def test_goto_end():
+def test_goto_end(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll.set_selected_item_index(0)
     scroll._jump_to_bottom(scroll.get_viewport_height())
@@ -69,7 +66,8 @@ def test_goto_end():
     scroll.clear()
 
 
-def test_goto_start():
+def test_goto_start(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll.set_selected_item_index(4)
     assert scroll.get() == "Elem4"
@@ -79,7 +77,8 @@ def test_goto_start():
     scroll.clear()
 
 
-def test_jump_down():
+def test_jump_down(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll.set_selected_item_index(0)
     scroll._jump_down(scroll.get_viewport_height())
@@ -87,7 +86,8 @@ def test_jump_down():
     scroll.clear()
 
 
-def test_jump_up():
+def test_jump_up(SCROLLMENU):
+    scroll = SCROLLMENU
     scroll.add_item_list(elems)
     scroll.set_selected_item_index(4)
     assert scroll.get() == "Elem4"
