@@ -93,3 +93,14 @@ def SCROLLTEXTBLOCK(request, GRID, LOGGER):
         return text_box
 
     return _SCROLLTEXTBLOCK
+
+
+@pytest.fixture
+def COLORRULE(request, LOGGER):
+
+    def _COLORRULE(text, rule_type, match_type, color_A=py_cui.RED_ON_BLACK, color_B=py_cui.RED_ON_BLACK, region=None, whitespace=False):
+
+        color_rule = py_cui.colors.ColorRule(text, color_A, color_B, rule_type, match_type, region, whitespace, LOGGER)
+        return color_rule
+
+    return _COLORRULE

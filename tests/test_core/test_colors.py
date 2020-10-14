@@ -1,60 +1,49 @@
 import pytest # noqa
 import py_cui
-from py_cui.colors import ColorRule
-import py_cui.debug as dbg
-
-# Initialize debug logger
-logger = dbg.PyCUILogger('PYCUI TEST')
 
 # Some test strings
 test_string_A = "Hello world, etc 123 @ testing @ ++-- Test"
 test_string_B = "     Test string number two Space"
 test_string_C = "Hi"
 
-# Initialize a dummy grid, widget, and color rules
-dummy_grid = py_cui.grid.Grid(3, 3, 30, 30, logger)
-dummy_widget = py_cui.widgets.Widget('1', 'Test', dummy_grid,
-                                     1, 1, 1, 1, 1, 0, logger)
 
-color_rule_A = ColorRule('@.*@', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
-                         'contains', 'regex', None, False, logger)
+def gen_color_rule_examples(rule_gen):
+    color_rule_examples = []
+    color_rule_examples.append(rule_gen('@.*@', 'contains', 'regex'))
+    color_rule_examples.append(rule_gen('Test', 'startswith', 'line'))
+    color_rule_examples.append(rule_gen('Space', 'endswith', 'regex'))
+    color_rule_examples.append(rule_gen('Test', 'notstartswith', 'region', region=[3,5]))
+    color_rule_examples.append(rule_gen('Test', 'notendswith', 'line'))
 
-color_rule_B = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
-                         'startswith', 'line', None, False, logger)
-
-color_rule_C = ColorRule('Space', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
-                         'endswith', 'regex', None,   False, logger)
-
-color_rule_D = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
-                         'notstartswith', 'region', [3, 5], False, logger)
-
-color_rule_E = ColorRule('Test', py_cui.RED_ON_BLACK, py_cui.RED_ON_BLACK,
-                         'notendswith', 'line', None, False, logger)
+    return color_rule_examples
 
 
-def test_check_match():
-    assert color_rule_A._check_match(test_string_A) is True
-    assert color_rule_B._check_match(test_string_A) is False
-    assert color_rule_C._check_match(test_string_A) is False
-    assert color_rule_D._check_match(test_string_A) is True
-    assert color_rule_E._check_match(test_string_A) is False
+def test_check_match(COLORRULE):
+    rules = gen_color_rule_examples(COLORRULE)
+    
+    assert rules[0]._check_match(test_string_A) is True
+    assert rules[1]._check_match(test_string_A) is False
+    assert rules[2]._check_match(test_string_A) is False
+    assert rules[3]._check_match(test_string_A) is True
+    assert rules[4]._check_match(test_string_A) is False
 
-    assert color_rule_A._check_match(test_string_B) is False
-    assert color_rule_B._check_match(test_string_B) is True
-    assert color_rule_C._check_match(test_string_B) is True
-    assert color_rule_D._check_match(test_string_B) is False
-    assert color_rule_E._check_match(test_string_B) is True
+    assert rules[0]._check_match(test_string_B) is False
+    assert rules[1]._check_match(test_string_B) is True
+    assert rules[2]._check_match(test_string_B) is True
+    assert rules[3]._check_match(test_string_B) is False
+    assert rules[4]._check_match(test_string_B) is True
 
-    assert color_rule_A._check_match(test_string_C) is False
-    assert color_rule_B._check_match(test_string_C) is False
-    assert color_rule_C._check_match(test_string_C) is False
-    assert color_rule_D._check_match(test_string_C) is True
-    assert color_rule_E._check_match(test_string_C) is True
+    assert rules[0]._check_match(test_string_C) is False
+    assert rules[1]._check_match(test_string_C) is False
+    assert rules[2]._check_match(test_string_C) is False
+    assert rules[3]._check_match(test_string_C) is True
+    assert rules[4]._check_match(test_string_C) is True
 
 
-def test_generate_fragments_A():
+def test_generate_fragments_contains_regex(COLORRULE, DUMMYWIDGET):
+    rules = gen_color_rule_examples(COLORRULE)
 
-    fragments, match = color_rule_A.generate_fragments(dummy_widget,
+    fragments, match = rules[0].generate_fragments(DUMMYWIDGET,
                                                        test_string_A,
                                                        test_string_A)
     assert match is True
@@ -66,7 +55,7 @@ def test_generate_fragments_A():
     assert fragments[2][0] == " ++-- Test"
     assert fragments[2][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_A.generate_fragments(dummy_widget,
+    fragments, match = rules[0].generate_fragments(DUMMYWIDGET,
                                                        test_string_B,
                                                        test_string_B)
     assert match is False
@@ -74,7 +63,7 @@ def test_generate_fragments_A():
     assert fragments[0][0] == test_string_B
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_A.generate_fragments(dummy_widget,
+    fragments, match = rules[0].generate_fragments(DUMMYWIDGET,
                                                        test_string_C,
                                                        test_string_C)
     assert match is False
@@ -83,9 +72,10 @@ def test_generate_fragments_A():
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
 
-def test_generate_fragments_B():
+def test_generate_fragments_startswith_line(COLORRULE, DUMMYWIDGET):
+    rules = gen_color_rule_examples(COLORRULE)
 
-    fragments, match = color_rule_B.generate_fragments(dummy_widget,
+    fragments, match = rules[1].generate_fragments(DUMMYWIDGET,
                                                        test_string_A,
                                                        test_string_A)
     assert match is False
@@ -93,7 +83,7 @@ def test_generate_fragments_B():
     assert fragments[0][0] == test_string_A
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_B.generate_fragments(dummy_widget,
+    fragments, match = rules[1].generate_fragments(DUMMYWIDGET,
                                                        test_string_B,
                                                        test_string_B)
     assert match is True
@@ -101,7 +91,7 @@ def test_generate_fragments_B():
     assert fragments[0][0] == test_string_B
     assert fragments[0][1] == py_cui.RED_ON_BLACK
 
-    fragments, match = color_rule_B.generate_fragments(dummy_widget,
+    fragments, match = rules[1].generate_fragments(DUMMYWIDGET,
                                                        test_string_C,
                                                        test_string_C)
     assert match is False
@@ -110,8 +100,10 @@ def test_generate_fragments_B():
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
 
-def test_generate_fragments_C():
-    fragments, match = color_rule_C.generate_fragments(dummy_widget,
+def test_generate_fragments_endswith_regex(COLORRULE, DUMMYWIDGET):
+    rules = gen_color_rule_examples(COLORRULE)
+
+    fragments, match = rules[2].generate_fragments(DUMMYWIDGET,
                                                        test_string_A,
                                                        test_string_A)
     assert match is False
@@ -119,7 +111,7 @@ def test_generate_fragments_C():
     assert fragments[0][0] == test_string_A
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_C.generate_fragments(dummy_widget,
+    fragments, match = rules[2].generate_fragments(DUMMYWIDGET,
                                                        test_string_B,
                                                        test_string_B)
     assert match is True
@@ -131,7 +123,7 @@ def test_generate_fragments_C():
     assert fragments[2][0] == ''
     assert fragments[2][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_C.generate_fragments(dummy_widget,
+    fragments, match = rules[2].generate_fragments(DUMMYWIDGET,
                                                        test_string_C,
                                                        test_string_C)
     assert match is False
@@ -140,8 +132,10 @@ def test_generate_fragments_C():
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
 
-def test_generate_fragments_D():
-    fragments, match = color_rule_D.generate_fragments(dummy_widget,
+def test_generate_fragments_notstartswith_region(COLORRULE, DUMMYWIDGET):
+    rules = gen_color_rule_examples(COLORRULE)
+
+    fragments, match = rules[3].generate_fragments(DUMMYWIDGET,
                                                        test_string_A,
                                                        test_string_A)
     assert match is True
@@ -153,7 +147,7 @@ def test_generate_fragments_D():
     assert fragments[2][0] == " world, etc 123 @ testing @ ++-- Test"
     assert fragments[2][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_D.generate_fragments(dummy_widget,
+    fragments, match = rules[3].generate_fragments(DUMMYWIDGET,
                                                        test_string_B,
                                                        test_string_B)
     assert match is False
@@ -161,7 +155,7 @@ def test_generate_fragments_D():
     assert fragments[0][0] == test_string_B
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_D.generate_fragments(dummy_widget,
+    fragments, match = rules[3].generate_fragments(DUMMYWIDGET,
                                                        test_string_C,
                                                        test_string_C)
     # In this case we match, but our input is too small
@@ -172,8 +166,10 @@ def test_generate_fragments_D():
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
 
-def test_generate_fragments_E():
-    fragments, match = color_rule_E.generate_fragments(dummy_widget,
+def test_generate_fragments_notendswith_line(COLORRULE, DUMMYWIDGET):
+    rules = gen_color_rule_examples(COLORRULE)
+
+    fragments, match = rules[4].generate_fragments(DUMMYWIDGET,
                                                        test_string_A,
                                                        test_string_A)
     assert match is False
@@ -181,7 +177,7 @@ def test_generate_fragments_E():
     assert fragments[0][0] == test_string_A
     assert fragments[0][1] == py_cui.WHITE_ON_BLACK
 
-    fragments, match = color_rule_E.generate_fragments(dummy_widget,
+    fragments, match = rules[4].generate_fragments(DUMMYWIDGET,
                                                        test_string_B,
                                                        test_string_B)
     assert len(fragments) == 1
@@ -189,7 +185,7 @@ def test_generate_fragments_E():
     assert fragments[0][0] == test_string_B
     assert fragments[0][1] == py_cui.RED_ON_BLACK
 
-    fragments, match = color_rule_E.generate_fragments(dummy_widget,
+    fragments, match = rules[4].generate_fragments(DUMMYWIDGET,
                                                        test_string_C,
                                                        test_string_C)
     assert match is True
