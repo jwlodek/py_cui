@@ -82,6 +82,19 @@ def CHECKBOXMENU(request, GRID, LOGGER):
 
 
 @pytest.fixture
+def TEXTBOX(request, GRID, LOGGER):
+    
+    def _TEXTBOX(text='Hello World', row=1, col=1, rowspan=1, colspan=2):
+        test_grid = GRID(10,10,100,100)
+        text_box = py_cui.widgets.TextBox('id', 'Test', test_grid,
+                                            row, col, rowspan, colspan, 1, 0, LOGGER,
+                                            text, False)
+        return text_box
+    
+    return _TEXTBOX
+
+
+@pytest.fixture
 def SCROLLTEXTBLOCK(request, GRID, LOGGER):
 
     def _SCROLLTEXTBLOCK(text, row=1, col=1, row_span=1, col_span=2):
