@@ -1,27 +1,18 @@
 import pytest
 
 import py_cui
-import py_cui.debug as dbg
-import py_cui.control_widgets.slider as slider
 
 
-logger = dbg.PyCUILogger('PYCUI TEST')
-
-grid_test = py_cui.grid.Grid(10, 10, 100, 100, logger)
-
-
-def test_initial_values_base():
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
-                                      1, 0, logger, 0, 100, 5, 30)
+def test_initial_values_base(SLIDER):
+    test_slider = SLIDER(minval=0, maxval=100, step=5)
 
     assert test_slider.get_slider_value() == 30
     assert test_slider.update_slider_value(1) == 35
     assert test_slider.update_slider_value(-1) == 30
 
 
-def test_min_value():
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
-                                      1, 0, logger, 10, 220, 5, 30)
+def test_min_value(SLIDER):
+    test_slider = SLIDER(maxval=220, step=5)
 
     idx = 0
     while idx < 100:
@@ -31,13 +22,12 @@ def test_min_value():
     assert test_slider.get_slider_value() == 10
 
 
-def test_min_value_fail():
+def test_min_value_fail(SLIDER):
     # min 10
     # max 90
     # step 4
     # initial 65
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
-                                      1, 0, logger, 10, 90, 4, 65)
+    test_slider = SLIDER(init_val=65)
 
     idx = 0
     while idx < 4:
@@ -47,9 +37,8 @@ def test_min_value_fail():
     assert test_slider.get_slider_value() != 10
 
 
-def test_max_value():
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
-                                      1, 0, logger, 10, 220, 5, 30)
+def test_max_value(SLIDER):
+    test_slider = SLIDER(maxval=220, step=5)
     idx = 0
     while idx < 100:
         print(idx)
@@ -59,13 +48,12 @@ def test_max_value():
     assert test_slider.get_slider_value() == 220
 
 
-def test_change_step():
+def test_change_step(SLIDER):
     # min 10
     # max 90
     # step 4
     # initial 65
-    test_slider = slider.SliderWidget('id', 'slider', grid_test, 1, 1, 1, 2,
-                                      1, 0, logger, 10, 90, 4, 65)
+    test_slider = SLIDER(init_val=65)
 
     _cur = test_slider.get_slider_value()
     assert _cur == 65
@@ -86,7 +74,6 @@ def test_change_step():
     assert _cur_3 == 10
 
 
-def test_wrong_inital_value():
+def test_wrong_inital_value(SLIDER):
     with pytest.raises(py_cui.errors.PyCUIInvalidValue):
-        slider.SliderWidget('id', 'slider', grid_test, 1,
-                            1, 1, 2, 1, 0, logger, 10, 90, 4, 165)
+        _ = SLIDER(init_val=165)

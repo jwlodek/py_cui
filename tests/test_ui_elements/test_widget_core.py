@@ -4,73 +4,53 @@ import py_cui.grid as grid
 import py_cui.widgets as widgets
 import py_cui.errors as err
 
-import py_cui.debug as dbg
-
-logger = dbg.PyCUILogger('PYCUI TEST')
 
 
-test_grid = grid.Grid(5, 7, 90, 210, logger)
-
-test_cell_A = widgets.Widget('1', 'TestA',
-                             test_grid, 0, 0, 1, 1, 1, 0, logger)
-
-test_cell_B = widgets.Widget('2', 'Test B',
-                             test_grid, 3, 4, 2, 1, 1, 0, logger)
-
-test_cell_C = widgets.Widget('3', 'Test C',
-                             test_grid, 1, 2, 1, 3, 1, 0, logger)
-
-test_cell_D = widgets.Widget('4',
-                             'Test D -----------------------------------',
-                             test_grid, 0, 0, 1, 1, 1, 0, logger)
-
-
-# grid spot width should be 6 x 6, with an overlap of 2 chars on the edges
-test_grid_over = grid.Grid(3, 3, 20, 20, logger)
-test_cell_over_A = widgets.Widget('5', 'Test Over A',
-                                  test_grid_over, 2, 0, 1, 1, 1, 0, logger)
-test_cell_over_B = widgets.Widget('6', 'Test Over B',
-                                  test_grid_over, 0, 2, 1, 1, 1, 0, logger)
-test_cell_over_C = widgets.Widget('7', 'Test Over C',
-                                  test_grid_over, 2, 2, 1, 1, 1, 0, logger)
-
-
-def test_illegal_create_1():
+def test_illegal_create_no_parent_grid(LOGGER):
     try:
-        _ = widgets.Widget('8', 'Test E', None, 0, 5, 1, 1, 1, 0, logger)
+        _ = widgets.Widget('8', 'Test E', None, 0, 5, 1, 1, 1, 0, LOGGER)
         assert False
     except err.PyCUIMissingParentError:
         assert True
 
 
-def test_illegal_create_2():
+def test_illegal_create_oob_1(GRID, LOGGER):
+    test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('9', 'Test E',
-                           test_grid, 6, 8, 1, 1, 1, 0, logger)
+                           test_grid, 6, 8, 1, 1, 1, 0, LOGGER)
         assert False
     except err.PyCUIOutOfBoundsError:
         assert True
 
 
-def test_illegal_create_3():
+def test_illegal_create__oob_2(GRID, LOGGER):
+    test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('10', 'Test E',
-                           test_grid, 4, 0, 3, 1, 1, 0, logger)
+                           test_grid, 4, 0, 3, 1, 1, 0, LOGGER)
         assert False
     except err.PyCUIOutOfBoundsError:
         assert True
 
 
-def test_illegal_create_4():
+def test_illegal_create__oob_3(GRID, LOGGER):
+    test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('11', 'Test E',
-                           test_grid, 0, 6, 1, 2, 1, 0, logger)
+                           test_grid, 0, 6, 1, 2, 1, 0, LOGGER)
         assert False
     except err.PyCUIOutOfBoundsError:
         assert True
 
 
-def test_get_start_position():
+def test_get_start_position(CUSTOMWIDGET):
+
+    test_cell_A = CUSTOMWIDGET('1', 'Test A', 0, 0, 1, 1)
+    test_cell_B = CUSTOMWIDGET('2', 'Test B', 3, 4, 2, 1)
+    test_cell_C = CUSTOMWIDGET('3', 'Test C', 1, 2, 1, 3)
+    test_cell_D = CUSTOMWIDGET('4', 'Test D -----------------------------------', 0, 0, 1, 1)
+
     xA, yA = test_cell_A.get_start_position()
     xB, yB = test_cell_B.get_start_position()
     xC, yC = test_cell_C.get_start_position()
@@ -81,7 +61,13 @@ def test_get_start_position():
     assert xD == -1 and yD == 1
 
 
-def test_get_absolute_dims_simple():
+def test_get_absolute_dims_simple(CUSTOMWIDGET):
+
+    test_cell_A = CUSTOMWIDGET('1', 'Test A', 0, 0, 1, 1)
+    test_cell_B = CUSTOMWIDGET('2', 'Test B', 3, 4, 2, 1)
+    test_cell_C = CUSTOMWIDGET('3', 'Test C', 1, 2, 1, 3)
+    test_cell_D = CUSTOMWIDGET('4', 'Test D -----------------------------------', 0, 0, 1, 1)
+
     hA, wA = test_cell_A.get_absolute_dimensions()
     hB, wB = test_cell_B.get_absolute_dimensions()
     hC, wC = test_cell_C.get_absolute_dimensions()
