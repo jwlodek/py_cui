@@ -6,20 +6,7 @@ import py_cui.errors as err
 
 
 
-# grid spot width should be 6 x 6, with an overlap of 2 chars on the edges
-"""
-test_grid_over = grid.Grid(3, 3, 20, 20, logger)
-test_cell_over_A = widgets.Widget('5', 'Test Over A',
-                                  test_grid_over, 2, 0, 1, 1, 1, 0, logger)
-test_cell_over_B = widgets.Widget('6', 'Test Over B',
-                                  test_grid_over, 0, 2, 1, 1, 1, 0, logger)
-test_cell_over_C = widgets.Widget('7', 'Test Over C',
-                                  test_grid_over, 2, 2, 1, 1, 1, 0, logger)
-"""
-
-
-def test_illegal_create_1(GRID, LOGGER):
-    test_grid = GRID(5, 7, 90, 210)
+def test_illegal_create_no_parent_grid(LOGGER):
     try:
         _ = widgets.Widget('8', 'Test E', None, 0, 5, 1, 1, 1, 0, LOGGER)
         assert False
@@ -27,7 +14,7 @@ def test_illegal_create_1(GRID, LOGGER):
         assert True
 
 
-def test_illegal_create_2(GRID, LOGGER):
+def test_illegal_create_oob_1(GRID, LOGGER):
     test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('9', 'Test E',
@@ -37,7 +24,7 @@ def test_illegal_create_2(GRID, LOGGER):
         assert True
 
 
-def test_illegal_create_3(GRID, LOGGER):
+def test_illegal_create__oob_2(GRID, LOGGER):
     test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('10', 'Test E',
@@ -47,7 +34,7 @@ def test_illegal_create_3(GRID, LOGGER):
         assert True
 
 
-def test_illegal_create_4(GRID, LOGGER):
+def test_illegal_create__oob_3(GRID, LOGGER):
     test_grid = GRID(5, 7, 90, 210)
     try:
         _ = widgets.Widget('11', 'Test E',
