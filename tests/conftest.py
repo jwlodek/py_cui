@@ -109,6 +109,18 @@ def SCROLLTEXTBLOCK(request, GRID, LOGGER):
 
 
 @pytest.fixture
+def SLIDER(request, GRID, LOGGER):
+
+    def _SLIDER(minval=10, maxval=90, step=4, init_val=30):
+        test_grid = GRID(10, 10, 100, 100)
+        slider = py_cui.control_widgets.slider.SliderWidget('id', 'slider', test_grid, 1, 1, 1, 2,
+                                                            1, 0, LOGGER, minval, maxval, step, init_val)
+        return slider
+
+    return _SLIDER
+
+
+@pytest.fixture
 def COLORRULE(request, LOGGER):
 
     def _COLORRULE(text, rule_type, match_type, color_A=py_cui.RED_ON_BLACK, color_B=py_cui.RED_ON_BLACK, region=None, whitespace=False):
