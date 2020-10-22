@@ -74,6 +74,25 @@ Below are some screenshots and gifs of programs written with py_cui. Additional 
     <img src="docs/assets/pyautogit-demo.gif">
 </p>
 
+## Getting started
+
+The easiest way to get set up for developing a full `py_cui` application is to use the available `cookiecutter` template. First, install the `cookiecutter` tool:
+```
+pip install cookiecutter
+```
+Once it is installed, navigate to the directory in which you would like your projects to live, and run:
+```
+cookiecutter https://github.com/jwlodek/py_cui_cookiecutter
+```
+This will clone the template, and show prompts for several variables, including project name and description, as well as some developer information.
+Once it is done, you can enter your project directory, install it with pip, and run it, and you should be able to see a `Hello World` example:
+```
+cd myproject
+pip install .
+myproject
+```
+You are now ready to extend this template for your own application!
+
 ## Writing a PyCUI
 
 Basic usage of `py_cui` starts with creating a PyCUI object, and specifiying it's grid size. Keep in mind that grid cell height and width will be measured in terminal characters, not pixels, so there is a lower limit on legal grid size, and heights will be smaller values than widths. Create this object with:
