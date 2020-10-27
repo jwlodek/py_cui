@@ -37,6 +37,10 @@ class UIElement:
         absolute dimensions of ui element in terminal characters
     _color : int
         Default color for which to draw element
+    _border_color: int
+        Color used to draw the border of the element when not focused
+    _focus_border_color: int
+        Color used to draw the border of the element when focused
     _selected : bool
         toggle for marking an element as selected
     _renderer : py_cui.renderer.Renderer
@@ -60,6 +64,7 @@ class UIElement:
         self._height,   self._width     = 0, 0
         self._color                     = py_cui.WHITE_ON_BLACK
         self._border_color              = self._color
+        self._focus_border_color        = self._color
         self._selected_color            = self._color
         self._mouse_press_handler       = None
         self._selected                  = False
@@ -199,7 +204,10 @@ class UIElement:
             color code for combination
         """
 
-        return self._border_color
+        if self._selected:
+            return self._focus_border_color
+        else:
+            return self._border_color
 
 
     def get_selected_color(self):
@@ -289,6 +297,17 @@ class UIElement:
 
         self._border_color = color
 
+    def set_focus_border_color(self, color):
+        """Sets element border color if the current element
+        is focused
+
+        Parameters
+        ----------
+        color : int
+            New color pair key code
+        """
+
+        self._focus_border_color = color
 
     def set_selected_color(self, color):
         """Sets element sected color
