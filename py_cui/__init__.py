@@ -1271,6 +1271,30 @@ class PyCUI:
             self._popup.set_on_submit_action(callback)
 
 
+    def show_filedialog_popup(self, title, popup_type='file', initial_dir='.', callback=None, ascii_icons=False, limit_extensions=[]):
+        """Shows form popup.
+
+        Used for inputting several fields worth of values
+
+        Paramters
+        ---------
+        title : str
+            Message title
+        fields : List[str]
+            Names of each individual field
+        passwd_fields : List[str]
+            Field names that should have characters hidden
+        required : List[str]
+            Fields that are required before submission
+        callback=None : Function
+            If not none, fired after loading is completed. Must be a no-arg function
+        """
+
+        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, initial_dir, title, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        #if callback is not None:
+        #    self._popup.set_on_submit_action(callback)
+
+
     def increment_loading_bar(self):
         """Increments progress bar if loading bar popup is open
         """
