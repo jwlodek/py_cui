@@ -35,8 +35,8 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
     def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = []):
         super().__init__(logger)
-        os.path.abspath(initial_loc)
-        self._current_dir = initial_loc
+        
+        self._current_dir = os.path.abspath(initial_loc)
         self._ascii_icons = ascii_icons
         self._dialog_type = dialog_type
 
@@ -64,6 +64,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
                 self.add_item_list(files)
             elif self._dialog_type == 'opendir':
                 self.add_item_list(dirs)
+            self.set_title(os.path.basename(self._current_dir))
 
 
 class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
@@ -102,7 +103,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
 
         parent_start_x, parent_start_y = self._parent_dialog.get_start_position()
         start_x = (parent_start_x + 3 + self._parent_dialog._padx)
-        start_y = (parent_start_y + self._parent_dialog._pady + 1)
+        start_y = (parent_start_y + self._parent_dialog._pady + 3)
         return start_x, start_y
 
 
@@ -133,21 +134,9 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         """
 
         super()._handle_key_press(key_pressed)
-        valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
-            ret_val = self.get()
-            valid_pressed = True
-        elif key_pressed == py_cui.keys.KEY_ESCAPE:
-            ret_val = None
-            valid_pressed = True
-
-        if valid_pressed:
-            self._root.close_popup()
-            if self._command is not None:
-                if ret_val is not None or self._run_command_if_none:
-                    self._command(ret_val)
-            else:
-                self._root.show_warning_popup('No Command Specified', 'The menu popup had no specified command')
+            self._current_dir = os.path.join(self.get()._path)
+            self.refresh_view()
 
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
@@ -208,8 +197,8 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
 
         parent_start_x, _ = self._parent_dialog.get_start_position()
         _, parent_stop_y = self._parent_dialog.get_stop_position()
-        start_x = (parent_start_x + 3 + self._parent_dialog._padx)
-        start_y = (parent_stop_y - self._parent_dialog._pady - 5)
+        start_x = (parent_start_x + 4 + self._parent_dialog._padx)
+        start_y = (parent_stop_y - self._parent_dialog._pady - 7)
         return start_x, start_y
 
 
@@ -222,9 +211,10 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
             The position in characters in the terminal window to stop the Field element
         """
 
+        parent_width, parent_height = self._parent_dialog.get_absolute_dimensions()
         parent_stop_x, parent_stop_y = self._parent_dialog.get_stop_position()
-        stop_x = (parent_stop_x - 3 - self._parent_dialog._padx)
-        stop_y = (parent_stop_y - self._parent_dialog._pady - 1)
+        stop_x = (parent_stop_x - 4 - int(5 * parent_width / 7))
+        stop_y = (parent_stop_y - self._parent_dialog._pady - 2)
         return stop_x, stop_y
 
 
@@ -293,7 +283,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
 class FileDialogButton(py_cui.ui.UIElement):
 
 
-    def __init__(self, parent_dialog, statusbar_msg, command, *args):
+    def __init__(self, parent_dialog, statusbar_msg, command, button_num, *args):
         """Initializer for Button Widget
         """
 
@@ -302,6 +292,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         self.set_color(py_cui.MAGENTA_ON_BLACK)
         self.set_help_text(statusbar_msg)
         self.command = command
+        self._button_num = button_num
 
 
     def get_absolute_start_pos(self):
@@ -378,10 +369,11 @@ class FileDialogPopup(py_cui.popups.Popup):
         #FileDialogImplementation.__init__(self, self._form_fields, required_fields, logger)
         self._filename_input = FileNameInput(self, 'Path', renderer, logger)
         self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger)
-        self._submit_button = FileDialogButton(self, 'Submit', self._submit_action, '', 'Submit', renderer, logger)
-        self._cancel_button = FileDialogButton(self, 'Cancel', self._root.close_popup, '', 'Cancel', renderer, logger)
+        self._submit_button = FileDialogButton(self, 'Submit', self._submit_action, 1, '', 'Submit', renderer, logger)
+        self._cancel_button = FileDialogButton(self, 'Cancel', self._root.close_popup, 2, '', 'Cancel', renderer, logger)
         self._internal_popup = None
         self.update_height_width()
+        self._file_dir_select.set_selected(True)
 
 
     def _submit_action(self):
@@ -400,9 +392,9 @@ class FileDialogPopup(py_cui.popups.Popup):
         root_height, root_width = self._root.get_absolute_size()
 
         
-        form_start_x = int(root_width / 5)
+        form_start_x = int(root_width / 6)
         
-        form_start_y = int(root_height / 5)
+        form_start_y = int(root_height / 8)
 
         return form_start_x, form_start_y
 
@@ -418,9 +410,9 @@ class FileDialogPopup(py_cui.popups.Popup):
 
         root_height, root_width = self._root.get_absolute_size()
         
-        form_stop_x = int(4 * root_width / 5)
+        form_stop_x = int(5 * root_width / 6)
         
-        form_stop_y = int(4 * root_height / 5)
+        form_stop_y = int(7 * root_height / 8)
         return form_stop_x, form_stop_y
 
 
@@ -477,8 +469,11 @@ class FileDialogPopup(py_cui.popups.Popup):
             elif key_pressed == py_cui.keys.KEY_ESCAPE:
                 self._root.close_popup()
             else:
-                if self.get_selected_form_index() < len(self._form_fields):
-                    self._form_fields[self.get_selected_form_index()]._handle_key_press(key_pressed)
+                if self._file_dir_select.is_selected():
+                    self._file_dir_select._handle_key_press(key_pressed)
+                elif self._filename_input.is_selected():
+                    self._filename_input._handle_key_press(key_pressed)
+
         else:
             self._internal_popup._handle_key_press(key_pressed)
 
@@ -519,8 +514,8 @@ class FileDialogPopup(py_cui.popups.Popup):
 
         self._file_dir_select._draw()
         self._filename_input._draw()
-        self._submit_button._draw()
-        self._cancel_button._draw()
+        #self._submit_button._draw()
+        #self._cancel_button._draw()
 
         if self._internal_popup is not None:
             self._internal_popup._draw()
