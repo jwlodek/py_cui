@@ -6,13 +6,44 @@ import py_cui.widgets
 import py_cui.popups
 import os
 
+import sys
+import stat
+
+
+def is_filepath_hidden(path):
+
+    name = os.path.basename(path)
+    marked_hidden = name.startswith('.')
+    if sys.platform != 'win32':
+        return marked_hidden
+    else:
+        return bool(os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN) or marked_hidden
+
 
 class FileDirElem:
+    """Simple helper class defining a single file or directory
+
+    Attributes
+    ----------
+    _type : str
+        Either dir or file
+    _name : str
+        The name of the file or directory
+    _path : str
+        The absolute path to the directory or file
+    _folder_icon : str
+        icon or text for folder
+    _file_icon : str
+        icon for file
+    """
 
     def __init__(self, elem_type, name, fullpath, ascii_icons=False):
         self._type = elem_type
         self._name = name
         self._path = fullpath
+
+        # Use unicode icons of folder and file, or use text instead
+        # for compatibility reasons.
         if not ascii_icons:
             self._folder_icon = '\U0001f4c1'
             # Folder icon is two characters, so 
@@ -22,6 +53,13 @@ class FileDirElem:
             self._file_icon = '     '
 
     def __str__(self):
+        """Override of string function
+
+        Returns
+        -------
+        description : str
+            Icon and name of dir or file
+        """
 
         if self._type == 'file':
             return '{} {}'.format(self._file_icon, self._name)
@@ -31,17 +69,31 @@ class FileDirElem:
 
 
 class FileSelectImplementation(py_cui.ui.MenuImplementation):
+    """Extension of menu implementation that allows for listing files and dirs in a location
+
+    Attributes
+    ----------
+    _current_dir : str
+        The current focused-on directory
+    _ascii_icons : bool
+        Toggle using ascii or unicode icons
+    _dialog_type : str
+        Type of open dialog
+    _limit_extensions : List[str]
+        List of file extensions to show as visible
+    """
 
 
-    def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = []):
+    def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False):
         super().__init__(logger)
         
         self._current_dir = os.path.abspath(initial_loc)
         self._ascii_icons = ascii_icons
         self._dialog_type = dialog_type
+        self._show_hidden = show_hidden
 
-        self.refresh_view()
         self._limit_extensions = limit_extensions
+        self.refresh_view()
 
 
     def refresh_view(self):
@@ -53,13 +105,22 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
             dirs = []
             files = []
             for item in os.listdir(self._current_dir):
-                item_path = os.path.join(self._current_dir, item)
-                if os.path.isdir(item_path):
-                    dirs.append(FileDirElem('dir', item, item_path, ascii_icons=self._ascii_icons))
+                if not self._show_hidden and is_filepath_hidden(self._current_dir):
+                    pass
                 else:
-                    files.append(FileDirElem('file', item, item_path, ascii_icons=self._ascii_icons))
-            self._logger.debug(str(dirs))
+                    item_path = os.path.join(self._current_dir, item)
+                    if os.path.isdir(item_path):
+                        dirs.append(FileDirElem('dir', item, item_path, ascii_icons=self._ascii_icons))
+                    else:
+                        if len(self._limit_extensions) > 0:
+                            for ext in self._limit_extensions:
+                                if item.endswith(ext):
+                                    files.append(FileDirElem('file', item, item_path, ascii_icons=self._ascii_icons))
+                                    break
+                        else:
+                            files.append(FileDirElem('file', item, item_path, ascii_icons=self._ascii_icons))
 
+            # If not at root of file system, add a .. directory.
             up_dir = os.path.dirname(self._current_dir)
             if self._current_dir != up_dir:
                 self.add_item(FileDirElem('dir', '..', up_dir, ascii_icons=self._ascii_icons))
@@ -73,10 +134,9 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
 
 class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
+    """Custom UI Element for selecting files or directories.
 
-    """A scroll menu popup.
-
-    Allows for popup with several menu items to select from
+    Displays list of files and dirs in a given location
 
     Attributes
     ----------
@@ -155,11 +215,20 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
                 self._current_dir = old_dir
                 self.refresh_view()
 
+            
+        viewport_height = self.get_viewport_height()
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
-            viewport_height = self._height - (2 * self._pady) - 3
             self._scroll_down(viewport_height)
+        if key_pressed == py_cui.keys.KEY_HOME:
+            self._jump_to_top()
+        if key_pressed == py_cui.keys.KEY_END:
+            self._jump_to_bottom(viewport_height)
+        if key_pressed == py_cui.keys.KEY_PAGE_UP:
+            self._jump_up()
+        if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
+            self._jump_down(viewport_height)
 
 
     def _draw(self):
@@ -400,7 +469,6 @@ class FileDialogButton(py_cui.ui.UIElement):
 
 
 class InternalFileDialogPopup(py_cui.popups.MessagePopup):
-    
     """A helper class for abstracting a message popup tied to a parent popup
 
     Attributes
