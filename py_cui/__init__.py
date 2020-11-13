@@ -1290,9 +1290,7 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, initial_dir, title, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
-        #if callback is not None:
-        #    self._popup.set_on_submit_action(callback)
+        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, initial_dir, callback, title, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
 
 
     def increment_loading_bar(self):
