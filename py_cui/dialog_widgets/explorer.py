@@ -11,6 +11,24 @@ import stat
 
 
 def is_filepath_hidden(path):
+    """TODO
+
+    Parameters
+    ----------
+    path : TODO
+        TODO
+
+    Returns
+    -------
+    marked_hidden : TODO
+        TODO
+
+    Returns
+    -------
+    bool(os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN) or marked_hidden : TODO
+        TODO
+    """
+
 
     name = os.path.basename(path)
     marked_hidden = name.startswith('.')
@@ -38,6 +56,10 @@ class FileDirElem:
     """
 
     def __init__(self, elem_type, name, fullpath, ascii_icons=False):
+        """TODO
+
+        """
+
         self._type = elem_type
         self._name = name
         self._path = fullpath
@@ -85,6 +107,10 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
 
     def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False):
+        """TODO
+
+        """
+
         super().__init__(logger)
         
         self._current_dir = os.path.abspath(initial_loc)
@@ -97,6 +123,10 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
 
     def refresh_view(self):
+        """TODO
+
+        """
+
 
         if not os.path.exists(self._current_dir):
             raise FileNotFoundError
@@ -258,6 +288,26 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
 
 
 class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
+    """TODO
+
+    Attributes
+    ----------
+    _parent_dialog : TODO
+        TODO
+    _help_text : TODO
+        TODO
+    set_text(initial_dir) : TODO
+        TODO
+    _padx : TODO
+        TODO
+    _pady : TODO
+        TODO
+    _selected : TODO
+        TODO
+    update_height_width() : TODO
+        TODO
+    """
+
 
     def __init__(self, parent_dialog, title, initial_dir, renderer, logger):
         """Initializer for the FormFieldElement class
@@ -377,6 +427,24 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
 
 
 class FileDialogButton(py_cui.ui.UIElement):
+    """TODO
+
+    Attributes
+    ----------
+    _parent_dialog : TODO
+        TODO
+    set_color(py_cui.GREEN_ON_BLACK) : TODO
+        TODO
+    set_color(py_cui.RED_ON_BLACK) : TODO
+        TODO
+    set_help_text(statusbar_msg) : TODO
+        TODO
+    command : TODO
+        TODO
+    _button_num : TODO
+        TODO
+    """
+
 
 
     def __init__(self, parent_dialog, statusbar_msg, command, button_num, *args):
@@ -429,6 +497,16 @@ class FileDialogButton(py_cui.ui.UIElement):
 
 
     def _handle_mouse_press(self, x, y):
+        """TODO
+
+        Parameters
+        ----------
+        x : TODO
+            TODO
+        y : TODO
+            TODO
+        """
+
         super()._handle_mouse_press(x, y)
         if self.command is not None:
             if self._button_num == 0:
@@ -494,8 +572,36 @@ class InternalFileDialogPopup(py_cui.popups.MessagePopup):
 
 
 class FileDialogPopup(py_cui.popups.Popup):
+    """TODO
+
+    Attributes
+    ----------
+    _submit_action : TODO
+        TODO
+    _filename_input : TODO
+        TODO
+    _file_dir_select : TODO
+        TODO
+    _submit_button : TODO
+        TODO
+    _cancel_button : TODO
+        TODO
+    _internal_popup : TODO
+        TODO
+    update_height_width() : TODO
+        TODO
+    _file_dir_select.set_selected(True) : TODO
+        TODO
+    _currently_selected : TODO
+        TODO
+    """
+
 
     def __init__(self, root, callback, initial_dir, title, dialog_type, ascii_icons, limit_extensions, color, renderer, logger):
+        """TODO
+
+        """
+
 
 
         py_cui.popups.Popup.__init__(self, root, title, '', color, renderer, logger)
@@ -512,6 +618,14 @@ class FileDialogPopup(py_cui.popups.Popup):
 
 
     def display_warning(self, message):
+        """TODO
+
+        Parameters
+        ----------
+        message : TODO
+            TODO
+        """
+
 
         self._internal_popup = InternalFileDialogPopup(self,
                                                         self._root,
@@ -524,6 +638,10 @@ class FileDialogPopup(py_cui.popups.Popup):
 
 
     def _submit_action(self):
+        """TODO
+
+        """
+
         pass
 
 
