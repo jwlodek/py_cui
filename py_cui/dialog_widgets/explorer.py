@@ -6,27 +6,23 @@ import py_cui.widgets
 import py_cui.popups
 import os
 
+# Imports used to detect hidden files
 import sys
 import stat
 
 
 def is_filepath_hidden(path):
-    """TODO
+    """Function checks if file or folder is considered "hidden"
 
     Parameters
     ----------
-    path : TODO
-        TODO
+    path : str
+        Path to file or folder
 
     Returns
     -------
-    marked_hidden : TODO
-        TODO
-
-    Returns
-    -------
-    bool(os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN) or marked_hidden : TODO
-        TODO
+    marked_hidden : bool
+        True if name starts with '.', or has hidden attribute in OS
     """
 
 
@@ -56,8 +52,7 @@ class FileDirElem:
     """
 
     def __init__(self, elem_type, name, fullpath, ascii_icons=False):
-        """TODO
-
+        """Intializer for FilDirElem
         """
 
         self._type = elem_type
@@ -74,8 +69,21 @@ class FileDirElem:
             self._folder_icon = '<DIR>'
             self._file_icon = '     '
 
+
+    def get_path(self):
+        """Getter for path
+
+        Returns
+        -------
+        path : str
+            Path of file/dir represented by elem
+        """
+
+        return self._path
+
+
     def __str__(self):
-        """Override of string function
+        """Override of to-string function
 
         Returns
         -------
@@ -107,8 +115,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
 
     def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False):
-        """TODO
-
+        """Initalizer for the file select menu implementation. Includes some logic for getting list of file and folders.
         """
 
         super().__init__(logger)
@@ -123,10 +130,8 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
 
 
     def refresh_view(self):
-        """TODO
-
+        """Function that refreshes the current list of files and folders in view
         """
-
 
         if not os.path.exists(self._current_dir):
             raise FileNotFoundError
@@ -135,7 +140,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
             dirs = []
             files = []
             for item in os.listdir(self._current_dir):
-                if not self._show_hidden and is_filepath_hidden(self._current_dir):
+                if not self._show_hidden and is_filepath_hidden(os.path.join(self._current_dir, item)):
                     pass
                 else:
                     item_path = os.path.join(self._current_dir, item)
@@ -528,7 +533,14 @@ class FileDialogButton(py_cui.ui.UIElement):
         if key_pressed == py_cui.keys.KEY_ENTER:
             if self.command is not None:
                 if self._button_num == 0:
-                    self.command(self._parent_dialog._filename_input.get())
+                    res = self._parent_dialog._filename_input.get()
+                    if res is not None:
+                        if self._parent_dialog.result_is_valid(res):
+                            self.command(res.get_path())
+                        else:
+                            self._parent_dialog.display_warning('Selected path or name not valid!')
+                    else:
+                        self._parent_dialog.display_warning('No path is selected!')
                 else:
                     self.command()
 
@@ -572,58 +584,73 @@ class InternalFileDialogPopup(py_cui.popups.MessagePopup):
 
 
 class FileDialogPopup(py_cui.popups.Popup):
-    """TODO
+    """Main implementation class of a FileDialog poup.
 
     Attributes
     ----------
-    _submit_action : TODO
-        TODO
-    _filename_input : TODO
-        TODO
-    _file_dir_select : TODO
-        TODO
-    _submit_button : TODO
-        TODO
-    _cancel_button : TODO
-        TODO
-    _internal_popup : TODO
-        TODO
-    update_height_width() : TODO
-        TODO
-    _file_dir_select.set_selected(True) : TODO
-        TODO
-    _currently_selected : TODO
-        TODO
+    _submit_action : func
+        A function that takes a single string argument. Called with selected path when submit button is pressed
+    _filename_input : FileNameInput
+        Extension of textbox, acts as input field to create new dirs/files or select save name
+    _file_dir_select : FileSelectElement
+        Extension  of scroll menu used to display current files and dirs
+    _submit_button : FileDialogButton
+        Extension of button - Runs the callback with the selected file
+    _cancel_button : FileDialogButton
+        Extension of button - closes popup
+    _internal_popup : InternalFileDialogPopup
+        Extension of message popup, used to display warnings as secondary popup.
+    _currently_selected : UIElement
+        Currently selected sub-element of file dialog popup
     """
 
 
-    def __init__(self, root, callback, initial_dir, title, dialog_type, ascii_icons, limit_extensions, color, renderer, logger):
-        """TODO
-
+    def __init__(self, root, callback, initial_dir, dialog_type, ascii_icons, limit_extensions, color, renderer, logger):
+        """Initalizer for the FileDialogPopup
         """
 
+        # Convert dialog type into popup title message
+        title = 'File Dialog'
+        input_title = 'Path'
+        if dialog_type == 'openfile':
+            title = 'Open File'
+            input_title = 'New File'
+        elif dialog_type == 'opendir':
+            title = 'Open Directory'
+            input_title = 'New Dir'
+        elif dialog_type == 'saveas':
+            title = 'Save As'
+            input_title = 'New Name'
 
-
+        # Call superclass initailizer
         py_cui.popups.Popup.__init__(self, root, title, '', color, renderer, logger)
-        #FileDialogImplementation.__init__(self, self._form_fields, required_fields, logger)
+
+        # Our submit action must be a function that takes a string as its only parameter.
         self._submit_action = callback
-        self._filename_input = FileNameInput(self, 'File Path', '/home/jwlodek', renderer, logger)
-        self._file_dir_select = FileSelectElement(self, '/home/jwlodek', 'openfile', ascii_icons, title, color, None, renderer, logger)
+        self._dialog_type = dialog_type
+
+        # Create our internal UI elements. Menu for selection, field for new elements, buttons for submit/cancel.
+        self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
+        self._file_dir_select = FileSelectElement(self, initial_dir, 'openfile', ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
         self._submit_button = FileDialogButton(self, 'Submit', self._submit_action, 1, '', 'Submit', renderer, logger)
         self._cancel_button = FileDialogButton(self, 'Cancel', self._root.close_popup, 2, '', 'Cancel', renderer, logger)
+
+        # Internal popup used for secondary errors and warnings
         self._internal_popup = None
+
+        # Initialize current state.
         self.update_height_width()
         self._file_dir_select.set_selected(True)
         self._currently_selected = self._file_dir_select
 
 
     def display_warning(self, message):
-        """TODO
+        """Helper function for showing internal popup warning message
 
         Parameters
         ----------
-        message : TODO
-            TODO
+        message : str
+            Warning message to display
         """
 
 
@@ -637,13 +664,6 @@ class FileDialogPopup(py_cui.popups.Popup):
 
 
 
-    def _submit_action(self):
-        """TODO
-
-        """
-
-        pass
-
 
     def get_absolute_start_pos(self):
         """Override of base class, computes position based on root dimensions
@@ -655,10 +675,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         """
 
         root_height, root_width = self._root.get_absolute_size()
-
-        
         form_start_x = int(root_width / 6)
-        
         form_start_y = int(root_height / 8)
 
         return form_start_x, form_start_y
@@ -674,10 +691,9 @@ class FileDialogPopup(py_cui.popups.Popup):
         """
 
         root_height, root_width = self._root.get_absolute_size()
-        
         form_stop_x = int(5 * root_width / 6)
-        
         form_stop_y = int(7 * root_height / 8)
+
         return form_stop_x, form_stop_y
 
 
@@ -708,7 +724,9 @@ class FileDialogPopup(py_cui.popups.Popup):
             Key code of pressed key
         """
 
+        # If internal popup is active, pass keypresses down to it.
         if self._internal_popup is None:
+            # Use the TAB key to cycle between sub-elements
             if key_pressed == py_cui.keys.KEY_TAB:
                 if self._currently_selected == self._file_dir_select:
                     self._file_dir_select.set_selected(False)
@@ -726,8 +744,12 @@ class FileDialogPopup(py_cui.popups.Popup):
                     self._cancel_button.set_selected(False)
                     self._currently_selected = self._file_dir_select
                     self._file_dir_select.set_selected(True)
+
+            # Use the escape key to cancel
             elif key_pressed == py_cui.keys.KEY_ESCAPE:
                 self._root.close_popup()
+
+            # Otherwise pass key to currently selected sub-element
             else:
                 self._currently_selected._handle_key_press(key_pressed)
         else:
@@ -768,18 +790,21 @@ class FileDialogPopup(py_cui.popups.Popup):
         Here, we only draw a border, and then the individual form elements
         """
 
+        # Renderer prep
         self._renderer.set_color_mode(self._color)
         self._renderer.set_color_rules([])
         self._renderer.draw_border(self)
 
+        # Draw all sub-elements
         self._file_dir_select._draw()
         self._filename_input._draw()
         self._submit_button._draw()
         self._cancel_button._draw()
 
-        # Re-draw the selected widget last so we have 
+        # Re-draw the selected element last so we have cursor in correct spot
         self._currently_selected._draw()
 
+        # If required, draw internal popup.
         if self._internal_popup is not None:
             self._internal_popup._draw()
         self._renderer.unset_color_mode(self._color)
