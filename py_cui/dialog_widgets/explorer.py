@@ -239,8 +239,6 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
             self._current_dir = self.get()._path
             try:
                 self.refresh_view()
-                self._parent_dialog._filename_input.clear()
-                self._parent_dialog._filename_input.set_text(self._current_dir)
             except FileNotFoundError:
                 self._parent_dialog.display_warning('Selected directory does not exist!')
                 self._current_dir = old_dir
@@ -398,12 +396,23 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
             self._insert_char(key_pressed)
         elif key_pressed == py_cui.keys.KEY_ENTER:
             old_dir = self._parent_dialog._file_dir_select._current_dir
-            self._parent_dialog._file_dir_select._current_dir = self.get()
+            new_elem = os.path.join(old_dir, self.get())
             try:
-                self._parent_dialog._file_dir_select.refresh_view()
-            except FileNotFoundError:
-                self._parent_dialog.display_warning('Selected path does not exist!')
-                self._parent_dialog._file_dir_select._current_dir = old_dir
+                if self._parent_dialog._dialog_type == 'saveas':
+                    self._parent_dialog._submit_action(new_elem)
+                elif self._parent_dialog._dialog_type == 'opendir':
+                    os.mkdir(new_elem)
+                    self._parent_dialog._file_dir_select.refresh_view()
+                else:
+                    if os.path.exists(new_elem):
+                        raise FileExistsError
+                    fp = open(new_elem, 'w')
+                    fp.close()
+                    self._parent_dialog._file_dir_select.refresh_view()
+            except FileExistsError:
+                self._parent_dialog.display_warning('Selected path already exists!')
+            except PermissionError:
+                self._parent_dialog.display_warning('Insufficient permissions!')
 
 
     def _draw(self):
@@ -631,7 +640,7 @@ class FileDialogPopup(py_cui.popups.Popup):
 
         # Create our internal UI elements. Menu for selection, field for new elements, buttons for submit/cancel.
         self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
-        self._file_dir_select = FileSelectElement(self, initial_dir, 'openfile', ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
+        self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
         self._submit_button = FileDialogButton(self, 'Submit', self._submit_action, 1, '', 'Submit', renderer, logger)
         self._cancel_button = FileDialogButton(self, 'Cancel', self._root.close_popup, 2, '', 'Cancel', renderer, logger)
 
