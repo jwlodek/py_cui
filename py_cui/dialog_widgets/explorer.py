@@ -181,12 +181,12 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         Runs command even if there are no menu items (passes None)
     """
 
-    def __init__(self, root, initial_dir, dialog_type, ascii_icons, title, color, command, renderer, logger):
+    def __init__(self, root, initial_dir, dialog_type, ascii_icons, title, color, command, renderer, logger, limit_extensions=[]):
         """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
         py_cui.ui.UIElement.__init__(self, 0, '', renderer, logger)
-        FileSelectImplementation.__init__(self, initial_dir, dialog_type, ascii_icons, logger)
+        FileSelectImplementation.__init__(self, initial_dir, dialog_type, ascii_icons, logger, limit_extensions=limit_extensions)
         self._command              = command
         self._parent_dialog        = root
         #self._run_command_if_none  = run_command_if_none

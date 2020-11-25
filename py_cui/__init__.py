@@ -1271,7 +1271,7 @@ class PyCUI:
             self._popup.set_on_submit_action(callback)
 
 
-    def show_filedialog_popup(self, title, popup_type='file', initial_dir='.', callback=None, ascii_icons=False, limit_extensions=[]):
+    def show_filedialog_popup(self, popup_type='file', initial_dir='.', callback=None, ascii_icons=False, limit_extensions=[]):
         """Shows form popup.
 
         Used for inputting several fields worth of values
@@ -1290,7 +1290,7 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, initial_dir, callback, title, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, callback, initial_dir, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
 
 
     def increment_loading_bar(self):
