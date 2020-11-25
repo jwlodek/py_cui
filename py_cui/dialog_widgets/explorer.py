@@ -522,11 +522,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         """
 
         super()._handle_mouse_press(x, y)
-        if self.command is not None:
-            if self._button_num == 0:
-                self.command(self._parent_dialog._filename_input.get())
-            else:
-                self.command()
+        self.perform_command()
 
 
     def _handle_key_press(self, key_pressed):
@@ -540,18 +536,26 @@ class FileDialogButton(py_cui.ui.UIElement):
 
         super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
-            if self.command is not None:
-                if self._button_num == 0:
-                    res = self._parent_dialog._filename_input.get()
-                    if res is not None:
-                        if self._parent_dialog.result_is_valid(res):
-                            self.command(res.get_path())
-                        else:
-                            self._parent_dialog.display_warning('Selected path or name not valid!')
-                    else:
-                        self._parent_dialog.display_warning('No path is selected!')
+            self.perform_command()
+
+    
+    def perform_command(self):
+        if self.command is not None:
+            if self._button_num == 0:
+                if self._parent_dialog._dialog_type == 'saveas':
+                    # If submitting 'saveas', we return the currently opened dir joined with the filename
+                    res = os.path.join(self._parent_dialog._file_dir_select._current_dir, self._parent_dialog._filename_input.get())
+                elif self._parent_dialog._dialog_type == 'opendir':
+                    # Otherwise, return the currently opened directory
+                    res = self._parent_dialog._file_dir_select._current_dir
                 else:
-                    self.command()
+                    res = self._parent_dialog._file_dir_select.get().get_path()
+                if res is not None:
+                        self.command(res)
+                else:
+                    self._parent_dialog.display_warning('No path is selected!')
+            else:
+                self.command()
 
 
     def _draw(self):
