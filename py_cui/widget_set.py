@@ -11,7 +11,7 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 import shutil
 import py_cui.widgets as widgets
 import py_cui.grid as grid
-import py_cui.control_widgets.slider as slider
+import py_cui.controls as controls
 
 
 class WidgetSet:
@@ -455,20 +455,20 @@ class WidgetSet:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_slider = slider.SliderWidget(id,
-                                         title,
-                                         self._grid,
-                                         row,
-                                         column,
-                                         row_span,
-                                         column_span,
-                                         padx,
-                                         pady,
-                                         self._logger,
-                                         min_val,
-                                         max_val,
-                                         step,
-                                         init_val)
+        new_slider = controls.slider.SliderWidget(id,
+                                                  title,
+                                                  self._grid,
+                                                  row,
+                                                  column,
+                                                  row_span,
+                                                  column_span,
+                                                  padx,
+                                                  pady,
+                                                  self._logger,
+                                                  min_val,
+                                                  max_val,
+                                                  step,
+                                                  init_val)
         self._widgets[id] = new_slider
         self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
