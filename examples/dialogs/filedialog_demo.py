@@ -5,29 +5,39 @@ class App:
 
     def __init__(self, master):
 
-
         # The root py_cui window
         self.master = master
 
 
-        # Simple button that opens form popup
-        self.master.add_button('Open Form', 1, 1, command=self.open_file_dialog)
+        # Simple button that opens filedialog popup
+        self.master.add_button('Open Demo File Dialog', 1, 1, command=self.open_file_dialog)
 
 
     def open_file_dialog(self):
         """Callback for button press, opens form popup
         """
 
-        # The name of the form is Demo From
-        # The second argument represents individual fields. These must be unique
-        # We specify password fields to be ones where characters are replaced with '*'
-        # Required fields will need to be populated before submission
-        # The callback function is called with a single parameter - a dict of fields -> user inputs
-        self.master.show_filedialog_popup(popup_type='openfile', callback=self.show_dialog_results, limit_extensions=['.py', '.txt'])
+        # Here we open our file dialog. There are three valid popup_type kwargs:
+        #
+        # 1. openfile -> which will return the currently selected file
+        # 2. opendir -> which will return the currently entered directory
+        # 3. saveas -> which will return the currently entered directory joined with the specified new name
+        #
+        # Your assigned callback function will be called with the appropriate return value as the only argument.
+        # You can also specify an initial directory with kwarg initial_dir, whether or not to use ascii icons
+        # for folders and files with ascii_icons=True, and you can limit visible file extensions for saveas or 
+        # openfile popup types.
+        #
+        # Feel free to experiment with the available dialogs by editing the below.
+        self.master.show_filedialog_popup(popup_type='openfile', 
+                                            callback=self.show_dialog_results, 
+                                            initial_dir='.', 
+                                            ascii_icons=False, 
+                                            limit_extensions=[])
 
 
     def show_dialog_results(self, result):
-        """Helper function called on exit. Prints form results
+        """Utility function that simply shows the result of the filedialog in a popup.
         """
 
         self.master.show_message_popup('The file dialog returned:',result)

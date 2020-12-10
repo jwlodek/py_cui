@@ -165,7 +165,6 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
                 self.add_item_list(files)
             elif self._dialog_type == 'opendir':
                 self.add_item_list(dirs)
-            self.set_title(self._current_dir)
 
 
 class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
@@ -236,19 +235,25 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             old_dir = self._current_dir
-            self._current_dir = self.get()._path
-            try:
-                self.refresh_view()
-            except FileNotFoundError:
-                self._parent_dialog.display_warning('Selected directory does not exist!')
-                self._current_dir = old_dir
-                self.refresh_view()
-            except PermissionError:
-                self._parent_dialog.display_warning('Permission Error Accessing: {} !'.format(self._current_dir))
-                self._current_dir = old_dir
-                self.refresh_view()
+            if os.path.isdir(self.get()._path):
+                self._current_dir = self.get()._path
+                try:
+                    self.refresh_view()
+                except FileNotFoundError:
+                    self._parent_dialog.display_warning('Selected directory does not exist!')
+                    self._current_dir = old_dir
+                    self.refresh_view()
+                except PermissionError:
+                    self._parent_dialog.display_warning('Permission Error Accessing: {} !'.format(self._current_dir))
+                    self._current_dir = old_dir
+                    self.refresh_view()
+                finally:
+                    self.set_title(self._current_dir)
+            elif self._parent_dialog._dialog_type == 'openfile':
+                self._parent_dialog._submit_action(self.get()._path)
+            else:
+                pass
 
-            
         viewport_height = self.get_viewport_height()
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
@@ -291,24 +296,12 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
 
 
 class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
-    """TODO
+    """UI Element class representing name input field for filedialog
 
     Attributes
     ----------
-    _parent_dialog : TODO
-        TODO
-    _help_text : TODO
-        TODO
-    set_text(initial_dir) : TODO
-        TODO
-    _padx : TODO
-        TODO
-    _pady : TODO
-        TODO
-    _selected : TODO
-        TODO
-    update_height_width() : TODO
-        TODO
+    _parent_dialog : FileDialog
+        parent dialog widget or popup
     """
 
 
@@ -441,24 +434,15 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
 
 
 class FileDialogButton(py_cui.ui.UIElement):
-    """TODO
+    """Utility button element for parent filedialog
 
     Attributes
     ----------
-    _parent_dialog : TODO
-        TODO
-    set_color(py_cui.GREEN_ON_BLACK) : TODO
-        TODO
-    set_color(py_cui.RED_ON_BLACK) : TODO
-        TODO
-    set_help_text(statusbar_msg) : TODO
-        TODO
-    command : TODO
-        TODO
-    _button_num : TODO
-        TODO
+    _parent_dialog : FileDialog
+        Main filedialog popup or widget
+    _button_num : int
+        0 for submit button, 1 for cancel button
     """
-
 
 
     def __init__(self, parent_dialog, statusbar_msg, command, button_num, *args):
@@ -486,7 +470,6 @@ class FileDialogButton(py_cui.ui.UIElement):
         """
 
         _, parent_width = self._parent_dialog.get_absolute_dimensions()
-        parent_start_x, _ = self._parent_dialog.get_start_position()
         parent_stop_x, parent_stop_y = self._parent_dialog.get_stop_position()
         start_x = (parent_stop_x - 4 - int((3 - self._button_num) * parent_width / 7))
         start_y = (parent_stop_y - self._parent_dialog._pady - 7)
@@ -502,8 +485,7 @@ class FileDialogButton(py_cui.ui.UIElement):
             The position in characters in the terminal window to stop the Field element
         """
 
-        parent_height, parent_width = self._parent_dialog.get_absolute_dimensions()
-        parent_start_x, _ = self._parent_dialog.get_start_position()
+        _, parent_width = self._parent_dialog.get_absolute_dimensions()
         parent_stop_x, parent_stop_y = self._parent_dialog.get_stop_position()
         stop_x = (parent_stop_x - 4 - int((2 - self._button_num) * parent_width / 7))
         stop_y = (parent_stop_y - self._parent_dialog._pady - 2)
@@ -511,14 +493,14 @@ class FileDialogButton(py_cui.ui.UIElement):
 
 
     def _handle_mouse_press(self, x, y):
-        """TODO
+        """Handles mouse presses 
 
         Parameters
         ----------
-        x : TODO
-            TODO
-        y : TODO
-            TODO
+        x : int
+            x coordinate of click in characters
+        y : int
+            y coordinate of click in characters
         """
 
         super()._handle_mouse_press(x, y)
