@@ -29,15 +29,15 @@ import py_cui
 import py_cui.keys
 import py_cui.statusbar
 import py_cui.widgets
-import py_cui.control_widgets
+import py_cui.controls
+import py_cui.dialogs
 import py_cui.widget_set
 import py_cui.popups
 import py_cui.renderer
 import py_cui.debug
 import py_cui.errors
 from py_cui.colors import *
-import py_cui.dialog_widgets
-import py_cui.control_widgets
+
 
 
 # Version number
@@ -800,20 +800,20 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_slider = py_cui.control_widgets.slider.SliderWidget(id,
-                                                                title,
-                                                                self._grid,
-                                                                row,
-                                                                column,
-                                                                row_span,
-                                                                column_span,
-                                                                padx,
-                                                                pady,
-                                                                self._logger,
-                                                                min_val,
-                                                                max_val,
-                                                                step,
-                                                                init_val)
+        new_slider = py_cui.controls.slider.SliderWidget(id,
+                                                         title,
+                                                         self._grid,
+                                                         row,
+                                                         column,
+                                                         row_span,
+                                                         column_span,
+                                                         padx,
+                                                         pady,
+                                                         self._logger,
+                                                         min_val,
+                                                         max_val,
+                                                         step,
+                                                         init_val)
         self._widgets[id] = new_slider
         self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
@@ -1266,7 +1266,7 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialog_widgets.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        self._popup = py_cui.dialogs.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
         if callback is not None:
             self._popup.set_on_submit_action(callback)
 
@@ -1290,7 +1290,7 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, callback, initial_dir, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self, callback, initial_dir, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
 
 
     def increment_loading_bar(self):
