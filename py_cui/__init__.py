@@ -41,7 +41,7 @@ import py_cui.control_widgets
 
 
 # Version number
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 def fit_text(width, text, center=False):
@@ -1269,6 +1269,28 @@ class PyCUI:
         self._popup = py_cui.dialog_widgets.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
         if callback is not None:
             self._popup.set_on_submit_action(callback)
+
+
+    def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=False, limit_extensions=[]):
+        """Shows form popup.
+
+        Used for inputting several fields worth of values
+
+        Paramters
+        ---------
+        title : str
+            Message title
+        fields : List[str]
+            Names of each individual field
+        passwd_fields : List[str]
+            Field names that should have characters hidden
+        required : List[str]
+            Fields that are required before submission
+        callback=None : Function
+            If not none, fired after loading is completed. Must be a no-arg function
+        """
+
+        self._popup = py_cui.dialog_widgets.explorer.FileDialogPopup(self, callback, initial_dir, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
 
 
     def increment_loading_bar(self):

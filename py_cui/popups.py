@@ -41,9 +41,11 @@ class Popup(py_cui.ui.UIElement):
         self._text         = text
         self._selected     = True
         self._close_keys   = [py_cui.keys.KEY_ESCAPE]
-        self._color = color
-        self._border_color = color
-        self._selected_color = color
+        # Default to use the selected color for all aspects of ui element
+        self._color                 = color
+        self._border_color          = color
+        self._focus_border_color    = color
+        self._selected_color        = color
         self.update_height_width()
 
     
