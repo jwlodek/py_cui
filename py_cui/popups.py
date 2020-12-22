@@ -190,7 +190,7 @@ class YesNoPopup(Popup):
             if self._command is not None:
                 self._command(ret_val)
             else:
-                self._root.show_warning_popup('No Command Specified', 'The Yes/No popup had no specified command')
+                self._root.show_warning_popup('No Command Specified', 'The textbox popup had no specified command!')
 
 
     def _draw(self):
