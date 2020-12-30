@@ -363,6 +363,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         height, width           = self.get_absolute_dimensions()
         self._cursor_text_pos   = 0
         self._cursor_x          = start_x + 2 + padx
+        self._initial_cursor    = self._cursor_x
         self._cursor_max_left   = self._cursor_x
         self._cursor_max_right  = start_x + width - 1 - pady
         self._cursor_y          = start_y + int(height / 2) + 1
