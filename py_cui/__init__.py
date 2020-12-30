@@ -762,6 +762,7 @@ class PyCUI:
         self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
 
+
     def add_slider(self, title, row, column, row_span=1,
                    column_span=1, padx=1, pady=0,
                    min_val=0, max_val=100, step=1, init_val=0):
@@ -791,7 +792,6 @@ class PyCUI:
             step to incremento or decrement
         init_val = 0 int
             initial value of the slider
-
 
         Returns
         -------
@@ -842,8 +842,6 @@ class PyCUI:
                 if self.get_widgets()[widget_id]._contains_position(x, y):
                     return self.get_widgets()[widget_id]
         return None
-
-
 
 
     def _get_horizontal_neighbors(self, widget, direction):
@@ -1370,7 +1368,6 @@ class PyCUI:
         self._logger.info('Drew widgets')
 
 
-
     def _draw_status_bars(self, stdscr, height, width):
         """Draws status bar and title bar
 
@@ -1474,8 +1471,8 @@ class PyCUI:
 
         Parameters
         ----------
-        stdscr : curses Standard cursor
-            The cursor used to draw the CUI
+        stdscr : curses Standard screen
+            The screen buffer used for drawing CUI elements
         """
 
         self._stdscr = stdscr
@@ -1495,7 +1492,6 @@ class PyCUI:
         # If user specified a refresh timeout, apply it here
         if self._refresh_timeout > 0:
             self._stdscr.timeout(self._refresh_timeout)
-        #self._stdscr.timeout(1000)
 
         # If user sets non-default border characters, update them here
         if self._border_characters is not None:
@@ -1516,10 +1512,10 @@ class PyCUI:
                 if self._simulated_terminal is None:
                     height, width   = stdscr.getmaxyx()
                 else:
-                    height  = self._simulated_terminal[0]
-                    width   = self._simulated_terminal[1]
+                    height = self._simulated_terminal[0]
+                    width  = self._simulated_terminal[1]
 
-                height          = height - 4
+                height = height - 4
 
                 # If the user defined an update function to fire on each draw call,
                 # Run it here. This can of course be also handled user-side

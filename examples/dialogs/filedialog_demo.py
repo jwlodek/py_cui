@@ -17,7 +17,7 @@ class App:
         """Callback for button press, opens form popup
         """
 
-        # Here we open our file dialog. There are three valid popup_type kwargs:
+        # Here we open our file dialog. There are three valid popup_type kwarg values:
         #
         # 1. openfile -> which will return the currently selected file
         # 2. opendir -> which will return the currently entered directory
@@ -40,7 +40,7 @@ class App:
         """Utility function that simply shows the result of the filedialog in a popup.
         """
 
-        self.master.show_message_popup('The file dialog returned:',result)
+        self.master.show_message_popup('The file dialog returned:', result)
 
 
 # Create the UI

@@ -1,5 +1,4 @@
-"""
-The most basic possible use case for py_cui
+"""The most basic possible use case for py_cui
 
 @author:    Jakub Wlodek
 @created:   12-Aug-2019

@@ -1,5 +1,4 @@
 import py_cui
-  
 root = py_cui.PyCUI(10, 10)
 root.add_button("Quit", 0, 0, command=exit)
 root.add_label("info", 5, 0)
