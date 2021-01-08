@@ -443,7 +443,7 @@ class PyCUI:
     # Widget add functions. Each of these adds a particular type of widget
     # to the grid in a specified location.
 
-    def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0) -> py_cui.widgets.ScrollMenu:
+    def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0):
         """Function that adds a new scroll menu to the CUI grid
 
         Parameters
@@ -487,7 +487,7 @@ class PyCUI:
         return new_scroll_menu
 
 
-    def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X') -> py_cui.widgets.CheckBoxMenu:
+    def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
         """Function that adds a new checkbox menu to the CUI grid
 
         Parameters
@@ -534,7 +534,7 @@ class PyCUI:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False) -> py_cui.widgets.TextBox:
+    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False):
         """Function that adds a new text box to the CUI grid
 
         Parameters
@@ -582,7 +582,7 @@ class PyCUI:
         return new_text_box
 
 
-    def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '') -> py_cui.widgets.ScrollTextBlock:
+    def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
         """Function that adds a new text block to the CUI grid
 
         Parameters
@@ -629,7 +629,7 @@ class PyCUI:
         return new_text_block
 
 
-    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0) -> py_cui.widgets.Label:
+    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -671,7 +671,7 @@ class PyCUI:
         return new_label
 
 
-    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True) -> py_cui.widgets.BlockLabel:
+    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True):
         """Function that adds a new block label to the CUI grid
 
         Parameters
@@ -716,7 +716,7 @@ class PyCUI:
         return new_label
 
 
-    def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None) -> py_cui.widgets.Button:
+    def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
         """Function that adds a new button to the CUI grid
 
         Parameters
@@ -764,7 +764,7 @@ class PyCUI:
 
     def add_slider(self, title, row, column, row_span=1,
                    column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.control_widgets.slider:
+                   min_val=0, max_val=100, step=1, init_val=0):
         """Function that adds a new label to the CUI grid
 
         Parameters
