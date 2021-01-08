@@ -12,7 +12,7 @@ import logging
 
 class PopupExample:
 
-    def __init__(self, master):
+    def __init__(self, master: py_cui.PyCUI):
 
         # This is a reference to our top level CUI object
         self.master = master
