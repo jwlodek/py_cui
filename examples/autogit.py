@@ -18,7 +18,7 @@ __version__ = '0.0.1'
 
 class AutoGitCUI:
 
-    def __init__(self, root, dir):
+    def __init__(self, root: py_cui.PyCUI, dir):
         self.root = root
         self.dir = dir
         os.chdir(self.dir)

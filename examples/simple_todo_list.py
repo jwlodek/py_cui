@@ -10,7 +10,7 @@ import logging
 
 class SimpleTodoList:
 
-    def __init__(self, master):
+    def __init__(self, master: py_cui.PyCUI):
 
         self.master = master
 

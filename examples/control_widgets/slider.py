@@ -4,7 +4,7 @@ import py_cui
 
 
 class App:
-    def __init__(self, master):
+    def __init__(self, master: py_cui.PyCUI):
         self.master = master
 
         self.g1 = self.master.add_scroll_menu('GRID1',
@@ -18,7 +18,7 @@ class App:
         self.g4.set_slider_step(3)
 
 
-root = py_cui.PyCUI(9,6)
+root = py_cui.PyCUI(9, 6)
 root.set_title('Test Slider')
 s = App(root)
 root.start()

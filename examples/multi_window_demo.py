@@ -9,7 +9,7 @@ import py_cui
 
 class MultiWindowDemo:
 
-    def __init__(self, root):
+    def __init__(self, root: py_cui.PyCUI):
 
         # Root PyCUI window
         self.root = root
