@@ -404,7 +404,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.MenuImplementation.__init__(self, logger)
-        self.set_help_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
+        self.set_help_text('Focus mode on ScrollMenu. Use Up/Down/PgUp/PgDown/Home/End to scroll, Esc to exit.')
 
 
     def _handle_mouse_press(self, x, y):
