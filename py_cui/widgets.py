@@ -701,6 +701,8 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             self._jump_to_end()
         elif key_pressed > 31 and key_pressed < 128:
             self._insert_char(key_pressed)
+        elif key_pressed > 1000 and key_pressed < 1128:
+            self._insert_char(key_pressed)
 
 
     def _draw(self):
