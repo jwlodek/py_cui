@@ -184,7 +184,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
-        py_cui.ui.UIElement.__init__(self, 0, '', renderer, logger)
+        py_cui.ui.UIElement.__init__(self, 0, os.path.abspath(initial_dir), renderer, logger)
         FileSelectImplementation.__init__(self, initial_dir, dialog_type, ascii_icons, logger, limit_extensions=limit_extensions)
         self._command              = command
         self._parent_dialog        = root

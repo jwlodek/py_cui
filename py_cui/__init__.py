@@ -765,7 +765,7 @@ class PyCUI:
 
     def add_slider(self, title, row, column, row_span=1,
                    column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.control_widgets.slider:
+                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.controls.slider:
         """Function that adds a new label to the CUI grid
 
         Parameters
