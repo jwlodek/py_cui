@@ -3,7 +3,7 @@ import logging
 
 class App:
 
-    def __init__(self, master):
+    def __init__(self, master: py_cui.PyCUI):
 
         # Variable that will store user inputs from form
         self.form_results = None

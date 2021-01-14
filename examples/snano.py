@@ -17,7 +17,7 @@ __version__ = '0.0.1'
 
 class SuperNano:
 
-    def __init__(self, root, dir):
+    def __init__(self, root: py_cui.PyCUI, dir):
 
         # Wrapper class takes its parent PyCUI object
         self.root = root
