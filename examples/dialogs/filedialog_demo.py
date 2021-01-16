@@ -1,5 +1,6 @@
 import py_cui
 import logging
+import curses
 
 class App:
 
@@ -8,9 +9,9 @@ class App:
         # The root py_cui window
         self.master = master
 
-
         # Simple button that opens filedialog popup
         self.master.add_button('Open Demo File Dialog', 1, 1, command=self.open_file_dialog)
+        self.master.add_key_command(py_cui.keys.KEY_B_LOWER, lambda : curses.init_color(curses.COLOR_BLUE, 100, 0, 1000))
 
 
     def open_file_dialog(self):
@@ -32,7 +33,7 @@ class App:
         self.master.show_filedialog_popup(popup_type='openfile', 
                                             callback=self.show_dialog_results, 
                                             initial_dir='.', 
-                                            ascii_icons=False, 
+                                            ascii_icons=True, 
                                             limit_extensions=[])
 
 

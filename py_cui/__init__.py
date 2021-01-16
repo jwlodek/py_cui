@@ -372,6 +372,7 @@ class PyCUI:
         # Start colors in curses.
         # For each color pair in color map, initialize color combination.
         curses.start_color()
+        curses.init_color(curses.COLOR_BLUE, 0, 0, 500)
         for color_pair in py_cui.colors._COLOR_MAP.keys():
             fg_color, bg_color = py_cui.colors._COLOR_MAP[color_pair]
             curses.init_pair(color_pair, fg_color, bg_color)
@@ -1483,7 +1484,7 @@ class PyCUI:
         stdscr.refresh()
         curses.mousemask(curses.ALL_MOUSE_EVENTS)
         # stdscr.nodelay(False)
-        stdscr.keypad(True)
+        #stdscr.keypad(True)
 
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()

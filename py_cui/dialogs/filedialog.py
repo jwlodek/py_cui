@@ -4,6 +4,7 @@
 import py_cui.ui
 import py_cui.widgets
 import py_cui.popups
+import py_cui.colors
 import os
 
 # Imports used to detect hidden files
@@ -188,6 +189,12 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         FileSelectImplementation.__init__(self, initial_dir, dialog_type, ascii_icons, logger, limit_extensions=limit_extensions)
         self._command              = command
         self._parent_dialog        = root
+        self._text_color_rules = [
+            py_cui.colors.ColorRule('\U0001f4c1', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,'startswith', 'region', [3, 1000], False, logger),
+            py_cui.colors.ColorRule('<DIR>', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE, 'startswith', 'region', [6, 1000], False, logger),
+            py_cui.colors.ColorRule('     ', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [6, 1000], True, logger),
+            py_cui.colors.ColorRule('\U0001f5ce', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [3, 1000], False, logger)
+        ]
         #self._run_command_if_none  = run_command_if_none
 
 
@@ -275,7 +282,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
 
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)
-        self._renderer.set_color_rules([])
+        self._renderer.set_color_rules(self._text_color_rules)
         counter = self._pady + 1
         line_counter = 0
         for item in self._view_items:
