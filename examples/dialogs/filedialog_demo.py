@@ -1,6 +1,4 @@
 import py_cui
-import logging
-import curses
 
 class App:
 
@@ -11,11 +9,10 @@ class App:
 
         # Simple button that opens filedialog popup
         self.master.add_button('Open Demo File Dialog', 1, 1, command=self.open_file_dialog)
-        self.master.add_key_command(py_cui.keys.KEY_B_LOWER, lambda : curses.init_color(curses.COLOR_BLUE, 100, 0, 1000))
 
 
     def open_file_dialog(self):
-        """Callback for button press, opens form popup
+        """Callback for button press, opens filedialog popup
         """
 
         # Here we open our file dialog. There are three valid popup_type kwarg values:
@@ -29,7 +26,7 @@ class App:
         # for folders and files with ascii_icons=True, and you can limit visible file extensions for saveas or 
         # openfile popup types.
         #
-        # Feel free to experiment with the available dialogs by editing the below.
+        # Feel free to experiment with the available dialogs by editing the below "show" command.
         self.master.show_filedialog_popup(popup_type='openfile', 
                                             callback=self.show_dialog_results, 
                                             initial_dir='.', 
