@@ -388,13 +388,14 @@ class Renderer:
         for text_elem in render_text:
             self.set_color_mode(text_elem[1])
 
-            if selected:
+            # BLACK_ON_WHITE + BOLD is unreadable on windows terminals
+            if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
                 self._set_bold()
 
             self._stdscr.addstr(y, current_start_x, text_elem[0])
             current_start_x = current_start_x + len(text_elem[0])
 
-            if selected:
+            if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
                 self._unset_bold()
             
             self.unset_color_mode(text_elem[1])
