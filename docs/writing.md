@@ -1,8 +1,45 @@
-# Writing a py_cui, step by step
+# Writing a py_cui, Step by Step
+
+Once you have installed `py_cui`, you can continue on to create an application.
 
 On this page, we will create a simple `py_cui` program, step by step. We will create something similar to the todo list example that can be seen in the `examples` directory in the repository.
 
-**Step 1 - Create PyCUI and wrapper class**
+To get started, you can either use the `py_cui_cookiecutter` template, or start the project from scratch.
+
+**Step 0 - Full Project Setup (Optional)**
+
+If you are developing a mid to large scale project that is meant to be distributed via PyPi, you may want to use the available `cookiecutter` template to generate some boilerplate setup code for you. First, install the `cookiecutter` tool:
+
+```
+pip install cookiecutter
+```
+
+Once it is installed, navigate to the directory in which you would like your projects to live, and run:
+
+```
+cookiecutter https://github.com/jwlodek/py_cui_cookiecutter
+```
+
+This will clone the template, and ask several questions about your application, including project name and description, as well as some developer information. It will then create a basic `py_cui` style project with some pre-done functionality like a working `setup.py` file etc.
+
+The entrypoint for the created program will be in `myproject/__init__.py`, in the `main` method.
+
+To run the interface created with `cookiecutter`, enter your project's top-level directory, install with `pip` (you may want to set up a virtual environment first), and use the project's name to run the program. If you do this without making any changes to the template, you should be able to see a `Hello World` example:
+
+```
+cd myproject
+pip install .
+myproject
+```
+
+You are now ready to extend this template for your own application!
+
+Alternatively, of course, you may always create your project structure from scratch, depending on your needs. 
+
+
+**Step 1 - Create PyCUI and Wrapper Class**
+
+Once you have the project template set up, or have created your own project structure, you can start developing the application itself.
 
 The recommended way to create `py_cui` programs is to create a wrapper class that takes the `PyCUI` object as an argument, similar to how `Tk` objects are often passed as an argument to a wrapper class.
 
@@ -11,6 +48,7 @@ import py_cui
 
 class SimpleTodoList:
 
+    # We add type annotations to our master PyCUI objects for improved intellisense
     def __init__(self, master):
 
         self.master = master
@@ -25,7 +63,7 @@ s = SimpleTodoList(root)
 root.start()
 ```
 
-**Step 2 - Add your widgets**
+**Step 2 - Add Your Widgets**
 
 Next, we want to add widgets to the CUI. We will add 3 scroll menus to represent our lists of TODO, In Progress, and Done, a text field for adding new items for now.
 In more complex programs, you may use any object with an implemented `__str__` function to pass to a scroll menu, but in this example, we will simply input strings representing 
@@ -36,7 +74,8 @@ import py_cui
 
 class SimpleTodoList:
 
-    def __init__(self, master):
+    # We add type annotations to our master PyCUI objects for improved intellisense
+    def __init__(self, master: py_cui.PyCUI):
 
         self.master = master
 
@@ -54,9 +93,10 @@ root.set_title('CUI TODO List')
 s = SimpleTodoList(root)
 root.start()
 ```
+
 Note how we set the `row_span` and `column_span` values, so that even though the grid is 7x6, our widgets will actually be larger than that size. The reason we define these sizes is becaue we wish to have the text field fill a narrow row, meaning that we must subdivide the window into many rows.
 
-**Step 3 - Add key commands**
+**Step 3 - Add Key Commands**
 
 Next, add keybindings to your widgets. We want buttons that send items into the next list, and the items get removed if theyre in the "Done" list. Also, we need to make the text field send its contents into the "TODO" list.
 
@@ -65,7 +105,8 @@ import py_cui
 
 class SimpleTodoList:
 
-    def __init__(self, master):
+    # We add type annotations to our master PyCUI objects for improved intellisense
+    def __init__(self, master: py_cui.PyCUI):
 
         self.master = master
 
@@ -128,9 +169,19 @@ Note that in the `mark_as_in_progress` and `mark_as_done` functions spawn an err
 **Step 4 - You're done!**
 
 That's it! our simple example is complete, and you can test it with:
+
 ```
 python3 simple_todo.py
 ```
-You should see something similar to this:
+
+if you created your own file, or with:
+
+```
+cd myproject
+pip install --upgrade .
+myproject
+```
+
+if you used the `cookiecutter` project template.
 
 Feel free to play around with this CUI, and note how the keybindings we assigned perform the tasks we wanted them to.
