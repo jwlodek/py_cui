@@ -1270,7 +1270,7 @@ class PyCUI:
             self._popup.set_on_submit_action(callback)
 
 
-    def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=False, limit_extensions=[]):
+    def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=True, limit_extensions=[]):
         """Shows form popup.
 
         Used for inputting several fields worth of values
