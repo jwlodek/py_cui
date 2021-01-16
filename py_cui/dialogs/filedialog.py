@@ -257,7 +257,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
                 finally:
                     self.set_title(self._current_dir)
             elif self._parent_dialog._dialog_type == 'openfile':
-                self._parent_dialog._submit_action(self.get()._path)
+                self._parent_dialog._submit(self.get()._path)
             else:
                 pass
 
@@ -400,20 +400,23 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
             new_elem = os.path.join(old_dir, self.get())
             try:
                 if self._parent_dialog._dialog_type == 'saveas':
-                    self._parent_dialog._submit_action(new_elem)
+                    self._parent_dialog._submit(new_elem)
+
                 elif self._parent_dialog._dialog_type == 'opendir':
                     os.mkdir(new_elem)
                     self._parent_dialog._file_dir_select.refresh_view()
+
                 else:
-                    if os.path.exists(new_elem):
-                        raise FileExistsError
                     fp = open(new_elem, 'w')
                     fp.close()
                     self._parent_dialog._file_dir_select.refresh_view()
+                    
             except FileExistsError:
-                self._parent_dialog.display_warning('Selected path already exists!')
+                self._parent_dialog.display_warning('File/Directory already exists!')
             except PermissionError:
                 self._parent_dialog.display_warning('Insufficient permissions!')
+            finally:
+                self.clear()
 
 
     def _draw(self):
@@ -459,7 +462,7 @@ class FileDialogButton(py_cui.ui.UIElement):
 
         super().__init__(*args)
         self._parent_dialog = parent_dialog
-        if statusbar_msg == 'Submit':
+        if self.get_title() == 'OK':
             self.set_color(py_cui.GREEN_ON_BLACK)
         else:
             self.set_color(py_cui.RED_ON_BLACK)
@@ -531,7 +534,7 @@ class FileDialogButton(py_cui.ui.UIElement):
     
     def perform_command(self):
         if self.command is not None:
-            if self._button_num == 0:
+            if self._button_num == 1:
                 if self._parent_dialog._dialog_type == 'saveas':
                     # If submitting 'saveas', we return the currently opened dir joined with the filename
                     res = os.path.join(self._parent_dialog._file_dir_select._current_dir, self._parent_dialog._filename_input.get())
@@ -541,11 +544,11 @@ class FileDialogButton(py_cui.ui.UIElement):
                 else:
                     res = self._parent_dialog._file_dir_select.get().get_path()
                 if res is not None:
-                        self.command(res)
+                    self.command(res)
                 else:
                     self._parent_dialog.display_warning('No path is selected!')
             else:
-                self.command()
+                self._parent_dialog._root.close_popup()
 
 
     def _draw(self):
@@ -613,7 +616,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         """
 
         # Convert dialog type into popup title message
-        title = 'File Dialog'
+        title = ''
         input_title = 'Path'
         if dialog_type == 'openfile':
             title = 'Open File'
@@ -635,8 +638,8 @@ class FileDialogPopup(py_cui.popups.Popup):
         # Create our internal UI elements. Menu for selection, field for new elements, buttons for submit/cancel.
         self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
         self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
-        self._submit_button = FileDialogButton(self, 'Submit', self._submit_action, 1, '', 'Submit', renderer, logger)
-        self._cancel_button = FileDialogButton(self, 'Cancel', self._root.close_popup, 2, '', 'Cancel', renderer, logger)
+        self._submit_button = FileDialogButton(self, title, self._submit, 1, '', 'OK', renderer, logger)
+        self._cancel_button = FileDialogButton(self, 'Cancel {}'.format(title), self._root.close_popup, 2, '', 'ESC', renderer, logger)
 
         # Internal popup used for secondary errors and warnings
         self._internal_popup = None
@@ -645,6 +648,14 @@ class FileDialogPopup(py_cui.popups.Popup):
         self.update_height_width()
         self._file_dir_select.set_selected(True)
         self._currently_selected = self._file_dir_select
+
+
+    def _submit(self, output):
+        valid, msg = self.output_valid(output)
+        if not valid:
+            self.display_warning(msg)
+        else:
+            self._submit_action(output)
 
 
     def display_warning(self, message):
@@ -666,6 +677,14 @@ class FileDialogPopup(py_cui.popups.Popup):
                                                         self._logger)
 
 
+    def output_valid(self, output):
+        if self._dialog_type == 'openfile' and not os.path.isfile(output):
+            return False, 'Please select a valid file path!'
+        elif self._dialog_type == 'opendir' and not os.path.isdir(output):
+            return False, 'Please select a valid directory path!'
+        elif self._dialog_type == 'saveas' and not os.access(self._file_dir_select._current_dir, os.W_OK):
+            return False, 'Permission Error!'
+        return True, None
 
 
     def get_absolute_start_pos(self):
@@ -678,8 +697,8 @@ class FileDialogPopup(py_cui.popups.Popup):
         """
 
         root_height, root_width = self._root.get_absolute_size()
-        form_start_x = int(root_width / 6)
-        form_start_y = int(root_height / 8)
+        form_start_x = int(root_width / 8)
+        form_start_y = int(root_height / 9)
 
         return form_start_x, form_start_y
 
@@ -694,8 +713,8 @@ class FileDialogPopup(py_cui.popups.Popup):
         """
 
         root_height, root_width = self._root.get_absolute_size()
-        form_stop_x = int(5 * root_width / 6)
-        form_stop_y = int(7 * root_height / 8)
+        form_stop_x = int(7 * root_width / 8)
+        form_stop_y = int(8.75 * root_height / 9)
 
         return form_stop_x, form_stop_y
 
