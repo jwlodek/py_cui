@@ -98,7 +98,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self.title_enabled = False
         self.border_enabled = False
         self.display_value = True
-        self.fine_step = False
 
 
     def _draw(self):
