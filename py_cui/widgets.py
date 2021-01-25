@@ -404,7 +404,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.MenuImplementation.__init__(self, logger)
-        self.set_help_text('Focus mode on ScrollMenu. Use up/down to scroll, Enter to trigger command, Esc to exit.')
+        self.set_help_text('Focus mode on ScrollMenu. Use Up/Down/PgUp/PgDown/Home/End to scroll, Esc to exit.')
 
 
     def _handle_mouse_press(self, x, y):
@@ -699,7 +699,8 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             self._jump_to_start()
         elif key_pressed == py_cui.keys.KEY_END:
             self._jump_to_end()
-        elif key_pressed > 31 and key_pressed < 128:
+        elif key_pressed > 31 and key_pressed < 128 or \
+                key_pressed > 1000 and key_pressed < 1128:
             self._insert_char(key_pressed)
 
 

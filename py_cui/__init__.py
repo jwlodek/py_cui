@@ -762,9 +762,10 @@ class PyCUI:
         self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_button))))
         return new_button
 
+    
     def add_slider(self, title, row, column, row_span=1,
                    column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.control_widgets.slider:
+                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.control_widgets.slider.SliderWidget:
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -819,6 +820,7 @@ class PyCUI:
                            .format(title, id, str(type(new_slider))))
         return new_slider
 
+    
     def get_element_at_position(self, x, y):
         """Returns containing widget for character position
 
@@ -842,8 +844,6 @@ class PyCUI:
                 if self.get_widgets()[widget_id]._contains_position(x, y):
                     return self.get_widgets()[widget_id]
         return None
-
-
 
 
     def _get_horizontal_neighbors(self, widget, direction):
