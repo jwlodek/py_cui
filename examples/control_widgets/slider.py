@@ -11,11 +11,11 @@ class App:
         self.default = self.root.add_slider("Default", 0, 0, init_val=15)
 
         # Borderless titled
-        self.named_borderless_slider = self.root.add_slider("Fancy Name", 1, 0, init_val=100)
+        self.named_borderless_slider = self.root.add_slider("Fancy Name", 1, 0, min_val=-80, max_val=-10, init_val=-20)
         self.named_borderless_slider.title_enabled = True
 
         # Bordered
-        self.nameless_bordered_slider = self.root.add_slider("Fancy Frame", 2, 0, init_val=0)
+        self.nameless_bordered_slider = self.root.add_slider("Fancy Frame", 2, 0, min_val=-20, max_val=30)
         self.nameless_bordered_slider.border_enabled = True
 
         # Bordered titled

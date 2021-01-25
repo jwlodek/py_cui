@@ -110,34 +110,33 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
         text_y_pos = self._start_y + int(self._height / 2)
 
-        # screen length of the slider bar
         height, width = self.get_absolute_dimensions()
         width -= 2
 
+        # Bordered, either entitled or not titled
         if self.border_enabled:
-            # Bordered, either entitled or not titled
             self._renderer.draw_border(self, fill=False, with_title=self.title_enabled)
             text_y_pos += 1
             width -= 4
 
+        # Entitled borderless
         elif self.title_enabled:
-            # Entitled borderless
             self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
             text_y_pos += 1
 
-        progress = self._bar_char * int((width * self._cur_val) / self._max_val)
-
+        # Compensate length in case for negative values
         if self.display_value:
-            rounded_str_val = str(int(self._cur_val))
-            progress = progress[: -len(rounded_str_val)] + rounded_str_val
+            min_string = str(self._min_val)
+            width -= len(min_string)
 
-        self._renderer.draw_text(self,
-                                 progress,
-                                 text_y_pos,
-                                 centered=False,
-                                 bordered=self.border_enabled
-                                 )
+        progress = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
 
+        # Compensate length for current value
+        if self.display_value:
+            str_current = str(int(self._cur_val))
+            progress = ("#" * len(min_string) + progress)[: -len(str_current)] + str_current
+
+        self._renderer.draw_text(self, progress, text_y_pos, centered=False, bordered=self.border_enabled)
         self._renderer.unset_color_mode(self._color)
 
 
