@@ -73,7 +73,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
     """
 
     """
-    Attributes
+    Parameters
     ----------
     _min_val : int
         Lowest value of the slider
@@ -95,20 +95,21 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
                                        row_span, column_span, padx,
                                        pady, logger, selectable=True)
 
+        self.title_enabled = False
+        self.border_enabled = False
+        self.display_value = True
+        self.fine_step = False
+
 
     def _draw(self):
+        """Override of base class draw function
+        """
 
         super()._draw()
         self._renderer.set_color_mode(self._color)
-        target_y = self._start_y + int(self._height / 2)
 
-        # this block depends on the draw, but if equal for popup
-        # can be moved to SliderImplementation
+        text_y_pos = self._start_y + int(self._height / 2)
 
-        # --
-        # simple normalize width:
-        # ratio between screen bar width and bar interval
-        fact = (self._max_val - self._min_val) / (self._width - 4)
         # screen length of the slider bar
         _len = int((self._cur_val - self._min_val) / fact)
         # append percentual
@@ -116,10 +117,10 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         _bar = " " + self._bar_char * _bar_length + str(self._cur_val)
 
         self._renderer.draw_text(self,
-                                 _bar,
-                                 target_y,
+                                 progress,
+                                 text_y_pos,
                                  centered=False,
-                                 bordered=False
+                                 bordered=self.border_enabled
                                  )
 
         self._renderer.unset_color_mode(self._color)
@@ -139,7 +140,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             self.update_slider_value(-1)
         if key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.update_slider_value(1)
-
 
 
 class SliderPopup(py_cui.popups.Popup, SliderImplementation):
