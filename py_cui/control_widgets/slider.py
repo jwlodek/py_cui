@@ -7,7 +7,8 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
     _bar_char = '#'
 
-    def __init__(self, min_val, max_val, init_val, step):
+    def __init__(self, min_val, max_val, init_val, step, logger):
+        super().__init__(logger)
 
         self._min_val = min_val
         self._max_val = max_val
@@ -23,19 +24,33 @@ class SliderImplementation(py_cui.ui.UIImplementation):
     def set_bar_char(self, char):
         """Updates the character used to represent the slider bar
         """
-        
+
         self._bar_char = char
 
 
-    def update_slider_value(self, direction):
-        """Sets the value of the slider - increment decrement
+    def update_slider_value(self, offset: int) -> float:
+        """
+        Steps up or down the value in offset fashion.
+
+        Parameters
+        ----------
+        offset : int
+            Number of steps to increase or decrease the slider value.
+
+        Returns
+        -------
+        self._cur_val: float
+            Current slider value.
+
         """
 
         # direction , 1 raise value, -1 lower value
-        self._cur_val += (direction * self._step)
-        if (self._cur_val <= self._min_val):
+        self._cur_val += (offset * self._step)
+
+        if self._cur_val <= self._min_val:
             self._cur_val = self._min_val
-        if (self._cur_val >= self._max_val):
+
+        if self._cur_val >= self._max_val:
             self._cur_val = self._max_val
 
         return self._cur_val
@@ -74,12 +89,11 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
     def __init__(self, id, title, grid, row, column, row_span, column_span,
                  padx, pady, logger, min_val, max_val, step, init_val):
 
-        SliderImplementation.__init__(self, min_val, max_val, init_val, step)
+        SliderImplementation.__init__(self, min_val, max_val, init_val, step, logger)
 
         py_cui.widgets.Widget.__init__(self, id, title, grid, row, column,
                                        row_span, column_span, padx,
                                        pady, logger, selectable=True)
-
 
 
     def _draw(self):
@@ -100,7 +114,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         # append percentual
         _bar_length = _len - len(str(self._max_val))
         _bar = " " + self._bar_char * _bar_length + str(self._cur_val)
-        # --
 
         self._renderer.draw_text(self,
                                  _bar,
