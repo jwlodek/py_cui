@@ -5,8 +5,6 @@ import py_cui.popups
 
 class SliderImplementation(py_cui.ui.UIImplementation):
 
-    _bar_char = '#'
-
     def __init__(self, min_val, max_val, init_val, step, logger):
         super().__init__(logger)
 
@@ -14,6 +12,8 @@ class SliderImplementation(py_cui.ui.UIImplementation):
         self._max_val = max_val
         self._cur_val = init_val
         self._step = step
+
+        self._bar_char = "#"
 
         if self._cur_val < self._min_val or self._cur_val > self._max_val:
             raise py_cui.errors.PyCUIInvalidValue(
@@ -134,7 +134,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         # Compensate length for current value
         if self.display_value:
             str_current = str(int(self._cur_val))
-            progress = ("#" * len(min_string) + progress)[: -len(str_current)] + str_current
+            progress = (self._bar_char * len(min_string) + progress)[: -len(str_current)] + str_current
 
         self._renderer.draw_text(self, progress, text_y_pos, centered=False, bordered=self.border_enabled)
         self._renderer.unset_color_mode(self._color)
