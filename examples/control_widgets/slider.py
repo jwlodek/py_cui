@@ -1,43 +1,63 @@
 #!/usr/bin/env python3
-
+import itertools
 import py_cui
 
 
 class App:
+    character_gen = itertools.cycle(("X", "-", "█", "[", "#"))
+
     def __init__(self, root_: py_cui.PyCUI):
         self.root = root_
 
         # Default configuration
-        self.default = self.root.add_slider("Default", 0, 0, init_val=15)
+        self.default = self.root.add_slider(
+            "Default", 0, 0, column_span=3, min_val=-50, max_val=50
+        )
 
-        # Borderless titled
-        self.named_borderless_slider = self.root.add_slider("Fancy Name", 0, 1, min_val=-80, max_val=-10, init_val=-20)
-        self.named_borderless_slider.title_enabled = True
+        # controls
+        self.title_button = self.root.add_button(
+            "Toggle title", 1, 0, command=self.default.toggle_title
+        )
+        self.border_button = self.root.add_button(
+            "Toggle border", 1, 1, command=self.default.toggle_border
+        )
+        self.value_button = self.root.add_button(
+            "Toggle value", 1, 2, command=self.default.toggle_value
+        )
+        self.character_button = self.root.add_button(
+            "Cycle char", 2, 0, command=self.cycle_characters
+        )
+        self.height_button = self.root.add_button(
+            "Change height", 2, 1, command=self.default.toggle_border
+        )
+        self.step_slider = self.root.add_slider(
+            "Step size", 2, 2, min_val=1, init_val=2, max_val=10
+        )
 
-        # Bordered
-        self.nameless_bordered_slider = self.root.add_slider("Fancy Frame", 1, 0, min_val=-20, max_val=30)
-        self.nameless_bordered_slider.border_enabled = True
+        # setups
+        self.step_slider.toggle_border()
+        self.step_slider.toggle_title()
+        self.root.set_on_draw_update_func(self.set_step)
+        self.height_cycle = itertools.cycle(
+            (
+                self.default.align_to_top,
+                self.default.align_to_middle,
+                self.default.align_to_bottom,
+            )
+        )
 
-        # Bordered titled
-        self.named_bordered_slider = self.root.add_slider("Even fancier Frame", 1, 1, init_val=25)
-        self.named_bordered_slider.border_enabled = True
-        self.named_bordered_slider.title_enabled = True
+    def cycle_characters(self):
+        self.default.set_bar_char(next(self.character_gen))
 
-        # Value display disabled, enabled title or set initial value to find out where it is.
-        self.clean_slider = self.root.add_slider("Minimalistic", 2, 0, init_val=30)
-        self.clean_slider.title_enabled = True
-        self.clean_slider.display_value = False
+    def cycle_height(self):
+        next(self.height_cycle)()
 
-        # Custom character
-        self.bar = self.root.add_slider("Straight", 2, 1, init_val=30)
-        self.bar.title_enabled = True
-        self.bar.set_bar_char("_")
-
-        # changing step size
-        self.default.set_slider_step(3)
+    def set_step(self):
+        self.default.set_slider_step(self.step_slider.get_slider_value())
 
 
-root = py_cui.PyCUI(3, 2)
-root.set_title('Test Slider')
+root = py_cui.PyCUI(3, 3)
+# root.set_refresh_timeout(0.1)
+root.set_title("Slider playground")
 s = App(root)
 root.start()

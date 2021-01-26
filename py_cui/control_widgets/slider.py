@@ -95,9 +95,50 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
                                        row_span, column_span, padx,
                                        pady, logger, selectable=True)
 
-        self.title_enabled = False
-        self.border_enabled = False
-        self.display_value = True
+        self._title_enabled = False
+        self._border_enabled = False
+        self._display_value = True
+        self._alignment = "mid"
+        self.set_help_text("Focus mode on Slider. Use left/right to adjust value. Esc to exit.")
+
+
+    def toggle_title(self):
+        """Toggles visibility of the widget's name.
+        """
+
+        self._title_enabled = not self._title_enabled
+
+
+    def toggle_border(self):
+        """Toggles visibility of the widget's border.
+        """
+
+        self._border_enabled = not self._border_enabled
+
+
+    def toggle_value(self):
+        """Toggles visibility of the widget's current value in integer.
+        """
+
+        self._display_value = not self._display_value
+
+
+    def align_to_top(self):
+        """Aligns widget height to top.
+        """
+        self._alignment = "top"
+
+
+    def align_to_middle(self):
+        """Aligns widget height to middle, default option.
+        """
+        self._alignment = "mid"
+
+
+    def align_to_bottom(self):
+        """Aligns widget height to bottom.
+        """
+        self._alignment = "btm"
 
 
     def _draw(self):
@@ -113,29 +154,29 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         width -= 2
 
         # Bordered, either entitled or not titled
-        if self.border_enabled:
-            self._renderer.draw_border(self, fill=False, with_title=self.title_enabled)
+        if self._border_enabled:
+            self._renderer.draw_border(self, fill=False, with_title=self._title_enabled)
             text_y_pos += 1
             width -= 4
 
         # Entitled borderless
-        elif self.title_enabled:
+        elif self._title_enabled:
             self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
             text_y_pos += 1
 
         # Compensate length in case for negative values
-        if self.display_value:
+        if self._display_value:
             min_string = str(self._min_val)
             width -= len(min_string)
 
         progress = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
 
         # Compensate length for current value
-        if self.display_value:
+        if self._display_value:
             str_current = str(int(self._cur_val))
             progress = (self._bar_char * len(min_string) + progress)[: -len(str_current)] + str_current
 
-        self._renderer.draw_text(self, progress, text_y_pos, centered=False, bordered=self.border_enabled)
+        self._renderer.draw_text(self, progress, text_y_pos, centered=False, bordered=self._border_enabled)
         self._renderer.unset_color_mode(self._color)
 
 
