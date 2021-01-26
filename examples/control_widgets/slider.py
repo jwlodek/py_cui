@@ -15,24 +15,12 @@ class App:
         )
 
         # controls
-        self.title_button = self.root.add_button(
-            "Toggle title", 1, 0, command=self.default.toggle_title
-        )
-        self.border_button = self.root.add_button(
-            "Toggle border", 1, 1, command=self.default.toggle_border
-        )
-        self.value_button = self.root.add_button(
-            "Toggle value", 1, 2, command=self.default.toggle_value
-        )
-        self.character_button = self.root.add_button(
-            "Cycle char", 2, 0, command=self.cycle_characters
-        )
-        self.height_button = self.root.add_button(
-            "Change height", 2, 1, command=self.default.toggle_border
-        )
-        self.step_slider = self.root.add_slider(
-            "Step size", 2, 2, min_val=1, init_val=2, max_val=10
-        )
+        self.title_button = self.root.add_button("Toggle title", 1, 0, command=self.default.toggle_title)
+        self.border_button = self.root.add_button("Toggle border", 1, 1, command=self.default.toggle_border)
+        self.value_button = self.root.add_button("Toggle value", 1, 2, command=self.default.toggle_value)
+        self.character_button = self.root.add_button("Cycle char", 2, 0, command=self.cycle_characters)
+        self.height_button = self.root.add_button("Change height", 2, 1, command=self.cycle_height)
+        self.step_slider = self.root.add_slider("Step size", 2, 2, min_val=1, init_val=2, max_val=10)
 
         # setups
         self.step_slider.toggle_border()

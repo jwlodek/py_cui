@@ -110,7 +110,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def toggle_border(self):
-        """Toggles visibility of the widget's border.
+        """Toggles visibility of the widget's border. Enabling this will disable the alignment.
         """
 
         self._border_enabled = not self._border_enabled
@@ -141,6 +141,63 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._alignment = "btm"
 
 
+    def _determine_height_adjustment(self, widget_height, text_y_pos):
+        virtual_widget_height = 2 if self._title_enabled else 1
+
+        if self._alignment == "top":
+            return text_y_pos - (widget_height - virtual_widget_height) // 2
+        elif self._alignment == "btm":
+            return text_y_pos + (widget_height - virtual_widget_height) // 2
+
+        return text_y_pos
+
+
+    def _draw_border(self):
+
+        text_y_pos = self._start_y + int(self._height / 2)
+
+        height, width = self.get_absolute_dimensions()
+        text_y_pos += 1
+        width -= 6
+
+        self._renderer.draw_border(self, fill=False, with_title=self._title_enabled)
+
+        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, centered=False, bordered=True)
+        self._renderer.unset_color_mode(self._color)
+
+
+    def _draw_borderless(self):
+        text_y_pos = self._start_y + int(self._height / 2)
+
+        height, width = self.get_absolute_dimensions()
+        text_y_pos += 1
+        width -= 2
+
+        if self._alignment == "top":
+            text_y_pos -= (height // 2) - (1 if self._title_enabled else 0)
+        elif self._alignment == "btm":
+            text_y_pos += (height // 2) - 1
+
+        if self._title_enabled:
+            self._renderer.draw_text(self, self.get_title(), text_y_pos - 1, centered=False, bordered=False)
+        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, centered=False, bordered=False)
+
+
+    def _generate_bar(self, width) -> str:
+        if self._display_value:
+            min_string = str(self._min_val)
+            value_str = str(int(self._cur_val))
+
+            width -= len(min_string)
+
+            bar = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
+            progress = (self._bar_char * len(min_string) + bar)[: -len(value_str)] + value_str
+        else:
+            progress = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
+
+        return progress
+
+
     def _draw(self):
         """Override of base class draw function
         """
@@ -148,36 +205,10 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         super()._draw()
         self._renderer.set_color_mode(self._color)
 
-        text_y_pos = self._start_y + int(self._height / 2)
-
-        height, width = self.get_absolute_dimensions()
-        width -= 2
-
-        # Bordered, either entitled or not titled
         if self._border_enabled:
-            self._renderer.draw_border(self, fill=False, with_title=self._title_enabled)
-            text_y_pos += 1
-            width -= 4
-
-        # Entitled borderless
-        elif self._title_enabled:
-            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
-            text_y_pos += 1
-
-        # Compensate length in case for negative values
-        if self._display_value:
-            min_string = str(self._min_val)
-            width -= len(min_string)
-
-        progress = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
-
-        # Compensate length for current value
-        if self._display_value:
-            str_current = str(int(self._cur_val))
-            progress = (self._bar_char * len(min_string) + progress)[: -len(str_current)] + str_current
-
-        self._renderer.draw_text(self, progress, text_y_pos, centered=False, bordered=self._border_enabled)
-        self._renderer.unset_color_mode(self._color)
+            self._draw_border()
+        else:
+            self._draw_borderless()
 
 
     def _handle_key_press(self, key_pressed):
