@@ -53,8 +53,9 @@ class App:
         self.default.set_slider_step(self.step_slider.get_slider_value())
 
 
-root = py_cui.PyCUI(3, 3)
-# root.set_refresh_timeout(0.1)
-root.set_title("Slider playground")
-s = App(root)
-root.start()
+if __name__ == '__main__':
+    root = py_cui.PyCUI(3, 3)
+    root.set_title("Slider playground")
+    # root.set_refresh_timeout(0.1)
+    s = App(root)
+    root.start()

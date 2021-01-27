@@ -141,36 +141,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._alignment = "btm"
 
 
-    def _draw_border(self):
-        """Internal method implementing logic for bordered slider.
-        Bordered sliders use build-in method, """
-
-        height, width = self.get_absolute_dimensions()
-        width -= 6
-
-        visual_height = 2 + (1 if self._title_enabled else 0)
-
-        if self._alignment == "top":
-            text_y_pos = self._start_y
-        elif self._alignment == "mid":
-            text_y_pos = self._start_y + ((height - visual_height) // 2)
-        else:
-            text_y_pos = self._start_y + height - visual_height - 1
-
-        print(self._start_y, self._alignment, self._height, text_y_pos)
-
-        if self._title_enabled:
-            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
-            text_y_pos += 1
-
-        self._custom_draw_border(text_y_pos, self)
-        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, centered=False, bordered=True)
-
-        self._renderer.unset_color_mode(self._color)
-
-
     def _custom_draw_border(self, start_y, ui_element):
-        """Draws ascii border around ui element
+        """Custom draw_border method from
 
         Parameters
         ----------
@@ -194,23 +166,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
         if ui_element.is_selected():
             renderer._unset_bold()
-
-
-    def _draw_borderless(self):
-        text_y_pos = self._start_y + int(self._height / 2)
-
-        height, width = self.get_absolute_dimensions()
-        text_y_pos += 1
-        width -= 2
-
-        if self._alignment == "top":
-            text_y_pos -= int(height / 2) - (1 if self._title_enabled else 0)
-        elif self._alignment == "btm":
-            text_y_pos += int(height / 2) - 1
-
-        if self._title_enabled:
-            self._renderer.draw_text(self, self.get_title(), text_y_pos - 1, centered=False, bordered=False)
-        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, centered=False, bordered=False)
 
 
     def _generate_bar(self, width: int) -> str:
@@ -237,10 +192,29 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         super()._draw()
         self._renderer.set_color_mode(self._color)
 
-        if self._border_enabled:
-            self._draw_border()
+        height, width = self.get_absolute_dimensions()
+        width -= 6
+
+        visual_height = (2 if self._border_enabled else 0) + (1 if self._title_enabled else 0)
+
+        if self._alignment == "top":
+            text_y_pos = self._start_y
+        elif self._alignment == "mid":
+            text_y_pos = self._start_y + ((height - visual_height) // 2)
         else:
-            self._draw_borderless()
+            text_y_pos = self._start_y + height - visual_height - 1
+
+        if self._title_enabled:
+            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
+            text_y_pos += 1
+
+        if self._border_enabled:
+            self._custom_draw_border(text_y_pos, self)
+            self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, bordered=True)
+        else:
+            self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, bordered=False)
+
+        self._renderer.unset_color_mode(self._color)
 
 
     def _handle_key_press(self, key_pressed):
