@@ -141,17 +141,18 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._alignment = "btm"
 
 
-    def _custom_draw_border(self, start_y, ui_element):
-        """Custom draw_border method from
+    def _custom_draw_border(self, start_y: int):
+        """Custom method made from renderer.draw_border to support alignment for bordered variants.
 
         Parameters
         ----------
-        ui_element : py_cui.ui.UIElement
-            The ui_element being drawn
+        start_y : int
+            border's Y-axis starting coordination
         """
 
         start_y = start_y
         renderer = self.get_renderer()
+        ui_element = self
 
         if ui_element.is_selected():
             renderer._set_bold()
@@ -169,7 +170,12 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _generate_bar(self, width: int) -> str:
-        """Internal implementation to generate progression bar.
+        """Internal implementation to generate progression bar
+
+        Parameters
+        ----------
+        width : int
+            Width of bar in character length.
         """
         if self._display_value:
             min_string = str(self._min_val)
@@ -209,7 +215,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             text_y_pos += 1
 
         if self._border_enabled:
-            self._custom_draw_border(text_y_pos, self)
+            self._custom_draw_border(self, text_y_pos)
             self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, bordered=True)
         else:
             self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, bordered=False)
@@ -218,12 +224,12 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _handle_key_press(self, key_pressed):
-        """LEFT_ARROW decrease value, RIGHT_ARROW increase.
+        """LEFT_ARROW decreases value, RIGHT_ARROW increases.
 
         Parameters
         ----------
         key_pressed : int
-            key code of key pressed
+            key code of pressed key
         """
 
         super()._handle_key_press(key_pressed)

@@ -38,7 +38,8 @@ class App:
                     Press a button to make a change.
                     You can change character freely,
                     but for demonstration purpose,
-                    I've set it to cycle it here."""
+                    I've set it to cycle it here.
+                    """
 
         help_text = cleandoc(help_text)
         self.spacer.set_text(help_text)
