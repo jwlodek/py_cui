@@ -215,7 +215,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             text_y_pos += 1
 
         if self._border_enabled:
-            self._custom_draw_border(self, text_y_pos)
+            self._custom_draw_border(text_y_pos)
             self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, bordered=True)
         else:
             self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, bordered=False)
