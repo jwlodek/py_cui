@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from inspect import cleandoc
 import itertools
 import py_cui
 
@@ -10,17 +11,16 @@ class App:
         self.root = root_
 
         # Default configuration
-        self.default = self.root.add_slider(
-            "Default", 0, 0, column_span=3, min_val=-50, max_val=50
-        )
+        self.default = self.root.add_slider("Default", 0, 0, column_span=2, min_val=-50, max_val=50)
 
         # controls
         self.title_button = self.root.add_button("Toggle title", 1, 0, command=self.default.toggle_title)
         self.border_button = self.root.add_button("Toggle border", 1, 1, command=self.default.toggle_border)
         self.value_button = self.root.add_button("Toggle value", 1, 2, command=self.default.toggle_value)
         self.character_button = self.root.add_button("Cycle char", 2, 0, command=self.cycle_characters)
-        self.height_button = self.root.add_button("Change height", 2, 1, command=self.cycle_height)
+        self.align_button = self.root.add_button("Change alignment", 2, 1, command=self.cycle_height)
         self.step_slider = self.root.add_slider("Step size", 2, 2, min_val=1, init_val=2, max_val=10)
+        self.spacer = self.root.add_text_block("Spacer", 0, 2)
 
         # setups
         self.step_slider.toggle_border()
@@ -33,6 +33,15 @@ class App:
                 self.default.align_to_bottom,
             )
         )
+
+        help_text = """
+                    Press a button to make a change.
+                    You can change character freely,
+                    but for demonstration purpose,
+                    I've set it to cycle it here."""
+
+        help_text = cleandoc(help_text)
+        self.spacer.set_text(help_text)
 
     def cycle_characters(self):
         self.default.set_bar_char(next(self.character_gen))

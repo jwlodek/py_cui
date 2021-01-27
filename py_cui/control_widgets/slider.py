@@ -141,29 +141,59 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._alignment = "btm"
 
 
-    def _determine_height_adjustment(self, widget_height, text_y_pos):
-        virtual_widget_height = 2 if self._title_enabled else 1
-
-        if self._alignment == "top":
-            return text_y_pos - (widget_height - virtual_widget_height) // 2
-        elif self._alignment == "btm":
-            return text_y_pos + (widget_height - virtual_widget_height) // 2
-
-        return text_y_pos
-
-
     def _draw_border(self):
-
-        text_y_pos = self._start_y + int(self._height / 2)
+        """Internal method implementing logic for bordered slider.
+        Bordered sliders use build-in method, """
 
         height, width = self.get_absolute_dimensions()
-        text_y_pos += 1
         width -= 6
 
-        self._renderer.draw_border(self, fill=False, with_title=self._title_enabled)
+        visual_height = 2 + (1 if self._title_enabled else 0)
 
-        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, centered=False, bordered=True)
+        if self._alignment == "top":
+            text_y_pos = self._start_y
+        elif self._alignment == "mid":
+            text_y_pos = self._start_y + ((height - visual_height) // 2)
+        else:
+            text_y_pos = self._start_y + height - visual_height - 1
+
+        print(self._start_y, self._alignment, self._height, text_y_pos)
+
+        if self._title_enabled:
+            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
+            text_y_pos += 1
+
+        self._custom_draw_border(text_y_pos, self)
+        self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, centered=False, bordered=True)
+
         self._renderer.unset_color_mode(self._color)
+
+
+    def _custom_draw_border(self, start_y, ui_element):
+        """Draws ascii border around ui element
+
+        Parameters
+        ----------
+        ui_element : py_cui.ui.UIElement
+            The ui_element being drawn
+        """
+
+        start_y = start_y
+        renderer = self.get_renderer()
+
+        if ui_element.is_selected():
+            renderer._set_bold()
+
+        renderer.set_color_mode(ui_element.get_border_color())
+
+        renderer._draw_border_top(ui_element, start_y, False)
+        renderer._draw_blank_row(ui_element, start_y + 1)
+        renderer._draw_border_bottom(ui_element, start_y + 2)
+
+        renderer.unset_color_mode(ui_element.get_border_color())
+
+        if ui_element.is_selected():
+            renderer._unset_bold()
 
 
     def _draw_borderless(self):
@@ -174,16 +204,18 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         width -= 2
 
         if self._alignment == "top":
-            text_y_pos -= (height // 2) - (1 if self._title_enabled else 0)
+            text_y_pos -= int(height / 2) - (1 if self._title_enabled else 0)
         elif self._alignment == "btm":
-            text_y_pos += (height // 2) - 1
+            text_y_pos += int(height / 2) - 1
 
         if self._title_enabled:
             self._renderer.draw_text(self, self.get_title(), text_y_pos - 1, centered=False, bordered=False)
         self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, centered=False, bordered=False)
 
 
-    def _generate_bar(self, width) -> str:
+    def _generate_bar(self, width: int) -> str:
+        """Internal implementation to generate progression bar.
+        """
         if self._display_value:
             min_string = str(self._min_val)
             value_str = str(int(self._cur_val))
