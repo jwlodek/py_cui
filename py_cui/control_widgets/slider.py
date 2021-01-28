@@ -5,14 +5,15 @@ import py_cui.popups
 
 class SliderImplementation(py_cui.ui.UIImplementation):
 
-    _bar_char = '#'
-
-    def __init__(self, min_val, max_val, init_val, step):
+    def __init__(self, min_val, max_val, init_val, step, logger):
+        super().__init__(logger)
 
         self._min_val = min_val
         self._max_val = max_val
         self._cur_val = init_val
         self._step = step
+
+        self._bar_char = "#"
 
         if self._cur_val < self._min_val or self._cur_val > self._max_val:
             raise py_cui.errors.PyCUIInvalidValue(
@@ -23,19 +24,33 @@ class SliderImplementation(py_cui.ui.UIImplementation):
     def set_bar_char(self, char):
         """Updates the character used to represent the slider bar
         """
-        
+
         self._bar_char = char
 
 
-    def update_slider_value(self, direction):
-        """Sets the value of the slider - increment decrement
+    def update_slider_value(self, offset: int) -> float:
+        """
+        Steps up or down the value in offset fashion.
+
+        Parameters
+        ----------
+        offset : int
+            Number of steps to increase or decrease the slider value.
+
+        Returns
+        -------
+        self._cur_val: float
+            Current slider value.
+
         """
 
         # direction , 1 raise value, -1 lower value
-        self._cur_val += (direction * self._step)
-        if (self._cur_val <= self._min_val):
+        self._cur_val += (offset * self._step)
+
+        if self._cur_val <= self._min_val:
             self._cur_val = self._min_val
-        if (self._cur_val >= self._max_val):
+
+        if self._cur_val >= self._max_val:
             self._cur_val = self._max_val
 
         return self._cur_val
@@ -58,7 +73,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
     """
 
     """
-    Attributes
+    Parameters
     ----------
     _min_val : int
         Lowest value of the slider
@@ -74,51 +89,146 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
     def __init__(self, id, title, grid, row, column, row_span, column_span,
                  padx, pady, logger, min_val, max_val, step, init_val):
 
-        SliderImplementation.__init__(self, min_val, max_val, init_val, step)
+        SliderImplementation.__init__(self, min_val, max_val, init_val, step, logger)
 
         py_cui.widgets.Widget.__init__(self, id, title, grid, row, column,
                                        row_span, column_span, padx,
                                        pady, logger, selectable=True)
 
+        self._title_enabled = False
+        self._border_enabled = False
+        self._display_value = True
+        self._alignment = "mid"
+        self.set_help_text("Focus mode on Slider. Use left/right to adjust value. Esc to exit.")
+
+
+    def toggle_title(self):
+        """Toggles visibility of the widget's name.
+        """
+
+        self._title_enabled = not self._title_enabled
+
+
+    def toggle_border(self):
+        """Toggles visibility of the widget's border. Enabling this will disable the alignment.
+        """
+
+        self._border_enabled = not self._border_enabled
+
+
+    def toggle_value(self):
+        """Toggles visibility of the widget's current value in integer.
+        """
+
+        self._display_value = not self._display_value
+
+
+    def align_to_top(self):
+        """Aligns widget height to top.
+        """
+        self._alignment = "top"
+
+
+    def align_to_middle(self):
+        """Aligns widget height to middle, default option.
+        """
+        self._alignment = "mid"
+
+
+    def align_to_bottom(self):
+        """Aligns widget height to bottom.
+        """
+        self._alignment = "btm"
+
+
+    def _custom_draw_border(self, start_y: int):
+        """Custom method made from renderer.draw_border to support alignment for bordered variants.
+
+        Parameters
+        ----------
+        start_y : int
+            border's Y-axis starting coordination
+        """
+
+        renderer = self.get_renderer()
+        ui_element = self
+
+        if ui_element.is_selected():
+            renderer._set_bold()
+
+        renderer.set_color_mode(ui_element.get_border_color())
+
+        renderer._draw_border_top(ui_element, start_y, False)
+        renderer._draw_blank_row(ui_element, start_y + 1)
+        renderer._draw_border_bottom(ui_element, start_y + 2)
+
+        renderer.unset_color_mode(ui_element.get_border_color())
+
+        if ui_element.is_selected():
+            renderer._unset_bold()
+
+
+    def _generate_bar(self, width: int) -> str:
+        """Internal implementation to generate progression bar
+
+        Parameters
+        ----------
+        width : int
+            Width of bar in character length.
+        """
+        if self._display_value:
+            min_string = str(self._min_val)
+            value_str = str(int(self._cur_val))
+
+            width -= len(min_string)
+
+            bar = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
+            progress = (self._bar_char * len(min_string) + bar)[: -len(value_str)] + value_str
+        else:
+            progress = self._bar_char * int((width * (self._cur_val - self._min_val)) / (self._max_val - self._min_val))
+
+        return progress
 
 
     def _draw(self):
+        """Override of base class draw function
+        """
 
         super()._draw()
         self._renderer.set_color_mode(self._color)
-        target_y = self._start_y + int(self._height / 2)
 
-        # this block depends on the draw, but if equal for popup
-        # can be moved to SliderImplementation
+        height, width = self.get_absolute_dimensions()
+        width -= 6
 
-        # --
-        # simple normalize width:
-        # ratio between screen bar width and bar interval
-        fact = (self._max_val - self._min_val) / (self._width - 4)
-        # screen length of the slider bar
-        _len = int((self._cur_val - self._min_val) / fact)
-        # append percentual
-        _bar_length = _len - len(str(self._max_val))
-        _bar = " " + self._bar_char * _bar_length + str(self._cur_val)
-        # --
+        visual_height = (2 if self._border_enabled else 0) + (1 if self._title_enabled else 0)
 
-        self._renderer.draw_text(self,
-                                 _bar,
-                                 target_y,
-                                 centered=False,
-                                 bordered=False
-                                 )
+        if self._alignment == "top":
+            text_y_pos = self._start_y
+        elif self._alignment == "mid":
+            text_y_pos = self._start_y + ((height - visual_height) // 2)
+        else:
+            text_y_pos = self._start_y + height - visual_height - 1
+
+        if self._title_enabled:
+            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
+            text_y_pos += 1
+
+        if self._border_enabled:
+            self._custom_draw_border(text_y_pos)
+            self._renderer.draw_text(self, self._generate_bar(width), text_y_pos + 1, bordered=True)
+        else:
+            self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, bordered=False)
 
         self._renderer.unset_color_mode(self._color)
 
 
     def _handle_key_press(self, key_pressed):
-        """LEFT_ARROW decrease value, RIGHT_ARROW increase.
+        """LEFT_ARROW decreases value, RIGHT_ARROW increases.
 
         Parameters
         ----------
         key_pressed : int
-            key code of key pressed
+            key code of pressed key
         """
 
         super()._handle_key_press(key_pressed)
@@ -126,7 +236,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             self.update_slider_value(-1)
         if key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.update_slider_value(1)
-
 
 
 class SliderPopup(py_cui.popups.Popup, SliderImplementation):
