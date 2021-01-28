@@ -150,7 +150,6 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             border's Y-axis starting coordination
         """
 
-        start_y = start_y
         renderer = self.get_renderer()
         ui_element = self
 
