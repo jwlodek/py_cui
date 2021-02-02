@@ -130,7 +130,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def align_to_middle(self):
-        """Aligns widget height to middle, default option.
+        """Aligns widget height to middle. default configuration.
         """
         self._alignment = "mid"
 
@@ -148,6 +148,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         ----------
         start_y : int
             border's Y-axis starting coordination
+        content: str
+            string to be drawn inside the border
         """
 
         renderer = self.get_renderer()
@@ -159,27 +161,31 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             renderer._set_bold()
             renderer._draw_border_top(ui_element, start_y, False)
 
-            renderer.draw_text(self, content, start_y + 1, selected=True, bordered=True)
+            renderer.draw_text(ui_element, content, start_y + 1, selected=True, bordered=True)
             renderer._set_bold()
 
             renderer._draw_border_bottom(ui_element, start_y + 2)
             renderer._unset_bold()
         else:
             renderer._draw_border_top(ui_element, start_y, False)
-            renderer.draw_text(self, content, start_y + 1, selected=False, bordered=True)
+            renderer.draw_text(ui_element, content, start_y + 1, selected=False, bordered=True)
             renderer._draw_border_bottom(ui_element, start_y + 2)
-
 
         renderer.unset_color_mode(ui_element.get_border_color())
 
 
     def _generate_bar(self, width: int) -> str:
-        """Internal implementation to generate progression bar
+        """Internal implementation to generate progression bar.
 
         Parameters
         ----------
         width : int
             Width of bar in character length.
+
+        Returns
+        -------
+        progress: str
+            progressive bar string  with length of width.
         """
         if self._display_value:
             min_string = str(self._min_val)
@@ -196,15 +202,13 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _draw(self):
-        """Override of base class draw function
+        """Override of base class draw function.
         """
 
         super()._draw()
         self._renderer.set_color_mode(self._color)
 
         height, width = self.get_absolute_dimensions()
-        width -= 6
-
         visual_height = (2 if self._border_enabled else 0) + (1 if self._title_enabled else 0)
 
         if self._alignment == "top":
@@ -221,8 +225,10 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             text_y_pos += 1
 
         if self._border_enabled:
+            width -= 6
             self._custom_draw_with_border(text_y_pos, self._generate_bar(width))
         else:
+            width -= 2
             self._renderer.draw_text(
                 self, self._generate_bar(width), text_y_pos, selected=self.is_selected(), bordered=False
             )
