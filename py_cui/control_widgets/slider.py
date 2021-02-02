@@ -141,7 +141,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._alignment = "btm"
 
 
-    def _custom_draw_border(self, start_y: int, content: str):
+    def _custom_draw_with_border(self, start_y: int, content: str):
         """Custom method made from renderer.draw_border to support alignment for bordered variants.
 
         Parameters
@@ -159,14 +159,14 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             renderer._set_bold()
             renderer._draw_border_top(ui_element, start_y, False)
 
-            renderer.draw_text(self, content, start_y + 1, selected=ui_element.is_selected(), bordered=True)
+            renderer.draw_text(self, content, start_y + 1, selected=True, bordered=True)
             renderer._set_bold()
 
             renderer._draw_border_bottom(ui_element, start_y + 2)
             renderer._unset_bold()
         else:
             renderer._draw_border_top(ui_element, start_y, False)
-            renderer.draw_text(self, content, start_y + 1, selected=ui_element.is_selected(), bordered=True)
+            renderer.draw_text(self, content, start_y + 1, selected=False, bordered=True)
             renderer._draw_border_bottom(ui_element, start_y + 2)
 
 
@@ -215,13 +215,17 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             text_y_pos = self._start_y + height - visual_height - 1
 
         if self._title_enabled:
-            self._renderer.draw_text(self, self.get_title(), text_y_pos, bordered=False)
+            self._renderer.draw_text(
+                self, self.get_title(), text_y_pos, selected=self.is_selected(), bordered=False
+            )
             text_y_pos += 1
 
         if self._border_enabled:
-            self._custom_draw_border(text_y_pos, self._generate_bar(width))
+            self._custom_draw_with_border(text_y_pos, self._generate_bar(width))
         else:
-            self._renderer.draw_text(self, self._generate_bar(width), text_y_pos, bordered=False)
+            self._renderer.draw_text(
+                self, self._generate_bar(width), text_y_pos, selected=self.is_selected(), bordered=False
+            )
 
         self._renderer.unset_color_mode(self._color)
 
