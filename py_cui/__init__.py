@@ -29,19 +29,19 @@ import py_cui
 import py_cui.keys
 import py_cui.statusbar
 import py_cui.widgets
-import py_cui.control_widgets
+import py_cui.controls
+import py_cui.dialogs
 import py_cui.widget_set
 import py_cui.popups
 import py_cui.renderer
 import py_cui.debug
 import py_cui.errors
 from py_cui.colors import *
-import py_cui.dialog_widgets
-import py_cui.control_widgets
+
 
 
 # Version number
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 def fit_text(width, text, center=False):
@@ -372,6 +372,7 @@ class PyCUI:
         # Start colors in curses.
         # For each color pair in color map, initialize color combination.
         curses.start_color()
+        curses.init_color(curses.COLOR_BLUE, 0, 0, 500)
         for color_pair in py_cui.colors._COLOR_MAP.keys():
             fg_color, bg_color = py_cui.colors._COLOR_MAP[color_pair]
             curses.init_pair(color_pair, fg_color, bg_color)
@@ -765,7 +766,7 @@ class PyCUI:
     
     def add_slider(self, title, row, column, row_span=1,
                    column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.control_widgets.slider.SliderWidget:
+                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.controls.slider.SliderWidget:
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -793,7 +794,6 @@ class PyCUI:
         init_val = 0 int
             initial value of the slider
 
-
         Returns
         -------
         new_slider : Slider
@@ -801,20 +801,20 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_slider = py_cui.control_widgets.slider.SliderWidget(id,
-                                                                title,
-                                                                self._grid,
-                                                                row,
-                                                                column,
-                                                                row_span,
-                                                                column_span,
-                                                                padx,
-                                                                pady,
-                                                                self._logger,
-                                                                min_val,
-                                                                max_val,
-                                                                step,
-                                                                init_val)
+        new_slider = py_cui.controls.slider.SliderWidget(id,
+                                                         title,
+                                                         self._grid,
+                                                         row,
+                                                         column,
+                                                         row_span,
+                                                         column_span,
+                                                         padx,
+                                                         pady,
+                                                         self._logger,
+                                                         min_val,
+                                                         max_val,
+                                                         step,
+                                                         init_val)
         self._widgets[id] = new_slider
         self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
@@ -1266,9 +1266,31 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialog_widgets.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
+        self._popup = py_cui.dialogs.form.FormPopup(self, fields, passwd_fields, required, {}, title, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
         if callback is not None:
             self._popup.set_on_submit_action(callback)
+
+
+    def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=True, limit_extensions=[]):
+        """Shows form popup.
+
+        Used for inputting several fields worth of values
+
+        Paramters
+        ---------
+        title : str
+            Message title
+        fields : List[str]
+            Names of each individual field
+        passwd_fields : List[str]
+            Field names that should have characters hidden
+        required : List[str]
+            Fields that are required before submission
+        callback=None : Function
+            If not none, fired after loading is completed. Must be a no-arg function
+        """
+
+        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self, callback, initial_dir, popup_type, ascii_icons, limit_extensions, py_cui.WHITE_ON_BLACK, self._renderer, self._logger)
 
 
     def increment_loading_bar(self):
@@ -1346,7 +1368,6 @@ class PyCUI:
             self.get_widgets()[self._selected_widget]._draw()
 
         self._logger.info('Drew widgets')
-
 
 
     def _draw_status_bars(self, stdscr, height, width):
@@ -1452,8 +1473,8 @@ class PyCUI:
 
         Parameters
         ----------
-        stdscr : curses Standard cursor
-            The cursor used to draw the CUI
+        stdscr : curses Standard screen
+            The screen buffer used for drawing CUI elements
         """
 
         self._stdscr = stdscr
@@ -1464,7 +1485,7 @@ class PyCUI:
         stdscr.refresh()
         curses.mousemask(curses.ALL_MOUSE_EVENTS)
         # stdscr.nodelay(False)
-        stdscr.keypad(True)
+        #stdscr.keypad(True)
 
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
@@ -1473,7 +1494,6 @@ class PyCUI:
         # If user specified a refresh timeout, apply it here
         if self._refresh_timeout > 0:
             self._stdscr.timeout(self._refresh_timeout)
-        #self._stdscr.timeout(1000)
 
         # If user sets non-default border characters, update them here
         if self._border_characters is not None:
@@ -1494,10 +1514,10 @@ class PyCUI:
                 if self._simulated_terminal is None:
                     height, width   = stdscr.getmaxyx()
                 else:
-                    height  = self._simulated_terminal[0]
-                    width   = self._simulated_terminal[1]
+                    height = self._simulated_terminal[0]
+                    width  = self._simulated_terminal[1]
 
-                height          = height - 4
+                height = height - 4
 
                 # If the user defined an update function to fire on each draw call,
                 # Run it here. This can of course be also handled user-side

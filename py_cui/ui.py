@@ -62,6 +62,7 @@ class UIElement:
         self._start_x,  self._stop_y    = 0, 0
         self._stop_x,   self._start_y   = 0, 0
         self._height,   self._width     = 0, 0
+        # Default UI Element color is white on black.
         self._color                     = py_cui.WHITE_ON_BLACK
         self._border_color              = self._color
         self._focus_border_color        = self._color
@@ -281,6 +282,8 @@ class UIElement:
 
         if self._border_color == self._color:
             self._border_color = color
+        if self._focus_border_color == self._color:
+            self._focus_border_color = color
         if self._selected_color == self._color:
             self._selected_color = color
         self._color = color

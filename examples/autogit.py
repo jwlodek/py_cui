@@ -1,5 +1,5 @@
-"""
-Example of using py_cui to create a simple git control.
+"""Example of using py_cui to create a simple git control.
+
 This example is expanded into a full application with https://github.com/jwlodek/pyautogit
 
 @author:    Jakub Wlodek
@@ -18,10 +18,15 @@ __version__ = '0.0.1'
 
 class AutoGitCUI:
 
+
     def __init__(self, root: py_cui.PyCUI, dir):
         self.root = root
-        self.dir = dir
+
+        # Store current directory
+        self.dir = os.path.abspath(dir)
         os.chdir(self.dir)
+
+        # get current git status
         proc = Popen(['git', 'status', '-s'], stdout=PIPE, stderr=PIPE)
         while proc.returncode is None:
             proc.wait()
@@ -31,7 +36,7 @@ class AutoGitCUI:
             print('ERROR - fatal, {} is not a git repository.'.format(self.dir))
             exit()
 
-        self.dir = os.path.abspath(self.dir)
+        # Set title
         self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
 
         # Keybindings when in overview mode, and set info bar
@@ -104,30 +109,42 @@ class AutoGitCUI:
 
 
     def get_logo(self):
-        logo =         "         _    _ _______ ____   _____ _____ _______\n" 
-        logo = logo +  "    /\\  | |  | |__   __/ __ \\ / ____|_   _|__   __|\n"
-        logo = logo +  "   /  \\ | |  | |  | | | |  | | |  __  | |    | |   \n"
-        logo = logo +  "  / /\\ \\| |  | |  | | | |  | | | |_ | | |    | |   \n"
-        logo = logo +  " / ____ \\ |__| |  | | | |__| | |__| |_| |_   | |   \n"
-        logo = logo +  "/_/    \\_\\____/   |_|  \\____/ \\_____|_____|  |_|   \n\n\n"
-        logo = logo + "Powered by the py_cui Python Command Line UI Library:\n\n"
-        logo = logo + "https://github.com/jwlodek/py_cui\n\n"
-        logo = logo + "Documentation available online here: https://jwlodek.github.io/py_cui\n\n"
-        logo = logo + "Star me on Github!\n\n"
-        logo = logo + "Copyright (c) 2019-2020 Jakub Wlodek\n\n"
+        """Grabs ascii art logo text
+        """
+
+        logo = "         _    _ _______ ____   _____ _____ _______\n" \
+                "    /\\  | |  | |__   __/ __ \\ / ____|_   _|__   __|\n" \
+                "   /  \\ | |  | |  | | | |  | | |  __  | |    | |   \n" \
+                "  / /\\ \\| |  | |  | | | |  | | | |_ | | |    | |   \n" \
+                " / ____ \\ |__| |  | | | |__| | |__| |_| |_   | |   \n" \
+                "/_/    \\_\\____/   |_|  \\____/ \\_____|_____|  |_|   \n\n\n" \
+                "Powered by the py_cui Python Command Line UI Library:\n\n" \
+                "https://github.com/jwlodek/py_cui\n\n" \
+                "Documentation available online here: https://jwlodek.github.io/py_cui\n\n" \
+                "Star me on Github!\n\n" \
+                "Copyright (c) 2019-2020 Jakub Wlodek\n\n"
         return logo
 
 
     def process_menu_option(self, option):
+        """TODO - process menu option from popup menu
+        """
 
         self.root.set_title(option)
 
 
     def show_menu(self):
+        """Displays popup menu, with supported git commands
+        """
+
         option_list = ['Add all', 'Push', 'Pull', 'Stash', 'Pop Stash', 'Set Editor']
         self.root.show_menu_popup('Autogit Menu', option_list, self.process_menu_option)
 
+
     def show_git_commit_diff(self):
+        """Displays diff for given git commit
+        """
+
         try:
             commit_val = self.git_commits_menu.get()[:7]
             proc = Popen(['git', 'diff', commit_val], stdout=PIPE, stderr=PIPE)
@@ -137,6 +154,7 @@ class AutoGitCUI:
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to read commit diff information')
+
 
     def add_all(self):
         try:

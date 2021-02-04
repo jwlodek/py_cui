@@ -1,21 +1,33 @@
 # PyCUI Installation
 
-The easiest way to install py_cui is to use `pip`. You may simply run:
+You may install `py_cui` via pip (use `pip3` if python 2 and 3 are installed side by side)
+
+```
+pip install py-cui
+```
+
+Make sure to run as root/sudo as required. Note that the library is titled `py_cui`, but the name of the pypi package is `py-cui`, though in most cases, installing with 
+
 ```
 pip install py_cui
 ```
-and the library should install along with all dependancies. If you are working on a machine where `pip` defaults to the `Python 2` version, replace `pip` with `pip3`.
 
-There is no Python 2 support for `py_cui`, you will need a version of Python 3.4+ in order to use it. It may function with older versions of Python 3, but it has not been tested on them.
+should work OK.
 
-Alternatively, if you wish to avoid using pip, you may install from this repository:
+If you would like to use `py_cui` directly from source, clone this repository with:
 
 ```
 git clone https://github.com/jwlodek/py_cui
+```
+
+Then build/install with `pip`:
+
+```
 cd py_cui
 pip install .
 ```
-This will use pip to install from the sources in the git repository. If you wish to avoid installing altogether, you may copy an example from the `examples/` directory into the root `py_cui` directory, and run it with python3. Note that in this case you are required to install the dependancies yourself, which are `curses` on UNIX (should be included with python3) and `windows-curses` on windows, which can be installed with `pip`.
+
+If you would like to try it out without installing, first make sure that `curses` is installed (`windows-curses` if on windows), and then copy one of the example files into the top directory. You may then simply run it with `python3`.
 
 ### Developer Installation
 
