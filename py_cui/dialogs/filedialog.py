@@ -161,7 +161,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
             if self._current_dir != up_dir:
                 self.add_item(FileDirElem('dir', '..', up_dir, ascii_icons=self._ascii_icons))
 
-            if self._dialog_type == 'openfile':
+            if self._dialog_type == 'openfile' or self._dialog_type == 'saveas':
                 self.add_item_list(dirs)
                 self.add_item_list(files)
             elif self._dialog_type == 'opendir':
