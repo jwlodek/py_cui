@@ -166,7 +166,7 @@ class PopupExample:
             color = py_cui.CYAN_ON_BLACK
         elif new_color == "MAGENTA":
             color = py_cui.MAGENTA_ON_BLACK
-        for key in self.master.widgets.keys():
+        for key in self.master.get_widgets().keys():
             if isinstance(self.master.get_widgets()[key], py_cui.widgets.Button):
                 self.master.get_widgets()[key].set_color(color)
 
