@@ -13,6 +13,7 @@ Created on August 12, 2019
 [Aaron Pierce (aaronpierce)](https://github.com/aaronpierce)  
 [Caleb Reese (cptbldbrd)](https://github.com/cptbldbrd)  
 [wdog (wdog)](https://github.com/wdog)
+[jupiterbjy (jupiterbjy)](https://github.com/jupiterbjy)
 
 ### License
 

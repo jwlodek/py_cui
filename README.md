@@ -143,9 +143,11 @@ Below is a table of python projects developed with the help of `py_cui`. If you'
 
 Project | Description
 --------|-------------
+[pypodcasts](https://github.com/jwlodek/pypodcasts) | A TUI for listening to and managing podcast feeds. (Coming Soon)
 [pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
+[CUIAudioPlayer](https://github.com/jupiterbjy/CUIAudioPlayer) | A TUI for playing back audio files in a variety of formats.
 [tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
 [hue-tui](https://github.com/channel-42/hue-tui) | A CUI controlling for Philips Hue lights.
 [mini-radio-player](https://github.com/wdog/mini-radio-player-pycui) | A terminal based radio interface for linux.
