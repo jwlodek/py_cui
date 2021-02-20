@@ -49,7 +49,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
         """Function that checks if field is valid.
 
         This function can be implemented by subclasses to support different
-        field types (ex. emaile etc.)
+        field types (ex. emails etc.)
 
         Returns
         -------
@@ -307,12 +307,11 @@ class FormImplementation(py_cui.ui.UIImplementation):
         return output
 
 
-
 class Form(py_cui.widgets.Widget, FormImplementation):
     """Main Widget class extending the FormImplementation. TODO
     """
-    pass
 
+    pass
 
 
 class InternalFormPopup(py_cui.popups.MessagePopup):
@@ -416,7 +415,6 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
         form_start_y = int(root_height / 2) - int(min_required_y / 2)
 
         return form_start_x, form_start_y
-
 
 
     def get_absolute_stop_pos(self):

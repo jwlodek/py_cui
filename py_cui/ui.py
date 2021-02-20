@@ -78,14 +78,14 @@ class UIElement:
         """Must be implemented by subclass, computes the absolute coords of upper-left corner
         """
 
-        return 0, 0
+        raise NotImplementedError
 
 
     def get_absolute_stop_pos(self):
         """Must be implemented by subclass, computes the absolute coords of bottom-right corner
         """
 
-        return 1, 1
+        raise NotImplementedError
 
 
     def get_absolute_dimensions(self):
@@ -300,6 +300,7 @@ class UIElement:
 
         self._border_color = color
 
+
     def set_focus_border_color(self, color):
         """Sets element border color if the current element
         is focused
@@ -311,6 +312,7 @@ class UIElement:
         """
 
         self._focus_border_color = color
+
 
     def set_selected_color(self, color):
         """Sets element sected color
@@ -364,7 +366,7 @@ class UIElement:
         """Must be implemented by subclass. Used to handle keypresses
         """
 
-        pass
+        raise NotImplementedError
 
 
     def add_mouse_press_handler(self, mouse_press_handler_func):
@@ -396,7 +398,7 @@ class UIElement:
         """Must be implemented by subclasses. Uses renderer to draw element to terminal
         """
 
-        pass
+        raise NotImplementedError
 
 
     def _assign_renderer(self, renderer):
@@ -442,7 +444,6 @@ class UIElement:
         within_x = self._start_x <= x and self._start_x + self._width >= x
         within_y = self._start_y <= y and self._start_y + self._height >= y
         return within_x and within_y
-
 
 
 class UIImplementation:
