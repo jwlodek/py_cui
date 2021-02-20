@@ -1035,8 +1035,11 @@ class PyCUI:
         self.set_selected_widget(widget.get_id())
         # If autofocus buttons is selected, we automatically process the button command and reset to overview mode
         if self._auto_focus_buttons and auto_press_buttons and isinstance(widget, py_cui.widgets.Button):
-            widget.command()
+            if widget.command is not None:
+                widget.command()
+
             self._logger.info('Moved focus to button {} - ran autofocus command'.format(widget.get_title()))
+
         elif self._auto_focus_buttons and isinstance(widget, py_cui.widgets.Button):
             self.status_bar.set_text(self._init_status_bar_text)
         else:

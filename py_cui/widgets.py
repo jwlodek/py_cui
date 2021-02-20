@@ -607,8 +607,7 @@ class Button(Widget):
         super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             if self.command is not None:
-                ret = self.command()
-            return ret
+                return self.command()
 
 
     def _draw(self):
