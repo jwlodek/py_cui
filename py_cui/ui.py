@@ -716,7 +716,7 @@ class MenuImplementation(UIImplementation):
         return self._selected_item
 
 
-    def set_selected_item_index(self, selected_item):
+    def set_selected_item_index(self, selected_item_index):
         """Sets the currently selected item
 
         Parameters
@@ -725,7 +725,7 @@ class MenuImplementation(UIImplementation):
             The new selected item index
         """
 
-        self._selected_item = selected_item
+        self._selected_item = selected_item_index
 
 
     def _scroll_up(self):
@@ -821,7 +821,7 @@ class MenuImplementation(UIImplementation):
 
         Parameters
         ----------
-        item_list : list of Object
+        item_list : List[Object]
             list of objects to add as items to the scrollmenu
         """
 
@@ -865,7 +865,7 @@ class MenuImplementation(UIImplementation):
 
         Returns
         -------
-        item_list : list of str
+        item_list : List[Object]
             list of items in the scrollmenu
         """
 
@@ -877,13 +877,26 @@ class MenuImplementation(UIImplementation):
 
         Returns
         -------
-        item : str
+        item : Object
             selected item, or None if there are no items in the menu
         """
 
         if len(self._view_items) > 0:
             return self._view_items[self._selected_item]
         return None
+
+
+    def set_selected_item(self, selected_item):
+        """Function that replaces the currently selected item with a new item
+
+        Parameters
+        ----------
+        item : Object
+            A new selected item to replace the current one
+        """
+
+        if selected_item is not None and self.get() is not None:
+            self._view_items[self._selected_item] = selected_item
 
 
 class CheckBoxMenuImplementation(MenuImplementation):

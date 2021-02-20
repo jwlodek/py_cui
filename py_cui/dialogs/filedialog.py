@@ -359,7 +359,6 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         return stop_x, stop_y
 
 
-
     def update_height_width(self):
         """Override of base class. Updates text field variables for form field
         """
