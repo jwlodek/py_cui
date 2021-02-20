@@ -716,7 +716,7 @@ class MenuImplementation(UIImplementation):
         return self._selected_item
 
 
-    def set_selected_item_index(self, selected_item):
+    def set_selected_item_index(self, selected_item_index):
         """Sets the currently selected item
 
         Parameters
@@ -725,7 +725,7 @@ class MenuImplementation(UIImplementation):
             The new selected item index
         """
 
-        self._selected_item = selected_item
+        self._selected_item = selected_item_index
 
 
     def _scroll_up(self):

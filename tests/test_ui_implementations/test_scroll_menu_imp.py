@@ -95,3 +95,13 @@ def test_jump_up(SCROLLMENU):
     assert scroll.get_selected_item_index() == 0
     assert scroll.get() == "Elem0"
     scroll.clear()
+
+
+def test_set_selected_item(SCROLLMENU):
+    scroll = SCROLLMENU
+    scroll.add_item_list(elems)
+    scroll.set_selected_item_index(4)
+    assert scroll.get() == "Elem4"
+    scroll.set_selected_item("Elem6")
+    assert scroll.get() == "Elem6"
+    scroll.clear()
