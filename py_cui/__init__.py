@@ -39,7 +39,6 @@ import py_cui.errors
 from py_cui.colors import *
 
 
-
 # Version number
 __version__ = '0.1.3'
 

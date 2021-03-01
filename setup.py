@@ -1,8 +1,5 @@
 import setuptools
 from sys import platform
-import py_cui
-
-py_cui_version = py_cui.__version__
 
 # Use README for long description
 with open('README.md', 'r') as readme_fp:
@@ -18,7 +15,7 @@ setuptools.setup(
     description='A widget and grid based framework for building command line user interfaces in python.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version=py_cui_version,
+    version='0.1.3',
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
