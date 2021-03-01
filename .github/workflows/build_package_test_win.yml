@@ -1,0 +1,23 @@
+# This workflow will install Python dependencies, run tests and lint for several python version on push and pull request
+
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  build_package:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Update pip
+      run: |
+        python -m pip install --upgrade pip
+    - name: Build package
+      run: |
+        pip install .
