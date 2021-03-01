@@ -115,7 +115,6 @@ class Popup(py_cui.ui.UIElement):
         Can be implemented by subclass. Base draw function will draw the title and text in a bordered box
         """
 
-        super()._draw()
         target_y = int(self._stop_y - self._start_y / 2)
         self._renderer.set_color_rules([])
         self._renderer._set_bold()
