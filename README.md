@@ -145,6 +145,7 @@ Project | Description
 --------|-------------
 [pypodcasts](https://github.com/jwlodek/pypodcasts) | A TUI for listening to and managing podcast feeds. (Coming Soon)
 [pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
+[recoverpy](https://github.com/PabloLec/recoverpy) | A CUI for recovering overwritten or deleted data on linux.
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
 [CUIAudioPlayer](https://github.com/jupiterbjy/CUIAudioPlayer) | A TUI for playing back audio files in a variety of formats.
