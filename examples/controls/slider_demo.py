@@ -23,8 +23,6 @@ class App:
         self.spacer = self.root.add_text_block("Spacer", 0, 2)
 
         # setups
-        self.step_slider.toggle_border()
-        self.step_slider.toggle_title()
         self.root.set_on_draw_update_func(self.set_step)
         self.height_cycle = itertools.cycle(
             (
@@ -57,6 +55,5 @@ class App:
 if __name__ == '__main__':
     root = py_cui.PyCUI(3, 3)
     root.set_title("Slider playground")
-    # root.set_refresh_timeout(0.1)
     s = App(root)
     root.start()

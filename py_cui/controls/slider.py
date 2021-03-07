@@ -22,9 +22,16 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
 
     def set_bar_char(self, char):
-        """Updates the character used to represent the slider bar
+        """
+        Updates the character used to represent the slider bar.
+
+        Parameters
+        ----------
+        char : str
+            Character to represent progressive bar.
         """
 
+        assert len(char) == 1, "char should contain exactly one character, got {} instead.".format(len(char))
         self._bar_char = char
 
 
@@ -41,49 +48,60 @@ class SliderImplementation(py_cui.ui.UIImplementation):
         -------
         self._cur_val: float
             Current slider value.
-
         """
 
         # direction , 1 raise value, -1 lower value
         self._cur_val += (offset * self._step)
 
-        if self._cur_val <= self._min_val:
+        if self._cur_val < self._min_val:
             self._cur_val = self._min_val
 
-        if self._cur_val >= self._max_val:
+        elif self._cur_val > self._max_val:
             self._cur_val = self._max_val
 
         return self._cur_val
 
 
     def get_slider_value(self):
-        """return current slider value
         """
+        Returns current slider value.
+
+        Returns
+        -------
+        self._cur_val: float
+            Current slider value.
+        """
+
         return self._cur_val
 
 
-    def set_slider_step(self,step):
-        """change step value
+    def set_slider_step(self, step):
         """
+        Changes the step value.
+
+        Parameters
+        ----------
+        step : int
+            Step size of the slider.
+        """
+
         self._step = step
 
 
 class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
-    """Widget for a Slider
     """
+    Widget for a Slider
 
-    """
     Parameters
     ----------
-    _min_val : int
+    min_val : int
         Lowest value of the slider
-    _max_val: int
+    max_val: int
         Highest value of the slider
-    _step : int
+    step : int
         Increment from low to high value
-    _cur_val:
-        Current value of the slider
-
+    init_val:
+        Initial value of the slider
     """
 
     def __init__(self, id, title, grid, row, column, row_span, column_span,
@@ -95,8 +113,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
                                        row_span, column_span, padx,
                                        pady, logger, selectable=True)
 
-        self._title_enabled = False
-        self._border_enabled = False
+        self._title_enabled = True
+        self._border_enabled = True
         self._display_value = True
         self._alignment = "mid"
         self.set_help_text("Focus mode on Slider. Use left/right to adjust value. Esc to exit.")
@@ -110,7 +128,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def toggle_border(self):
-        """Toggles visibility of the widget's border. Enabling this will disable the alignment.
+        """Toggles visibility of the widget's border.
         """
 
         self._border_enabled = not self._border_enabled
@@ -142,7 +160,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _custom_draw_with_border(self, start_y: int, content: str):
-        """Custom method made from renderer.draw_border to support alignment for bordered variants.
+        """
+        Custom method made from renderer.draw_border to support alignment for bordered variants.
 
         Parameters
         ----------
@@ -152,6 +171,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             string to be drawn inside the border
         """
 
+        # having closer reference allow faster access. More dot access means more scopes to search for.
         renderer = self.get_renderer()
         ui_element = self
 
@@ -175,7 +195,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _generate_bar(self, width: int) -> str:
-        """Internal implementation to generate progression bar.
+        """
+        Internal implementation to generate progression bar.
 
         Parameters
         ----------
@@ -237,7 +258,8 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _handle_key_press(self, key_pressed):
-        """LEFT_ARROW decreases value, RIGHT_ARROW increases.
+        """
+        LEFT_ARROW decreases value, RIGHT_ARROW increases.
 
         Parameters
         ----------
