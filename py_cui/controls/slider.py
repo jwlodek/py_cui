@@ -31,7 +31,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
             Character to represent progressive bar.
         """
 
-        assert len(char) == 1, f"char should contain exactly one character, got {len(char)} instead."
+        assert len(char) == 1, "char should contain exactly one character, got {} instead.".format(len(char))
         self._bar_char = char
 
 
