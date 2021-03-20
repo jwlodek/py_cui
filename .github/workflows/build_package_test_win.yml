@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint for several python version on push and pull request
+# Workflow checks if pip can build py_cui on windows.
 
 name: build pkg
 

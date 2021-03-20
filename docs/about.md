@@ -19,7 +19,7 @@ Created on August 12, 2019
 
 BSD 3-Clause License
 
-Copyright (c) 2019 - 2020, Jakub Wlodek
+Copyright (c) 2019 - 2021, Jakub Wlodek
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

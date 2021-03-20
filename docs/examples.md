@@ -221,4 +221,4 @@ root.start()
 
 ### Other examples
 
-Other examples are available in the `examples` directory in the repository on github. For a larger example of a project using `py_cui`, see [pyautogit](https://github.com/jwlodek/pyautogit).
+Other examples are available in the [`examples`](https://github.com/jwlodek/py_cui/tree/master/examples) directory in the repository on github. For a larger example of a project using `py_cui`, see [pyautogit](https://github.com/jwlodek/pyautogit).
