@@ -63,9 +63,13 @@ Below are some screenshots and gifs of programs written with py_cui. Additional 
     <img src="docs/assets/py2048-demo.gif">
 </p>
 
-**unipkg - A command line utility that will allow for managing all installed package managers on your system through one cli interface**
+**recoverpy - A TUI that allows for recovering lost or deleted files**
 
-[unipkg](https://github.com/jwlodek/unipkg) is currently an in-progress project, check back in the future to see a screenshot, and more information.
+[recoverpy](https://github.com/PabloLec/recoverpy) is a utility for recovering files on linux. It will search through every inode to find your requested file block.
+
+<p align="center">
+    <img src="docs/assets/recoverpy-demo.gif">
+</p>
 
 **pyautogit - A command line interface for managing git repositories**
 
@@ -157,4 +161,4 @@ Project | Description
 
 BSD 3-Clause License
 
-Copyright (c) 2019-2020, Jakub Wlodek
+Copyright (c) 2019-2021, Jakub Wlodek

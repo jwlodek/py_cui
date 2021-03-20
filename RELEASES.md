@@ -2,7 +2,7 @@
 
 This file will contain a changelog for all release versions of py_cui.
 
-## v0.1.3 - Feb ??, 2021
+## v0.1.3 - Mar 7 2021
 
 This release adds filedialog popup support, a significant overhaul of the slider widget, overhaul of testing, scroll menu improvements, and minor bugfixes
 
@@ -17,7 +17,7 @@ This release adds filedialog popup support, a significant overhaul of the slider
 * IDE annotations added to examples
 * Cyrillic input support for textboxes
 * Avoid drawing bolded black on white - produces illegible results on many terminals
-* Add custom exceptions for un
+* Raise exceptions when function required to be implemented is not.
 
 ### Issues Fixed
 

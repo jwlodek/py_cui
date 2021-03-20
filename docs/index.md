@@ -40,9 +40,13 @@ Below are some screenshots and gifs of programs written with py_cui. Additional 
     <img src="assets/py2048-demo.gif">
 </p>
 
-**unipkg - A command line utility that will allow for managing all installed package managers on your system through one cli interface**
+**recoverpy - A TUI that allows for recovering lost or deleted files**
 
-[unipkg](https://github.com/jwlodek/unipkg) is currently an in-progress project, check back in the future to see a screenshot, and more information.
+[recoverpy](https://github.com/PabloLec/recoverpy) is a utility for recovering files on linux. It will search through every inode to find your requested file block.
+
+<p align="center">
+    <img src="assets/recoverpy-demo.gif">
+</p>
 
 **pyautogit - A command line interface for managing git repositories**
 
@@ -57,9 +61,12 @@ Below is a table of python projects developed with the help of `py_cui`. If you'
 
 Project | Description
 --------|-------------
+[pypodcasts](https://github.com/jwlodek/pypodcasts) | A TUI for listening to and managing podcast feeds. (Coming Soon)
 [pyautogit](https://github.com/jwlodek/pyautogit) | A command line UI for interfacing with git features for multiple repositories.
+[recoverpy](https://github.com/PabloLec/recoverpy) | A CUI for recovering overwritten or deleted data on linux.
 [py_cui_2048](https://github.com/jwlodek/py_cui_2048) | A CUI version of the classic 2048 game.
 [unipkg](https://github.com/jwlodek/unipkg) | A CUI interface for managing all installed package managers on your system. (In-Progress)
+[CUIAudioPlayer](https://github.com/jupiterbjy/CUIAudioPlayer) | A TUI for playing back audio files in a variety of formats.
 [tinypub](https://github.com/HakierGrzonzo/tinyPub) | A console-based ebook reader.
 [hue-tui](https://github.com/channel-42/hue-tui) | A CUI controlling for Philips Hue lights.
 [mini-radio-player](https://github.com/wdog/mini-radio-player-pycui) | A terminal based radio interface for linux.
@@ -68,4 +75,4 @@ Project | Description
 
 BSD 3-Clause License
 
-Copyright (c) 2019-2020, Jakub Wlodek
+Copyright (c) 2019-2021, Jakub Wlodek

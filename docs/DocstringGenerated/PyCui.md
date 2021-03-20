@@ -126,6 +126,7 @@ first create an instance of this class, and then add cells + widgets to it.
  show_loading_icon_popup | Shows a loading icon popup
  show_loading_bar_popup | Shows loading bar popup.
  show_form_popup | Shows form popup.
+ show_filedialog_popup | Shows form popup.
  increment_loading_bar | Increments progress bar if loading bar popup is open
  stop_loading_popup | Leaves loading state, and closes popup.
  close_popup | Closes the popup, and resets focus
@@ -483,7 +484,7 @@ Function that gets current set of widgets
 ### add_scroll_menu
 
 ```python
-def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0)
+def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0) -> py_cui.widgets.ScrollMenu
 ```
 
 Function that adds a new scroll menu to the CUI grid
@@ -516,7 +517,7 @@ Function that adds a new scroll menu to the CUI grid
 ### add_checkbox_menu
 
 ```python
-def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X')
+def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X') -> py_cui.widgets.CheckBoxMenu
 ```
 
 Function that adds a new checkbox menu to the CUI grid
@@ -550,7 +551,7 @@ Function that adds a new checkbox menu to the CUI grid
 ### add_text_box
 
 ```python
-def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False)
+def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False) -> py_cui.widgets.TextBox
 ```
 
 Function that adds a new text box to the CUI grid
@@ -585,7 +586,7 @@ Function that adds a new text box to the CUI grid
 ### add_text_block
 
 ```python
-def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '')
+def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '') -> py_cui.widgets.ScrollTextBlock
 ```
 
 Function that adds a new text block to the CUI grid
@@ -619,7 +620,7 @@ Function that adds a new text block to the CUI grid
 ### add_label
 
 ```python
-def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0)
+def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0) -> py_cui.widgets.Label
 ```
 
 Function that adds a new label to the CUI grid
@@ -652,7 +653,7 @@ Function that adds a new label to the CUI grid
 ### add_block_label
 
 ```python
-def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True)
+def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True) -> py_cui.widgets.BlockLabel
 ```
 
 Function that adds a new block label to the CUI grid
@@ -686,7 +687,7 @@ Function that adds a new block label to the CUI grid
 ### add_button
 
 ```python
-def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None)
+def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None) -> py_cui.widgets.Button
 ```
 
 Function that adds a new button to the CUI grid
@@ -1190,18 +1191,43 @@ Shows form popup.
 
 Used for inputting several fields worth of values
 
-Paramters
----------
-title : str
-Message title
-fields : List[str]
-Names of each individual field
-passwd_fields : List[str]
-Field names that should have characters hidden
-required : List[str]
-Fields that are required before submission
-callback=None : Function
-If not none, fired after loading is completed. Must be a no-arg function
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ title  |  str | Message title
+ fields  |  List[str] | Names of each individual field
+ passwd_fields  |  List[str] | Field names that should have characters hidden
+ required  |  List[str] | Fields that are required before submission
+ callback=None  |  Function | If not none, fired after loading is completed. Must be a no-arg function
+
+
+
+
+
+### show_filedialog_popup
+
+```python
+def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=True, limit_extensions=[])
+```
+
+Shows form popup.
+
+
+
+Used for inputting several fields worth of values
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ title  |  str | Message title
+ fields  |  List[str] | Names of each individual field
+ passwd_fields  |  List[str] | Field names that should have characters hidden
+ required  |  List[str] | Fields that are required before submission
+ callback=None  |  Function | If not none, fired after loading is completed. Must be a no-arg function
 
 
 
@@ -1389,7 +1415,7 @@ Main CUI draw loop called by start()
 
  Parameter  | Type  | Doc
 -----|----------|-----
- stdscr  |  curses Standard cursor | The cursor used to draw the CUI
+ stdscr  |  curses Standard screen | The screen buffer used for drawing CUI elements
 
 
 

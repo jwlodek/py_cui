@@ -2,7 +2,7 @@
 
 Once you have installed `py_cui`, you can continue on to create an application.
 
-On this page, we will create a simple `py_cui` program, step by step. We will create something similar to the todo list example that can be seen in the `examples` directory in the repository.
+On this page, we will create a simple `py_cui` program, step by step. We will create something similar to the todo list example that can be seen in the [`examples`](https://github.com/jwlodek/py_cui/blob/master/examples/simple_todo_list.py) directory in the repository.
 
 To get started, you can either use the `py_cui_cookiecutter` template, or start the project from scratch.
 
@@ -49,7 +49,7 @@ import py_cui
 class SimpleTodoList:
 
     # We add type annotations to our master PyCUI objects for improved intellisense
-    def __init__(self, master):
+    def __init__(self, master : py_cui.PyCUI):
 
         self.master = master
 
@@ -57,6 +57,8 @@ class SimpleTodoList:
 root = py_cui.PyCUI(7, 6)
 
 # If we want to use unicode box characters, we toggle them on here.
+# Alternatively, you can define your own border characters using
+# root.set_border_characters(...)
 root.toggle_unicode_borders()
 root.set_title('CUI TODO List')
 s = SimpleTodoList(root)
@@ -94,7 +96,7 @@ s = SimpleTodoList(root)
 root.start()
 ```
 
-Note how we set the `row_span` and `column_span` values, so that even though the grid is 7x6, our widgets will actually be larger than that size. The reason we define these sizes is becaue we wish to have the text field fill a narrow row, meaning that we must subdivide the window into many rows.
+Note how we set the `row_span` and `column_span` values, so that even though the grid is 7x6, our widgets will actually be larger than any individual cell. The reason we define these sizes is becaue we wish to have the text field fill a narrow row, meaning that we must subdivide the window into many rows.
 
 **Step 3 - Add Key Commands**
 
@@ -185,3 +187,66 @@ myproject
 if you used the `cookiecutter` project template.
 
 Feel free to play around with this CUI, and note how the keybindings we assigned perform the tasks we wanted them to.
+
+### Advanced Features
+
+There are several features supported by `py_cui` that allow for more complex interfaces to be created. Below is a quick rundown of some of these, and how to implement them in you application. If there is something not listed 
+
+**Live Updates to Widgets**
+
+By default, `py_cui` only refreshes the screen when an event is registered, like a key or mouse press. If you would like to change this behavior, you simply must set the screen refresh timeout (in seconds) with:
+
+```Python
+root.set_refresh_timeout(1)
+```
+
+Note that that this will simply have the UI refresh every set number of seconds, and processing any updates to widgets must be performed in a parallel thread outside of the main draw/IO thread.
+
+**Multiple "Windows"**
+
+If your UI requires multiple UI screens, you should not creat multiple `PyCUI` instances, but rather by using multiple `WidgetSet` objects. You should use the original root instance to create the widget sets, and then apply the one you would like to currently display. For a basic example of this principle, see below:
+
+```Python
+import py_cui
+
+class MultiWindowDemo:
+
+    def __init__(self, root: py_cui.PyCUI):
+
+        # Root PyCUI window
+        self.root = root
+
+        # Collect current CUI configuration as a widget set object
+        self.widget_set_A = self.root.create_new_widget_set(3,3)
+
+        # Add a button the the CUI
+        self.widget_set_A.add_button('Open 2nd Window', 1, 1, command = self.open_set_B)
+
+        # apply the initial widget set
+        self.root.apply_widget_set(self.widget_set_A)
+
+        # Create a second widget set (window). This one will have a 5x5 grid, not 3x3 like the original CUI
+        self.widget_set_B = self.root.create_new_widget_set(5, 5)
+
+        # Add a text box to the second widget set
+        self.text_box_B = self.widget_set_B.add_text_box('Enter something', 0, 0, column_span=2)
+        self.text_box_B.add_key_command(py_cui.keys.KEY_ENTER, self.open_set_A)
+
+
+    def open_set_A(self):
+        # Fired on the ENTER key in the textbox. Use apply_widget_set to switch between "windows"
+        self.root.apply_widget_set(self.widget_set_A)
+
+
+    def open_set_B(self):
+        # Fired on button press. Use apply_widget_set to switch between "windows"
+        self.root.apply_widget_set(self.widget_set_B)
+
+
+# Create CUI object, pass to wrapper class, and start the CUI
+root = py_cui.PyCUI(3, 3)
+wrapper = MultiWindowDemo(root)
+root.start()
+```
+
+In addition, it may be worthwhile to create additional wrapper classes for the individual screens in order to better separate the logic for each. An example of this approach would be the [`ScreenManager`](https://github.com/jwlodek/pyautogit/blob/master/pyautogit/screen_manager.py) and various [sub-classes](https://github.com/jwlodek/pyautogit/blob/master/pyautogit/settings_screen.py) for `pyautogit`.

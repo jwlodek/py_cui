@@ -1,3 +1,5 @@
 pytest
 pytest-cov
+npdoc2md
+mkdocs
 windows-curses ; platform_system=="Windows"

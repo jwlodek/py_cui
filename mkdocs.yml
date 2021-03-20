@@ -18,7 +18,6 @@ nav:
         - PyCUI: DocstringGenerated/PyCui.md
         - Grid: DocstringGenerated/Grid.md
         - UI: DocstringGenerated/Ui.md
-        - Widgets: DocstringGenerated/Widgets.md
         - Popups: DocstringGenerated/Popups.md
         - Colors: DocstringGenerated/Colors.md
         - Widget Sets: DocstringGenerated/WidgetSet.md

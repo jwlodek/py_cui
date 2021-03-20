@@ -48,6 +48,8 @@ class contains all links to the CUI engine.
  _stop_x, _stop_y  |  int, int | Coords in terminal characters for bottom-right corner of element
  _height, width  |  int, int | absolute dimensions of ui element in terminal characters
  _color  |  int | Default color for which to draw element
+ _border_color |  int | Color used to draw the border of the element when not focused
+ _focus_border_color |  int | Color used to draw the border of the element when focused
  _selected  |  bool | toggle for marking an element as selected
  _renderer  |  py_cui.renderer.Renderer | The default ui renderer
  _logger    |  py_cui.debug.PyCUILogger | The default logger inherited from the parent
@@ -76,6 +78,7 @@ class contains all links to the CUI engine.
  set_title | Function that sets the widget title.
  set_color | Sets element default color
  set_border_color | Sets element border color
+ set_focus_border_color | Sets element border color if the current element
  set_selected_color | Sets element sected color
  set_selected | Marks the UI element as selected or not selected
  set_help_text | Sets status bar help text
@@ -472,6 +475,28 @@ def set_border_color(self, color)
 Sets element border color
 
 
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ color  |  int | New color pair key code
+
+
+
+
+
+### set_focus_border_color
+
+```python
+def set_focus_border_color(self, color)
+```
+
+Sets element border color if the current element
+
+
+is focused
 
 
 #### Parameters
@@ -1109,6 +1134,7 @@ Analogous to a RadioButton
  remove_item | Function that removes a specific item from the menu
  get_item_list | Function that gets list of items in a scroll menu
  get | Function that gets the selected item from the scroll menu
+ set_selected_item | Function that replaces the currently selected item with a new item
 
 
 
@@ -1165,7 +1191,7 @@ Gets the currently selected item
 ### set_selected_item_index
 
 ```python
-def set_selected_item_index(self, selected_item)
+def set_selected_item_index(self, selected_item_index)
 ```
 
 Sets the currently selected item
@@ -1326,7 +1352,7 @@ Adds a list of items to the scroll menu.
 
  Parameter  | Type  | Doc
 -----|----------|-----
- item_list  |  list of Object | list of objects to add as items to the scrollmenu
+ item_list  |  List[Object] | list of objects to add as items to the scrollmenu
 
 
 
@@ -1382,7 +1408,7 @@ Function that gets list of items in a scroll menu
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- item_list  |  list of str | list of items in the scrollmenu
+ item_list  |  List[Object] | list of items in the scrollmenu
 
 
 
@@ -1403,7 +1429,28 @@ Function that gets the selected item from the scroll menu
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- item  |  str | selected item, or None if there are no items in the menu
+ item  |  Object | selected item, or None if there are no items in the menu
+
+
+
+
+
+### set_selected_item
+
+```python
+def set_selected_item(self, selected_item)
+```
+
+Function that replaces the currently selected item with a new item
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  Object | A new selected item to replace the current one
 
 
 
