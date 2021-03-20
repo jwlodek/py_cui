@@ -2,7 +2,7 @@
 
 This file will contain a changelog for all release versions of py_cui.
 
-## v0.1.3 - Mar 7 2021
+## v0.1.3 - Mar 19 2021
 
 This release adds filedialog popup support, a significant overhaul of the slider widget, overhaul of testing, scroll menu improvements, and minor bugfixes
 
