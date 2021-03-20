@@ -110,7 +110,7 @@ Function that checks if field is valid.
 
 
 This function can be implemented by subclasses to support different
-field types (ex. emaile etc.)
+field types (ex. emails etc.)
 
 
 #### Returns

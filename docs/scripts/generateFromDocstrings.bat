@@ -8,3 +8,11 @@ git pull
 py npdoc2md.py -i ..\..\..\py_cui -o ..\..\DocstringGenerated -s statusbar.py errors.py
 cd ..
 rmdir /s /q npdoc2md
+cd ..\DocstringGenerated
+rm Controls.md
+rm Dialogs.md
+mkdir Dialogs
+mkdir Controls
+mv Slider.md Controls\.
+mv Filedialog.md Dialogs\.
+mv Form.md Dialogs\.

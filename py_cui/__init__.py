@@ -1278,7 +1278,7 @@ class PyCUI:
 
         Used for inputting several fields worth of values
 
-        Paramters
+        Parameters
         ---------
         title : str
             Message title
