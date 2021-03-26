@@ -1118,7 +1118,7 @@ class TextBlockImplementation(UIImplementation):
         if len(self._text_lines) == 1 and self._text_lines[0] == '':
             self.set_text(text)
         else:
-            self._text_lines.append(lines)
+            self._text_lines.extend(lines)
 
 
     def clear(self):
