@@ -157,6 +157,20 @@ def test_set_text(SCROLLTEXTBLOCK):
     assert cursor_x == max_left
 
 
+def test_write(SCROLLTEXTBLOCK):
+    text_box = SCROLLTEXTBLOCK('')
+
+    text_box.write('Line1\nLine2\nLine3\n')
+    assert text_box.get_current_line() == 'Line1'
+    text_box._move_down()
+    assert text_box.get_current_line() == 'Line2'
+    text_box._move_down()
+    assert text_box.get_current_line() == 'Line3'
+
+    text_box.write('Line4\n')
+    text_box._move_down()
+    assert text_box.get_current_line() == 'Line4'
+
 def test_move_down(SCROLLTEXTBLOCK):
     text_box = SCROLLTEXTBLOCK('Hello World\nTest')
 
