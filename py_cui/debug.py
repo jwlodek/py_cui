@@ -100,7 +100,33 @@ class PyCUILogger(logging.Logger):
         super(PyCUILogger, self).__init__(name)
         self._live_debug_level      = logging.ERROR
         self._live_debug_enabled    = False
+        self._debug_msg_buffer      = []
+        self._buffer_size           = 100
+        self._num_view_msg          = 10
+        self._live_debug_alignment  = 'TOP'
+        self._current_bottom_debug_msg = 0
 
+
+    def set_live_debug_alignment(self, alignment = 'TOP'):
+        self._live_debug_alignment = alignment
+
+
+    def is_live_debug_enabled(self):
+        return self._live_debug_enabled
+
+    def toggle_live_debug(self):
+        self._live_debug_enabled = not self._live_debug_enabled
+
+
+    def draw_live_debug(self):
+        num_messages_to_display = self._num_view_msg
+        if self.py_cui_root._height < num_messages_to_display:
+            num_messages_to_display = self.py_cui_root._height - 1
+        if len(self._debug_msg_buffer) < num_messages_to_display:
+            num_messages_to_display = len(self._debug_msg_buffer) - 1
+        
+        for i in range(0, num_messages_to_display):
+            self.py_cui_root._stdscr.addstr(num_messages_to_display - i + 1, 1, self._debug_msg_buffer[self._current_bottom_debug_msg - i])
 
     def _assign_root_window(self, py_cui_root):
         """Attaches logger to the root window for live debugging
@@ -117,7 +143,16 @@ class PyCUILogger(logging.Logger):
         """
 
         func = inspect.currentframe().f_back.f_back.f_code
-        return "{}: Function {} in {}:{}".format(text, func.co_name, os.path.basename(func.co_filename), func.co_firstlineno)
+        return "{} -> {}:{} - {}".format(text, 
+                                         func.co_name, 
+                                         os.path.basename(func.co_filename), 
+                                         func.co_firstlineno)
+
+
+    def _add_msg_to_buffer(self, msg):
+        if len(self._debug_msg_buffer) == self._buffer_size:
+            self._debug_msg_buffer.pop(0)
+        self._debug_msg_buffer.append(msg)
     
     
     def info(self, text):
@@ -130,6 +165,7 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
+        self._add_msg_to_buffer(debug_text)
         super().info(debug_text)
 
 
@@ -144,11 +180,8 @@ class PyCUILogger(logging.Logger):
 
         debug_text = self._get_debug_text(text)
         if self._live_debug_level == logging.DEBUG and self._live_debug_enabled:
-            if self.py_cui_root is not None:
-                self.py_cui_root.status_bar.set_text(debug_text)
-                super().debug(debug_text)
-        else:
-            super().debug(debug_text)
+            self._add_msg_to_buffer(debug_text)
+        super().debug(debug_text)
 
 
     def warn(self, text):
@@ -162,11 +195,8 @@ class PyCUILogger(logging.Logger):
 
         debug_text = self._get_debug_text(text)
         if self._live_debug_level < logging.WARN and self._live_debug_enabled:
-            if self.py_cui_root is not None:
-                self.py_cui_root.status_bar.set_text(debug_text)
-                super().debug(debug_text)
-        else:
-            super().warn(debug_text)
+            self._add_msg_to_buffer(debug_text)
+        super().warn(debug_text)
 
 
     def error(self, text):
@@ -180,16 +210,5 @@ class PyCUILogger(logging.Logger):
 
         debug_text = self._get_debug_text(text)
         if self._live_debug_level < logging.ERROR and self._live_debug_enabled:
-            if self.py_cui_root is not None:
-                self.py_cui_root.status_bar.set_text(debug_text)
-                super().debug(debug_text)
-        else:
-            super().error(debug_text)
-
-
-    def toggle_live_debug(self, level=logging.ERROR):
-        """Toggles live debugging mode
-        """
-
-        self._live_debug_enabled    = not self._live_debug_enabled
-        self._live_debug_level      = level
+            self._add_msg_to_buffer(debug_text)
+        super().error(debug_text)
