@@ -450,7 +450,6 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             self._jump_down(viewport_height)
 
 
-
     def _draw(self):
         """Overrides base class draw function
         """

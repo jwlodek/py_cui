@@ -470,16 +470,17 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_scroll_menu     = py_cui.widgets.ScrollMenu(id,
-                                                 title,
-                                                 self._grid,
-                                                 row,
-                                                 column,
-                                                 row_span,
-                                                 column_span,
-                                                 padx,
-                                                 pady,
-                                                 self._logger)
+        new_scroll_menu = py_cui.widgets.ScrollMenu(id,
+                                                    title,
+                                                    self._grid,
+                                                    row,
+                                                    column,
+                                                    row_span,
+                                                    column_span,
+                                                    padx,
+                                                    pady,
+                                                    self._logger)
+        new_scroll_menu._assign_renderer(self._renderer)
         self._widgets[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -516,17 +517,18 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_checkbox_menu   = py_cui.widgets.CheckBoxMenu(id,
-                                                   title,
-                                                   self._grid,
-                                                   row,
-                                                   column,
-                                                   row_span,
-                                                   column_span,
-                                                   padx,
-                                                   pady,
-                                                   self._logger,
-                                                   checked_char)
+        new_checkbox_menu = py_cui.widgets.CheckBoxMenu(id,
+                                                        title,
+                                                        self._grid,
+                                                        row,
+                                                        column,
+                                                        row_span,
+                                                        column_span,
+                                                        padx,
+                                                        pady,
+                                                        self._logger,
+                                                        checked_char)
+        new_checkbox_menu._assign_renderer(self._renderer)
         self._widgets[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -565,7 +567,7 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_box        = py_cui.widgets.TextBox(id,
+        new_text_box = py_cui.widgets.TextBox(id,
                                               title,
                                               self._grid,
                                               row, column,
@@ -575,6 +577,7 @@ class PyCUI:
                                               self._logger,
                                               initial_text,
                                               password)
+        new_text_box._assign_renderer(self._renderer)
         self._widgets[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -611,17 +614,18 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_text_block      = py_cui.widgets.ScrollTextBlock(id,
-                                                      title,
-                                                      self._grid,
-                                                      row,
-                                                      column,
-                                                      row_span,
-                                                      column_span,
-                                                      padx,
-                                                      pady,
-                                                      self._logger,
-                                                      initial_text)
+        new_text_block = py_cui.widgets.ScrollTextBlock(id,
+                                                        title,
+                                                        self._grid,
+                                                        row,
+                                                        column,
+                                                        row_span,
+                                                        column_span,
+                                                        padx,
+                                                        pady,
+                                                        self._logger,
+                                                        initial_text)
+        new_text_block._assign_renderer(self._renderer)
         self._widgets[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -656,16 +660,17 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = py_cui.widgets.Label(id,
-                                            title,
-                                            self._grid,
-                                            row,
-                                            column,
-                                            row_span,
-                                            column_span,
-                                            padx,
-                                            pady,
-                                            self._logger)
+        new_label = py_cui.widgets.Label(id,
+                                         title,
+                                         self._grid,
+                                         row,
+                                         column,
+                                         row_span,
+                                         column_span,
+                                         padx,
+                                         pady,
+                                         self._logger)
+        new_label._assign_renderer(self._renderer)
         self._widgets[id]  = new_label
         self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
@@ -700,17 +705,18 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_label           = py_cui.widgets.BlockLabel(id,
-                                                 title,
-                                                 self._grid,
-                                                 row,
-                                                 column,
-                                                 row_span,
-                                                 column_span,
-                                                 padx,
-                                                 pady,
-                                                 center,
-                                                 self._logger)
+        new_label = py_cui.widgets.BlockLabel(id,
+                                              title,
+                                              self._grid,
+                                              row,
+                                              column,
+                                              row_span,
+                                              column_span,
+                                              padx,
+                                              pady,
+                                              center,
+                                              self._logger)
+        new_label._assign_renderer(self._renderer)
         self._widgets[id]  = new_label
         self._logger.info('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_label))))
         return new_label
@@ -745,17 +751,18 @@ class PyCUI:
         """
 
         id = 'Widget{}'.format(len(self._widgets.keys()))
-        new_button          = py_cui.widgets.Button(id,
-                                             title,
-                                             self._grid,
-                                             row,
-                                             column,
-                                             row_span,
-                                             column_span,
-                                             padx,
-                                             pady,
-                                             self._logger,
-                                             command)
+        new_button = py_cui.widgets.Button(id,
+                                           title,
+                                           self._grid,
+                                           row,
+                                           column,
+                                           row_span,
+                                           column_span,
+                                           padx,
+                                           pady,
+                                           self._logger,
+                                           command)
+        new_button._assign_renderer(self._renderer)
         self._widgets[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -814,12 +821,13 @@ class PyCUI:
                                                          max_val,
                                                          step,
                                                          init_val)
+        new_slider._assign_renderer(self._renderer)
         self._widgets[id] = new_slider
         self._logger.info('Adding widget {} w/ ID {} of type {}'
                            .format(title, id, str(type(new_slider))))
         return new_slider
 
-    
+
     def get_element_at_position(self, x, y):
         """Returns containing widget for character position
 
