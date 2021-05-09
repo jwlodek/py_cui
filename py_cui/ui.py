@@ -401,7 +401,7 @@ class UIElement:
         raise NotImplementedError
 
 
-    def _assign_renderer(self, renderer):
+    def _assign_renderer(self, renderer, quiet=False):
         """Function that assigns a renderer object to the element
 
         (Meant for internal usage only)
@@ -417,10 +417,12 @@ class UIElement:
             If parameter is not an initialized renderer.
         """
 
-        if isinstance(renderer, py_cui.renderer.Renderer):
-            self._renderer = renderer
+        if renderer is None:
+            self._logger.debug('Renderer to assign is a NoneType')
         elif self._renderer is not None:
             raise py_cui.errors.PyCUIError('Renderer already assigned for the element')
+        elif isinstance(renderer, py_cui.renderer.Renderer):
+            self._renderer = renderer
         else:
             raise py_cui.errors.PyCUIError('Invalid renderer, must be of type py_cui.renderer.Renderer')
 
