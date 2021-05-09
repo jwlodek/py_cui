@@ -15,7 +15,7 @@ setuptools.setup(
     description='A widget and grid based framework for building command line user interfaces in python.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.1.3',
+    version='0.1.4',
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
@@ -35,5 +35,5 @@ setuptools.setup(
         'Programming Language :: Python :: 3.8',
     ],
     keywords='cui cli commandline user-interface ui',
-    python_requires='>=3.2',
+    python_requires='>=3.6',
 )

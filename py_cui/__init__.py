@@ -40,7 +40,7 @@ from py_cui.colors import *
 
 
 # Version number
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 def fit_text(width, text, center=False):
