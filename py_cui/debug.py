@@ -11,7 +11,7 @@ import py_cui
 import datetime
 
 
-def _enable_logging(logger, replace_log_file=True, filename='py_cui_log.txt', logging_level=logging.DEBUG):
+def _enable_logging(logger, replace_log_file=True, filename='py_cui.log', logging_level=logging.DEBUG):
     """Function that creates basic logging configuration for selected logger
 
     Parameters
@@ -31,16 +31,19 @@ def _enable_logging(logger, replace_log_file=True, filename='py_cui_log.txt', lo
         Only the custom PyCUILogger can be used here.
     """
 
+    # Remove existing log file if necessary
     abs_path = os.path.abspath(filename)
     if replace_log_file and os.path.exists(abs_path):
         os.remove(abs_path)
 
+    # Permission check and check if we are using custom py_cui logger
     if not os.access(os.path.dirname(abs_path), os.W_OK):
         raise PermissionError('You do not have permission to create py_cui.log file.')
 
     if not isinstance(logger, PyCUILogger):
         raise TypeError('Only the PyCUILogger can be used for logging in the py_cui module.')
 
+    # Create our logging utility objects
     log_file    = logging.FileHandler(filename)
     formatter   = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s | %(message)s')
     log_file.setFormatter(formatter)
@@ -79,47 +82,85 @@ def _initialize_logger(py_cui_root, name=None, custom_logger=True):
 
 
 class LiveDebugImplementation(py_cui.ui.MenuImplementation):
+    """Implementation class for the live debug menu - builds off of the scroll menu implementation
+
+    Attributes
+    ----------
+    _live_debug_level : int
+        Debug level at which to display messages. Can be separate from the default logging level
+    _buffer_size : List[str]
+        Number of log messages to keep buffered in the live debug window
+    """
+
 
     def __init__(self, parent_logger):
+        """Initializer for LiveDebugImplementation
+        """
 
         super().__init__(parent_logger)
         self._live_debug_level      = logging.ERROR
-        self._live_debug_enabled    = False
+        # Make default buffer size 100
         self._buffer_size           = 100
-        self._num_view_msg          = 10
-        #self._live_debug_alignment  = 'TOP'
-        self._current_bottom_debug_msg = 0
 
-    def add_item(self, item):
+
+    def add_item(self, msg, log_level):
+        """Override of default MenuImplementation add_item function
+
+        If items override the buffer pop the oldest log message
+
+        Parameters
+        ----------
+        item : str
+            Log message to add
+        """
+
         if len(self._view_items) == self._buffer_size:
             self._view_items.pop(0)
-        self._view_items.append(str(item))
+        self._view_items.append(f'{datetime.datetime.now()} - {log_leve} | {msg}')
 
 
 class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
-
+    """UIElement class for the live debug utility. extends from base UIElement class and LiveDebugImplementation
+    """
 
     def __init__(self, parent_logger):
+        """Initializer for LiveDebugElement class
+        """
+
         LiveDebugImplementation.__init__(self, parent_logger)
         py_cui.ui.UIElement.__init__(self, 'LiveDebug', 'PyCUI Live Debug', None, parent_logger)
+
+        # Initialize these to some dummy values to start with - will get overriden once 
+        # parent logger is assigned a root py_cui window
         self._start_x = 5
         self._start_y = 5
         self._stop_x = 150
         self._stop_y = 25
 
 
-    def print_to_live_debug_buffer(self, msg, msg_type):
-
-        self.add_item(f'{datetime.datetime.now()} - {msg_type} | {msg}')
-
-
     def get_absolute_start_pos(self):
+        """Override of base UI element class function. Sets start position relative to entire UI size
+
+        Returns
+        -------
+        start_x, start_y : int, int
+            Start position x, y coords in terminal characters
+        """
+
         start_x = int(self._logger.py_cui_root._width / 7) + 2
         start_y = int(self._logger.py_cui_root._height / 7) + 2
         return start_x, start_y 
 
 
     def get_absolute_stop_pos(self):
+         """Override of base UI element class function. Sets stop position relative to entire UI size
+
+        Returns
+        -------
+        stop_x, stop_y : int, int
+            Stop position x, y coords in terminal characters
+        """
+
         stop_x = 6 * int(self._logger.py_cui_root._width / 7) - 2
         stop_y = 6 * int(self._logger.py_cui_root._height / 7) - 2
         return stop_x, stop_y 
@@ -142,7 +183,18 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
 
 
     def _handle_key_press(self, key_pressed):
+        """Override of base class function.
 
+        Essentially the same as the ScrollMenu widget _handle_key_press, with the exception that Esc breaks
+        out of live debug mode.
+
+        Parameters
+        ----------
+        key_pressed : int
+            The keycode of the pressed key
+        """
+
+        # If we have escape pressed, we break out of live debug mode
         if key_pressed == py_cui.keys.KEY_ESCAPE:
             self._logger.toggle_live_debug()
 
@@ -162,7 +214,7 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
         
 
     def _draw(self):
-        """Overrides base class draw function
+        """Overrides base class draw function. Mostly a copy of ScrollMenu widget - but reverse item list
         """
 
         self._renderer.set_color_mode(py_cui.WHITE_ON_BLACK)
@@ -212,11 +264,7 @@ class PyCUILogger(logging.Logger):
         self.py_cui_root            = None
         self._live_debug_element    = LiveDebugElement(self)
 
-
-    def set_live_debug_alignment(self, alignment = 'TOP'):
-        self._live_debug_alignment = alignment
-
-
+ 
     def is_live_debug_enabled(self):
         return self._live_debug_enabled
 
@@ -224,14 +272,23 @@ class PyCUILogger(logging.Logger):
         self._live_debug_enabled = not self._live_debug_enabled
 
     def draw_live_debug(self):
+        """Function that draws the live debug UI element if applicable
+        """
+
         if self.is_live_debug_enabled() and self.py_cui_root is not None:
             self._live_debug_element._draw()
 
+
     def _assign_root_window(self, py_cui_root):
-        """Attaches logger to the root window for live debugging
+        """Function that assigns a PyCUI root object to the logger. Important for live-debug hooks
+
+        Parameters
+        ----------
+        py_cui_root : PyCUI
+            Root PyCUI object for the application
         """
 
-        if not isinstance(py_cui_root, py_cui.PyCUI):
+       if not isinstance(py_cui_root, py_cui.PyCUI):
             raise TypeError('py_cui_root type must be py_cui.PyCUI')
 
         self.py_cui_root = py_cui_root
@@ -240,6 +297,16 @@ class PyCUILogger(logging.Logger):
 
     def _get_debug_text(self, text):
         """Function that generates full debug text for the log
+
+        Parameters
+        ----------
+        text : str
+            Log message
+
+        Returns
+        -------
+        msg : str
+            Log message with function, file, and line num info
         """
 
         func = inspect.currentframe().f_back.f_back.f_code
@@ -250,7 +317,7 @@ class PyCUILogger(logging.Logger):
     
     
     def info(self, text):
-        """Adds stacktrace info to log
+        """Override of base logger info function to add hooks for live debug mode
         
         Parameters
         ----------
@@ -265,7 +332,7 @@ class PyCUILogger(logging.Logger):
 
 
     def debug(self, text):
-        """Function that allows for live debugging of py_cui programs by displaying log messages in the satus bar
+        """Override of base logger debug function to add hooks for live debug mode
         
         Parameters
         ----------
@@ -280,7 +347,7 @@ class PyCUILogger(logging.Logger):
 
 
     def warn(self, text):
-        """Function that allows for live debugging of py_cui programs by displaying log messages in the satus bar
+        """Override of base logger warn function to add hooks for live debug mode
         
         Parameters
         ----------
@@ -295,7 +362,7 @@ class PyCUILogger(logging.Logger):
 
 
     def error(self, text):
-        """Function that displays error messages live in status bar for py_cui logging
+        """Override of base logger error function to add hooks for live debug mode
         
         Parameters
         ----------
