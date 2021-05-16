@@ -237,6 +237,18 @@ class PyCUI:
             print('Failed to initialize logger: {}'.format(str(e)))
 
 
+    def is_live_debug_mode_active(self):
+        if self._logger is None:
+            return False
+        else:
+            return self._logger.is_live_debug_enabled()
+
+
+    def toggle_live_debug_mode(self):
+        if self._logger is not None:
+            self._logger.toggle_live_debug()
+
+
     def apply_widget_set(self, new_widget_set):
         """Function that replaces all widgets in a py_cui with those of a different widget set
 
@@ -1440,6 +1452,12 @@ class PyCUI:
 
         selected_widget = self.get_widgets()[self._selected_widget]
 
+        # If logging is enabled, the Ctrl + D key code will enable "live-debug"
+        # mode, where debug messages are printed on the screen
+        if self._logger is not None:
+            if key_pressed == py_cui.keys.KEY_CTRL_D:
+                self.toggle_live_debug_mode()
+
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
         if self._in_focused_mode and self._popup is None:
@@ -1581,6 +1599,11 @@ class PyCUI:
                     # draw the popup if required
                     if self._popup is not None:
                         self._popup._draw()
+
+                    # If we are in live debug mode, we draw our debug messages
+                    if self.is_live_debug_mode_active():
+                        self._logger.draw_live_debug()
+
                 except curses.error as e:
                     self._logger.error('Curses error while drawing TUI')
                     self._display_window_warning(stdscr, str(e))
