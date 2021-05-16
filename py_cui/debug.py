@@ -8,6 +8,7 @@ import os
 import logging
 import inspect
 import py_cui
+import datetime
 
 
 def _enable_logging(logger, replace_log_file=True, filename='py_cui_log.txt', logging_level=logging.DEBUG):
@@ -89,11 +90,10 @@ class LiveDebugImplementation(py_cui.ui.MenuImplementation):
         #self._live_debug_alignment  = 'TOP'
         self._current_bottom_debug_msg = 0
 
-    def add_item(self, item, viewport_height):
+    def add_item(self, item):
         if len(self._view_items) == self._buffer_size:
             self._view_items.pop(0)
         self._view_items.append(str(item))
-        #self._top_view = len(self._view_items) - viewport_height
 
 
 class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
@@ -102,28 +102,28 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
     def __init__(self, parent_logger):
         LiveDebugImplementation.__init__(self, parent_logger)
         py_cui.ui.UIElement.__init__(self, 'LiveDebug', 'PyCUI Live Debug', None, parent_logger)
+        self._start_x = 5
+        self._start_y = 5
+        self._stop_x = 150
+        self._stop_y = 25
 
 
     def print_to_live_debug_buffer(self, msg, msg_type):
 
-        try:
-            viewport_height = self.get_viewport_height()
-            self.add_item('{} - {}'.format(msg_type, msg), viewport_height)
-        except AttributeError:
-            self.add_item('{} - {}'.format(msg_type, msg), 0)
+        self.add_item(f'{datetime.datetime.now()} - {msg_type} | {msg}')
 
 
     def get_absolute_start_pos(self):
-        return 5, 5
+        start_x = int(self._logger.py_cui_root._width / 7) + 2
+        start_y = int(self._logger.py_cui_root._height / 7) + 2
+        return start_x, start_y 
 
 
     def get_absolute_stop_pos(self):
-        stop_x = 10
-        stop_y = 10
-        if self._logger.py_cui_root is not None:
-            stop_x = 6 * int(self._logger.py_cui_root._width / 7) - 2
-            stop_y = 6 * int(self._logger.py_cui_root._height / 7) - 2
+        stop_x = 6 * int(self._logger.py_cui_root._width / 7) - 2
+        stop_y = 6 * int(self._logger.py_cui_root._height / 7) - 2
         return stop_x, stop_y 
+
 
     def _handle_mouse_press(self, x, y):
         """Override of base class function, handles mouse press in menu
@@ -169,7 +169,7 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
         self._renderer.draw_border(self)
         counter = self._pady + 1
         line_counter = 0
-        for item in self._view_items:
+        for item in reversed(self._view_items):
             line = str(item)
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
@@ -209,8 +209,8 @@ class PyCUILogger(logging.Logger):
         super(PyCUILogger, self).__init__(name)
         self._live_debug_level      = logging.ERROR
         self._live_debug_enabled    = False
-        self._live_debug_element = LiveDebugElement(self)
-        self.py_cui_root = None
+        self.py_cui_root            = None
+        self._live_debug_element    = LiveDebugElement(self)
 
 
     def set_live_debug_alignment(self, alignment = 'TOP'):
@@ -235,6 +235,7 @@ class PyCUILogger(logging.Logger):
             raise TypeError('py_cui_root type must be py_cui.PyCUI')
 
         self.py_cui_root = py_cui_root
+        self._live_debug_element.update_height_width()
 
 
     def _get_debug_text(self, text):
@@ -258,7 +259,8 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        self._live_debug_element.print_to_live_debug_buffer(debug_text, 'INFO')
+        if self._live_debug_level <= logging.INFO and self._live_debug_enabled:
+            self._live_debug_element.print_to_live_debug_buffer(debug_text, 'INFO')
         super().info(debug_text)
 
 
@@ -272,7 +274,7 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level == logging.DEBUG and self._live_debug_enabled:
+        if self._live_debug_level <= logging.DEBUG and self._live_debug_enabled:
             self._live_debug_element.print_to_live_debug_buffer(debug_text, 'DEBUG')
         super().debug(debug_text)
 
@@ -287,7 +289,7 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level < logging.WARN and self._live_debug_enabled:
+        if self._live_debug_level <= logging.WARN and self._live_debug_enabled:
             self._live_debug_element.print_to_live_debug_buffer(debug_text, 'WARN')
         super().warn(debug_text)
 
@@ -302,6 +304,6 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level < logging.ERROR and self._live_debug_enabled:
+        if self._live_debug_level <= logging.ERROR and self._live_debug_enabled:
             self._live_debug_element.print_to_live_debug_buffer(debug_text, 'ERROR')
         super().error(debug_text)

@@ -1356,7 +1356,8 @@ class PyCUI:
             self._widgets[widget_id].update_height_width()
         if self._popup is not None:
             self._popup.update_height_width()
-
+        if self._logger._live_debug_element is not None:
+            self._logger._live_debug_element.update_height_width()
 
     def get_absolute_size(self):
         """Returns dimensions of CUI
