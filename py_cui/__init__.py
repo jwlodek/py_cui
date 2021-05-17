@@ -390,11 +390,17 @@ class PyCUI:
             self._renderer = py_cui.renderer.Renderer(self, self._stdscr, self._logger)
         for widget_id in self.get_widgets().keys():
             if self.get_widgets()[widget_id] is not None:
-                self.get_widgets()[widget_id]._assign_renderer(self._renderer)
-        if self._popup is not None:
-            self._popup._assign_renderer(self._renderer)
-        if self._logger is not None:
-            self._logger._live_debug_element._assign_renderer(self._renderer)
+                try:
+                    self.get_widgets()[widget_id]._assign_renderer(self._renderer)
+                except py_cui.errors.PyCUIError:
+                    self._logger.debug(f'Renderer already assigned for widget {self.get_widgets()[widget_id]}')
+        try:
+            if self._popup is not None:
+                self._popup._assign_renderer(self._renderer)
+            if self._logger is not None:
+                self._logger._live_debug_element._assign_renderer(self._renderer)
+        except py_cui.errors.PyCUIError:
+            self._logger.debug('Renderer already assigned to popup or live-debug elements')
 
 
     def toggle_unicode_borders(self):

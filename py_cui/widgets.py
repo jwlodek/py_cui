@@ -22,6 +22,7 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 
 import curses
+from typing import Callable
 import py_cui
 import py_cui.ui
 import py_cui.colors
@@ -404,7 +405,28 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.MenuImplementation.__init__(self, logger)
+        self._on_selection_change = None
         self.set_help_text('Focus mode on ScrollMenu. Use Up/Down/PgUp/PgDown/Home/End to scroll, Esc to exit.')
+
+
+    def set_on_selection_change_event(self, on_selection_change_event):
+        """Function that sets the function fired when menu selection changes, with the new selection as an arg
+
+        Parameters
+        ----------
+        on_selection_change_event : Callable
+            Callable function that takes in as an argument the newly selected element
+
+        Raises
+        ------
+        TypeError
+            Raises a type error if event function is not callable
+        """
+
+        if not isinstance(on_selection_change_event, Callable):
+            raise TypeError('On selection change event must be a Callable!')
+        
+        self._on_selection_change = on_selection_change_event
 
 
     def _handle_mouse_press(self, x, y):
@@ -417,10 +439,16 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         """
 
         super()._handle_mouse_press(x, y)
+
+        current = self.get_selected_item_index()
         viewport_top = self._start_y + self._pady + 1
+
         if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
             elem_clicked = y - viewport_top + self._top_view
             self.set_selected_item_index(elem_clicked)
+        
+        if self.get_selected_item_index() != current and self._on_selection_change is not None:
+            self._on_selection_change(self.get())
 
 
     def _handle_key_press(self, key_pressed):
@@ -435,7 +463,10 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         """
 
         super()._handle_key_press(key_pressed)
+
+        current = self.get_selected_item_index()
         viewport_height = self.get_viewport_height()
+        
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
@@ -448,6 +479,8 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             self._jump_up()
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
+        if self.get_selected_item_index() != current and self._on_selection_change is not None:
+            self._on_selection_change(self.get())
 
 
     def _draw(self):
