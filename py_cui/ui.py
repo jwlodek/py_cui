@@ -1195,7 +1195,7 @@ class TextBlockImplementation(UIImplementation):
                 self._viewport_x_start = self._viewport_x_start - 1
             self._cursor_text_pos_x = self._cursor_text_pos_x - 1
 
-        self._logger.debug(f'Moved cursor left to pos {self._cursor_text_pos_x})
+        self._logger.debug(f'Moved cursor left to pos {self._cursor_text_pos_x}')
 
 
     def _move_right(self):
