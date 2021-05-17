@@ -740,7 +740,7 @@ class MenuImplementation(UIImplementation):
         if self._selected_item > 0:
             self._selected_item = self._selected_item - 1
 
-        self._logger.info('Scrolling up to item {}'.format(self._selected_item))
+        self._logger.debug(f'Scrolling up to item {self._selected_item}')
 
 
     def _scroll_down(self, viewport_height):
@@ -759,7 +759,7 @@ class MenuImplementation(UIImplementation):
         if self._selected_item > self._top_view + viewport_height:
             self._top_view = self._top_view + 1
 
-        self._logger.info('Scrolling down to item {}'.format(self._selected_item))
+        self._logger.debug(f'Scrolling down to item {self._selected_item}')
 
 
     def _jump_up(self):
@@ -815,7 +815,7 @@ class MenuImplementation(UIImplementation):
             Object to add to the menu. Must have implemented __str__ function
         """
 
-        self._logger.info('Adding item {} to menu'.format(str(item)))
+        self._logger.debug(f'Adding item {str(item)} to menu')
         self._view_items.append(item)
 
 
@@ -828,7 +828,7 @@ class MenuImplementation(UIImplementation):
             list of objects to add as items to the scrollmenu
         """
 
-        self._logger.info('Adding item list {} to menu'.format(str(item_list)))
+        self._logger.debug(f'Adding item list {str(item_list)} to menu')
         for item in item_list:
             self.add_item(item)
 
@@ -839,7 +839,7 @@ class MenuImplementation(UIImplementation):
 
         if len(self._view_items) == 0:
             return
-        self._logger.info('Removing {}'.format(str(self._view_items[self._selected_item])))
+        self._logger.debug(f'Removing {str(self._view_items[self._selected_item])}')
         del self._view_items[self._selected_item]
         if self._selected_item >= len(self._view_items) and self._selected_item > 0:
             self._selected_item = self._selected_item - 1
@@ -856,7 +856,7 @@ class MenuImplementation(UIImplementation):
 
         if len(self._view_items) == 0 or item not in self._view_items:
             return
-        self._logger.info('Removing {}'.format(str(item)))
+        self._logger.debug(f'Removing {str(item)}')
         i_index = self._view_items.index(item)
         del self._view_items[i_index]
         if self._selected_item >= i_index:
@@ -1103,7 +1103,7 @@ class TextBlockImplementation(UIImplementation):
 
         text = ''
         for line in self._text_lines:
-            text = '{}{}\n'.format(text, line)
+            text = f'{text}{line}\n'
         return text
 
 
@@ -1195,7 +1195,7 @@ class TextBlockImplementation(UIImplementation):
                 self._viewport_x_start = self._viewport_x_start - 1
             self._cursor_text_pos_x = self._cursor_text_pos_x - 1
 
-        self._logger.info('Moved cursor left to pos {}'.format(self._cursor_text_pos_x))
+        self._logger.debug(f'Moved cursor left to pos {self._cursor_text_pos_x})
 
 
     def _move_right(self):
@@ -1211,7 +1211,7 @@ class TextBlockImplementation(UIImplementation):
                 self._viewport_x_start = self._viewport_x_start + 1
             self._cursor_text_pos_x = self._cursor_text_pos_x + 1
 
-        self._logger.info('Moved cursor right to pos {}'.format(self._cursor_text_pos_x))
+        self._logger.debug(f'Moved cursor right to pos {self._cursor_text_pos_x}')
 
 
     def _move_up(self):
@@ -1230,7 +1230,7 @@ class TextBlockImplementation(UIImplementation):
                 self._cursor_x = self._cursor_x - (self._cursor_text_pos_x - temp)
                 self._cursor_text_pos_x = temp
 
-        self._logger.info('Moved cursor up to line {}'.format(self._cursor_text_pos_y))
+        self._logger.debug(f'Moved cursor up to line {self._cursor_text_pos_y}')
 
 
     def _move_down(self):
@@ -1248,7 +1248,7 @@ class TextBlockImplementation(UIImplementation):
                 self._cursor_x = self._cursor_x - (self._cursor_text_pos_x - temp)
                 self._cursor_text_pos_x = temp
 
-        self._logger.info('Moved cursor down to line {}'.format(self._cursor_text_pos_y))
+        self._logger.debug(f'Moved cursor down to line {self._cursor_text_pos_y}')
 
 
 
@@ -1257,7 +1257,7 @@ class TextBlockImplementation(UIImplementation):
         """
 
         current_line = self.get_current_line()
-        self._logger.info('Inserting newline in location {}'.format(self._cursor_text_pos_x))
+        self._logger.debug(f'Inserting newline in location {self._cursor_text_pos_x}')
 
         new_line_1 = current_line[:self._cursor_text_pos_x]
         new_line_2 = current_line[self._cursor_text_pos_x:]
@@ -1278,7 +1278,7 @@ class TextBlockImplementation(UIImplementation):
         """
 
         current_line = self.get_current_line()
-        self._logger.info('Inserting backspace in location {}'.format(self._cursor_text_pos_x))
+        self._logger.debug(f'Inserting backspace in location {self._cursor_text_pos_x}')
 
         if self._cursor_text_pos_x == 0 and self._cursor_text_pos_y != 0:
             self._cursor_text_pos_x = len(self._text_lines[self._cursor_text_pos_y - 1])
@@ -1301,7 +1301,7 @@ class TextBlockImplementation(UIImplementation):
         """Function that handles recieving a home keypress
         """
 
-        self._logger.info('Inserting Home')
+        self._logger.debug('Inserting Home')
 
         self._cursor_x = self._cursor_max_left
         self._cursor_text_pos_x = 0
@@ -1313,7 +1313,7 @@ class TextBlockImplementation(UIImplementation):
         """
 
         current_line = self.get_current_line()
-        self._logger.info('Inserting End')
+        self._logger.debug('Inserting End')
 
         self._cursor_text_pos_x = len(current_line)
         if len(current_line) > self._viewport_width:
@@ -1328,7 +1328,7 @@ class TextBlockImplementation(UIImplementation):
         """
 
         current_line = self.get_current_line()
-        self._logger.info('Inserting delete to pos {}'.format(self._cursor_text_pos_x))
+        self._logger.debug(f'Inserting delete to pos {self._cursor_text_pos_x}')
 
         if self._cursor_text_pos_x == len(current_line) and self._cursor_text_pos_y < len(self._text_lines) - 1:
             self._text_lines[self._cursor_text_pos_y] = self._text_lines[self._cursor_text_pos_y] + self._text_lines[self._cursor_text_pos_y + 1]
@@ -1347,7 +1347,7 @@ class TextBlockImplementation(UIImplementation):
         """
 
         current_line = self.get_current_line()
-        self._logger.info('Inserting character {} to pos {}'.format(chr(key_pressed), self._cursor_text_pos_x))
+        self._logger.debug(f'Inserting character {chr(key_pressed)} to pos {self._cursor_text_pos_x}')
 
         self.set_text_line(current_line[:self._cursor_text_pos_x] + chr(key_pressed) + current_line[self._cursor_text_pos_x:])
         if len(current_line) <= self._viewport_width:

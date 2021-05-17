@@ -404,7 +404,7 @@ class LoadingIconPopup(Popup):
         """Initializer for LoadingIconPopup
         """
 
-        super().__init__(root, title, '{} ... \\'.format(message), color, renderer, logger)
+        super().__init__(root, title, f'{message} ... \\', color, renderer, logger)
         self._loading_icons = ['\\', '|', '/', '-']
         self._icon_counter = 0
         self._message = message
@@ -428,7 +428,7 @@ class LoadingIconPopup(Popup):
         """Overrides base draw function
         """
 
-        self._text = '{} ... {}'.format(self._message, self._loading_icons[self._icon_counter])
+        self._text = f'{self._message} ... {self._loading_icons[self._icon_counter]}'
         self._icon_counter = self._icon_counter + 1
         if self._icon_counter == len(self._loading_icons):
             self._icon_counter = 0
@@ -454,7 +454,7 @@ class LoadingBarPopup(Popup):
         """Initializer for LoadingBarPopup
         """
 
-        super().__init__(root, title, '{} (0/{})'.format('-' * num_items, num_items), color, renderer, logger)
+        super().__init__(root, title, f'{"-" * num_items} (0/{num_items})', color, renderer, logger)
         self._num_items          = num_items
         self._loading_icons      = ['\\', '|', '/', '-']
         self._icon_counter       = 0
@@ -503,11 +503,8 @@ class LoadingBarPopup(Popup):
         if self._icon_counter == len(self._loading_icons):
             self._icon_counter = 0
 
-        self.set_text('{}{} ({}/{}) {}'.format( '#' * completed_blocks, 
-                                                '-' * non_completed_blocks, 
-                                                self._completed_items, 
-                                                self._num_items, 
-                                                self._loading_icons[self._icon_counter]))
+        self.set_text(f'{"#" * completed_blocks}{"-" * non_completed_blocks} \
+                       ({self._completed_items}/{self._num_items}) {self._loading_icons[self._icon_counter]}')
         
         # Use Superclass draw after new text is computed
         super()._draw()

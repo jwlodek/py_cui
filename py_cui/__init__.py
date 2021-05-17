@@ -518,7 +518,7 @@ class PyCUI:
             A reference to the created checkbox object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_checkbox_menu = py_cui.widgets.CheckBoxMenu(id,
                                                         title,
                                                         self._grid,
@@ -531,7 +531,7 @@ class PyCUI:
                                                         self._logger,
                                                         checked_char)
         new_checkbox_menu._assign_renderer(self._renderer)
-        self._widgets[id]  = new_checkbox_menu
+        self.get_widgets()[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_checkbox_menu))}')
@@ -568,7 +568,7 @@ class PyCUI:
             A reference to the created textbox object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_text_box = py_cui.widgets.TextBox(id,
                                               title,
                                               self._grid,
@@ -580,7 +580,7 @@ class PyCUI:
                                               initial_text,
                                               password)
         new_text_box._assign_renderer(self._renderer)
-        self._widgets[id]    = new_text_box
+        self.get_widgets()[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_box))}')
@@ -615,7 +615,7 @@ class PyCUI:
             A reference to the created textblock object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_text_block = py_cui.widgets.ScrollTextBlock(id,
                                                         title,
                                                         self._grid,
@@ -628,7 +628,7 @@ class PyCUI:
                                                         self._logger,
                                                         initial_text)
         new_text_block._assign_renderer(self._renderer)
-        self._widgets[id]  = new_text_block
+        self.get_widgets()[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_block))}')
@@ -661,7 +661,7 @@ class PyCUI:
             A reference to the created label object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_label = py_cui.widgets.Label(id,
                                          title,
                                          self._grid,
@@ -673,7 +673,7 @@ class PyCUI:
                                          pady,
                                          self._logger)
         new_label._assign_renderer(self._renderer)
-        self._widgets[id]  = new_label
+        self.get_widgets()[id]  = new_label
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
         return new_label
 
@@ -706,7 +706,7 @@ class PyCUI:
             A reference to the created block label object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_label = py_cui.widgets.BlockLabel(id,
                                               title,
                                               self._grid,
@@ -719,7 +719,7 @@ class PyCUI:
                                               center,
                                               self._logger)
         new_label._assign_renderer(self._renderer)
-        self._widgets[id]  = new_label
+        self.get_widgets()[id]  = new_label
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
         return new_label
 
@@ -752,7 +752,7 @@ class PyCUI:
             A reference to the created button object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_button = py_cui.widgets.Button(id,
                                            title,
                                            self._grid,
@@ -765,7 +765,7 @@ class PyCUI:
                                            self._logger,
                                            command)
         new_button._assign_renderer(self._renderer)
-        self._widgets[id]  = new_button
+        self.get_widgets()[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_button))}')
@@ -808,7 +808,7 @@ class PyCUI:
             A reference to the created slider object.
         """
 
-        id = len(self._widgets.keys())
+        id = len(self.get_widgets().keys())
         new_slider = py_cui.controls.slider.SliderWidget(id,
                                                          title,
                                                          self._grid,
@@ -824,7 +824,7 @@ class PyCUI:
                                                          step,
                                                          init_val)
         new_slider._assign_renderer(self._renderer)
-        self._widgets[id] = new_slider
+        self.get_widgets()[id] = new_slider
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_slider))}')
         return new_slider
 
@@ -913,7 +913,7 @@ class PyCUI:
         for col in range(col_range_start, col_range_stop):
             for row in range(row_start, row_start + row_span):
                 for widget_id in self.get_widgets().keys():
-                    if self.get_widgets[widget_id] is not None:
+                    if self.get_widgets()[widget_id] is not None:
                         if self.get_widgets()[widget_id]._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
 

@@ -184,4 +184,5 @@ class Grid:
         self._column_width   = int(self._width    / self._num_columns)
         self._offset_x       = self._width    % self._num_columns
         self._offset_y       = self._height   % self._num_rows
-        self._logger.info('Updated grid. Cell dims: {}x{}, Offsets {},{}'.format(self._row_height, self._column_width, self._offset_x, self._offset_y))
+        self._logger.debug(f'Updated grid. Cell dims: {self._row_height}x{self._column_width}, \
+                             Offsets {self._offset_x},{self._offset_y}')

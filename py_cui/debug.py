@@ -117,7 +117,7 @@ class PyCUILogger(logging.Logger):
         """
 
         func = inspect.currentframe().f_back.f_back.f_code
-        return "{}: Function {} in {}:{}".format(text, func.co_name, os.path.basename(func.co_filename), func.co_firstlineno)
+        return f'{text}: Function {func.co_name} in {os.path.basename(func.co_filename)}:{func.co_firstlineno}'
     
     
     def info(self, text):
