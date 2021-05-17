@@ -175,6 +175,7 @@ class PyCUI:
         self._exit_key     = exit_key
         self._forward_cycle_key = py_cui.keys.KEY_CTRL_LEFT
         self._reverse_cycle_key = py_cui.keys.KEY_CTRL_RIGHT
+        self._toggle_live_debug_key = None
 
         # Callback to fire when CUI is stopped.
         self._on_stop = None
@@ -220,6 +221,9 @@ class PyCUI:
             self._reverse_cycle_key = reverse_cycle_key
 
 
+    def set_toggle_live_debug_key(self, toggle_debug_key):
+        self._toggle_live_debug_key = toggle_debug_key
+
     def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG):
         """Function enables logging for py_cui library
 
@@ -234,6 +238,7 @@ class PyCUI:
         try:
             py_cui.debug._enable_logging(self._logger, filename=log_file_path, logging_level=logging_level)
             self._logger.info('Initialized logger')
+            self._toggle_live_debug_key = py_cui.keys.KEY_CTRL_D
         except PermissionError as e:
             print(f'Failed to initialize logger: {str(e)}')
 
@@ -372,7 +377,6 @@ class PyCUI:
         # Start colors in curses.
         # For each color pair in color map, initialize color combination.
         curses.start_color()
-        curses.init_color(curses.COLOR_BLUE, 0, 0, 500)
         for color_pair in py_cui.colors._COLOR_MAP.keys():
             fg_color, bg_color = py_cui.colors._COLOR_MAP[color_pair]
             curses.init_pair(color_pair, fg_color, bg_color)
@@ -389,6 +393,8 @@ class PyCUI:
                 self.get_widgets()[widget_id]._assign_renderer(self._renderer)
         if self._popup is not None:
             self._popup._assign_renderer(self._renderer)
+        if self._logger is not None:
+            self._logger._live_debug_element._assign_renderer(self._renderer)
 
 
     def toggle_unicode_borders(self):
@@ -486,7 +492,7 @@ class PyCUI:
         self.get_widgets()[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}')
+        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}')
         return new_scroll_menu
 
 
@@ -1333,16 +1339,16 @@ class PyCUI:
 
         Parameters
         ---------
-        title : str
-            Message title
-        fields : List[str]
-            Names of each individual field
-        passwd_fields : List[str]
-            Field names that should have characters hidden
-        required : List[str]
-            Fields that are required before submission
-        callback=None : Function
-            If not none, fired after loading is completed. Must be a no-arg function
+        popup_type : str
+            Type of filedialog popup - either openfile, opendir, or saveas
+        initial_dir : os.PathLike
+            Path to directory in which to open the file dialog, default "."
+        callback=None : Callable
+            If not none, fired after loading is completed. Must be a no-arg function, default=None
+        ascii_icons : bool
+            Compatibility option - use ascii icons instead of unicode file/folder icons, default True
+        limit_extensions : List[str]
+            Only show files with extensions in this list if not empty. Default, []
         """
 
         self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self, 
@@ -1355,7 +1361,7 @@ class PyCUI:
                                                                 self._renderer, 
                                                                 self._logger)
 
-        self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
+        self._logger.debug(f'Opened {str(type(self._popup))} popup with type {popup_type}')
 
 
     def increment_loading_bar(self):
@@ -1406,7 +1412,8 @@ class PyCUI:
                 self.get_widgets()[widget_id].update_height_width()
         if self._popup is not None:
             self._popup.update_height_width()
-
+        if self._logger._live_debug_element is not None:
+            self._logger._live_debug_element.update_height_width()
 
     def get_absolute_size(self):
         """Returns dimensions of CUI
@@ -1433,6 +1440,9 @@ class PyCUI:
         # We draw the selected widget last to support cursor location.
         if self._selected_widget is not None:
             self.get_widgets()[self._selected_widget]._draw()
+
+        if self._logger is not None and self._logger.is_live_debug_enabled():
+            self._logger.draw_live_debug()
 
         self._logger.info('Drew widgets')
 
@@ -1497,9 +1507,19 @@ class PyCUI:
 
         selected_widget = self.get_widgets()[self._selected_widget]
 
+        # If logging is enabled, the Ctrl + D key code will enable "live-debug"
+        # mode, where debug messages are printed on the screen
+        if self._logger is not None and self._toggle_live_debug_key is not None:
+            if key_pressed == self._toggle_live_debug_key:
+                self._logger.toggle_live_debug()
+
+        # If we are in live debug mode, we only handle keypresses for the live debug UI element
+        if self._logger is not None and self._logger.is_live_debug_enabled():
+            self._logger._live_debug_element._handle_key_press(key_pressed)
+
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
-        if self._in_focused_mode and self._popup is None:
+        elif self._in_focused_mode and self._popup is None:
             if key_pressed == py_cui.keys.KEY_ESCAPE:
                 self.status_bar.set_text(self._init_status_bar_text)
                 self._in_focused_mode = False
@@ -1638,6 +1658,11 @@ class PyCUI:
                     # draw the popup if required
                     if self._popup is not None:
                         self._popup._draw()
+
+                    # If we are in live debug mode, we draw our debug messages
+                    if self._logger.is_live_debug_enabled():
+                        self._logger.draw_live_debug()
+
                 except curses.error as e:
                     self._logger.error('Curses error while drawing TUI')
                     self._display_window_warning(stdscr, str(e))
@@ -1683,7 +1708,7 @@ class PyCUI:
         """
 
         out = ''
-        for _id in self.get_widgets().keys():
+        for widget_id in self.get_widgets().keys():
             if self.get_widgets()[widget_id] is not None:
                 out += f'{self.get_widgets()[widget_id].get_title()}\n'
         return out
