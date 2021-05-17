@@ -219,7 +219,7 @@ class Renderer:
             self._stdscr.addstr(y, start_x + padx, render_text)
         else:
             render_text = f'{self._border_characters["UP_LEFT"]}{2 * self._border_characters["HORIZONTAL"]}' \
-                          f'{title} {self._border_characters["HORIZONTAL"] * (width - 6 - 2 * padx - len(title))}' \
+                          f' {title} {self._border_characters["HORIZONTAL"] * (width - 6 - 2 * padx - len(title))}' \
                           f'{self._border_characters["UP_RIGHT"]}'
 
             self._stdscr.addstr(y, start_x + padx, render_text)
