@@ -1631,16 +1631,16 @@ class PyCUI:
                 # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
-                    _, x, y, _, _ = curses.getmouse()
+                    id, x, y, _, mouse_event = curses.getmouse()
                     in_element = self.get_element_at_position(x, y)
 
                     # In first case, we click inside already selected widget, pass click for processing
                     if in_element is not None and in_element.is_selected():
-                        in_element._handle_mouse_press(x, y)
+                        in_element._handle_mouse_press(x, y, mouse_event)
                     # Otherwise, if not a popup, select the clicked on widget
                     elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
                         self.move_focus(in_element)
-                        in_element._handle_mouse_press(x, y)
+                        in_element._handle_mouse_press(x, y, mouse_event)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:

@@ -75,6 +75,7 @@ class Widget(py_cui.ui.UIElement):
         self._pady         = pady
         self._selectable       = selectable
         self._key_commands     = {}
+        self._mouse_commands   = {}
         self._text_color_rules = []
         self._default_color = py_cui.WHITE_ON_BLACK
         self._border_color = self._default_color
@@ -92,7 +93,33 @@ class Widget(py_cui.ui.UIElement):
             a non-argument function or lambda function to execute if in focus mode and key is pressed
         """
 
+
         self._key_commands[key] = command
+
+
+    def add_mouse_command(self, mouse_event, command):
+        """Maps a keycode to a function that will be executed when in focus mode
+
+        Parameters
+        ----------
+        key : py_cui.keys.MOUSE_EVENT
+            Mouse event code from py_cui.keys
+        command : Callable
+            a non-argument function or lambda function to execute if in focus mode and key is pressed
+
+        Raises
+        ------
+        PyCUIError
+            If input mouse event code is not valid
+        """
+
+        if mouse_event not in py_cui.keys.MOUSE_EVENTS:
+            raise py_cui.errors.PyCUIError(f'Event code {mouse_event} is not a valid py_cui mouse event!')
+
+        if mouse_event in self._mouse_commands.keys():
+            self._logger.warn(f'Overriding mouse command for event {mouse_event}')
+
+        self._mouse_commands[mouse_event] = command
 
 
     def update_key_command(self, key, command):
@@ -429,7 +456,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self._on_selection_change = on_selection_change_event
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -438,17 +465,22 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        # For either click or double click we want to jump to the clicked-on item
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK or mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
+            current = self.get_selected_item_index()
+            viewport_top = self._start_y + self._pady + 1
 
-        current = self.get_selected_item_index()
-        viewport_top = self._start_y + self._pady + 1
-
-        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
-            elem_clicked = y - viewport_top + self._top_view
-            self.set_selected_item_index(elem_clicked)
+            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+                elem_clicked = y - viewport_top + self._top_view
+                self.set_selected_item_index(elem_clicked)
         
-        if self.get_selected_item_index() != current and self._on_selection_change is not None:
-            self._on_selection_change(self.get())
+            if self.get_selected_item_index() != current and self._on_selection_change is not None:
+                self._on_selection_change(self.get())
+
+        # For scroll menu, handle custom mouse press after initial event, since we will likely want to
+        # have access to the newly selected item
+        super()._handle_mouse_press(x, y, mouse_event)
+
 
 
     def _handle_key_press(self, key_pressed):
