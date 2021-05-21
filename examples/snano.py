@@ -66,10 +66,10 @@ class SuperNano:
         if len(target) == 0:
             target = '.'
         elif not os.path.exists(target):
-            self.root.show_error_popup('Does not exist', 'ERROR - {} path does not exist'.format(target))
+            self.root.show_error_popup('Does not exist', f'ERROR - {target} path does not exist')
             return
         elif not os.path.isdir(target):
-            self.root.show_error_popup('Not a Dir', 'ERROR - {} is not a directory'.format(target))
+            self.root.show_error_popup('Not a Dir', f'ERROR - {target} is not a directory')
             return
         target = os.path.abspath(target)
         self.current_dir_box.set_text(target)
@@ -128,7 +128,7 @@ class SuperNano:
             fp = open(os.path.join(self.dir, self.edit_text_block.get_title()), 'w')
             fp.write(self.edit_text_block.get())
             fp.close()
-            self.root.show_message_popup('Saved', 'Your file has been saved as {}'.format(self.edit_text_block.get_title()))
+            self.root.show_message_popup('Saved', f'Your file has been saved as {self.edit_text_block.get_title()}')
         else:
             self.root.show_error_popup('No File Opened', 'Please open a file before saving it.')
 
@@ -156,10 +156,10 @@ def parse_args():
     if 'directory' not in args.keys():
         return '.' 
     elif not os.path.exists(args['directory']):
-        print('ERROR - {} path does not exist'.format(args['directory']))
+        print(f'ERROR - {args["directory"]} path does not exist')
         exit()
     elif not os.path.isdir(args['directory']):
-        print('ERROR - {} is not a directory'.format(args['directory']))
+        print(f'ERROR - {args["directory"]} is not a directory')
         exit()
     return args['directory']
 
@@ -169,7 +169,7 @@ dir = parse_args()
 
 # Initialize the PyCUI object, and set the title
 root = py_cui.PyCUI(7, 8)
-root.set_title('Super Nano v{}'.format(__version__))
+root.set_title(f'Super Nano v{__version__}')
 
 # Create the wrapper instance object.
 frame = SuperNano(root, dir)

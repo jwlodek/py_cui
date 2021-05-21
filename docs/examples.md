@@ -51,7 +51,7 @@ class SimpleTodoList:
     def add_item(self):
         """ Add a todo item """
 
-        self.todo_scroll_cell.add_item('{}'.format(self.new_todo_textbox.get()))
+        self.todo_scroll_cell.add_item(f'{self.new_todo_textbox.get()}')
         self.new_todo_textbox.clear()
 
     def mark_as_in_progress(self):

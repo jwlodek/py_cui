@@ -86,7 +86,7 @@ class MenuImplementation(UIImplementation):
         if self._selected_item > 0:
             self._selected_item = self._selected_item - 1
 
-        self._logger.debug('Scrolling up to item {}'.format(self._selected_item))
+        self._logger.debug(f'Scrolling up to item {self._selected_item}')
 
     def _scroll_down(self, viewport_height):
         if self._selected_item < len(self._view_items) - 1:
@@ -94,22 +94,22 @@ class MenuImplementation(UIImplementation):
         if self._selected_item > self._top_view + viewport_height:
             self._top_view = self._top_view + 1
 
-        self._logger.debug('Scrolling down to item {}'.format(self._selected_item))
+        self._logger.debug(f'Scrolling down to item {self._selected_item}')
 
     def add_item(self, item_text):
-        self._logger.debug('Adding item {} to menu'.format(item_text))
+        self._logger.debug(f'Adding item {item_text} to menu')
         self._view_items.append(item_text)
 
 
     def add_item_list(self, item_list):
-        self._logger.debug('Adding item list {} to menu'.format(str(item_list)))
+        self._logger.debug(f'Adding item list {str(item_list)} to menu')
         for item in item_list:
             self.add_item(item)
 
     def remove_selected_item(self):
         if len(self._view_items) == 0:
             return
-        self._logger.debug('Removing {}'.format(self._view_items[self._selected_item]))
+        self._logger.debug(f'Removing {self._view_items[self._selected_item]}')
         del self._view_items[self._selected_item]
         if self._selected_item >= len(self._view_items):
             self._selected_item = self._selected_item - 1
@@ -205,7 +205,7 @@ Finally, add a function to the `PyCUI` class in `__init__.py` that will add the 
 ```Python
 def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
 
-    id = 'Widget{}'.format(len(self.get_widgets().keys()))
+    id = f'Widget{len(self.get_widgets().keys())}'
     new_scroll_menu = widgets.ScrollMenu(   id, 
                                             title, 
                                             self._grid, 
@@ -219,7 +219,7 @@ def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, pad
     self.get_widgets()[id] = new_scroll_menu
     if self._selected_widget is None:
         self.set_selected_widget(id)
-    self._logger.debug('Adding widget {} w/ ID {} of type {}'.format(title, id, str(type(new_scroll_menu))))
+    self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}'
     return new_scroll_menu
 ```
 The function must:

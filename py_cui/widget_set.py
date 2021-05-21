@@ -454,7 +454,7 @@ class WidgetSet:
             A reference to the created slider object.
         """
 
-        id = 'Widget{}'.format(len(self._widgets.keys()))
+        id = f'Widget{len(self._widgets.keys())}'
         new_slider = controls.slider.SliderWidget(id,
                                                   title,
                                                   self._grid,

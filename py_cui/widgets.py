@@ -65,7 +65,7 @@ class Widget(py_cui.ui.UIElement):
         self._grid = grid
         grid_rows, grid_cols = self._grid.get_dimensions()
         if (grid_cols < column + column_span) or (grid_rows < row + row_span):
-            raise py_cui.errors.PyCUIOutOfBoundsError("Target grid too small for widget {}".format(title))
+            raise py_cui.errors.PyCUIOutOfBoundsError(f"Target grid too small for widget {title}")
 
         self._row          = row
         self._column       = column
@@ -619,9 +619,9 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         line_counter = 0
         for item in self._view_items:
             if self._selected_item_dict[item]:
-                line = '[{}] - {}'.format(self._checked_char, str(item))
+                line = f'[{self._checked_char}] - {str(item)}'
             else:
-                line = '[ ] - {}'.format(str(item))
+                line = f'[ ] - {str(item)}'
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:
