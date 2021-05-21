@@ -154,10 +154,10 @@ def parse_args():
     if "directory" not in args.keys():
         return "."
     elif not os.path.exists(args["directory"]):
-        print("ERROR - {} path does not exist".format(args["directory"]))
+        print(f"ERROR - {args['directory']} path does not exist")
         exit()
     elif not os.path.isdir(args["directory"]):
-        print("ERROR - {} is not a directory".format(args["directory"]))
+        print(f"ERROR - {args['directory']} is not a directory")
         exit()
     return args["directory"]
 
