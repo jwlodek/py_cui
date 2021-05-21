@@ -17,8 +17,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
         if self._cur_val < self._min_val or self._cur_val > self._max_val:
             raise py_cui.errors.PyCUIInvalidValue(
-                'initial value must be between {} and {}'
-                .format(self._min_val, self._max_val))
+                f'initial value must be between {self._min_val} and {self._max_val}')
 
 
     def set_bar_char(self, char):
@@ -31,7 +30,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
             Character to represent progressive bar.
         """
 
-        assert len(char) == 1, "char should contain exactly one character, got {} instead.".format(len(char))
+        assert len(char) == 1, f"char should contain exactly one character, got {len(char)} instead."
         self._bar_char = char
 
 
