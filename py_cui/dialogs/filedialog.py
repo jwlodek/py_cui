@@ -93,9 +93,9 @@ class FileDirElem:
         """
 
         if self._type == 'file':
-            return '{} {}'.format(self._file_icon, self._name)
+            return f'{self._file_icon} {self._name}'
         else:
-            return '{} {}'.format(self._folder_icon, self._name)
+            return f'{self._folder_icon} {self._name}'
 
 
 
@@ -251,7 +251,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
                     self._current_dir = old_dir
                     self.refresh_view()
                 except PermissionError:
-                    self._parent_dialog.display_warning('Permission Error Accessing: {} !'.format(self._current_dir))
+                    self._parent_dialog.display_warning(f'Permission Error Accessing: {self._current_dir} !')
                     self._current_dir = old_dir
                     self.refresh_view()
                 finally:
@@ -638,7 +638,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
         self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
         self._submit_button = FileDialogButton(self, title, self._submit, 1, '', 'OK', renderer, logger)
-        self._cancel_button = FileDialogButton(self, 'Cancel {}'.format(title), self._root.close_popup, 2, '', 'ESC', renderer, logger)
+        self._cancel_button = FileDialogButton(self, f'Cancel {title}', self._root.close_popup, 2, '', 'ESC', renderer, logger)
 
         # Internal popup used for secondary errors and warnings
         self._internal_popup = None

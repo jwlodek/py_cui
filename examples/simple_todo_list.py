@@ -81,7 +81,7 @@ class SimpleTodoList:
         """Add a todo item
         """
 
-        self.todo_scroll_cell.add_item('{}'.format(self.new_todo_textbox.get()))
+        self.todo_scroll_cell.add_item(f'{self.new_todo_textbox.get()}')
 
 
     def remove_item(self):

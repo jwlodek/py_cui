@@ -61,7 +61,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
 
         msg = None
         if len(self._text) == 0 and self.is_required():
-            msg = 'Field <{}> cannot be empty!'.format(self.get_fieldname())
+            msg = f'Field <{self.get_fieldname()}> cannot be empty!'
 
         return msg is None, msg
 
@@ -482,7 +482,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                     self._internal_popup = InternalFormPopup(self,
                                                              self._root, 
                                                              err_msg, 
-                                                             'Required fields: {}'.format(str(self._required_fields)),
+                                                             f'Required fields: {str(self._required_fields)}',
                                                              py_cui.YELLOW_ON_BLACK, 
                                                              self._renderer, 
                                                              self._logger)
