@@ -16,19 +16,26 @@ class StatusBar:
         status bar text
     color : py_cui.COLOR
         color to display the statusbar
+    root : py_cui.PyCUI
+        Main PyCUI object reference
+    is_title_bar : bool
+        Is the StatusBar displayed on the top of the grid
     """
 
-    def __init__(self, text, color):
+    def __init__(self, text, color, root, is_title_bar=False):
         """Initializer for statusbar
         """
 
         self.__text = text
         self.__color = color
+        self.__height = 1
+        self.__root = root
+        self.__is_title_bar = is_title_bar
 
 
     def get_color(self):
         """Getter for status bar color
-        
+
         Returns
         -------
         color : int
@@ -39,7 +46,7 @@ class StatusBar:
 
 
     def get_text(self):
-        """Getter for stattus bar text
+        """Getter for status bar text
 
         Returns
         -------
@@ -72,3 +79,33 @@ class StatusBar:
         """
 
         self.__text = text
+
+    def get_height(self):
+        """Getter for status bar height in row
+
+        Returns
+        -------
+        height : int
+            The statusbar height in row
+        """
+
+        return self.__height
+
+    def show(self):
+        """Sets the status bar height to 1"""
+
+        self.__height = 1
+        self._refresh_root_size()
+
+    def hide(self):
+        """Sets the status bar height to 0"""
+
+        self.__height = 0
+        self._refresh_root_size()
+
+    def _refresh_root_size(self):
+        """Resets the grid's title bar offset if needed and calls a UI size update."""
+
+        if self.__is_title_bar:
+            self.__root._grid._title_bar_offset = self.__height
+        self.__root._refresh_height_width()

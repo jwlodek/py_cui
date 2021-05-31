@@ -7,7 +7,7 @@ TODO: This test file is probably overkill
 
 
 def test_status_bar():
-    bar = py_cui.statusbar.StatusBar('Hello', py_cui.WHITE_ON_BLACK)
+    bar = py_cui.statusbar.StatusBar('Hello', py_cui.WHITE_ON_BLACK, root=py_cui.PyCUI)
     assert bar.get_text() == 'Hello'
     bar.set_text('Test')
     assert bar.get_text() == 'Test'
