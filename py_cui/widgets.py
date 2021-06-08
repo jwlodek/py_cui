@@ -659,6 +659,12 @@ class Button(Widget):
         self.set_help_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
 
 
+    def _handle_mouse_press(self, x, y, mouse_event):
+        
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            self.command()
+
+
     def _handle_key_press(self, key_pressed):
         """Override of base class, adds ENTER listener that runs the button's command
 
@@ -828,7 +834,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self._viewport_height    = self._cursor_max_down  - self._cursor_max_up
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -837,27 +843,29 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
-        if y >= self._cursor_max_up and y <= self._cursor_max_down:
-            if x >= self._cursor_max_left and x <= self._cursor_max_right:
-                line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
-                if len(self._text_lines) <= line_clicked_index:
-                    self._cursor_text_pos_y = len(self._text_lines) - 1
-                    self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
-                    line = self._text_lines[len(self._text_lines) - 1]
-                else:
-                    self._cursor_text_pos_y = line_clicked_index
-                    self._cursor_y = y
-                    line = self._text_lines[line_clicked_index]
-                
-                if x <= len(line) + self._cursor_max_left:
-                    old_text_pos = self._cursor_text_pos_x
-                    old_cursor_x = self._cursor_x
-                    self._cursor_x = x
-                    self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
-                else:
-                    self._cursor_x = self._cursor_max_left + len(line)
-                    self._cursor_text_pos_x = len(line)
+        super()._handle_mouse_press(x, y, mouse_event)
+        
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            if y >= self._cursor_max_up and y <= self._cursor_max_down:
+                if x >= self._cursor_max_left and x <= self._cursor_max_right:
+                    line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
+                    if len(self._text_lines) <= line_clicked_index:
+                        self._cursor_text_pos_y = len(self._text_lines) - 1
+                        self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
+                        line = self._text_lines[len(self._text_lines) - 1]
+                    else:
+                        self._cursor_text_pos_y = line_clicked_index
+                        self._cursor_y = y
+                        line = self._text_lines[line_clicked_index]
+                    
+                    if x <= len(line) + self._cursor_max_left:
+                        old_text_pos = self._cursor_text_pos_x
+                        old_cursor_x = self._cursor_x
+                        self._cursor_x = x
+                        self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
+                    else:
+                        self._cursor_x = self._cursor_max_left + len(line)
+                        self._cursor_text_pos_x = len(line)
 
 
     def _handle_key_press(self, key_pressed):
