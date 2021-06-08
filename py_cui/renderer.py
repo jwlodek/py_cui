@@ -384,6 +384,7 @@ class Renderer:
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
+            text_elem[0] = text_elem[0].replace(chr(0), "")
             self.set_color_mode(text_elem[1])
 
             # BLACK_ON_WHITE + BOLD is unreadable on windows terminals
