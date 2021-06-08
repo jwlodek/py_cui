@@ -40,7 +40,10 @@ def get_char_from_ascii(key_num):
     char : character
         character converted from ascii
     """
-    
+
+    if key_num is None:
+        return None
+
     return chr(key_num)
 
 

@@ -1,4 +1,4 @@
-"""Module contatining all core widget classes for py_cui.
+"""Module containing all core widget classes for py_cui.
 
 Widgets are the basic building blocks of a user interface made with py_cui.
 This module contains classes for:
@@ -54,7 +54,7 @@ class Widget(py_cui.ui.UIElement):
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True):
         """Initializer for base widget class
 
-        Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+        Class UIElement superclass initializer, and then assigns widget to grid, along with row/column info
         and color rules and key commands
         """
 
@@ -184,8 +184,7 @@ class Widget(py_cui.ui.UIElement):
             y_adjust = offset_y
 
         x_pos = self._column * col_width + x_adjust
-        # Always add two to the y_pos, because we have a title bar + a pad row
-        y_pos = self._row * row_height + 2 + y_adjust
+        y_pos = self._row * row_height + y_adjust + self._grid._title_bar_offset + 1
         return x_pos, y_pos
 
 
