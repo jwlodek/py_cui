@@ -22,6 +22,7 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 
 import curses
+import inspect
 from typing import Callable
 import py_cui
 import py_cui.ui
@@ -290,6 +291,40 @@ class Widget(py_cui.ui.UIElement):
     # BELOW FUNCTIONS SHOULD BE OVERWRITTEN BY SUB-CLASSES
 
 
+    def _handle_mouse_press(self, x, y, mouse_event):
+        """Base class function that handles all assigned mouse presses.
+
+        When overwriting this function, make sure to add a super()._handle_mouse_press(x, y, mouse_event) call,
+        as this is required for user defined key command support
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
+        """
+
+        # Retrieve the command function if it exists
+        if mouse_event in self._mouse_commands.keys():
+            command = self._mouse_commands[mouse_event]
+            
+            # Identify num of args from callable. This allows for user to create commands that take in x, y
+            # coords of the mouse press as input
+            num_args = 0
+            try:
+                num_args = len(inspect.signature(command).parameters)
+            except ValueError:
+                self._logger.error('Failed to get mouse press command signature!')
+            except TypeError:
+                self._logger.error('Type of object not supported for signature identification!')
+
+            # Depending on the number of parameters for the command, pass in the x and y
+            # values, or do nothing
+            if num_args == 2:
+                command(x, y)
+            else:
+                command()
+
+
     def _handle_key_press(self, key_pressed):
         """Base class function that handles all assigned key presses.
 
@@ -478,7 +513,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         # For scroll menu, handle custom mouse press after initial event, since we will likely want to
         # have access to the newly selected item
-        super()._handle_mouse_press(x, y, mouse_event)
+        Widget._handle_mouse_press(x, y, mouse_event)
 
 
 
@@ -518,7 +553,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         """Overrides base class draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)
         counter = self._pady + 1
@@ -560,7 +595,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         self.set_help_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -569,7 +604,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
         viewport_top = self._start_y + self._pady + 1
         if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
             elem_clicked = y - viewport_top + self._top_view
@@ -656,12 +691,11 @@ class Button(Widget):
         self.command = command
         self.set_color(py_cui.MAGENTA_ON_BLACK)
         self.set_help_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
-
-
-    def _handle_mouse_press(self, x, y, mouse_event):
         
-        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
-            self.command()
+        # By default we will process command on click or double click
+        if self.command is not None:
+            self.add_mouse_command(py_cui.keys.LEFT_MOUSE_CLICK, self.command)
+            self.add_mouse_command(py_cui.keys.LEFT_MOUSE_DBL_CLICK, self.command)
 
 
     def _handle_key_press(self, key_pressed):
@@ -856,7 +890,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
                         self._cursor_text_pos_y = line_clicked_index
                         self._cursor_y = y
                         line = self._text_lines[line_clicked_index]
-                    
+
                     if x <= len(line) + self._cursor_max_left:
                         old_text_pos = self._cursor_text_pos_x
                         old_cursor_x = self._cursor_x

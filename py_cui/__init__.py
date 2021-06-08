@@ -1626,7 +1626,6 @@ class PyCUI:
                     self._logger.info('Detected mouse click')
                     id, x, y, _, mouse_event = curses.getmouse()
                     in_element = self.get_element_at_position(x, y)
-                    self._logger.debug(f'In element : {in_element.get_title()}')
 
                     # In first case, we click inside already selected widget, pass click for processing
                     if in_element is not None:
