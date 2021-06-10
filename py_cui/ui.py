@@ -956,16 +956,40 @@ class CheckBoxMenuImplementation(MenuImplementation):
         super().remove_item(item)
 
 
+    def toggle_item_checked(self, item):
+        """Function that marks an item as selected
+
+        Parameters
+        ----------
+        item : object
+            Toggle item checked state
+        """
+
+        self._selected_item_dict[item] = not self._selected_item_dict[item]
+
+
     def mark_item_as_checked(self, item):
         """Function that marks an item as selected
 
         Parameters
         ----------
         item : object
-            Mark item as checked
+            Toggle item checked state
         """
 
-        self._selected_item_dict[item] = not self._selected_item_dict[item]
+        self._selected_item_dict[item] = True
+
+
+    def mark_item_as_not_checked(self, item):
+        """Function that marks an item as selected
+
+        Parameters
+        ----------
+        item : object
+            Item to uncheck
+        """
+
+        self._selected_item_dict[item] = False
 
 
 class TextBlockImplementation(UIImplementation):
