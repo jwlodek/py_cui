@@ -94,7 +94,6 @@ class Widget(py_cui.ui.UIElement):
             a non-argument function or lambda function to execute if in focus mode and key is pressed
         """
 
-
         self._key_commands[key] = command
 
 
@@ -528,7 +527,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
 
         current = self.get_selected_item_index()
         viewport_height = self.get_viewport_height()
@@ -745,7 +744,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         """Need to update all cursor positions on resize
         """
 
-        super().update_height_width()
+        Widget.update_height_width(self)
         padx, _             = self.get_padding()
         start_x, start_y    = self.get_start_position()
         height, width       = self.get_absolute_dimensions()
@@ -767,7 +766,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y, mouse_event)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
         if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
             if x <= len(self._text) + self._cursor_max_left:
                 old_text_pos = self._cursor_text_pos
@@ -788,7 +787,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
@@ -810,7 +809,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         """Override of base draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
 
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_text(self, self._title, self._cursor_y - 2, bordered=False)
@@ -876,7 +875,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y, mouse_event)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
         
         if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
             if y >= self._cursor_max_up and y <= self._cursor_max_down:
@@ -910,7 +909,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
 
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self._move_left()
@@ -942,7 +941,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         """Override of base class draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
 
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)
