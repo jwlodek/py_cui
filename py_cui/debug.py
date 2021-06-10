@@ -166,20 +166,23 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
         return stop_x, stop_y 
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
         ----------
         x, y : int
             Coordinates of mouse press
+        mouse_event : int
+            Key code for py_cui mouse event
         """
 
-        super()._handle_mouse_press(x, y)
-        viewport_top = self._start_y + self._pady + 1
-        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
-            elem_clicked = y - viewport_top + self._top_view
-            self.set_selected_item_index(elem_clicked)
+        py_cui.ui.UIElement._handle_mouse_press(x, y, mouse_event)
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            viewport_top = self._start_y + self._pady + 1
+            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+                elem_clicked = y - viewport_top + self._top_view
+                self.set_selected_item_index(elem_clicked)
 
 
     def _handle_key_press(self, key_pressed):

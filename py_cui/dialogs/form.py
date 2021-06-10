@@ -495,7 +495,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
             self._internal_popup._handle_key_press(key_pressed)
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function
 
         Simply enters the appropriate field when mouse is pressed on it
@@ -506,7 +506,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
             Coordinates of the mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        py_cui.popups.Popup._handle_mouse_press(self, x, y, mouse_event)
         for i, field in enumerate(self._form_fields):
             if field._contains_position(x, y):
                 self._form_fields[self.get_selected_form_index()].set_selected(False)
