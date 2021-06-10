@@ -86,7 +86,7 @@ class LiveDebugImplementation(py_cui.ui.MenuImplementation):
 
     Attributes
     ----------
-    _live_debug_level : int
+    level : int
         Debug level at which to display messages. Can be separate from the default logging level
     _buffer_size : List[str]
         Number of log messages to keep buffered in the live debug window
@@ -98,12 +98,12 @@ class LiveDebugImplementation(py_cui.ui.MenuImplementation):
         """
 
         super().__init__(parent_logger)
-        self._live_debug_level      = logging.ERROR
+        self.level      = logging.ERROR
         # Make default buffer size 100
         self._buffer_size           = 100
 
 
-    def add_item(self, msg, log_level):
+    def print_to_buffer(self, msg, log_level):
         """Override of default MenuImplementation add_item function
 
         If items override the buffer pop the oldest log message
@@ -166,20 +166,23 @@ class LiveDebugElement(py_cui.ui.UIElement, LiveDebugImplementation):
         return stop_x, stop_y 
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
         ----------
         x, y : int
             Coordinates of mouse press
+        mouse_event : int
+            Key code for py_cui mouse event
         """
 
-        super()._handle_mouse_press(x, y)
-        viewport_top = self._start_y + self._pady + 1
-        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
-            elem_clicked = y - viewport_top + self._top_view
-            self.set_selected_item_index(elem_clicked)
+        py_cui.ui.UIElement._handle_mouse_press(x, y, mouse_event)
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            viewport_top = self._start_y + self._pady + 1
+            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+                elem_clicked = y - viewport_top + self._top_view
+                self.set_selected_item_index(elem_clicked)
 
 
     def _handle_key_press(self, key_pressed):
@@ -259,7 +262,6 @@ class PyCUILogger(logging.Logger):
         """
 
         super(PyCUILogger, self).__init__(name)
-        self._live_debug_level      = logging.ERROR
         self._live_debug_enabled    = False
         self.py_cui_root            = None
         self._live_debug_element    = LiveDebugElement(self)
@@ -323,8 +325,8 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level <= logging.INFO and self._live_debug_enabled:
-            self._live_debug_element.print_to_live_debug_buffer(debug_text, 'INFO')
+        if self.level <= logging.INFO:
+            self._live_debug_element.print_to_buffer(debug_text, 'INFO')
         super().info(debug_text)
 
 
@@ -338,8 +340,8 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level <= logging.DEBUG and self._live_debug_enabled:
-            self._live_debug_element.print_to_live_debug_buffer(debug_text, 'DEBUG')
+        if self.level <= logging.DEBUG:
+            self._live_debug_element.print_to_buffer(debug_text, 'DEBUG')
         super().debug(debug_text)
 
 
@@ -353,8 +355,8 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level <= logging.WARN and self._live_debug_enabled:
-            self._live_debug_element.print_to_live_debug_buffer(debug_text, 'WARN')
+        if self.level <= logging.WARN:
+            self._live_debug_element.print_to_buffer(debug_text, 'WARN')
         super().warn(debug_text)
 
 
@@ -368,6 +370,22 @@ class PyCUILogger(logging.Logger):
         """
 
         debug_text = self._get_debug_text(text)
-        if self._live_debug_level <= logging.ERROR and self._live_debug_enabled:
-            self._live_debug_element.print_to_live_debug_buffer(debug_text, 'ERROR')
+        if self.level <= logging.ERROR:
+            self._live_debug_element.print_to_buffer(debug_text, 'ERROR')
         super().error(debug_text)
+
+
+    def critical(self, text):
+        """Override of base logger critical function to add hooks for live debug mode
+        
+        Parameters
+        ----------
+        text : str
+            The log text ot display
+        """
+
+        debug_text = self._get_debug_text(text)
+        if self.level <= logging.CRITICAL:
+            self._live_debug_element.print_to_buffer(debug_text, 'CRITICAL')
+        super().critical(debug_text)
+

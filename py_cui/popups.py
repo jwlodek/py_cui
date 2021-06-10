@@ -191,7 +191,7 @@ class YesNoPopup(Popup):
             if self._command is not None:
                 self._command(ret_val)
             else:
-                self._root.show_warning_popup('No Command Specified', 'The textbox popup had no specified command!')
+                self._root.show_warning_popup('No Command Specified', 'The yes/no popup had no specified command!')
 
 
     def _draw(self):
@@ -224,7 +224,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         """Need to update all cursor positions on resize
         """
 
-        super().update_height_width()
+        Popup.update_height_width(self)
         padx, pady              = self.get_padding()
         start_x, start_y        = self.get_start_position()
         height, width           = self.get_absolute_dimensions()
@@ -236,6 +236,27 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         self._viewport_width    = self._cursor_max_right - self._cursor_max_left
 
 
+    def _handle_mouse_press(self, x, y, mouse_event):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        Popup._handle_mouse_press(self, x, y, mouse_event)
+        if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
+            if x <= len(self._text) + self._cursor_max_left:
+                old_text_pos = self._cursor_text_pos
+                old_cursor_x = self._cursor_x
+                self._cursor_x = x
+                self._cursor_text_pos = old_text_pos + (x - old_cursor_x)
+            else:
+                self._cursor_x = self._cursor_max_left + len(self._text)
+                self._cursor_text_pos = len(self._text)
+
+
     def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
 
@@ -245,7 +266,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Popup._handle_key_press(self, key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
             self._ret_val = self._text
@@ -325,6 +346,32 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
         self._run_command_if_none  = run_command_if_none
 
 
+    def _handle_mouse_press(self, x, y, mouse_event):
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        # For either click or double click we want to jump to the clicked-on item
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK or mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
+            current = self.get_selected_item_index()
+            viewport_top = self._start_y + self._pady + 1
+
+            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+                elem_clicked = y - viewport_top + self._top_view
+                self.set_selected_item_index(elem_clicked)
+
+                # For double clicks we also process the menu selection
+                if mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
+                    ret_val = self.get()
+                    self.root.close_popup()
+                    self._command(ret_val)
+
+
+
     def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
 
@@ -336,7 +383,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Popup._handle_key_press(self, key_pressed)
         valid_pressed = False
         if key_pressed == py_cui.keys.KEY_ENTER:
             ret_val = self.get()
