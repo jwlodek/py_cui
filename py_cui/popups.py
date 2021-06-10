@@ -364,6 +364,13 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
                 elem_clicked = y - viewport_top + self._top_view
                 self.set_selected_item_index(elem_clicked)
 
+                # For double clicks we also process the menu selection
+                if mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
+                    ret_val = self.get()
+                    self.root.close_popup()
+                    self._command(ret_val)
+
+
 
     def _handle_key_press(self, key_pressed):
         """Override of base handle key press function
