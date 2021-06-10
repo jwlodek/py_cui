@@ -67,7 +67,6 @@ class UIElement:
         self._border_color              = self._color
         self._focus_border_color        = self._color
         self._selected_color            = self._color
-        self._mouse_press_handler       = None
         self._selected                  = False
         self._renderer                  = renderer
         self._logger                    = logger
@@ -369,19 +368,7 @@ class UIElement:
         raise NotImplementedError
 
 
-    def add_mouse_press_handler(self, mouse_press_handler_func):
-        """Sets a mouse press handler function
-
-        Parameters
-        ----------
-        mouse_press_handler_func : function / lambda function
-            Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
-        """
-
-        self._mouse_press_handler = mouse_press_handler_func
-
-
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Can be implemented by subclass. Used to handle mouse presses
 
         Parameters
@@ -390,8 +377,7 @@ class UIElement:
             Coordinates of the mouse press event.
         """
 
-        if self._mouse_press_handler is not None:
-            self._mouse_press_handler(x, y)
+        pass
 
 
     def _draw(self):

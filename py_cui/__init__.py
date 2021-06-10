@@ -110,10 +110,11 @@ class PyCUI:
 
     def __init__(self, num_rows, num_cols, auto_focus_buttons=True,
                  exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal=None):
-        """Constructor for PyCUI class
+        """Initializer for PyCUI class
         """
 
         self._title = 'PyCUI Window'
+        
         # When this is not set, the escape character delay
         # is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
@@ -229,7 +230,8 @@ class PyCUI:
     def set_toggle_live_debug_key(self, toggle_debug_key):
         self._toggle_live_debug_key = toggle_debug_key
 
-    def enable_logging(self, log_file_path='py_cui_log.txt', logging_level = logging.DEBUG):
+
+    def enable_logging(self, log_file_path='py_cui.log', logging_level = logging.DEBUG, live_debug_key = py_cui.keys.KEY_CTRL_D):
         """Function enables logging for py_cui library
 
         Parameters
@@ -243,7 +245,7 @@ class PyCUI:
         try:
             py_cui.debug._enable_logging(self._logger, filename=log_file_path, logging_level=logging_level)
             self._logger.info('Initialized logger')
-            self._toggle_live_debug_key = py_cui.keys.KEY_CTRL_D
+            self._toggle_live_debug_key = live_debug_key
         except PermissionError as e:
             print(f'Failed to initialize logger: {str(e)}')
 
@@ -874,6 +876,7 @@ class PyCUI:
 
         if self._popup is not None and self._popup._contains_position(x, y):
             return self._popup
+
         elif self._popup is None:
             for widget_id in self.get_widgets().keys():
                 if self.get_widgets()[widget_id] is not None:
@@ -1621,16 +1624,26 @@ class PyCUI:
                 # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
-                    _, x, y, _, _ = curses.getmouse()
-                    in_element = self.get_element_at_position(x, y)
+                    
+                    valid_mouse_event = True
+                    try:
+                        id, x, y, _, mouse_event = curses.getmouse()
+                    except curses.error as e:
+                        valid_mouse_event = False
+                        self._logger.error(f'Failed to handle mouse event: {str(e)}')
 
-                    # In first case, we click inside already selected widget, pass click for processing
-                    if in_element is not None and in_element.is_selected():
-                        in_element._handle_mouse_press(x, y)
-                    # Otherwise, if not a popup, select the clicked on widget
-                    elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
-                        self.move_focus(in_element)
-                        in_element._handle_mouse_press(x, y)
+                    if valid_mouse_event:
+                        in_element = self.get_element_at_position(x, y)
+
+                        # In first case, we click inside already selected widget, pass click for processing
+                        if in_element is not None:
+                            self._logger.info(f'handling mouse press for elem: {in_element.get_title()}')
+                            in_element._handle_mouse_press(x, y, mouse_event)
+
+                        # Otherwise, if not a popup, select the clicked on widget
+                        elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
+                            self.move_focus(in_element)
+                            in_element._handle_mouse_press(x, y, mouse_event)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:
