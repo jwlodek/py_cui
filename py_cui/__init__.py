@@ -130,21 +130,26 @@ class PyCUI:
             height  = simulated_terminal[0]
             width   = simulated_terminal[1]
 
+        # Add status and title bar
+        self.title_bar = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE, root=self, is_title_bar=True)
+        exit_key_char = py_cui.keys.get_char_from_ascii(exit_key)
+
+        if exit_key_char:
+            self._init_status_bar_text  = f'Press - {exit_key_char} - to exit. Arrow ' \
+                                        'Keys to move between widgets. Enter to ' \
+                                        'enter focus mode.'
+        else:
+            self._init_status_bar_text  = 'Press arrow Keys to move between widgets. ' \
+                                        'Enter to enter focus mode.' \
+
+        self.status_bar = py_cui.statusbar.StatusBar(self._init_status_bar_text,
+                                                     BLACK_ON_WHITE, root=self)
+
         # Init terminal height width. Subtract 4 from height
         # for title/status bar and padding
         self._height                = height
         self._width                 = width
-        self._height                = self._height - 4
-
-        # Add status and title bar
-        self.title_bar = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE)
-        exit_key_char = py_cui.keys.get_char_from_ascii(exit_key)
-        self._init_status_bar_text  = f'Press - {exit_key_char} - to exit. Arrow Keys to move ' \
-                                       'between widgets. Enter to enter focus ' \
-                                       'mode.'
-
-        self.status_bar = py_cui.statusbar.StatusBar(self._init_status_bar_text,
-                                                     BLACK_ON_WHITE)
+        self._height                = self._height - self.title_bar.get_height() - self.status_bar.get_height() - 2
 
         # Logging object initialization for py_cui
         self._logger = py_cui.debug._initialize_logger(self,
@@ -263,21 +268,7 @@ class PyCUI:
             self._grid         = new_widget_set._grid
             self._keybindings  = new_widget_set._keybindings
 
-            if self._simulated_terminal is None:
-                if self._stdscr is None:
-                    term_size = shutil.get_terminal_size()
-                    height  = term_size.lines
-                    width   = term_size.columns
-                else:
-                    # Use curses termsize when possible to fix resize bug on windows.
-                    height, width = self._stdscr.getmaxyx()
-            else:
-                height  = self._simulated_terminal[0]
-                width   = self._simulated_terminal[1]
-
-            height  = height - 4
-
-            self._refresh_height_width(height, width)
+            self._refresh_height_width()
             if self._stdscr is not None:
                 self._initialize_widget_renderer()
             self._selected_widget = new_widget_set._selected_widget
@@ -305,7 +296,7 @@ class PyCUI:
         """
 
         # Use current logging object and simulated terminal for sub-widget sets
-        return py_cui.widget_set.WidgetSet(num_rows, num_cols, self._logger, 
+        return py_cui.widget_set.WidgetSet(num_rows, num_cols, self._logger, root=self,
                                             simulated_terminal=self._simulated_terminal)
 
 
@@ -1399,16 +1390,24 @@ class PyCUI:
         self._popup = None
 
 
-    def _refresh_height_width(self, height, width):
-        """Function that updates the height and width of the CUI based on terminal window size
+    def _refresh_height_width(self):
+        """Function that updates the height and width of the CUI based on terminal window size."""
+        
+        if self._simulated_terminal is None:
+            if self._stdscr is None:
+                term_size = shutil.get_terminal_size()
+                height  = term_size.lines
+                width   = term_size.columns
+            else:
+                # Use curses termsize when possible to fix resize bug on windows.
+                height, width = self._stdscr.getmaxyx()
+        else:
+            height  = self._simulated_terminal[0]
+            width   = self._simulated_terminal[1]
 
-        Parameters
-        ----------
-        height : int
-            Window height in terminal characters
-        width : int
-            Window width in terminal characters
-        """
+        height  = height - self.title_bar.get_height() - self.status_bar.get_height() - 2
+        
+        self._logger.debug(f'Resizing CUI to new dimensions {height} by {width}')
 
         self._height = height
         self._width  = width
@@ -1466,12 +1465,12 @@ class PyCUI:
             Window width in terminal characters
         """
 
-        if self.status_bar is not None:
+        if self.status_bar is not None and self.status_bar.get_height() > 0:
             stdscr.attron(curses.color_pair(self.status_bar.get_color()))
             stdscr.addstr(height + 3, 0, fit_text(width, self.status_bar.get_text()))
             stdscr.attroff(curses.color_pair(self.status_bar.get_color()))
 
-        if self.title_bar is not None:
+        if self.title_bar is not None and self.title_bar.get_height() > 0:
             stdscr.attron(curses.color_pair(self.title_bar.get_color()))
             stdscr.addstr(0, 0, fit_text(width, self._title, center=True))
             stdscr.attroff(curses.color_pair(self.title_bar.get_color()))
@@ -1603,14 +1602,6 @@ class PyCUI:
                 # Initialization and size adjustment
                 stdscr.erase()
 
-                # find height width, adjust if status/title bar added. We decrement the height by 4 to account for status/title bar and padding
-                if self._simulated_terminal is None:
-                    height, width   = stdscr.getmaxyx()
-                else:
-                    height = self._simulated_terminal[0]
-                    width  = self._simulated_terminal[1]
-
-                height = height - 4
 
                 # If the user defined an update function to fire on each draw call,
                 # Run it here. This can of course be also handled user-side
@@ -1621,9 +1612,8 @@ class PyCUI:
                 # This is what allows the CUI to be responsive. Adjust grid size based on current terminal size
                 # Resize the grid and the widgets if there was a resize operation
                 if key_pressed == curses.KEY_RESIZE:
-                    self._logger.debug(f'Resizing CUI to new dimensions {height} by {width}')
                     try:
-                        self._refresh_height_width(height, width)
+                        self._refresh_height_width()
                     except py_cui.errors.PyCUIOutOfBoundsError as e:
                         self._logger.info('Resized terminal too small')
                         self._display_window_warning(stdscr, str(e))
@@ -1659,7 +1649,7 @@ class PyCUI:
 
                 try:
                     # Draw status/title bar, and all widgets. Selected widget will be bolded.
-                    self._draw_status_bars(stdscr, height, width)
+                    self._draw_status_bars(stdscr, self._height, self._width)
                     self._draw_widgets()
                     # draw the popup if required
                     if self._popup is not None:

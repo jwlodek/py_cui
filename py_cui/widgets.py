@@ -1,4 +1,4 @@
-"""Module contatining all core widget classes for py_cui.
+"""Module containing all core widget classes for py_cui.
 
 Widgets are the basic building blocks of a user interface made with py_cui.
 This module contains classes for:
@@ -54,7 +54,7 @@ class Widget(py_cui.ui.UIElement):
     def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True):
         """Initializer for base widget class
 
-        Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+        Class UIElement superclass initializer, and then assigns widget to grid, along with row/column info
         and color rules and key commands
         """
 
@@ -65,7 +65,7 @@ class Widget(py_cui.ui.UIElement):
         self._grid = grid
         grid_rows, grid_cols = self._grid.get_dimensions()
         if (grid_cols < column + column_span) or (grid_rows < row + row_span):
-            raise py_cui.errors.PyCUIOutOfBoundsError("Target grid too small for widget {}".format(title))
+            raise py_cui.errors.PyCUIOutOfBoundsError(f"Target grid too small for widget {title}")
 
         self._row          = row
         self._column       = column
@@ -157,8 +157,7 @@ class Widget(py_cui.ui.UIElement):
             y_adjust = offset_y
 
         x_pos = self._column * col_width + x_adjust
-        # Always add two to the y_pos, because we have a title bar + a pad row
-        y_pos = self._row * row_height + 2 + y_adjust
+        y_pos = self._row * row_height + y_adjust + self._grid._title_bar_offset + 1
         return x_pos, y_pos
 
 
@@ -587,9 +586,9 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         line_counter = 0
         for item in self._view_items:
             if self._selected_item_dict[item]:
-                line = '[{}] - {}'.format(self._checked_char, str(item))
+                line = f'[{self._checked_char}] - {str(item)}'
             else:
-                line = '[ ] - {}'.format(str(item))
+                line = f'[ ] - {str(item)}'
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:

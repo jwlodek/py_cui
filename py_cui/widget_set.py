@@ -29,15 +29,18 @@ class WidgetSet:
         list of keybindings to check against in the main CUI loop
     height, width : int
         height of the terminal in characters, width of terminal in characters
+    root : py_cui.PyCUI
+        Main PyCUI object reference
     """
 
-    def __init__(self, num_rows, num_cols, logger, simulated_terminal=None):
+    def __init__(self, num_rows, num_cols, logger, root, simulated_terminal=None):
         """Constructor for WidgetSet
         """
 
         self._widgets      = {}
         self._keybindings  = {}
 
+        self._root = root
         self._simulated_terminal = simulated_terminal
 
         if self._simulated_terminal is None:
@@ -50,7 +53,8 @@ class WidgetSet:
 
         self._height = height
         self._width = width
-        self._height = self._height - 4
+        status_bars_height = self._root.title_bar.get_height() + self._root.status_bar.get_height()
+        self._height = self._height - status_bars_height - 2
 
         self._grid = grid.Grid(num_rows, num_cols, self._height, self._width, logger)
 
@@ -454,7 +458,7 @@ class WidgetSet:
             A reference to the created slider object.
         """
 
-        id = 'Widget{}'.format(len(self._widgets.keys()))
+        id = f'Widget{len(self._widgets.keys())}'
         new_slider = controls.slider.SliderWidget(id,
                                                   title,
                                                   self._grid,

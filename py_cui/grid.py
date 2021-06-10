@@ -23,6 +23,8 @@ class Grid:
         The number of additional characters found by height mod rows and width mod columns
     _row_height, _column_width : int
         The number of characters in a single grid row, column
+    _title_bar_offset : int
+        Title bar row offset. Defaults to 1. Set to 0 if title bar is hidden.
     _logger : py_cui.debug.PyCUILogger
         logger object for maintaining debug messages
     """
@@ -51,6 +53,7 @@ class Grid:
         self._offset_y      = self._height  % self._num_rows    - 1
         self._row_height    = int(self._height   / self._num_rows)
         self._column_width  = int(self._width    / self._num_columns)
+        self._title_bar_offset = 1
         self._logger        = logger
 
 
