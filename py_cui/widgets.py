@@ -513,7 +513,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         # For scroll menu, handle custom mouse press after initial event, since we will likely want to
         # have access to the newly selected item
-        Widget._handle_mouse_press(x, y, mouse_event)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
 
 
 
@@ -758,7 +758,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -767,7 +767,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        super()._handle_mouse_press(x, y, mouse_event)
         if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
             if x <= len(self._text) + self._cursor_max_left:
                 old_text_pos = self._cursor_text_pos

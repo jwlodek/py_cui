@@ -1624,18 +1624,26 @@ class PyCUI:
                 # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
-                    id, x, y, _, mouse_event = curses.getmouse()
-                    in_element = self.get_element_at_position(x, y)
-
-                    # In first case, we click inside already selected widget, pass click for processing
-                    if in_element is not None:
-                        self._logger.info(f'handling mouse press for elem: {in_element.get_title()}')
-                        in_element._handle_mouse_press(x, y, mouse_event)
                     
-                    # Otherwise, if not a popup, select the clicked on widget
-                    elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
-                        self.move_focus(in_element)
-                        in_element._handle_mouse_press(x, y, mouse_event)
+                    valid_mouse_event = True
+                    try:
+                        id, x, y, _, mouse_event = curses.getmouse()
+                    except curses.error as e:
+                        valid_mouse_event = False
+                        self._logger.error(f'Failed to handle mouse event: {str(e)}')
+
+                    if valid_mouse_event:
+                        in_element = self.get_element_at_position(x, y)
+
+                        # In first case, we click inside already selected widget, pass click for processing
+                        if in_element is not None:
+                            self._logger.info(f'handling mouse press for elem: {in_element.get_title()}')
+                            in_element._handle_mouse_press(x, y, mouse_event)
+
+                        # Otherwise, if not a popup, select the clicked on widget
+                        elif in_element is not None and not isinstance(in_element, py_cui.popups.Popup):
+                            self.move_focus(in_element)
+                            in_element._handle_mouse_press(x, y, mouse_event)
 
                 # If we have a post_loading_callback, fire it here
                 if self._post_loading_callback is not None and not self._loading:
