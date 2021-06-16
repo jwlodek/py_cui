@@ -22,7 +22,7 @@ import logging      # Use logging library for debug purposes
 # there is a open source windows-curses module that adds curses support
 # for python on windows
 import curses
-
+from typing import Any, Callable, List, Dict, Optional, Tuple
 
 # py_cui imports
 import py_cui
@@ -43,7 +43,7 @@ from py_cui.colors import *
 __version__ = '0.1.4'
 
 
-def fit_text(width, text, center=False):
+def fit_text(width: int, text: str, center: bool=False) -> str:
     """Fits text to screen size
 
     Helper function to fit text within a given width. Used to fix issue with status/title bar text
@@ -108,8 +108,8 @@ class PyCUI:
         Dimensions for an alternative simulated terminal (used for testing)
     """
 
-    def __init__(self, num_rows, num_cols, auto_focus_buttons=True,
-                 exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal=None):
+    def __init__(self, num_rows: int, num_cols: int, auto_focus_buttons: bool=True,
+                 exit_key=py_cui.keys.KEY_Q_LOWER, simulated_terminal: List[int]=None):
         """Initializer for PyCUI class
         """
 
@@ -128,8 +128,8 @@ class PyCUI:
             height  = term_size.lines
             width   = term_size.columns
         else:
-            height  = simulated_terminal[0]
-            width   = simulated_terminal[1]
+            height  = self._simulated_terminal[0]
+            width   = self._simulated_terminal[1]
 
         # Add status and title bar
         self.title_bar = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE, root=self, is_title_bar=True)
@@ -158,36 +158,36 @@ class PyCUI:
 
         # Initialize grid, renderer, and widget dict
         self._grid                  = py_cui.grid.Grid(num_rows, num_cols, self._height, self._width, self._logger)
-        self._renderer              = None
-        self._border_characters     = None
-        self._stdscr                = None
-        self._widgets               = {}
+        self._stdscr: Any              = None
         self._refresh_timeout       = -1
+        self._border_characters: Optional[Dict[str,str]] = None
+        self._widgets: Dict[int,Optional['py_cui.widgets.Widget']] = {}
+        self._renderer: Optional['py_cui.renderer.Renderer'] = None
 
         # Variables for determining selected widget/focus mode
-        self._selected_widget       = None
+        self._selected_widget: Optional[int] = None
         self._in_focused_mode       = False
-        self._popup                 = None
+        self._popup: Any = None
         self._auto_focus_buttons    = auto_focus_buttons
 
         # CUI blocks when loading popup is open
         self._loading               = False
         self._stopped               = False
-        self._post_loading_callback = None
-        self._on_draw_update_func   = None
+        self._post_loading_callback: Optional[Callable[[],Any]] = None
+        self._on_draw_update_func: Optional[Callable[[],Any]]   = None
 
         # Top level keybindings. Exit key is 'q' by default
-        self._keybindings  = {}
+        self._keybindings: Dict[int,Any]  = {} # to be discussed
         self._exit_key     = exit_key
         self._forward_cycle_key = py_cui.keys.KEY_CTRL_LEFT
         self._reverse_cycle_key = py_cui.keys.KEY_CTRL_RIGHT
-        self._toggle_live_debug_key = None
+        self._toggle_live_debug_key: Optional[int] = None
 
         # Callback to fire when CUI is stopped.
-        self._on_stop = None
+        self._on_stop: Optional[Callable[[],Any]] = None
 
 
-    def set_refresh_timeout(self, timeout):
+    def set_refresh_timeout(self, timeout: int):
         """Sets the CUI auto-refresh timeout to a number of seconds.
 
         Parameters
@@ -200,7 +200,7 @@ class PyCUI:
         self._refresh_timeout = int(timeout * 1000)
 
 
-    def set_on_draw_update_func(self, update_function):
+    def set_on_draw_update_func(self, update_function: Callable[[],Any]):
         """Adds a function that is fired during each draw call of the CUI
 
         Parameters
@@ -212,7 +212,7 @@ class PyCUI:
         self._on_draw_update_func = update_function
 
 
-    def set_widget_cycle_key(self, forward_cycle_key=None, reverse_cycle_key=None):
+    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None: # Keycodes are type hinted as int
         """Assigns a key for automatically cycling through widgets in both focus and overview modes
 
         Parameters
@@ -227,11 +227,11 @@ class PyCUI:
             self._reverse_cycle_key = reverse_cycle_key
 
 
-    def set_toggle_live_debug_key(self, toggle_debug_key):
+    def set_toggle_live_debug_key(self, toggle_debug_key: int) -> None:
         self._toggle_live_debug_key = toggle_debug_key
 
 
-    def enable_logging(self, log_file_path='py_cui.log', logging_level = logging.DEBUG, live_debug_key = py_cui.keys.KEY_CTRL_D):
+    def enable_logging(self, log_file_path: str='py_cui.log', logging_level = logging.DEBUG, live_debug_key: int = py_cui.keys.KEY_CTRL_D) -> None:
         """Function enables logging for py_cui library
 
         Parameters
@@ -250,7 +250,7 @@ class PyCUI:
             print(f'Failed to initialize logger: {str(e)}')
 
 
-    def apply_widget_set(self, new_widget_set):
+    def apply_widget_set(self, new_widget_set: py_cui.widget_set.WidgetSet) -> None:
         """Function that replaces all widgets in a py_cui with those of a different widget set
 
         Parameters
@@ -278,7 +278,7 @@ class PyCUI:
             raise TypeError('Argument must be of type py_cui.widget_set.WidgetSet')
 
 
-    def create_new_widget_set(self, num_rows, num_cols):
+    def create_new_widget_set(self, num_rows: int, num_cols: int) -> 'py_cui.widget_set.WidgetSet':
         """Function that is used to create additional widget sets
 
         Use this function instead of directly creating widget set object instances, to allow
@@ -308,7 +308,7 @@ class PyCUI:
     # ----------------------------------------------#
 
 
-    def start(self):
+    def start(self) -> None:
         """Function that starts the CUI
         """
 
@@ -316,7 +316,7 @@ class PyCUI:
         curses.wrapper(self._draw)
 
 
-    def stop(self):
+    def stop(self) -> None:
         """Function that stops the CUI, and fires the callback function.
 
         Callback must be a no arg method
@@ -326,7 +326,7 @@ class PyCUI:
         self._stopped = True
 
 
-    def run_on_exit(self, command):
+    def run_on_exit(self, command: Callable[[],Any]):
         """Sets callback function on CUI exit. Must be a no-argument function or lambda function
 
         Parameters
@@ -338,7 +338,7 @@ class PyCUI:
         self._on_stop = command
 
 
-    def set_title(self, title):
+    def set_title(self, title: str) -> None:
         """Sets the title bar text
 
         Parameters
@@ -350,7 +350,7 @@ class PyCUI:
         self._title = title
 
 
-    def set_status_bar_text(self, text):
+    def set_status_bar_text(self, text: str) -> None:
         """Sets the status bar text when in overview mode
 
         Parameters
@@ -363,7 +363,7 @@ class PyCUI:
         self.status_bar.set_text(text)
 
 
-    def _initialize_colors(self):
+    def _initialize_colors(self) -> None:
         """Function for initialzing curses colors. Called when CUI is first created.
         """
 
@@ -375,16 +375,17 @@ class PyCUI:
             curses.init_pair(color_pair, fg_color, bg_color)
 
 
-    def _initialize_widget_renderer(self):
+    def _initialize_widget_renderer(self) -> None:
         """Function that creates the renderer object that will draw each widget
         """
 
         if self._renderer is None:
             self._renderer = py_cui.renderer.Renderer(self, self._stdscr, self._logger)
         for widget_id in self.get_widgets().keys():
-            if self.get_widgets()[widget_id] is not None:
+            widget = self.get_widgets()[widget_id] # using a temporary variable so that mypy doesn't show error
+            if widget is not None:
                 try:
-                    self.get_widgets()[widget_id]._assign_renderer(self._renderer)
+                    widget._assign_renderer(self._renderer)
                 except py_cui.errors.PyCUIError:
                     self._logger.debug(f'Renderer already assigned for widget {self.get_widgets()[widget_id]}')
         try:
@@ -396,7 +397,7 @@ class PyCUI:
             self._logger.debug('Renderer already assigned to popup or live-debug elements')
 
 
-    def toggle_unicode_borders(self):
+    def toggle_unicode_borders(self) -> None:
         """Function for toggling unicode based border rendering
         """
 
@@ -406,7 +407,7 @@ class PyCUI:
             self.set_widget_border_characters('+', '+', '+', '+', '-', '|')
 
 
-    def set_widget_border_characters(self, upper_left_corner, upper_right_corner, lower_left_corner, lower_right_corner, horizontal, vertical):
+    def set_widget_border_characters(self, upper_left_corner: str, upper_right_corner: str, lower_left_corner: str, lower_right_corner: str, horizontal: str, vertical: str) -> None:
         """Function that can be used to set arbitrary border characters for drawing widget borders by renderer.
 
         Parameters
@@ -436,12 +437,12 @@ class PyCUI:
         self._logger.debug(f'Set border_characters to {self._border_characters}')
 
 
-    def get_widgets(self):
+    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:  # docstring to be updated?
         """Function that gets current set of widgets
 
         Returns
         -------
-        widgets : dict of str -> widget
+        widgets : dict of str -> widget # dict of int -> widget
             dictionary mapping widget IDs to object instances
         """
 
@@ -450,7 +451,7 @@ class PyCUI:
     # Widget add functions. Each of these adds a particular type of widget
     # to the grid in a specified location.
 
-    def add_scroll_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0) -> py_cui.widgets.ScrollMenu:
+    def add_scroll_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0) -> 'py_cui.widgets.ScrollMenu':
         """Function that adds a new scroll menu to the CUI grid
 
         Parameters
@@ -495,7 +496,7 @@ class PyCUI:
         return new_scroll_menu
 
 
-    def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X') -> py_cui.widgets.CheckBoxMenu:
+    def add_checkbox_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0, checked_char: str='X') -> 'py_cui.widgets.CheckBoxMenu':
         """Function that adds a new checkbox menu to the CUI grid
 
         Parameters
@@ -543,7 +544,7 @@ class PyCUI:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False) -> py_cui.widgets.TextBox:
+    def add_text_box(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '', password: bool = False) -> 'py_cui.widgets.TextBox':
         """Function that adds a new text box to the CUI grid
 
         Parameters
@@ -592,7 +593,7 @@ class PyCUI:
         return new_text_box
 
 
-    def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '') -> py_cui.widgets.ScrollTextBlock:
+    def add_text_block(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '') -> 'py_cui.widgets.ScrollTextBlock':
         """Function that adds a new text block to the CUI grid
 
         Parameters
@@ -640,7 +641,7 @@ class PyCUI:
         return new_text_block
 
 
-    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0) -> py_cui.widgets.Label:
+    def add_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.Label':
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -683,7 +684,7 @@ class PyCUI:
         return new_label
 
 
-    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True) -> py_cui.widgets.BlockLabel:
+    def add_block_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, center: bool=True) -> 'py_cui.widgets.BlockLabel':
         """Function that adds a new block label to the CUI grid
 
         Parameters
@@ -729,7 +730,7 @@ class PyCUI:
         return new_label
 
 
-    def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None) -> py_cui.widgets.Button:
+    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Callable[[],Any]=None) -> 'py_cui.widgets.Button':
         """Function that adds a new button to the CUI grid
 
         Parameters
@@ -777,9 +778,9 @@ class PyCUI:
         return new_button
 
     
-    def add_slider(self, title, row, column, row_span=1,
-                   column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0) -> py_cui.controls.slider.SliderWidget:
+    def add_slider(self, title: str, row: int, column: int, row_span: int=1,
+                   column_span: int=1, padx: int=1, pady: int=0,
+                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -858,7 +859,7 @@ class PyCUI:
             self.get_widgets()[widget.get_id()] = None
         
 
-    def get_element_at_position(self, x, y):
+    def get_element_at_position(self, x: int, y: int) -> Optional['py_cui.ui.UIElement']:
         """Returns containing widget for character position
 
         Parameters
@@ -879,13 +880,14 @@ class PyCUI:
 
         elif self._popup is None:
             for widget_id in self.get_widgets().keys():
-                if self.get_widgets()[widget_id] is not None:
-                    if self.get_widgets()[widget_id]._contains_position(x, y):
-                        return self.get_widgets()[widget_id]
+                widget = self.get_widgets()[widget_id] # using temp variable for mypy
+                if widget is not None:
+                    if widget._contains_position(x, y):
+                        return widget 
         return None
 
 
-    def _get_horizontal_neighbors(self, widget, direction):
+    def _get_horizontal_neighbors(self, widget: 'py_cui.widgets.Widget', direction: int) -> Optional[List[int]]:
         """Gets all horizontal (left, right) neighbor widgets
 
         Parameters
@@ -919,8 +921,9 @@ class PyCUI:
         for col in range(col_range_start, col_range_stop):
             for row in range(row_start, row_start + row_span):
                 for widget_id in self.get_widgets().keys():
-                    if self.get_widgets()[widget_id] is not None:
-                        if self.get_widgets()[widget_id]._is_row_col_inside(row, col) and widget_id not in id_list:
+                    item_value = self.get_widgets()[widget_id] #using temporary variable, for mypy
+                    if item_value is not None:
+                        if item_value._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
 
         if direction == py_cui.keys.KEY_LEFT_ARROW:
@@ -932,7 +935,7 @@ class PyCUI:
         return id_list
 
 
-    def _get_vertical_neighbors(self, widget, direction):
+    def _get_vertical_neighbors(self, widget: 'py_cui.widgets.Widget', direction: int) -> Optional[List[int]]:
         """Gets all vertical (up, down) neighbor widgets
 
         Parameters
@@ -966,8 +969,9 @@ class PyCUI:
         for row in range(row_range_start, row_range_stop):
             for col in range(col_start, col_start + col_span):
                 for widget_id in self.get_widgets().keys():
-                    if self.get_widgets()[widget_id] is not None:
-                        if self.get_widgets()[widget_id]._is_row_col_inside(row, col) and widget_id not in id_list:
+                    item_value = self.get_widgets()[widget_id] # using temp variable, for mypy
+                    if item_value is not None:
+                        if item_value._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
 
         if direction == py_cui.keys.KEY_UP_ARROW:
@@ -981,7 +985,7 @@ class PyCUI:
     # CUI status functions. Used to switch between widgets, set the mode, and
     # identify neighbors for overview mode
 
-    def _check_if_neighbor_exists(self, direction):
+    def _check_if_neighbor_exists(self, direction: int) -> Optional[int]:
         """Function that checks if widget has neighbor in specified cell.
 
         Used for navigating CUI, as arrow keys find the immediate neighbor
@@ -993,27 +997,29 @@ class PyCUI:
 
         Returns
         -------
-        widget_id : str
+        widget_id : str # returns int after commit 936dee1 
             The widget neighbor ID if found, None otherwise
         """
 
-        start_widget                = self.get_widgets()[self._selected_widget]
+        if self._selected_widget is not None:
+            start_widget: Optional[py_cui.widgets.Widget] = self.get_widgets()[self._selected_widget]
 
         # Find all the widgets in the given row or column
-        neighbors = []
-        if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
-            neighbors = self._get_vertical_neighbors(start_widget, direction)
-        elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
-            neighbors = self._get_horizontal_neighbors(start_widget, direction)
+        neighbors: Optional[List[int]] = []
+        if start_widget is not None:
+            if direction in [py_cui.keys.KEY_DOWN_ARROW, py_cui.keys.KEY_UP_ARROW]:
+                neighbors = self._get_vertical_neighbors(start_widget, direction)
+            elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
+                neighbors = self._get_horizontal_neighbors(start_widget, direction)
 
-        if len(neighbors) == 0:
+        if neighbors is None:
             return None
 
         # We select the best match to jump to (first neighbor)
         return neighbors[0]
 
 
-    def get_selected_widget(self):
+    def get_selected_widget(self) -> Optional['py_cui.widgets.Widget']:
         """Function that gets currently selected widget
 
         Returns
@@ -1029,12 +1035,12 @@ class PyCUI:
             return None
 
 
-    def set_selected_widget(self, widget_id):
+    def set_selected_widget(self, widget_id: int) -> None:
         """Function that sets the selected widget for the CUI
 
         Parameters
         ----------
-        widget_id : str
+        widget_id : str #to be changed
             the id of the widget to select
         """
 
@@ -1045,7 +1051,7 @@ class PyCUI:
             self._logger.warn(f'Widget w/ ID {widget_id} does not exist among current widgets.')
 
 
-    def lose_focus(self):
+    def lose_focus(self) -> None:
         """Function that forces py_cui out of focus mode.
 
         After popup is called, focus is lost
@@ -1054,12 +1060,15 @@ class PyCUI:
         if self._in_focused_mode:
             self._in_focused_mode = False
             self.status_bar.set_text(self._init_status_bar_text)
-            self.get_widgets()[self._selected_widget].set_selected(False)
+            if self._selected_widget is not None:
+                widget = self.get_widgets()[self._selected_widget]
+                if widget is not None:
+                    widget.set_selected(False)
         else:
             self._logger.info('lose_focus: Not currently in focus mode')
 
 
-    def move_focus(self, widget, auto_press_buttons=True):
+    def move_focus(self, widget: 'py_cui.widgets.Widget', auto_press_buttons: bool=True) -> None:
         """Moves focus mode to different widget
 
         Parameters
@@ -1088,7 +1097,7 @@ class PyCUI:
         self._logger.debug(f'Moved focus to widget {widget.get_title()}')
 
 
-    def _cycle_widgets(self, reverse=False):
+    def _cycle_widgets(self, reverse: bool=False) -> None:
         """Function that is fired if cycle key is pressed to move to next widget
 
         Parameters
@@ -1098,34 +1107,37 @@ class PyCUI:
         """
 
         num_widgets = len(self.get_widgets().keys())
-        current_widget_num = self._selected_widget
+        current_widget_num: Optional[int] = self._selected_widget
 
-        if not reverse:
-            next_widget_num = current_widget_num + 1
-            if self.get_widgets()[next_widget_num] is None:
-                if next_widget_num == num_widgets:
-                    next_widget_num = 0
-                next_widget_num = next_widget_num + 1
-            cycle_key = self._forward_cycle_key
-        else:
-            next_widget_num = current_widget_num - 1
-            if self.get_widgets()[next_widget_num] is None:
-                if next_widget_num < 0:
-                    next_widget_num = num_widgets - 1
-                next_widget_num = next_widget_num + 1
-            cycle_key = self._reverse_cycle_key
+        if current_widget_num is not None:
+            if not reverse:
+                next_widget_num = current_widget_num + 1
+                if self.get_widgets()[next_widget_num] is None:
+                    if next_widget_num == num_widgets:
+                        next_widget_num = 0
+                    next_widget_num = next_widget_num + 1
+                cycle_key = self._forward_cycle_key
+            else:
+                next_widget_num = current_widget_num - 1
+                if self.get_widgets()[next_widget_num] is None:
+                    if next_widget_num < 0:
+                        next_widget_num = num_widgets - 1
+                    next_widget_num = next_widget_num + 1
+                cycle_key = self._reverse_cycle_key
 
-        current_widget_id = current_widget_num
-        next_widget_id = next_widget_num
-        
-        if self._in_focused_mode and cycle_key in self.get_widgets()[current_widget_id]._key_commands.keys():
-            # In the event that we are focusing on a widget with that key defined, we do not cycle.
-            pass
-        else:
-            self.move_focus(self.get_widgets()[next_widget_id], auto_press_buttons=False)
+            current_widget_id: int = current_widget_num
+            next_widget_id: int = next_widget_num
+        current_widget = self.get_widgets()[current_widget_id] 
+        next_widget = self.get_widgets()[next_widget_id] 
+        if current_widget and next_widget is not None: #pls check again
+            if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
+                # In the event that we are focusing on a widget with that key defined, we do not cycle.
+                pass
+            else:
+                self.move_focus(next_widget, auto_press_buttons=False)
 
 
-    def add_key_command(self, key, command):
+    def add_key_command(self, key: int, command: Callable[[],Any]) -> None:
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
@@ -1140,7 +1152,7 @@ class PyCUI:
 
     # Popup functions. Used to display messages, warnings, and errors to the user.
 
-    def show_message_popup(self, title, text):
+    def show_message_popup(self, title: str, text: str) -> None:
         """Shows a message popup
 
         Parameters
@@ -1156,7 +1168,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_warning_popup(self, title, text):
+    def show_warning_popup(self, title: str, text: str) -> None:
         """Shows a warning popup
 
         Parameters
@@ -1172,7 +1184,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_error_popup(self, title, text):
+    def show_error_popup(self, title: str, text: str) -> None:
         """Shows an error popup
 
         Parameters
@@ -1188,7 +1200,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_yes_no_popup(self, title, command):
+    def show_yes_no_popup(self, title: str, command: Callable[[bool], Any]):
         """Shows a yes/no popup.
 
         The 'command' parameter must be a function with a single boolean parameter
@@ -1206,7 +1218,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_text_box_popup(self, title, command, password=False):
+    def show_text_box_popup(self, title: str, command: Callable[[str], Any], password: bool=False):
         """Shows a textbox popup.
 
         The 'command' parameter must be a function with a single string parameter
@@ -1226,7 +1238,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_menu_popup(self, title, menu_items, command, run_command_if_none=False):
+    def show_menu_popup(self, title: str, menu_items: List[str], command: Callable[[str], Any], run_command_if_none: bool=False):
         """Shows a menu popup.
 
         The 'command' parameter must be a function with a single string parameter
@@ -1248,7 +1260,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_loading_icon_popup(self, title, message, callback=None):
+    def show_loading_icon_popup(self, title: str, message: str, callback: Callable[[],Any]=None):
         """Shows a loading icon popup
 
         Parameters
@@ -1271,7 +1283,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_loading_bar_popup(self, title, num_items, callback=None):
+    def show_loading_bar_popup(self, title: str, num_items: List[int], callback: Callable[[],Any]=None) -> None:
         """Shows loading bar popup.
 
         Use 'increment_loading_bar' to show progress
@@ -1296,7 +1308,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_form_popup(self, title, fields, passwd_fields=[], required=[], callback=None):
+    def show_form_popup(self, title: str, fields: List[str], passwd_fields: List[str]=[], required: List[str]=[], callback: Callable[[],Any]=None) -> None:
         """Shows form popup.
 
         Used for inputting several fields worth of values
@@ -1332,7 +1344,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
 
-    def show_filedialog_popup(self, popup_type='openfile', initial_dir='.', callback=None, ascii_icons=True, limit_extensions=[]):
+    def show_filedialog_popup(self, popup_type: str='openfile', initial_dir: str ='.', callback: Callable[[],Any]=None, ascii_icons: bool=True, limit_extensions: List[str]=[]) -> None:
         """Shows form popup.
 
         Used for inputting several fields worth of values
@@ -1364,7 +1376,7 @@ class PyCUI:
         self._logger.debug(f'Opened {str(type(self._popup))} popup with type {popup_type}')
 
 
-    def increment_loading_bar(self):
+    def increment_loading_bar(self) -> None:
         """Increments progress bar if loading bar popup is open
         """
 
@@ -1374,7 +1386,7 @@ class PyCUI:
             self._logger.warn('No popup is currently opened.')
 
 
-    def stop_loading_popup(self):
+    def stop_loading_popup(self) -> None:
         """Leaves loading state, and closes popup.
 
         Must be called by user to escape loading.
@@ -1385,7 +1397,7 @@ class PyCUI:
         self._logger.debug('Stopping open loading popup')
 
 
-    def close_popup(self):
+    def close_popup(self) -> None:
         """Closes the popup, and resets focus
         """
 
@@ -1393,7 +1405,7 @@ class PyCUI:
         self._popup = None
 
 
-    def _refresh_height_width(self):
+    def _refresh_height_width(self) -> None:
         """Function that updates the height and width of the CUI based on terminal window size."""
         
         if self._simulated_terminal is None:
@@ -1416,14 +1428,15 @@ class PyCUI:
         self._width  = width
         self._grid.update_grid_height_width(self._height, self._width)
         for widget_id in self.get_widgets().keys():
-            if self.get_widgets()[widget_id] is not None:
-                self.get_widgets()[widget_id].update_height_width()
+            widget = self.get_widgets()[widget_id] #using temp variable, for mypy
+            if widget is not None:
+                widget.update_height_width()
         if self._popup is not None:
             self._popup.update_height_width()
         if self._logger._live_debug_element is not None:
             self._logger._live_debug_element.update_height_width()
 
-    def get_absolute_size(self):
+    def get_absolute_size(self) -> Tuple[int,int]:
         """Returns dimensions of CUI
 
         Returns
@@ -1436,18 +1449,21 @@ class PyCUI:
 
     # Draw Functions. Function for drawing widgets, status bars, and popups
 
-    def _draw_widgets(self):
+    def _draw_widgets(self) -> None:
         """Function that draws all of the widgets to the screen
         """
 
         for widget_id in self.get_widgets().keys():
             if widget_id != self._selected_widget:
-                if self.get_widgets()[widget_id] is not None:
-                    self.get_widgets()[widget_id]._draw()
+                widget = self.get_widgets()[widget_id] 
+                if widget is not None:
+                    widget._draw()
 
         # We draw the selected widget last to support cursor location.
         if self._selected_widget is not None:
-            self.get_widgets()[self._selected_widget]._draw()
+            widget = self.get_widgets()[self._selected_widget]
+            if widget is not None:
+                widget._draw()
 
         if self._logger is not None and self._logger.is_live_debug_enabled():
             self._logger.draw_live_debug()
@@ -1455,7 +1471,7 @@ class PyCUI:
         self._logger.info('Drew widgets')
 
 
-    def _draw_status_bars(self, stdscr, height, width):
+    def _draw_status_bars(self, stdscr, height: int, width: int) -> None:
         """Draws status bar and title bar
 
         Parameters
@@ -1479,7 +1495,7 @@ class PyCUI:
             stdscr.attroff(curses.color_pair(self.title_bar.get_color()))
 
 
-    def _display_window_warning(self, stdscr, error_info):
+    def _display_window_warning(self, stdscr, error_info: str) -> None:
         """Function that prints some basic error info if there is an error with the CUI
 
         Parameters
@@ -1500,7 +1516,7 @@ class PyCUI:
         self._logger.error(f'Encountered error -> {error_info}')
 
 
-    def _handle_key_presses(self, key_pressed):
+    def _handle_key_presses(self, key_pressed: int) -> None:
         """Function that handles all main loop key presses.
 
         Parameters
@@ -1514,7 +1530,8 @@ class PyCUI:
             return
 
         selected_widget = self.get_widgets()[self._selected_widget]
-
+        if selected_widget is None:
+            return
         # If logging is enabled, the Ctrl + D key code will enable "live-debug"
         # mode, where debug messages are printed on the screen
         if self._logger is not None and self._toggle_live_debug_key is not None:
@@ -1555,7 +1572,9 @@ class PyCUI:
                 neighbor = self._check_if_neighbor_exists(key_pressed)
             if neighbor is not None:
                 self.set_selected_widget(neighbor)
-                self._logger.debug(f'Navigated to neighbor widget {self.get_widgets()[self._selected_widget].get_title()}')
+                widget = self.get_widgets()[self._selected_widget]
+                if widget is not None:
+                    self._logger.debug(f'Navigated to neighbor widget {widget.get_title()}')
 
         # if we have a popup, that takes key control from both overview and focus mode
         elif self._popup is not None:
@@ -1563,11 +1582,11 @@ class PyCUI:
             self._popup._handle_key_press(key_pressed)
 
 
-    def _draw(self, stdscr):
+    def _draw(self, stdscr) -> None: 
         """Main CUI draw loop called by start()
 
         Parameters
-        ----------
+        --------
         stdscr : curses Standard screen
             The screen buffer used for drawing CUI elements
         """
@@ -1591,7 +1610,7 @@ class PyCUI:
             self._stdscr.timeout(self._refresh_timeout)
 
         # If user sets non-default border characters, update them here
-        if self._border_characters is not None:
+        if self._border_characters is not None and self._renderer is not None:
             self._renderer._set_border_renderer_chars(self._border_characters)
 
         # Loop where key_pressed is the last character pressed. Wait for exit key while no popup or focus mode
