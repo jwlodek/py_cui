@@ -416,7 +416,8 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
         self._renderer.set_color_rules([])
         counter = self._pady + 1
         line_counter = 0
-        for line in self._view_items:
+        for item in self._view_items:
+            line = str(item)
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:
