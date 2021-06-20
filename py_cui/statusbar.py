@@ -5,7 +5,7 @@ TODO: File can probably be abstracted away - probably doesn't need a class
 
 # Author:    Jakub Wlodek
 # Created:   12-Aug-2019
-
+import py_cui
 
 class StatusBar:
     """Very simple class representing a status bar
@@ -22,7 +22,7 @@ class StatusBar:
         Is the StatusBar displayed on the top of the grid
     """
 
-    def __init__(self, text, color, root, is_title_bar=False):
+    def __init__(self, text: str, color: int, root: 'py_cui.PyCUI', is_title_bar=False):
         """Initializer for statusbar
         """
 
@@ -33,7 +33,7 @@ class StatusBar:
         self.__is_title_bar = is_title_bar
 
 
-    def get_color(self):
+    def get_color(self) -> int:
         """Getter for status bar color
 
         Returns
@@ -45,7 +45,7 @@ class StatusBar:
         return self.__color
 
 
-    def get_text(self):
+    def get_text(self) -> str:
         """Getter for status bar text
 
         Returns
@@ -57,7 +57,7 @@ class StatusBar:
         return self.__text
 
 
-    def set_color(self, color):
+    def set_color(self, color) -> None:
         """Setter for statusbar color
 
         Parameters
@@ -69,7 +69,7 @@ class StatusBar:
         self.__color = color
 
 
-    def set_text(self, text):
+    def set_text(self, text: str) -> None :
         """Sets the statusbar text
 
         Parameters
@@ -80,7 +80,7 @@ class StatusBar:
 
         self.__text = text
 
-    def get_height(self):
+    def get_height(self) -> int :
         """Getter for status bar height in row
 
         Returns
@@ -91,19 +91,19 @@ class StatusBar:
 
         return self.__height
 
-    def show(self):
+    def show(self) -> None:
         """Sets the status bar height to 1"""
 
         self.__height = 1
         self._refresh_root_size()
 
-    def hide(self):
+    def hide(self) -> None:
         """Sets the status bar height to 0"""
 
         self.__height = 0
         self._refresh_root_size()
 
-    def _refresh_root_size(self):
+    def _refresh_root_size(self) -> None:
         """Resets the grid's title bar offset if needed and calls a UI size update."""
 
         if self.__is_title_bar:
