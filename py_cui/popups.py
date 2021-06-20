@@ -7,6 +7,7 @@
 
 # required library imports
 import curses
+from typing import Tuple
 import py_cui
 import py_cui.ui
 import py_cui.errors
@@ -32,7 +33,7 @@ class Popup(py_cui.ui.UIElement):
     """
 
 
-    def __init__(self, root, title, text, color, renderer, logger):
+    def __init__(self, root: 'py_cui.PyCUI', title: str, text: str, color: int, renderer: 'py_cui.renderer.Renderer', logger):
         """Initializer for main popup class. Calls UIElement intialier, and sets some initial values
         """
 
@@ -56,7 +57,7 @@ class Popup(py_cui.ui.UIElement):
         pass
 
 
-    def set_text(self, text):
+    def set_text(self, text: str) -> None :
         """Sets popup text (message)
 
         Parameters
@@ -68,7 +69,7 @@ class Popup(py_cui.ui.UIElement):
         self._text = text
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -81,7 +82,7 @@ class Popup(py_cui.ui.UIElement):
         return int(root_width / 4), int(root_height / 3)
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -94,7 +95,7 @@ class Popup(py_cui.ui.UIElement):
         return (int(3 * root_width / 4)), (int(2 * root_height / 3))
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Handles key presses when popup is open
 
         By default, only closes popup when Escape is pressed
@@ -109,7 +110,7 @@ class Popup(py_cui.ui.UIElement):
             self._root.close_popup()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Function that uses renderer to draw the popup
 
         Can be implemented by subclass. Base draw function will draw the title and text in a bordered box
@@ -144,7 +145,7 @@ class MessagePopup(Popup):
                             py_cui.keys.KEY_DELETE]
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Draw function for MessagePopup. Calls superclass draw()
         """
 
@@ -168,7 +169,7 @@ class YesNoPopup(Popup):
         self._command = command
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int):
         """Handle key press overwrite from superclass
 
         Parameters
@@ -220,7 +221,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         self.update_height_width()
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Need to update all cursor positions on resize
         """
 
@@ -236,7 +237,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         self._viewport_width    = self._cursor_max_right - self._cursor_max_left
 
 
-    def _handle_mouse_press(self, x, y, mouse_event):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event) -> None:
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -257,7 +258,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
                 self._cursor_text_pos = len(self._text)
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int):
         """Override of base handle key press function
 
         Parameters
@@ -295,7 +296,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
             self._insert_char(key_pressed)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base draw function
         """
 
@@ -335,7 +336,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
         Runs command even if there are no menu items (passes None)
     """
 
-    def __init__(self, root, items, title, color, command, renderer, logger, run_command_if_none):
+    def __init__(self, root: 'py_cui.PyCUI', items, title, color, command, renderer, logger, run_command_if_none):
         """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
@@ -346,7 +347,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
         self._run_command_if_none  = run_command_if_none
 
 
-    def _handle_mouse_press(self, x, y, mouse_event):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -367,12 +368,12 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
                 # For double clicks we also process the menu selection
                 if mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
                     ret_val = self.get()
-                    self.root.close_popup()
+                    self._root.close_popup()
                     self._command(ret_val)
 
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base handle key press function
 
         Enter key runs command, Escape key closes menu
@@ -407,7 +408,7 @@ class MenuPopup(Popup, py_cui.ui.MenuImplementation):
             self._scroll_down(viewport_height)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Overrides base class draw function
         """
 
@@ -457,7 +458,7 @@ class LoadingIconPopup(Popup):
         self._message = message
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int):
         """Override of base class function.
 
         Loading icon popups cannot be cancelled, so we wish to avoid default behavior
@@ -471,7 +472,7 @@ class LoadingIconPopup(Popup):
         pass
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Overrides base draw function
         """
 
@@ -508,7 +509,7 @@ class LoadingBarPopup(Popup):
         self._completed_items    = 0
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int):
         """Override of base class function.
 
         Loading icon popups cannot be cancelled, so we wish to avoid default behavior
@@ -521,14 +522,14 @@ class LoadingBarPopup(Popup):
 
         pass
 
-    def _increment_counter(self):
+    def _increment_counter(self) -> None:
         """Function that increments an internal counter
         """
 
         self._completed_items += 1
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base draw function
         """
 

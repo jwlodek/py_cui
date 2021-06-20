@@ -1,6 +1,7 @@
 """Form widget for py_cui. Allows for giving user several fillable text fields in one block
 """
 
+from typing import Any, Callable, Dict, List, Optional, Tuple
 import py_cui.ui
 import py_cui.widgets
 import py_cui.popups
@@ -24,7 +25,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
         Toggle for making the field be required
     """
 
-    def __init__(self, fieldname, initial_text, password, required, logger):
+    def __init__(self, fieldname: str, initial_text: str, password: bool, required: bool, logger):
         """Initializer for base FormFields
         """
 
@@ -33,7 +34,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
         self._required = required
 
 
-    def get_fieldname(self):
+    def get_fieldname(self) -> str:
         """Getter for field name
 
         Returns
@@ -45,7 +46,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
         return self._fieldname
 
 
-    def is_valid(self):
+    def is_valid(self) -> Tuple[bool,Optional[str]]:
         """Function that checks if field is valid.
 
         This function can be implemented by subclasses to support different
@@ -66,7 +67,7 @@ class FormField(py_cui.ui.TextBoxImplementation):
         return msg is None, msg
 
 
-    def is_required(self):
+    def is_required(self) -> bool:
         """Checks if field is required
         
         Returns
@@ -89,7 +90,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
         The parent UI Element that contains the form element
     """
 
-    def __init__(self, parent_form, field_index, field, init_text, passwd, required, renderer, logger):
+    def __init__(self, parent_form, field_index: int, field, init_text: str, passwd: bool, required: bool, renderer: 'py_cui.renderer.Renderer', logger):
         """Initializer for the FormFieldElement class
         """
 
@@ -104,7 +105,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
         self.update_height_width()
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute start position
 
         Returns
@@ -121,7 +122,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
         return field_start_x, field_start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute stop position
 
         Returns
@@ -139,7 +140,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
         return field_stop_x, field_stop_y
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Override of base class. Updates text field variables for form field
         """
 
@@ -155,7 +156,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
         self._viewport_width    = self._cursor_max_right - self._cursor_max_left
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Handles text input for the field. Called by parent
         """
 
@@ -217,7 +218,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
         Function fired when submit is called
     """
 
-    def __init__(self, field_implementations, required_fields, logger):
+    def __init__(self, field_implementations: List['FormField'], required_fields: List[str], logger):
         """Initializer for the FormImplemnentation class
         """
 
@@ -226,10 +227,10 @@ class FormImplementation(py_cui.ui.UIImplementation):
         self._required_fields = required_fields
         
         self._selected_form_index = 0
-        self._on_submit_action = None
+        self._on_submit_action: Optional[Callable[[],Any]] = None
 
 
-    def get_selected_form_index(self):
+    def get_selected_form_index(self) -> int:
         """Getter for selected form index
 
         Returns
@@ -240,7 +241,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
 
         return self._selected_form_index
 
-    def set_selected_form_index(self, form_index):
+    def set_selected_form_index(self, form_index: int) -> None:
         """Setter for selected form index
 
         Parameters
@@ -252,7 +253,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
         self._selected_form_index = form_index
 
 
-    def set_on_submit_action(self, on_submit_action):
+    def set_on_submit_action(self, on_submit_action: Callable[[],Any]):
         """Setter for callback on submit
 
         Parameters
@@ -264,7 +265,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
         self._on_submit_action = on_submit_action
 
 
-    def jump_to_next_field(self):
+    def jump_to_next_field(self) -> None:
         """Function used to jump between form fields
         """
 
@@ -274,7 +275,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
             self.set_selected_form_index(0)
 
 
-    def is_submission_valid(self):
+    def is_submission_valid(self) -> Tuple[bool,Optional[str]]:
         """Function that checks if all fields are filled out correctly
 
         Returns
@@ -292,7 +293,7 @@ class FormImplementation(py_cui.ui.UIImplementation):
         return True, None
 
 
-    def get(self):
+    def get(self) -> Dict[str,str]:
         """Gets values entered into field as a dictionary
 
         Returns
@@ -323,7 +324,7 @@ class InternalFormPopup(py_cui.popups.MessagePopup):
         The parent form popup that spawned the message popup
     """
 
-    def __init__(self, parent, *args):
+    def __init__(self, parent: 'FormPopup', *args):
         """Initializer for Internal form Popup
         """
 
@@ -331,7 +332,7 @@ class InternalFormPopup(py_cui.popups.MessagePopup):
         self._parent = parent
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class, close in parent instead of root
         """
 
@@ -360,7 +361,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
 
         py_cui.popups.Popup.__init__(self, root, title, '', color, renderer, logger)
 
-        self._form_fields = []
+        self._form_fields: List['FormFieldElement'] = []
         for i, field in enumerate(fields):
             init_text = ''
             if field in fields_init_text:
@@ -379,7 +380,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
         self._internal_popup = None
 
 
-    def get_num_fields(self):
+    def get_num_fields(self) -> int:
         """Getter for number of fields
 
         Returns
@@ -391,7 +392,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
         return self._num_fields
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -417,7 +418,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
         return form_start_x, form_start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -443,7 +444,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
         return form_stop_x, form_stop_y
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Override of base class function
 
         Also updates all form field elements in the form
@@ -457,7 +458,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
             pass
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class. Here, we handle tabs, enters, and escapes
 
         All other key presses are passed to the currently selected field element
@@ -477,7 +478,8 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                 valid, err_msg = self.is_submission_valid()
                 if valid:
                     self._root.close_popup()
-                    self._on_submit_action(self.get())
+                    if self._on_submit_action is not None:
+                        self._on_submit_action(self.get()) #on_submit_action is a no-arg function?
                 else:
                     self._internal_popup = InternalFormPopup(self,
                                                              self._root, 
@@ -495,7 +497,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
             self._internal_popup._handle_key_press(key_pressed)
 
 
-    def _handle_mouse_press(self, x, y, mouse_event):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Override of base class function
 
         Simply enters the appropriate field when mouse is pressed on it
@@ -515,7 +517,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                 break
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base class.
         
         Here, we only draw a border, and then the individual form elements

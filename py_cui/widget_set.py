@@ -9,9 +9,14 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
 
 import shutil
+from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
 import py_cui.widgets as widgets
 import py_cui.grid as grid
 import py_cui.controls as controls
+
+if TYPE_CHECKING:
+    import py_cui
+    import py_cui.widgets
 
 
 class WidgetSet:
@@ -33,11 +38,11 @@ class WidgetSet:
         Main PyCUI object reference
     """
 
-    def __init__(self, num_rows, num_cols, logger, root, simulated_terminal=None):
+    def __init__(self, num_rows: int, num_cols: int, logger: 'py_cui.debug.PyCUILogger', root:'py_cui.PyCUI', simulated_terminal: Optional[List[int]] =None):
         """Constructor for WidgetSet
         """
 
-        self._widgets      = {}
+        self._widgets: Dict[int,Optional['py_cui.widgets.Widget']]      = {}
         self._keybindings  = {}
 
         self._root = root
@@ -58,11 +63,11 @@ class WidgetSet:
 
         self._grid = grid.Grid(num_rows, num_cols, self._height, self._width, logger)
 
-        self._selected_widget = None
+        self._selected_widget: Optional[int] = None
         self._logger = logger
 
 
-    def set_selected_widget(self, widget_id):
+    def set_selected_widget(self, widget_id: int) -> None:
         """Function that sets the selected cell for the CUI
 
         Parameters
@@ -75,7 +80,7 @@ class WidgetSet:
             self._selected_widget = widget_id
 
 
-    def get_widgets(self):
+    def get_widgets(self) -> Dict[int, Optional['py_cui.widgets.Widget']]:
         """Function that gets current set of widgets
 
         Returns
@@ -87,7 +92,7 @@ class WidgetSet:
         return self._widgets
 
 
-    def add_key_command(self, key, command):
+    def add_key_command(self, key: int, command: Callable[[],Any]):
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
@@ -101,7 +106,7 @@ class WidgetSet:
         self._keybindings[key] = command
 
 
-    def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_scroll_menu(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.ScrollMenu':
         """Function that adds a new scroll menu to the CUI grid
 
         Parameters
@@ -145,7 +150,7 @@ class WidgetSet:
         return new_scroll_menu
 
 
-    def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X'):
+    def add_checkbox_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0, checked_char: str='X') -> 'py_cui.widgets.CheckBoxMenu':
         """Function that adds a new checkbox menu to the CUI grid
 
         Parameters
@@ -192,7 +197,7 @@ class WidgetSet:
         return new_checkbox_menu
 
 
-    def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False):
+    def add_text_box(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '', password: bool = False) -> 'py_cui.widgets.TextBox':
         """Function that adds a new text box to the CUI grid
 
         Parameters
@@ -240,7 +245,7 @@ class WidgetSet:
         return new_text_box
 
 
-    def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = ''):
+    def add_text_block(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '') -> 'py_cui.widgets.ScrollTextBlock':
         """Function that adds a new text block to the CUI grid
 
         Parameters
@@ -287,7 +292,7 @@ class WidgetSet:
         return new_text_block
 
 
-    def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
+    def add_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.Label':
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -329,7 +334,7 @@ class WidgetSet:
         return new_label
 
 
-    def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True):
+    def add_block_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, center: bool=True) -> 'py_cui.widgets.BlockLabel':
         """Function that adds a new block label to the CUI grid
 
         Parameters
@@ -374,7 +379,7 @@ class WidgetSet:
         return new_label
 
 
-    def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None):
+    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Callable[[],Any]=None) -> 'py_cui.widgets.Button':
         """Function that adds a new button to the CUI grid
 
         Parameters
@@ -421,9 +426,11 @@ class WidgetSet:
         return new_button
 
 
-    def add_slider(self, title, row, column, row_span=1,
-                   column_span=1, padx=1, pady=0,
-                   min_val=0, max_val=100, step=1, init_val=0):
+    def add_slider(self, title: str, row: int, column: int, row_span: int=1,
+                   column_span: int=1, padx: int=1, pady: int=0,
+                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':     
+                   
+                   
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -458,7 +465,7 @@ class WidgetSet:
             A reference to the created slider object.
         """
 
-        id = f'Widget{len(self._widgets.keys())}'
+        id = len(self._widgets.keys())
         new_slider = controls.slider.SliderWidget(id,
                                                   title,
                                                   self._grid,

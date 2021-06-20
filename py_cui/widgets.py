@@ -459,7 +459,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
     """A scroll menu widget.
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger):
+    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger: 'py_cui.debug.PyCUILogger'):
         """Initializer for scroll menu. calls superclass initializers and sets help text
         """
 

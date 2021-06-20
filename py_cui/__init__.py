@@ -43,7 +43,7 @@ from py_cui.colors import *
 __version__ = '0.1.4'
 
 
-def fit_text(width: int, text: str, center: bool=False) -> str:
+def fit_text(width: int, text: str, center: bool = False) -> str:
     """Fits text to screen size
 
     Helper function to fit text within a given width. Used to fix issue with status/title bar text
@@ -128,8 +128,8 @@ class PyCUI:
             height  = term_size.lines
             width   = term_size.columns
         else:
-            height  = self._simulated_terminal[0]
-            width   = self._simulated_terminal[1]
+            height = self._simulated_terminal[0]
+            width  = self._simulated_terminal[1]
 
         # Add status and title bar
         self.title_bar = py_cui.statusbar.StatusBar(self._title, BLACK_ON_WHITE, root=self, is_title_bar=True)
@@ -488,7 +488,8 @@ class PyCUI:
                                                     padx,
                                                     pady,
                                                     self._logger)
-        new_scroll_menu._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_scroll_menu._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_scroll_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -536,7 +537,8 @@ class PyCUI:
                                                         pady,
                                                         self._logger,
                                                         checked_char)
-        new_checkbox_menu._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_checkbox_menu._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_checkbox_menu
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -585,7 +587,8 @@ class PyCUI:
                                               self._logger,
                                               initial_text,
                                               password)
-        new_text_box._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_text_box._assign_renderer(self._renderer)
         self.get_widgets()[id]    = new_text_box
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -633,7 +636,8 @@ class PyCUI:
                                                         pady,
                                                         self._logger,
                                                         initial_text)
-        new_text_block._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_text_block._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_text_block
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -678,7 +682,8 @@ class PyCUI:
                                          padx,
                                          pady,
                                          self._logger)
-        new_label._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_label._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_label
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
         return new_label
@@ -724,7 +729,8 @@ class PyCUI:
                                               pady,
                                               center,
                                               self._logger)
-        new_label._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_label._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_label
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
         return new_label
@@ -770,7 +776,8 @@ class PyCUI:
                                            pady,
                                            self._logger,
                                            command)
-        new_button._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_button._assign_renderer(self._renderer)
         self.get_widgets()[id]  = new_button
         if self._selected_widget is None:
             self.set_selected_widget(id)
@@ -829,7 +836,8 @@ class PyCUI:
                                                          max_val,
                                                          step,
                                                          init_val)
-        new_slider._assign_renderer(self._renderer)
+        if self._renderer is not None:
+            new_slider._assign_renderer(self._renderer)
         self.get_widgets()[id] = new_slider
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_slider))}')
         return new_slider
