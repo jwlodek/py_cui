@@ -16,7 +16,6 @@ import py_cui.controls as controls
 
 if TYPE_CHECKING:
     import py_cui
-    import py_cui.widgets
 
 
 class WidgetSet:

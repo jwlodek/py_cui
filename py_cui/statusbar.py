@@ -22,7 +22,7 @@ class StatusBar:
         Is the StatusBar displayed on the top of the grid
     """
 
-    def __init__(self, text: str, color: int, root: 'py_cui.PyCUI', is_title_bar=False):
+    def __init__(self, text: str, color: int, root: 'py_cui.PyCUI', is_title_bar: bool=False):
         """Initializer for statusbar
         """
 

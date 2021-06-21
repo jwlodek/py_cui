@@ -7,10 +7,10 @@ Contains base UI element class, along with UI implementation agnostic UI element
 # Created:   19-Mar-2020
 
 
-from typing import Any, List, NoReturn, Optional, Tuple, Union
 import py_cui
 import py_cui.errors
 import py_cui.colors
+from typing import Any, List, Optional, Tuple
 
 
 class UIElement:
@@ -682,7 +682,7 @@ class MenuImplementation(UIImplementation):
         self._view_items       = []
 
 
-    def clear(self):
+    def clear(self) -> None:
         """Clears all items from the Scroll Menu
         """
 
@@ -793,7 +793,7 @@ class MenuImplementation(UIImplementation):
             self._top_view = 0
 
 
-    def add_item(self, item: Any): # How to type hint item? - typing.Portocol supports from python3.7 only
+    def add_item(self, item: Any) -> None: 
         """Adds an item to the menu.
 
         Parameters
@@ -806,7 +806,7 @@ class MenuImplementation(UIImplementation):
         self._view_items.append(item)
 
 
-    def add_item_list(self, item_list: List[Any]): # how to type hint item? - typing.Portocol supports from python3.7 only
+    def add_item_list(self, item_list: List[Any]) -> None:
 
         """Adds a list of items to the scroll menu.
 
@@ -833,7 +833,7 @@ class MenuImplementation(UIImplementation):
             self._selected_item = self._selected_item - 1
 
 
-    def remove_item(self, item) -> None:
+    def remove_item(self, item: Any) -> None:
         """Function that removes a specific item from the menu
 
         Parameters
@@ -910,7 +910,7 @@ class CheckBoxMenuImplementation(MenuImplementation):
         self._checked_char       = checked_char
 
 
-    def add_item(self, item):
+    def add_item(self, item: Any) -> None:
         """Extends base class function, item is added and marked as unchecked to start
 
         Parameters

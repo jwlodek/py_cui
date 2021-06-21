@@ -382,7 +382,7 @@ class PyCUI:
         if self._renderer is None:
             self._renderer = py_cui.renderer.Renderer(self, self._stdscr, self._logger)
         for widget_id in self.get_widgets().keys():
-            widget = self.get_widgets()[widget_id] # using a temporary variable so that mypy doesn't show error
+            widget = self.get_widgets()[widget_id]
             if widget is not None:
                 try:
                     widget._assign_renderer(self._renderer)
@@ -437,12 +437,12 @@ class PyCUI:
         self._logger.debug(f'Set border_characters to {self._border_characters}')
 
 
-    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:  # docstring to be updated?
+    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:  
         """Function that gets current set of widgets
 
         Returns
         -------
-        widgets : dict of str -> widget # dict of int -> widget
+        widgets : dict of int -> widget 
             dictionary mapping widget IDs to object instances
         """
 
@@ -843,7 +843,7 @@ class PyCUI:
         return new_slider
 
 
-    def forget_widget(self, widget : py_cui.widgets.Widget) -> None:
+    def forget_widget(self, widget : 'py_cui.widgets.Widget') -> None:
         """Function that is used to destroy or "forget" widgets. Forgotten widgets will no longer be drawn
 
         Parameters
@@ -977,7 +977,7 @@ class PyCUI:
         for row in range(row_range_start, row_range_stop):
             for col in range(col_start, col_start + col_span):
                 for widget_id in self.get_widgets().keys():
-                    item_value = self.get_widgets()[widget_id] # using temp variable, for mypy
+                    item_value = self.get_widgets()[widget_id] 
                     if item_value is not None:
                         if item_value._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
@@ -1005,7 +1005,7 @@ class PyCUI:
 
         Returns
         -------
-        widget_id : str # returns int after commit 936dee1 
+        widget_id : int  
             The widget neighbor ID if found, None otherwise
         """
 
@@ -1048,7 +1048,7 @@ class PyCUI:
 
         Parameters
         ----------
-        widget_id : str #to be changed
+        widget_id : int 
             the id of the widget to select
         """
 

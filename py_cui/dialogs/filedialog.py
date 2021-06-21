@@ -1,12 +1,12 @@
 """Implementation, widget, and popup classes for file selection dialogs
 """
 
-from typing import Optional, Tuple
 import py_cui.ui
 import py_cui.widgets
 import py_cui.popups
 import py_cui.colors
 import os
+from typing import List, Optional, Tuple
 
 # Imports used to detect hidden files
 import sys
@@ -116,7 +116,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
     """
 
 
-    def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False):
+    def __init__(self, initial_loc: str, dialog_type: str, ascii_icons, logger, limit_extensions: List[str] = [], show_hidden: bool=False):
         """Initalizer for the file select menu implementation. Includes some logic for getting list of file and folders.
         """
 
@@ -182,7 +182,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         Runs command even if there are no menu items (passes None)
     """
 
-    def __init__(self, root, initial_dir, dialog_type, ascii_icons, title, color, command, renderer, logger, limit_extensions=[]):
+    def __init__(self, root, initial_dir, dialog_type: str, ascii_icons, title, color, command, renderer, logger, limit_extensions: List[str]=[]):
         """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
@@ -659,15 +659,15 @@ class FileDialogPopup(py_cui.popups.Popup):
         self._currently_selected = self._file_dir_select
 
 
-    def _submit(self, output):
+    def _submit(self, output: str) -> None:
         valid, msg = self.output_valid(output)
-        if not valid:
+        if not valid and msg is not None:
             self.display_warning(msg)
         else:
             self._submit_action(output)
 
 
-    def display_warning(self, message: str):
+    def display_warning(self, message: str) -> None:
         """Helper function for showing internal popup warning message
 
         Parameters

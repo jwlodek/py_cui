@@ -7,10 +7,9 @@
 import os
 import logging
 import inspect
-from types import FrameType
-from typing import Any, NoReturn, Optional, Tuple, Union
 import py_cui
 import datetime
+from typing import Any, Optional, Tuple
 
 
 def _enable_logging(logger: 'PyCUILogger', replace_log_file: bool=True, filename: str='py_cui.log', logging_level=logging.DEBUG) :
@@ -311,7 +310,7 @@ class PyCUILogger(logging.Logger):
         msg : str
             Log message with function, file, and line num info
         """
-        current_frame: Optional['FrameType'] = inspect.currentframe()
+        current_frame  = inspect.currentframe()
         if current_frame and current_frame.f_back and current_frame.f_back.f_back  is not None:
             func = current_frame.f_back.f_back.f_code
         return f'{text}: Function {func.co_name} in {os.path.basename(func.co_filename)}:{func.co_firstlineno}'

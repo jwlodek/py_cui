@@ -5,10 +5,10 @@
 # Created:   12-Aug-2019
 
 
-from typing import List, Tuple, Union
 import py_cui
 import curses
 import re
+from typing import List, Tuple, Union
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -345,7 +345,7 @@ class ColorRule:
         fragments: List[List[Union[int,str]]] = []
         match       = self._check_match(line)
         if selected:
-            fragments = [[render_text, widget.get_selected_color()]] # tuple might be better?
+            fragments = [[render_text, widget.get_selected_color()]] 
         else:
             fragments = [[render_text, widget.get_color()]]
         

@@ -7,10 +7,8 @@
 import curses
 import py_cui
 import py_cui.colors
-from typing import Any, Dict, Tuple, List, TYPE_CHECKING, Union, cast
+from typing import Dict, List, Union
 
-if TYPE_CHECKING:
-    import py_cui.ui
 
 
 class Renderer:
@@ -310,7 +308,7 @@ class Renderer:
         else:
             render_text = line[start_pos:start_pos + render_text_length]
 
-        render_text_fragments = self._generate_text_color_fragments(ui_element, line, render_text, selected) # returns List[List[int,str]]
+        render_text_fragments = self._generate_text_color_fragments(ui_element, line, render_text, selected) 
         return render_text_fragments
 
 

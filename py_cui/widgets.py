@@ -23,11 +23,12 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 import curses
 import inspect
-from typing import Callable, List, Dict, Tuple, Any, Optional
 import py_cui
 import py_cui.ui
 import py_cui.colors
 import py_cui.errors
+
+from typing import Callable, List, Dict, Tuple, Any, Optional
 
 
 class Widget(py_cui.ui.UIElement):

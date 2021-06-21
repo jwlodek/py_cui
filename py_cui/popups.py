@@ -7,10 +7,10 @@
 
 # required library imports
 import curses
-from typing import Tuple
 import py_cui
 import py_cui.ui
 import py_cui.errors
+from typing import Tuple
 
 
 class Popup(py_cui.ui.UIElement):

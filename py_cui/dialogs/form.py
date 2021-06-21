@@ -176,7 +176,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
             self._insert_char(key_pressed)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Draw function for the field. Called from parent. Essentially the same as a TextboxPopup
         """
 
@@ -479,7 +479,7 @@ class FormPopup(py_cui.popups.Popup, FormImplementation):
                 if valid:
                     self._root.close_popup()
                     if self._on_submit_action is not None:
-                        self._on_submit_action(self.get()) #on_submit_action is a no-arg function?
+                        self._on_submit_action(self.get()) 
                 else:
                     self._internal_popup = InternalFormPopup(self,
                                                              self._root, 
