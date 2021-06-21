@@ -43,7 +43,7 @@ class WidgetSet:
         """
 
         self._widgets: Dict[int,Optional['py_cui.widgets.Widget']]      = {}
-        self._keybindings  = {}
+        self._keybindings: Dict[int,Callable[[],Any]]  = {}
 
         self._root = root
         self._simulated_terminal = simulated_terminal
@@ -379,7 +379,7 @@ class WidgetSet:
         return new_label
 
 
-    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Callable[[],Any]=None) -> 'py_cui.widgets.Button':
+    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Optional[Callable[[],Any]]=None) -> 'py_cui.widgets.Button':
         """Function that adds a new button to the CUI grid
 
         Parameters

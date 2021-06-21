@@ -6,7 +6,7 @@ import py_cui.errors
 
 class SliderImplementation(py_cui.ui.UIImplementation):
 
-    def __init__(self, min_val, max_val, init_val, step, logger):
+    def __init__(self, min_val: int, max_val: int, init_val: int, step: int, logger):
         super().__init__(logger)
 
         self._min_val = min_val
@@ -21,7 +21,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
                 f'initial value must be between {self._min_val} and {self._max_val}')
 
 
-    def set_bar_char(self, char: str):
+    def set_bar_char(self, char: str) -> None:
         """
         Updates the character used to represent the slider bar.
 
