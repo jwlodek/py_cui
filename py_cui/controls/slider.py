@@ -21,8 +21,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
 
     def set_bar_char(self, char):
-        """
-        Updates the character used to represent the slider bar.
+        """Updates the character used to represent the slider bar.
 
         Parameters
         ----------
@@ -35,8 +34,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
 
     def update_slider_value(self, offset: int) -> float:
-        """
-        Steps up or down the value in offset fashion.
+        """Steps up or down the value in offset fashion.
 
         Parameters
         ----------
@@ -62,8 +60,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
 
     def get_slider_value(self):
-        """
-        Returns current slider value.
+        """Returns current slider value.
 
         Returns
         -------
@@ -75,8 +72,7 @@ class SliderImplementation(py_cui.ui.UIImplementation):
 
 
     def set_slider_step(self, step):
-        """
-        Changes the step value.
+        """Changes the step value.
 
         Parameters
         ----------
@@ -143,24 +139,26 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
     def align_to_top(self):
         """Aligns widget height to top.
         """
+
         self._alignment = "top"
 
 
     def align_to_middle(self):
         """Aligns widget height to middle. default configuration.
         """
+
         self._alignment = "mid"
 
 
     def align_to_bottom(self):
         """Aligns widget height to bottom.
         """
+
         self._alignment = "btm"
 
 
     def _custom_draw_with_border(self, start_y: int, content: str):
-        """
-        Custom method made from renderer.draw_border to support alignment for bordered variants.
+        """Custom method made from renderer.draw_border to support alignment for bordered variants.
 
         Parameters
         ----------
@@ -194,8 +192,7 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
 
 
     def _generate_bar(self, width: int) -> str:
-        """
-        Internal implementation to generate progression bar.
+        """Internal implementation to generate progression bar.
 
         Parameters
         ----------
@@ -256,9 +253,20 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
         self._renderer.unset_color_mode(self._color)
 
 
+    def _get_elems_per_char(self):
+
+        num_elems = self._max_val - self._min_val
+        start_x, _ = self.get_absolute_start_pos()
+        stop_x, _ = self.get_absolute_stop_pos()
+
+        # Remove left and right padding, 2 for internal padding, 2 for border
+        num_chars = stop_x - start_x - 2 * self._padx - 4
+
+        return int(num_elems/num_chars)
+
+
     def _handle_key_press(self, key_pressed):
-        """
-        LEFT_ARROW decreases value, RIGHT_ARROW increases.
+        """LEFT_ARROW decreases value, RIGHT_ARROW increases.
 
         Parameters
         ----------
@@ -271,6 +279,30 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             self.update_slider_value(-1)
         if key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.update_slider_value(1)
+
+
+    def _handle_mouse_press(self, x, y, mouse_event):
+
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            start_x, _ = self.get_absolute_start_pos()
+            stop_x, _ = self.get_absolute_stop_pos()
+            
+
+            # first slider bar character is the start pos + padding, + 1 for border + 1 for internal padding
+            bar_start_x = start_x + self._padx + 1
+
+            # Last slider bar character is the stop pos - padding - 1 for border - 1 for internal padding
+            bar_stop_x = stop_x - self._padx - 1
+            self._logger.error(f'Start: {bar_start_x} stop: {bar_stop_x}')
+
+            if x >= bar_start_x and x <= bar_stop_x:
+                bar_offset = x - bar_start_x
+                self._cur_val = bar_offset * self._get_elems_per_char()
+
+
+
+
+        #py_cui.widgets.Widget._handle_mouse_press(self, x, y, mouse_event)
 
 
 class SliderPopup(py_cui.popups.Popup, SliderImplementation):
