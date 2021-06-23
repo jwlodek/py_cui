@@ -93,9 +93,9 @@ class FileDirElem:
         """
 
         if self._type == 'file':
-            return '{} {}'.format(self._file_icon, self._name)
+            return f'{self._file_icon} {self._name}'
         else:
-            return '{} {}'.format(self._folder_icon, self._name)
+            return f'{self._folder_icon} {self._name}'
 
 
 
@@ -190,10 +190,14 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         self._command              = command
         self._parent_dialog        = root
         self._text_color_rules = [
-            py_cui.colors.ColorRule('\U0001f4c1', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,'startswith', 'region', [3, 1000], False, logger),
-            py_cui.colors.ColorRule('<DIR>', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE, 'startswith', 'region', [6, 1000], False, logger),
-            py_cui.colors.ColorRule('     ', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [6, 1000], True, logger),
-            py_cui.colors.ColorRule('\U0001f5ce', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [3, 1000], False, logger)
+            py_cui.colors.ColorRule('\U0001f4c1', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,
+                                    'startswith', 'region', [3, 1000], False, logger),
+            py_cui.colors.ColorRule('<DIR>', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,
+                                    'startswith', 'region', [6, 1000], False, logger),
+            py_cui.colors.ColorRule('     ', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE,
+                                    'startswith', 'region', [6, 1000], True, logger),
+            py_cui.colors.ColorRule('\U0001f5ce', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE,
+                                    'startswith', 'region', [3, 1000], False, logger)
         ]
         #self._run_command_if_none  = run_command_if_none
 
@@ -251,7 +255,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
                     self._current_dir = old_dir
                     self.refresh_view()
                 except PermissionError:
-                    self._parent_dialog.display_warning('Permission Error Accessing: {} !'.format(self._current_dir))
+                    self._parent_dialog.display_warning(f'Permission Error Accessing: {self._current_dir} !')
                     self._current_dir = old_dir
                     self.refresh_view()
                 finally:
@@ -363,7 +367,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         """Override of base class. Updates text field variables for form field
         """
 
-        super().update_height_width()
+        py_cui.popups.Popup.update_height_width(self)
         padx, pady              = self.get_padding()
         start_x, start_y        = self.get_start_position()
         height, width           = self.get_absolute_dimensions()
@@ -502,7 +506,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         return stop_x, stop_y
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Handles mouse presses 
 
         Parameters
@@ -511,10 +515,13 @@ class FileDialogButton(py_cui.ui.UIElement):
             x coordinate of click in characters
         y : int
             y coordinate of click in characters
+        mouse_event : int
+            Mouse event keycode of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
-        self.perform_command()
+        super()._handle_mouse_press(x, y, mouse_event)
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            self.perform_command()
 
 
     def _handle_key_press(self, key_pressed):
@@ -638,7 +645,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
         self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
         self._submit_button = FileDialogButton(self, title, self._submit, 1, '', 'OK', renderer, logger)
-        self._cancel_button = FileDialogButton(self, 'Cancel {}'.format(title), self._root.close_popup, 2, '', 'ESC', renderer, logger)
+        self._cancel_button = FileDialogButton(self, f'Cancel {title}', self._root.close_popup, 2, '', 'ESC', renderer, logger)
 
         # Internal popup used for secondary errors and warnings
         self._internal_popup = None
@@ -777,7 +784,7 @@ class FileDialogPopup(py_cui.popups.Popup):
             self._internal_popup._handle_key_press(key_pressed)
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x, y, mouse_event):
         """Override of base class function
 
         Simply enters the appropriate field when mouse is pressed on it
@@ -788,21 +795,22 @@ class FileDialogPopup(py_cui.popups.Popup):
             Coordinates of the mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        super()._handle_mouse_press(x, y, mouse_event)
         if self._file_dir_select._contains_position(x, y):
             self._filename_input.set_selected(False)
             self._file_dir_select.set_selected(True)
-            self._file_dir_select._handle_mouse_press(x, y)
+            self._file_dir_select._handle_mouse_press(x, y, mouse_event)
             
         elif self._filename_input._contains_position(x, y):
             self._filename_input.set_selected(True)
             self._file_dir_select.set_selected(False)
-            self._filename_input._handle_mouse_press(x, y)
+            self._filename_input._handle_mouse_press(x, y, mouse_event)
         
         elif self._submit_button._contains_position(x, y):
-            self._submit_button._handle_mouse_press(x, y)
+            self._submit_button._handle_mouse_press(x, y, mouse_event)
+
         elif self._cancel_button._contains_position(x, y):
-            self._cancel_button._handle_mouse_press(x, y)
+            self._cancel_button._handle_mouse_press(x, y, mouse_event)
 
 
     def _draw(self):

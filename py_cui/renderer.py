@@ -212,16 +212,16 @@ class Renderer:
         title         = ui_element.get_title()
 
         if not with_title or (len(title) + 4 >= width - 2 * padx):
-            render_text = '{}{}{}'.format(  self._border_characters['UP_LEFT'],
-                                            self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx),
-                                            self._border_characters['UP_RIGHT'])
+            render_text = f'{self._border_characters["UP_LEFT"]}' \
+                          f'{self._border_characters["HORIZONTAL"] * (width - 2 - 2 * padx)}' \
+                          f'{self._border_characters["UP_RIGHT"]}'
+
             self._stdscr.addstr(y, start_x + padx, render_text)
         else:
-            render_text = '{}{} {} {}{}'.format(self._border_characters['UP_LEFT'],
-                                                2 * self._border_characters['HORIZONTAL'],
-                                                title,
-                                                self._border_characters['HORIZONTAL'] * (width - 6 - 2 * padx - len(title)),
-                                                self._border_characters['UP_RIGHT'])
+            render_text = f'{self._border_characters["UP_LEFT"]}{2 * self._border_characters["HORIZONTAL"]}' \
+                          f' {title} {self._border_characters["HORIZONTAL"] * (width - 6 - 2 * padx - len(title))}' \
+                          f'{self._border_characters["UP_RIGHT"]}'
+
             self._stdscr.addstr(y, start_x + padx, render_text)
 
 
@@ -240,9 +240,9 @@ class Renderer:
         start_x, _    = ui_element.get_start_position()
         _, width      = ui_element.get_absolute_dimensions()
 
-        render_text = '{}{}{}'.format(  self._border_characters['DOWN_LEFT'],
-                                        self._border_characters['HORIZONTAL'] * (width - 2 - 2 * padx),
-                                        self._border_characters['DOWN_RIGHT'])
+        render_text = f'{self._border_characters["DOWN_LEFT"]}' \
+                      f'{self._border_characters["HORIZONTAL"] * (width - 2 - 2 * padx)}' \
+                      f'{self._border_characters["DOWN_RIGHT"]}'
         self._stdscr.addstr(y, start_x + padx, render_text)
 
 
@@ -261,9 +261,9 @@ class Renderer:
         start_x, _    = ui_element.get_start_position()
         _, width      = ui_element.get_absolute_dimensions()
 
-        render_text = '{}{}{}'.format(  self._border_characters['VERTICAL'],
-                                        ' ' * (width - 2 - 2 * padx),
-                                        self._border_characters['VERTICAL'])
+        render_text = f'{self._border_characters["VERTICAL"]}' \
+                      f'{" " * (width - 2 - 2 * padx)}' \
+                      f'{self._border_characters["VERTICAL"]}'
         
         self._stdscr.addstr(y, start_x + padx, render_text)
 
@@ -300,11 +300,9 @@ class Renderer:
 
         if len(line) - start_pos < render_text_length:
             if centered:
-                render_text = '{}'.format(  line[start_pos:].center(render_text_length,
-                                            ' '))
+                render_text = f'{line[start_pos:].center(render_text_length, " ")}'
             else:
-                render_text = '{}{}'.format(line[start_pos:],
-                                            ' ' * (render_text_length - len(line[start_pos:])))
+                render_text = f'{line[start_pos:]}{" " * (render_text_length - len(line[start_pos:]))}'
         else:
             render_text = line[start_pos:start_pos + render_text_length]
 
@@ -386,6 +384,7 @@ class Renderer:
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
+            text_elem[0] = text_elem[0].replace(chr(0), "")
             self.set_color_mode(text_elem[1])
 
             # BLACK_ON_WHITE + BOLD is unreadable on windows terminals

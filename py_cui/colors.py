@@ -360,6 +360,6 @@ class ColorRule:
             elif self._match_type == 'region':
                 fragments = self._split_text_on_region(widget, render_text, selected)
         
-            self._logger.info('Generated fragments: {}'.format(fragments))
+            self._logger.debug(f'Generated fragments: {fragments}')
         
         return fragments, match
