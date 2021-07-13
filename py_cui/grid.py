@@ -7,6 +7,7 @@ The grid is currently the only supported layout manager for py_cui
 # Created:   12-Aug-2019
 
 
+from typing import Tuple
 import py_cui
 
 
@@ -30,7 +31,7 @@ class Grid:
     """
 
 
-    def __init__(self, num_rows, num_columns, height, width, logger):
+    def __init__(self, num_rows: int, num_columns: int, height: int, width: int, logger: 'py_cui.debug.PyCUILogger'):
         """Constructor for the Grid class
 
         Parameters
@@ -57,7 +58,7 @@ class Grid:
         self._logger        = logger
 
 
-    def get_dimensions(self):
+    def get_dimensions(self) -> Tuple[int,int]:
         """Gets dimensions in rows/columns
 
         Returns
@@ -71,7 +72,7 @@ class Grid:
         return self._num_rows, self._num_columns
 
 
-    def get_dimensions_absolute(self):
+    def get_dimensions_absolute(self) -> Tuple[int,int]:
         """Gets dimensions of grid in terminal characters
 
         Returns
@@ -85,7 +86,7 @@ class Grid:
         return self._height, self._width
 
 
-    def get_offsets(self):
+    def get_offsets(self) -> Tuple[int,int]:
         """Gets leftover characters for x and y
 
         Returns
@@ -99,7 +100,7 @@ class Grid:
         return self._offset_x, self._offset_y
 
 
-    def get_cell_dimensions(self):
+    def get_cell_dimensions(self) -> Tuple[int,int]:
         """Gets size in characters of single (row, column) cell location
 
         Returns
@@ -113,7 +114,7 @@ class Grid:
         return self._row_height, self._column_width
 
 
-    def set_num_rows(self, num_rows):
+    def set_num_rows(self, num_rows: int) -> None:
         """Sets the grid row size
         
         Parameters
@@ -134,7 +135,7 @@ class Grid:
         self._row_height = int(self._height / self._num_rows)
 
 
-    def set_num_cols(self, num_columns):
+    def set_num_cols(self, num_columns: int) -> None:
         """Sets the grid column size
         
         Parameters
@@ -156,7 +157,7 @@ class Grid:
         self._column_width  = int(self._width / self._num_columns)
 
 
-    def update_grid_height_width(self, height, width):
+    def update_grid_height_width(self, height: int, width: int):
         """Update grid height and width. Allows for on-the-fly size editing
         
         Parameters

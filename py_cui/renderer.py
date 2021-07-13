@@ -7,6 +7,8 @@
 import curses
 import py_cui
 import py_cui.colors
+from typing import Dict, List, Union
+
 
 
 class Renderer:
@@ -25,13 +27,13 @@ class Renderer:
         List of currently loaded rules to apply during drawing
     """
 
-    def __init__(self, root, stdscr, logger):
+    def __init__(self, root: 'py_cui.PyCUI', stdscr, logger):
         """Constructor for renderer object
         """
 
         self._root         = root
         self._stdscr       = stdscr
-        self._color_rules  = []
+        self._color_rules: List['py_cui.colors.ColorRule'] = []
         self._logger       = logger
 
         # Define ui_element border characters
@@ -45,7 +47,7 @@ class Renderer:
         }
 
 
-    def _set_border_renderer_chars(self, border_char_set):
+    def _set_border_renderer_chars(self, border_char_set: Dict[str,str]) -> None:
         """Function that sets the border characters for ui_elements
 
         Parameters
@@ -62,21 +64,21 @@ class Renderer:
         self._border_characters['VERTICAL'  ] = border_char_set['VERTICAL'  ]
 
 
-    def _set_bold(self):
+    def _set_bold(self) -> None:
         """Sets bold draw mode
         """
 
         self._stdscr.attron(curses.A_BOLD)
 
 
-    def _unset_bold(self):
+    def _unset_bold(self) -> None:
         """Unsets bold draw mode
         """
 
         self._stdscr.attroff(curses.A_BOLD)
 
 
-    def set_color_rules(self, color_rules):
+    def set_color_rules(self, color_rules) -> None:
         """Sets current color rules
 
         Parameters
@@ -88,7 +90,7 @@ class Renderer:
         self._color_rules = color_rules
 
 
-    def set_color_mode(self, color_mode):
+    def set_color_mode(self, color_mode: int) -> None:
         """Sets the output color mode
 
         Parameters
@@ -100,7 +102,7 @@ class Renderer:
         self._stdscr.attron(curses.color_pair(color_mode))
 
 
-    def unset_color_mode(self, color_mode):
+    def unset_color_mode(self, color_mode: int) -> None:
         """Unsets the output color mode
 
         Parameters
@@ -112,7 +114,7 @@ class Renderer:
         self._stdscr.attroff(curses.color_pair(color_mode))
 
 
-    def reset_cursor(self, ui_element, fill=True):
+    def reset_cursor(self, ui_element: 'py_cui.ui.UIElement', fill: bool=True) -> None:
         """Positions the cursor at the bottom right of the selected element
 
         Parameters
@@ -139,7 +141,7 @@ class Renderer:
             self._stdscr.move(0,0)
 
 
-    def draw_cursor(self, cursor_y, cursor_x):
+    def draw_cursor(self, cursor_y: int, cursor_x: int) -> None:
         """Draws the cursor at a particular location
 
         Parameters
@@ -151,7 +153,7 @@ class Renderer:
         self._stdscr.move(cursor_y, cursor_x)
 
 
-    def draw_border(self, ui_element, fill=True, with_title=True):
+    def draw_border(self, ui_element: 'py_cui.ui.UIElement', fill: bool=True, with_title: bool=True) -> None:
         """Draws ascii border around ui element
 
         Parameters
@@ -193,7 +195,7 @@ class Renderer:
             self._unset_bold()
 
 
-    def _draw_border_top(self, ui_element, y, with_title):
+    def _draw_border_top(self, ui_element:'py_cui.ui.UIElement', y: int, with_title: bool) -> None:
         """Internal function for drawing top of border
 
         Parameters
@@ -225,7 +227,7 @@ class Renderer:
             self._stdscr.addstr(y, start_x + padx, render_text)
 
 
-    def _draw_border_bottom(self, ui_element, y):
+    def _draw_border_bottom(self, ui_element: 'py_cui.ui.UIElement', y: int) -> None:
         """Internal function for drawing bottom of border
 
         Parameters
@@ -246,7 +248,7 @@ class Renderer:
         self._stdscr.addstr(y, start_x + padx, render_text)
 
 
-    def _draw_blank_row(self, ui_element, y):
+    def _draw_blank_row(self, ui_element: 'py_cui.ui.UIElement', y: int) -> None:
         """Internal function for drawing a blank row
 
         Parameters
@@ -268,7 +270,7 @@ class Renderer:
         self._stdscr.addstr(y, start_x + padx, render_text)
 
 
-    def _get_render_text(self, ui_element, line, centered, bordered, selected, start_pos):
+    def _get_render_text(self, ui_element: 'py_cui.ui.UIElement', line: str, centered: bool, bordered: bool, selected, start_pos:int) -> List[List[Union[int,str]]]:
         """Internal function that computes the scope of the text that should be drawn
 
         Parameters
@@ -286,7 +288,7 @@ class Renderer:
 
         Returns
         -------
-        render_text : str
+        render_text : str # to be checked, returns a List of [int,str]
             The text shortened to fit within given space
         """
 
@@ -306,11 +308,11 @@ class Renderer:
         else:
             render_text = line[start_pos:start_pos + render_text_length]
 
-        render_text_fragments = self._generate_text_color_fragments(ui_element, line, render_text, selected)
+        render_text_fragments = self._generate_text_color_fragments(ui_element, line, render_text, selected) 
         return render_text_fragments
 
 
-    def _generate_text_color_fragments(self, ui_element, line, render_text, selected):
+    def _generate_text_color_fragments(self, ui_element: 'py_cui.ui.UIElement', line: str, render_text: str, selected) -> List[List[Union[int,str]]]:
         """Function that applies color rules to text, dividing them if match is found
 
         Parameters
@@ -327,6 +329,7 @@ class Renderer:
         fragments : list of [int, str]
             list of text - color code combinations to write
         """
+        fragments: List[List[Union[int,str]]]
 
         if selected: 
             fragments = [[render_text, ui_element.get_selected_color()]]
@@ -341,7 +344,7 @@ class Renderer:
         return fragments
 
 
-    def draw_text(self, ui_element, line, y, centered = False, bordered = True, selected = False, start_pos = 0):
+    def draw_text(self, ui_element: 'py_cui.ui.UIElement', line: str, y: int, centered: bool = False, bordered: bool = True, selected: bool = False, start_pos: int = 0):
         """Function that draws ui_element text.
 
         Parameters
@@ -384,20 +387,21 @@ class Renderer:
 
         # Each text elem is a list with [text, color]
         for text_elem in render_text:
-            text_elem[0] = text_elem[0].replace(chr(0), "")
-            self.set_color_mode(text_elem[1])
+            if isinstance(text_elem[0],str) and isinstance(text_elem[1],int):
+                text_elem[0] = text_elem[0].replace(chr(0), "")
+                self.set_color_mode(text_elem[1])
 
-            # BLACK_ON_WHITE + BOLD is unreadable on windows terminals
-            if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
-                self._set_bold()
+                # BLACK_ON_WHITE + BOLD is unreadable on windows terminals
+                if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
+                    self._set_bold()
 
-            self._stdscr.addstr(y, current_start_x, text_elem[0])
-            current_start_x = current_start_x + len(text_elem[0])
+                self._stdscr.addstr(y, current_start_x, text_elem[0])
+                current_start_x = current_start_x + len(text_elem[0])
 
-            if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
-                self._unset_bold()
-            
-            self.unset_color_mode(text_elem[1])
+                if selected and text_elem[1] != py_cui.BLACK_ON_WHITE:
+                    self._unset_bold()
+                
+                self.unset_color_mode(text_elem[1])
 
         if ui_element.is_selected():
             self._set_bold()

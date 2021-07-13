@@ -7,10 +7,11 @@
 
 from sys import platform
 import curses
+from typing import Optional
 
 # Some simple helper functions
 
-def get_ascii_from_char(char):
+def get_ascii_from_char(char: str) -> int:
     """Function that converts ascii code to character
 
     Parameters
@@ -27,7 +28,7 @@ def get_ascii_from_char(char):
     return ord(char)
 
 
-def get_char_from_ascii(key_num):
+def get_char_from_ascii(key_num: int) -> Optional[str]:
     """Function that converts a character to an ascii code
 
     Parameters
