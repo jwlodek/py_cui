@@ -177,7 +177,7 @@ class PyCUI:
         self._on_draw_update_func: Optional[Callable[[],Any]]   = None
 
         # Top level keybindings. Exit key is 'q' by default
-        self._keybindings: Dict[int,Any]  = {} # to be discussed
+        self._keybindings: Dict[int,Callable[[],Any]]  = {}
         self._exit_key     = exit_key
         self._forward_cycle_key = py_cui.keys.KEY_CTRL_LEFT
         self._reverse_cycle_key = py_cui.keys.KEY_CTRL_RIGHT
@@ -212,7 +212,7 @@ class PyCUI:
         self._on_draw_update_func = update_function
 
 
-    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None: # Keycodes are type hinted as int
+    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None: 
         """Assigns a key for automatically cycling through widgets in both focus and overview modes
 
         Parameters
@@ -888,7 +888,7 @@ class PyCUI:
 
         elif self._popup is None:
             for widget_id in self.get_widgets().keys():
-                widget = self.get_widgets()[widget_id] # using temp variable for mypy
+                widget = self.get_widgets()[widget_id] 
                 if widget is not None:
                     if widget._contains_position(x, y):
                         return widget 
