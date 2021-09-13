@@ -114,6 +114,7 @@ class PyCUI:
         """
 
         self._title = 'PyCUI Window'
+        self.escape_unfocuses = True
         # When this is not set, the escape character delay
         # is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
@@ -1443,7 +1444,7 @@ class PyCUI:
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
         if self._in_focused_mode and self._popup is None:
-            if key_pressed == py_cui.keys.KEY_ESCAPE:
+            if key_pressed == py_cui.keys.KEY_ESCAPE and self.escape_unfocuses:
                 self.status_bar.set_text(self._init_status_bar_text)
                 self._in_focused_mode = False
                 selected_widget.set_selected(False)
