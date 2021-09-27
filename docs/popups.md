@@ -6,13 +6,14 @@ This page contains information regarding all popups supported by `py_cui`. Pleas
 
 **Spawn Command**
 ```
-show_message_popup(title, text)
+show_message_popup(title, text, color = WHITE_ON_BLACK)
 show_warning_popup(title, text)
 show_error_popup(title, text)
 ```
 **Usage**
 
-Used to show a simple message, with a different color depending on warning level.
+`show_message_popup` takes an optional `color` argument which defaults to standard WHITE_ON_BLACK.
+`show_warning_popup` and `show_error_popup` are shorthand for respectively yellow and red colors.
 
 **Keys**
 
