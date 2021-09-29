@@ -313,6 +313,7 @@ class PyCUI:
         """
 
         self._logger.info(f'Starting {self._title} CUI')
+        self._stopped = False
         curses.wrapper(self._draw)
 
 
