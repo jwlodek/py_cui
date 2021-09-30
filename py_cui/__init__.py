@@ -38,7 +38,6 @@ import py_cui.debug
 import py_cui.errors
 from py_cui.colors import *
 
-
 # Version number
 __version__ = '0.1.4'
 
@@ -1161,7 +1160,7 @@ class PyCUI:
 
     # Popup functions. Used to display messages, warnings, and errors to the user.
 
-    def show_message_popup(self, title: str, text: str) -> None:
+    def show_message_popup(self, title: str, text: str, color: int = WHITE_ON_BLACK) -> None:
         """Shows a message popup
 
         Parameters
@@ -1170,9 +1169,10 @@ class PyCUI:
             Message title
         text : str
             Message text
+        color: int
+            Popup color with format FOREGOUND_ON_BACKGROUND. See colors module. Default: WHITE_ON_BLACK.
         """
 
-        color = WHITE_ON_BLACK
         self._popup = py_cui.popups.MessagePopup(self, title, text, color, self._renderer, self._logger)
         self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
 
@@ -1188,9 +1188,7 @@ class PyCUI:
             Warning text
         """
 
-        color = YELLOW_ON_BLACK
-        self._popup = py_cui.popups.MessagePopup(self, 'WARNING - ' + title, text, color, self._renderer, self._logger)
-        self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
+        self.show_message_popup(title=title, text=text, color=YELLOW_ON_BLACK)
 
 
     def show_error_popup(self, title: str, text: str) -> None:
@@ -1204,9 +1202,7 @@ class PyCUI:
             Error text
         """
 
-        color = RED_ON_BLACK
-        self._popup = py_cui.popups.MessagePopup(self, 'ERROR - ' + title, text, color, self._renderer, self._logger)
-        self._logger.debug(f'Opened {str(type(self._popup))} popup with title {title}')
+        self.show_message_popup(title=title, text=text, color=RED_ON_BLACK)
 
 
     def show_yes_no_popup(self, title: str, command: Callable[[bool], Any]):
