@@ -8,6 +8,7 @@
 import py_cui
 import curses
 import re
+from typing import List, Tuple, Union
 
 
 # Curses color configuration - curses colors automatically work as pairs, so it was easiest to
@@ -167,7 +168,7 @@ class ColorRule:
         Flag to determine whether to strip whitespace before matching.
     """
 
-    def __init__(self, regex, color, selected_color, rule_type, match_type, region, include_whitespace, logger):
+    def __init__(self, regex: str, color: int, selected_color: int, rule_type: str, match_type: str, region: List[int], include_whitespace: bool, logger):
         """Constructor for ColorRule object
             
         Parameters
@@ -205,7 +206,7 @@ class ColorRule:
         self._logger               = logger
 
 
-    def _check_match(self, line):
+    def _check_match(self, line: str) -> bool:
         """Checks if the color rule matches a line
         
         Parameters
@@ -242,7 +243,7 @@ class ColorRule:
         return False
 
 
-    def _generate_fragments_regex(self, widget, render_text, selected):
+    def _generate_fragments_regex(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], render_text:str, selected) -> List[List[Union[int,str]]]:
         """Splits text into fragments based on regular expression
         
         Parameters
@@ -258,7 +259,7 @@ class ColorRule:
             the render text split into fragments of strings paired with colors
         """
 
-        fragments = []
+        fragments: List[List[Union[int,str]]] = []
         matches = re.findall(self._regex, render_text)
         current_render_text = render_text
         for match in matches:
@@ -280,9 +281,9 @@ class ColorRule:
         return fragments
 
 
-    def _split_text_on_region(self, widget, render_text, selected):
+    def _split_text_on_region(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], render_text: str, selected) -> List[List[Union[str,int]]]:   # renderer._generate_text_color_fragments passes a uielement and not a widget
         """Splits text into fragments based on region
-        
+
         Parameters
         ----------
         widget : py_cui.Widget
@@ -296,7 +297,7 @@ class ColorRule:
             the render text split into fragments of strings paired with colors
         """
 
-        fragments = []
+        fragments: List[List[Union[int,str]]] = []
         
         if self._region is None or len(render_text) < self._region[0]:
             if selected:
@@ -322,7 +323,7 @@ class ColorRule:
         return fragments
 
 
-    def generate_fragments(self, widget, line, render_text, selected=False):
+    def generate_fragments(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], line: str, render_text: str, selected=False) -> Tuple[List[List[Union[str,int]]],bool]:
         """Splits text into fragments if matched line to regex
         
         Parameters
@@ -341,10 +342,10 @@ class ColorRule:
         matched : bool
             Boolean output saying if a match was found in the line.
         """
-
+        fragments: List[List[Union[int,str]]] = []
         match       = self._check_match(line)
         if selected:
-            fragments = [[render_text, widget.get_selected_color()]]
+            fragments = [[render_text, widget.get_selected_color()]] 
         else:
             fragments = [[render_text, widget.get_color()]]
         
