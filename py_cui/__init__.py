@@ -1629,7 +1629,6 @@ class PyCUI:
                 # Initialization and size adjustment
                 stdscr.erase()
 
-
                 # If the user defined an update function to fire on each draw call,
                 # Run it here. This can of course be also handled user-side
                 # through a separate thread.

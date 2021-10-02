@@ -466,28 +466,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
         py_cui.ui.MenuImplementation.__init__(self, logger)
-        self._on_selection_change: Optional[Callable[[Any],Any]] = None
         self.set_help_text('Focus mode on ScrollMenu. Use Up/Down/PgUp/PgDown/Home/End to scroll, Esc to exit.')
-
-
-    def set_on_selection_change_event(self, on_selection_change_event: Callable[[Any],Any]):
-        """Function that sets the function fired when menu selection changes, with the new selection as an arg
-
-        Parameters
-        ----------
-        on_selection_change_event : Callable
-            Callable function that takes in as an argument the newly selected element
-
-        Raises
-        ------
-        TypeError
-            Raises a type error if event function is not callable
-        """
-        #mypy false-positive
-        if not isinstance(on_selection_change_event, Callable):  #type: ignore
-            raise TypeError('On selection change event must be a Callable!')
-        
-        self._on_selection_change = on_selection_change_event
 
 
     def _handle_mouse_press(self, x: int, y: int, mouse_event: int):
@@ -509,7 +488,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
                 self.set_selected_item_index(elem_clicked)
         
             if self.get_selected_item_index() != current and self._on_selection_change is not None:
-                self._on_selection_change(self.get())
+                self._process_selection_change_event()
 
         # For scroll menu, handle custom mouse press after initial event, since we will likely want to
         # have access to the newly selected item
@@ -546,7 +525,8 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
         if self.get_selected_item_index() != current and self._on_selection_change is not None:
-            self._on_selection_change(self.get())
+
+            self._process_selection_change_event()
 
 
     def _draw(self) -> None:
