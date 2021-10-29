@@ -40,7 +40,7 @@ class SliderImplementation(py_cui.ui.UIImplementation)
 ### __init__
 
 ```python
-def __init__(self, min_val, max_val, init_val, step, logger)
+def __init__(self, min_val: int, max_val: int, init_val: int, step: int, logger)
 ```
 
 
@@ -54,7 +54,7 @@ def __init__(self, min_val, max_val, init_val, step, logger)
 ### set_bar_char
 
 ```python
-def set_bar_char(self, char)
+def set_bar_char(self, char: str) -> None
 ```
 
 
@@ -104,7 +104,7 @@ Steps up or down the value in offset fashion.
 ### get_slider_value
 
 ```python
-def get_slider_value(self)
+def get_slider_value(self) -> float
 ```
 
 
@@ -126,7 +126,7 @@ Returns current slider value.
 ### set_slider_step
 
 ```python
-def set_slider_step(self, step)
+def set_slider_step(self, step: int) -> None
 ```
 
 
@@ -204,7 +204,7 @@ def __init__(self, id, title, grid, row, column, row_span, column_span
 ### toggle_title
 
 ```python
-def toggle_title(self)
+def toggle_title(self) -> None
 ```
 
 Toggles visibility of the widget's name.
@@ -218,7 +218,7 @@ Toggles visibility of the widget's name.
 ### toggle_border
 
 ```python
-def toggle_border(self)
+def toggle_border(self) -> None
 ```
 
 Toggles visibility of the widget's border.
@@ -232,7 +232,7 @@ Toggles visibility of the widget's border.
 ### toggle_value
 
 ```python
-def toggle_value(self)
+def toggle_value(self) -> None
 ```
 
 Toggles visibility of the widget's current value in integer.
@@ -246,7 +246,7 @@ Toggles visibility of the widget's current value in integer.
 ### align_to_top
 
 ```python
-def align_to_top(self)
+def align_to_top(self) -> None
 ```
 
 Aligns widget height to top.
@@ -260,7 +260,7 @@ Aligns widget height to top.
 ### align_to_middle
 
 ```python
-def align_to_middle(self)
+def align_to_middle(self) -> None
 ```
 
 Aligns widget height to middle. default configuration.
@@ -274,7 +274,7 @@ Aligns widget height to middle. default configuration.
 ### align_to_bottom
 
 ```python
-def align_to_bottom(self)
+def align_to_bottom(self) -> None
 ```
 
 Aligns widget height to bottom.
@@ -288,7 +288,7 @@ Aligns widget height to bottom.
 ### _custom_draw_with_border
 
 ```python
-def _custom_draw_with_border(self, start_y: int, content: str)
+def _custom_draw_with_border(self, start_y: int, content: str) -> None
 ```
 
 
@@ -339,7 +339,7 @@ Internal implementation to generate progression bar.
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class draw function.
@@ -353,7 +353,7 @@ Override of base class draw function.
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 

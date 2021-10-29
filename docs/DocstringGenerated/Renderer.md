@@ -61,7 +61,7 @@ and text required for the cui. All of the functions supplied by the renderer cla
 ### __init__
 
 ```python
-def __init__(self, root, stdscr, logger)
+def __init__(self, root: 'py_cui.PyCUI', stdscr, logger)
 ```
 
 Constructor for renderer object
@@ -75,7 +75,7 @@ Constructor for renderer object
 ### _set_border_renderer_chars
 
 ```python
-def _set_border_renderer_chars(self, border_char_set)
+def _set_border_renderer_chars(self, border_char_set: Dict[str,str]) -> None
 ```
 
 Function that sets the border characters for ui_elements
@@ -96,7 +96,7 @@ Function that sets the border characters for ui_elements
 ### _set_bold
 
 ```python
-def _set_bold(self)
+def _set_bold(self) -> None
 ```
 
 Sets bold draw mode
@@ -110,7 +110,7 @@ Sets bold draw mode
 ### _unset_bold
 
 ```python
-def _unset_bold(self)
+def _unset_bold(self) -> None
 ```
 
 Unsets bold draw mode
@@ -124,7 +124,7 @@ Unsets bold draw mode
 ### set_color_rules
 
 ```python
-def set_color_rules(self, color_rules)
+def set_color_rules(self, color_rules) -> None
 ```
 
 Sets current color rules
@@ -145,7 +145,7 @@ Sets current color rules
 ### set_color_mode
 
 ```python
-def set_color_mode(self, color_mode)
+def set_color_mode(self, color_mode: int) -> None
 ```
 
 Sets the output color mode
@@ -166,7 +166,7 @@ Sets the output color mode
 ### unset_color_mode
 
 ```python
-def unset_color_mode(self, color_mode)
+def unset_color_mode(self, color_mode: int) -> None
 ```
 
 Unsets the output color mode
@@ -187,7 +187,7 @@ Unsets the output color mode
 ### reset_cursor
 
 ```python
-def reset_cursor(self, ui_element, fill=True)
+def reset_cursor(self, ui_element: 'py_cui.ui.UIElement', fill: bool=True) -> None
 ```
 
 Positions the cursor at the bottom right of the selected element
@@ -209,7 +209,7 @@ Positions the cursor at the bottom right of the selected element
 ### draw_cursor
 
 ```python
-def draw_cursor(self, cursor_y, cursor_x)
+def draw_cursor(self, cursor_y: int, cursor_x: int) -> None
 ```
 
 Draws the cursor at a particular location
@@ -230,7 +230,7 @@ Draws the cursor at a particular location
 ### draw_border
 
 ```python
-def draw_border(self, ui_element, fill=True, with_title=True)
+def draw_border(self, ui_element: 'py_cui.ui.UIElement', fill: bool=True, with_title: bool=True) -> None
 ```
 
 Draws ascii border around ui element
@@ -253,7 +253,7 @@ Draws ascii border around ui element
 ### _draw_border_top
 
 ```python
-def _draw_border_top(self, ui_element, y, with_title)
+def _draw_border_top(self, ui_element:'py_cui.ui.UIElement', y: int, with_title: bool) -> None
 ```
 
 Internal function for drawing top of border
@@ -276,7 +276,7 @@ Internal function for drawing top of border
 ### _draw_border_bottom
 
 ```python
-def _draw_border_bottom(self, ui_element, y)
+def _draw_border_bottom(self, ui_element: 'py_cui.ui.UIElement', y: int) -> None
 ```
 
 Internal function for drawing bottom of border
@@ -298,7 +298,7 @@ Internal function for drawing bottom of border
 ### _draw_blank_row
 
 ```python
-def _draw_blank_row(self, ui_element, y)
+def _draw_blank_row(self, ui_element: 'py_cui.ui.UIElement', y: int) -> None
 ```
 
 Internal function for drawing a blank row
@@ -320,7 +320,7 @@ Internal function for drawing a blank row
 ### _get_render_text
 
 ```python
-def _get_render_text(self, ui_element, line, centered, bordered, selected, start_pos)
+def _get_render_text(self, ui_element: 'py_cui.ui.UIElement', line: str, centered: bool, bordered: bool, selected, start_pos:int) -> List[List[Union[int,str]]]
 ```
 
 Internal function that computes the scope of the text that should be drawn
@@ -342,7 +342,7 @@ Internal function that computes the scope of the text that should be drawn
 
  Return Variable  | Type  | Doc
 -----|----------|-----
- render_text  |  str | The text shortened to fit within given space
+ render_text  |  str # to be checked, returns a List of [int,str] | The text shortened to fit within given space
 
 
 
@@ -351,7 +351,7 @@ Internal function that computes the scope of the text that should be drawn
 ### _generate_text_color_fragments
 
 ```python
-def _generate_text_color_fragments(self, ui_element, line, render_text, selected)
+def _generate_text_color_fragments(self, ui_element: 'py_cui.ui.UIElement', line: str, render_text: str, selected) -> List[List[Union[int,str]]]
 ```
 
 Function that applies color rules to text, dividing them if match is found
@@ -380,7 +380,7 @@ Function that applies color rules to text, dividing them if match is found
 ### draw_text
 
 ```python
-def draw_text(self, ui_element, line, y, centered = False, bordered = True, selected = False, start_pos = 0)
+def draw_text(self, ui_element: 'py_cui.ui.UIElement', line: str, y: int, centered: bool = False, bordered: bool = True, selected: bool = False, start_pos: int = 0)
 ```
 
 Function that draws ui_element text.
