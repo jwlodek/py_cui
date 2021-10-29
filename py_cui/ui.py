@@ -10,7 +10,9 @@ Contains base UI element class, along with UI implementation agnostic UI element
 import py_cui
 import py_cui.errors
 import py_cui.colors
-from typing import Any, List, Optional, Tuple
+
+import inspect
+from typing import Any, List, Optional, Tuple, Callable
 
 
 class UIElement:
@@ -680,6 +682,7 @@ class MenuImplementation(UIImplementation):
         self._selected_item    = 0
         self._page_scroll_len  = 5
         self._view_items       = []
+        self._on_selection_change: Optional[Callable[[Any],Any]] = None
 
 
     def clear(self) -> None:
@@ -692,6 +695,51 @@ class MenuImplementation(UIImplementation):
 
         self._logger.info('Clearing menu')
 
+
+    def set_on_selection_change_event(self, on_selection_change_event: Callable[[Any],Any]):
+        """Function that sets the function fired when menu selection changes.
+
+        Event function must take 0 or 1 parameters. If 1 parameter, the new selcted item will be passed in.
+
+        Parameters
+        ----------
+        on_selection_change_event : Callable
+            Callable function that takes in as an argument the newly selected element
+
+        Raises
+        ------
+        TypeError
+            Raises a type error if event function is not callable
+        """
+
+        #mypy false-positive
+        if not isinstance(on_selection_change_event, Callable):  #type: ignore
+            raise TypeError('On selection change event must be a Callable!')
+        
+        self._on_selection_change = on_selection_change_event
+
+
+    def _process_selection_change_event(self):
+        """Function that executes on-selection change event either with the current menu item, or with no-args"""
+
+        # Identify num of args from callable. This allows for user to create commands that take in x, y
+        # coords of the mouse press as input
+        num_args = 0
+        try:
+            num_args = len(inspect.signature(self._on_selection_change).parameters)
+        except ValueError:
+            self._logger.error('Failed to get on_selection_change signature!')
+        except TypeError:
+            self._logger.error('Type of object not supported for signature identification!')
+
+        # Depending on the number of parameters for the self._on_selection_change, pass in the x and y
+        # values, or do nothing
+        if num_args == 1:
+            self._on_selection_change(self.get())
+        elif num_args == 0:
+            self._on_selection_change()
+        else:
+            raise ValueError('On selection change event must accept either 0 or 1 parameters!')
 
 
     def get_selected_item_index(self) -> int:

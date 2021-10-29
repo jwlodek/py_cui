@@ -1020,7 +1020,7 @@ class PyCUI:
             elif direction in [py_cui.keys.KEY_RIGHT_ARROW, py_cui.keys.KEY_LEFT_ARROW]:
                 neighbors = self._get_horizontal_neighbors(start_widget, direction)
 
-        if neighbors is None:
+        if neighbors is None or len(neighbors) == 0:
             return None
 
         # We select the best match to jump to (first neighbor)
@@ -1628,7 +1628,6 @@ class PyCUI:
 
                 # Initialization and size adjustment
                 stdscr.erase()
-
 
                 # If the user defined an update function to fire on each draw call,
                 # Run it here. This can of course be also handled user-side
