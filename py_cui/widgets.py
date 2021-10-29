@@ -1,4 +1,4 @@
-"""Module contatining all core widget classes for py_cui.
+"""Module containing all core widget classes for py_cui.
 
 Widgets are the basic building blocks of a user interface made with py_cui.
 This module contains classes for:
@@ -22,10 +22,13 @@ file and extending the base Widget class, or if appropriate one of the other cor
 
 
 import curses
+import inspect
 import py_cui
 import py_cui.ui
 import py_cui.colors
 import py_cui.errors
+
+from typing import Callable, List, Dict, Tuple, Any, Optional
 
 
 class Widget(py_cui.ui.UIElement):
@@ -50,10 +53,10 @@ class Widget(py_cui.ui.UIElement):
         color rules to load into renderer when drawing widget
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, selectable: bool = True):
         """Initializer for base widget class
 
-        Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+        Class UIElement superclass initializer, and then assigns widget to grid, along with row/column info
         and color rules and key commands
         """
 
@@ -64,7 +67,7 @@ class Widget(py_cui.ui.UIElement):
         self._grid = grid
         grid_rows, grid_cols = self._grid.get_dimensions()
         if (grid_cols < column + column_span) or (grid_rows < row + row_span):
-            raise py_cui.errors.PyCUIOutOfBoundsError("Target grid too small for widget {}".format(title))
+            raise py_cui.errors.PyCUIOutOfBoundsError(f"Target grid too small for widget {title}")
 
         self._row          = row
         self._column       = column
@@ -73,14 +76,15 @@ class Widget(py_cui.ui.UIElement):
         self._padx         = padx
         self._pady         = pady
         self._selectable       = selectable
-        self._key_commands     = {}
-        self._text_color_rules = []
+        self._key_commands: Dict[int,Callable[[],Any]]     = {}
+        self._mouse_commands: Dict[int,Callable[[],Any]]   = {}
+        self._text_color_rules: List['py_cui.ColorRule'] = []
         self._default_color = py_cui.WHITE_ON_BLACK
         self._border_color = self._default_color
         self.update_height_width()
 
 
-    def add_key_command(self, key, command):
+    def add_key_command(self, key: int, command: Callable[[],Any]) -> Any:
         """Maps a keycode to a function that will be executed when in focus mode
 
         Parameters
@@ -94,7 +98,32 @@ class Widget(py_cui.ui.UIElement):
         self._key_commands[key] = command
 
 
-    def update_key_command(self, key, command):
+    def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None:
+        """Maps a keycode to a function that will be executed when in focus mode
+
+        Parameters
+        ----------
+        key : py_cui.keys.MOUSE_EVENT
+            Mouse event code from py_cui.keys
+        command : Callable
+            a non-argument function or lambda function to execute if in focus mode and key is pressed
+
+        Raises
+        ------
+        PyCUIError
+            If input mouse event code is not valid
+        """
+
+        if mouse_event not in py_cui.keys.MOUSE_EVENTS:
+            raise py_cui.errors.PyCUIError(f'Event code {mouse_event} is not a valid py_cui mouse event!')
+
+        if mouse_event in self._mouse_commands.keys():
+            self._logger.warn(f'Overriding mouse command for event {mouse_event}')
+
+        self._mouse_commands[mouse_event] = command
+
+
+    def update_key_command(self, key: int, command: Callable[[],Any]) -> Any:
         """Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
 
         Parameters
@@ -109,7 +138,7 @@ class Widget(py_cui.ui.UIElement):
             self.add_key_command(key, command)
 
 
-    def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False, selected_color=None):
+    def add_text_color_rule(self, regex: str, color: int, rule_type: str, match_type: str='line', region: List[int]=[0,1], include_whitespace: bool=False, selected_color=None) -> None:
         """Forces renderer to draw text using given color if text_condition_function returns True
 
         Parameters
@@ -136,7 +165,7 @@ class Widget(py_cui.ui.UIElement):
         self._text_color_rules.append(new_color_rule)
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Gets the absolute position of the widget in characters. Override of base class function
 
         Returns
@@ -156,12 +185,11 @@ class Widget(py_cui.ui.UIElement):
             y_adjust = offset_y
 
         x_pos = self._column * col_width + x_adjust
-        # Always add two to the y_pos, because we have a title bar + a pad row
-        y_pos = self._row * row_height + 2 + y_adjust
+        y_pos = self._row * row_height + y_adjust + self._grid._title_bar_offset + 1
         return x_pos, y_pos
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Gets the absolute dimensions of the widget in characters. Override of base class function
 
         Returns
@@ -189,7 +217,7 @@ class Widget(py_cui.ui.UIElement):
         return width + self._start_x, height + self._start_y
 
 
-    def get_grid_cell(self):
+    def get_grid_cell(self) -> Tuple[int,int]:
         """Gets widget row, column in grid
 
         Returns
@@ -201,7 +229,7 @@ class Widget(py_cui.ui.UIElement):
         return self._row, self._column
 
 
-    def get_grid_cell_spans(self):
+    def get_grid_cell_spans(self) -> Tuple[int,int]:
         """Gets widget row span, column span in grid
 
         Returns
@@ -213,7 +241,7 @@ class Widget(py_cui.ui.UIElement):
         return self._row_span, self._column_span
 
 
-    def set_selectable(self, selectable):
+    def set_selectable(self, selectable: bool) -> None:
         """Setter for widget selectablility
 
         Paramters
@@ -225,7 +253,7 @@ class Widget(py_cui.ui.UIElement):
         self._selectable = selectable
 
 
-    def is_selectable(self):
+    def is_selectable(self) -> bool:
         """Checks if the widget is selectable
 
         Returns
@@ -237,7 +265,7 @@ class Widget(py_cui.ui.UIElement):
         return self._selectable
 
 
-    def _is_row_col_inside(self, row, col):
+    def _is_row_col_inside(self, row: int, col: int) -> bool:
         """Checks if a particular row + column is inside the widget area
 
         Parameters
@@ -263,7 +291,41 @@ class Widget(py_cui.ui.UIElement):
     # BELOW FUNCTIONS SHOULD BE OVERWRITTEN BY SUB-CLASSES
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int):
+        """Base class function that handles all assigned mouse presses.
+
+        When overwriting this function, make sure to add a super()._handle_mouse_press(x, y, mouse_event) call,
+        as this is required for user defined key command support
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of key pressed
+        """
+
+        # Retrieve the command function if it exists
+        if mouse_event in self._mouse_commands.keys():
+            command = self._mouse_commands[mouse_event]
+            
+            # Identify num of args from callable. This allows for user to create commands that take in x, y
+            # coords of the mouse press as input
+            num_args = 0
+            try:
+                num_args = len(inspect.signature(command).parameters)
+            except ValueError:
+                self._logger.error('Failed to get mouse press command signature!')
+            except TypeError:
+                self._logger.error('Type of object not supported for signature identification!')
+
+            # Depending on the number of parameters for the command, pass in the x and y
+            # values, or do nothing
+            if num_args == 2:
+                command(x, y)
+            else:
+                command()
+
+
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Base class function that handles all assigned key presses.
 
         When overwriting this function, make sure to add a super()._handle_key_press(key_pressed) call,
@@ -280,7 +342,7 @@ class Widget(py_cui.ui.UIElement):
             command()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Base class draw class that checks if renderer is valid.
 
         Should be called with super()._draw() in overrides.
@@ -304,7 +366,7 @@ class Label(Widget):
         Toggle for drawing label border
     """
 
-    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, logger):
+    def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger):
         """Initalizer for Label widget
         """
 
@@ -312,14 +374,14 @@ class Label(Widget):
         self._draw_border = False
 
 
-    def toggle_border(self):
+    def toggle_border(self) -> None:
         """Function that gives option to draw border around label
         """
 
         self._draw_border = not self._draw_border
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override base draw class.
 
         Center text and draw it
@@ -345,7 +407,7 @@ class BlockLabel(Widget):
         Decides whether or not label should be centered
     """
 
-    def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center, logger):
+    def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, center, logger):
         """Initializer for blocklabel widget
         """
 
@@ -355,7 +417,7 @@ class BlockLabel(Widget):
         self._draw_border  = False
 
 
-    def set_title(self, title):
+    def set_title(self, title: str) -> None:
         """Override of base class, splits title into lines for rendering line by line.
 
         Parameters
@@ -368,14 +430,14 @@ class BlockLabel(Widget):
         self._lines = title.splitlines()
 
 
-    def toggle_border(self):
+    def toggle_border(self) -> None:
         """Function that gives option to draw border around label
         """
 
         self._draw_border = not self._draw_border
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override base draw class.
 
         Center text and draw it
@@ -398,7 +460,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
     """A scroll menu widget.
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger: 'py_cui.debug.PyCUILogger'):
         """Initializer for scroll menu. calls superclass initializers and sets help text
         """
 
@@ -407,7 +469,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self.set_help_text('Focus mode on ScrollMenu. Use Up/Down/PgUp/PgDown/Home/End to scroll, Esc to exit.')
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int):
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -416,14 +478,25 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
-        viewport_top = self._start_y + self._pady + 1
-        if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
-            elem_clicked = y - viewport_top + self._top_view
-            self.set_selected_item_index(elem_clicked)
+        # For either click or double click we want to jump to the clicked-on item
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK or mouse_event == py_cui.keys.LEFT_MOUSE_DBL_CLICK:
+            current = self.get_selected_item_index()
+            viewport_top = self._start_y + self._pady + 1
+
+            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+                elem_clicked = y - viewport_top + self._top_view
+                self.set_selected_item_index(elem_clicked)
+        
+            if self.get_selected_item_index() != current and self._on_selection_change is not None:
+                self._process_selection_change_event()
+
+        # For scroll menu, handle custom mouse press after initial event, since we will likely want to
+        # have access to the newly selected item
+        Widget._handle_mouse_press(self, x, y, mouse_event)
 
 
-    def _handle_key_press(self, key_pressed):
+
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override base class function.
 
         UP_ARROW scrolls up, DOWN_ARROW scrolls down.
@@ -434,8 +507,11 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
+
+        current = self.get_selected_item_index()
         viewport_height = self.get_viewport_height()
+        
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
@@ -448,13 +524,16 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             self._jump_up()
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
+        if self.get_selected_item_index() != current and self._on_selection_change is not None:
+
+            self._process_selection_change_event()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Overrides base class draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)
         counter = self._pady + 1
@@ -487,7 +566,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         Character to represent a checked item
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, checked_char: str):
         """Initializer for CheckBoxMenu Widget
         """
 
@@ -496,7 +575,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         self.set_help_text('Focus mode on CheckBoxMenu. Use up/down to scroll, Enter to toggle set, unset, Esc to exit.')
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -505,7 +584,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
         viewport_top = self._start_y + self._pady + 1
         if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
             elem_clicked = y - viewport_top + self._top_view
@@ -513,7 +592,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
             self.mark_item_as_checked(self._view_items[elem_clicked])
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of key presses.
 
         First, run the superclass function, scrolling should still work.
@@ -540,10 +619,10 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
         if key_pressed == py_cui.keys.KEY_ENTER:
-            self.mark_item_as_checked(self.get())
+            self.toggle_item_checked(self.get())
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Overrides base class draw function
         """
 
@@ -554,9 +633,9 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         line_counter = 0
         for item in self._view_items:
             if self._selected_item_dict[item]:
-                line = '[{}] - {}'.format(self._checked_char, str(item))
+                line = f'[{self._checked_char}] - {str(item)}'
             else:
-                line = '[ ] - {}'.format(str(item))
+                line = f'[ ] - {str(item)}'
             if line_counter < self._top_view:
                 line_counter = line_counter + 1
             else:
@@ -584,7 +663,7 @@ class Button(Widget):
         A no-args function to run when the button is pressed.
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, command):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, command: Optional[Callable[[],Any]]):
         """Initializer for Button Widget
         """
 
@@ -592,9 +671,14 @@ class Button(Widget):
         self.command = command
         self.set_color(py_cui.MAGENTA_ON_BLACK)
         self.set_help_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
+        
+        # By default we will process command on click or double click
+        if self.command is not None:
+            self.add_mouse_command(py_cui.keys.LEFT_MOUSE_CLICK, self.command)
+            self.add_mouse_command(py_cui.keys.LEFT_MOUSE_DBL_CLICK, self.command)
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class, adds ENTER listener that runs the button's command
 
         Parameters
@@ -609,7 +693,7 @@ class Button(Widget):
                 return self.command()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base class draw function
         """
 
@@ -627,7 +711,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
     """Widget for entering small single lines of text
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text, password):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, initial_text: str, password: bool):
         """Initializer for TextBox widget. Uses TextBoxImplementation as base
         """
 
@@ -637,11 +721,11 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self.set_help_text('Focus mode on TextBox. Press Esc to exit focus mode.')
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Need to update all cursor positions on resize
         """
 
-        super().update_height_width()
+        Widget.update_height_width(self)
         padx, _             = self.get_padding()
         start_x, start_y    = self.get_start_position()
         height, width       = self.get_absolute_dimensions()
@@ -654,7 +738,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self._viewport_width     = self._cursor_max_right - self._cursor_max_left
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -663,7 +747,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
         if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
             if x <= len(self._text) + self._cursor_max_left:
                 old_text_pos = self._cursor_text_pos
@@ -675,7 +759,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
                 self._cursor_text_pos = len(self._text)
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base handle key press function
 
         Parameters
@@ -684,7 +768,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
@@ -702,11 +786,11 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             self._insert_char(key_pressed)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
 
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_text(self, self._title, self._cursor_y - 2, bordered=False)
@@ -734,7 +818,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
     """Widget for editing large multi-line blocks of text
     """
 
-    def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text):
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, initial_text: str):
         """Initializer for TextBlock Widget. Uses TextBlockImplementation as base
         """
 
@@ -744,7 +828,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self.set_help_text('Focus mode on TextBlock. Press Esc to exit focus mode.')
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Function that updates the position of the text and cursor on resize
         """
 
@@ -763,7 +847,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self._viewport_height    = self._cursor_max_down  - self._cursor_max_up
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Override of base class function, handles mouse press in menu
 
         Parameters
@@ -772,30 +856,32 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             Coordinates of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
-        if y >= self._cursor_max_up and y <= self._cursor_max_down:
-            if x >= self._cursor_max_left and x <= self._cursor_max_right:
-                line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
-                if len(self._text_lines) <= line_clicked_index:
-                    self._cursor_text_pos_y = len(self._text_lines) - 1
-                    self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
-                    line = self._text_lines[len(self._text_lines) - 1]
-                else:
-                    self._cursor_text_pos_y = line_clicked_index
-                    self._cursor_y = y
-                    line = self._text_lines[line_clicked_index]
-                
-                if x <= len(line) + self._cursor_max_left:
-                    old_text_pos = self._cursor_text_pos_x
-                    old_cursor_x = self._cursor_x
-                    self._cursor_x = x
-                    self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
-                else:
-                    self._cursor_x = self._cursor_max_left + len(line)
-                    self._cursor_text_pos_x = len(line)
+        Widget._handle_mouse_press(self, x, y, mouse_event)
+        
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            if y >= self._cursor_max_up and y <= self._cursor_max_down:
+                if x >= self._cursor_max_left and x <= self._cursor_max_right:
+                    line_clicked_index = y - self._cursor_max_up + self._viewport_y_start
+                    if len(self._text_lines) <= line_clicked_index:
+                        self._cursor_text_pos_y = len(self._text_lines) - 1
+                        self._cursor_y = self._cursor_max_up + self._cursor_text_pos_y - self._viewport_y_start
+                        line = self._text_lines[len(self._text_lines) - 1]
+                    else:
+                        self._cursor_text_pos_y = line_clicked_index
+                        self._cursor_y = y
+                        line = self._text_lines[line_clicked_index]
+
+                    if x <= len(line) + self._cursor_max_left:
+                        old_text_pos = self._cursor_text_pos_x
+                        old_cursor_x = self._cursor_x
+                        self._cursor_x = x
+                        self._cursor_text_pos_x = old_text_pos + (x - old_cursor_x)
+                    else:
+                        self._cursor_x = self._cursor_max_left + len(line)
+                        self._cursor_text_pos_x = len(line)
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class handle key press function
 
         Parameters
@@ -804,7 +890,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        Widget._handle_key_press(self, key_pressed)
 
         if key_pressed == py_cui.keys.KEY_LEFT_ARROW:
             self._move_left()
@@ -832,11 +918,11 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             self._insert_char(key_pressed)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base class draw function
         """
 
-        super()._draw()
+        Widget._draw(self)
 
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)

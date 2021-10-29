@@ -15,6 +15,8 @@ npdoc2md/
 ecui/
 .coverage
 py_cui_log.txt
+*.log
 venv/
 .pytest_cache/
 demo.py
+*.log

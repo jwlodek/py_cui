@@ -6,13 +6,14 @@ import py_cui.widgets
 import py_cui.popups
 import py_cui.colors
 import os
+from typing import List, Optional, Tuple
 
 # Imports used to detect hidden files
 import sys
 import stat
 
 
-def is_filepath_hidden(path):
+def is_filepath_hidden(path:  str) -> bool:
     """Function checks if file or folder is considered "hidden"
 
     Parameters
@@ -52,7 +53,7 @@ class FileDirElem:
         icon for file
     """
 
-    def __init__(self, elem_type, name, fullpath, ascii_icons=False):
+    def __init__(self, elem_type: str, name: str, fullpath: str, ascii_icons: bool=False):
         """Intializer for FilDirElem
         """
 
@@ -71,7 +72,7 @@ class FileDirElem:
             self._file_icon = '     '
 
 
-    def get_path(self):
+    def get_path(self) -> str:
         """Getter for path
 
         Returns
@@ -83,7 +84,7 @@ class FileDirElem:
         return self._path
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Override of to-string function
 
         Returns
@@ -93,9 +94,9 @@ class FileDirElem:
         """
 
         if self._type == 'file':
-            return '{} {}'.format(self._file_icon, self._name)
+            return f'{self._file_icon} {self._name}'
         else:
-            return '{} {}'.format(self._folder_icon, self._name)
+            return f'{self._folder_icon} {self._name}'
 
 
 
@@ -115,7 +116,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
     """
 
 
-    def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False):
+    def __init__(self, initial_loc: str, dialog_type: str, ascii_icons, logger, limit_extensions: List[str] = [], show_hidden: bool=False):
         """Initalizer for the file select menu implementation. Includes some logic for getting list of file and folders.
         """
 
@@ -130,7 +131,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
         self.refresh_view()
 
 
-    def refresh_view(self):
+    def refresh_view(self) -> None:
         """Function that refreshes the current list of files and folders in view
         """
 
@@ -181,7 +182,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         Runs command even if there are no menu items (passes None)
     """
 
-    def __init__(self, root, initial_dir, dialog_type, ascii_icons, title, color, command, renderer, logger, limit_extensions=[]):
+    def __init__(self, root, initial_dir, dialog_type: str, ascii_icons, title, color, command, renderer, logger, limit_extensions: List[str]=[]):
         """Initializer for MenuPopup. Uses MenuImplementation as base
         """
 
@@ -190,15 +191,19 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         self._command              = command
         self._parent_dialog        = root
         self._text_color_rules = [
-            py_cui.colors.ColorRule('\U0001f4c1', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,'startswith', 'region', [3, 1000], False, logger),
-            py_cui.colors.ColorRule('<DIR>', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE, 'startswith', 'region', [6, 1000], False, logger),
-            py_cui.colors.ColorRule('     ', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [6, 1000], True, logger),
-            py_cui.colors.ColorRule('\U0001f5ce', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE, 'startswith', 'region', [3, 1000], False, logger)
+            py_cui.colors.ColorRule('\U0001f4c1', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,
+                                    'startswith', 'region', [3, 1000], False, logger),
+            py_cui.colors.ColorRule('<DIR>', py_cui.BLUE_ON_BLACK, py_cui.WHITE_ON_BLUE,
+                                    'startswith', 'region', [6, 1000], False, logger),
+            py_cui.colors.ColorRule('     ', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE,
+                                    'startswith', 'region', [6, 1000], True, logger),
+            py_cui.colors.ColorRule('\U0001f5ce', py_cui.WHITE_ON_BLACK, py_cui.BLACK_ON_WHITE,
+                                    'startswith', 'region', [3, 1000], False, logger)
         ]
         #self._run_command_if_none  = run_command_if_none
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute start position
 
         Returns
@@ -213,7 +218,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         return start_x, start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute stop position
 
         Returns
@@ -228,7 +233,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
         return stop_x, stop_y
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base handle key press function
 
         Enter key runs command, Escape key closes menu
@@ -239,27 +244,29 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        #super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             old_dir = self._current_dir
-            if os.path.isdir(self.get()._path):
-                self._current_dir = self.get()._path
-                try:
-                    self.refresh_view()
-                except FileNotFoundError:
-                    self._parent_dialog.display_warning('Selected directory does not exist!')
-                    self._current_dir = old_dir
-                    self.refresh_view()
-                except PermissionError:
-                    self._parent_dialog.display_warning('Permission Error Accessing: {} !'.format(self._current_dir))
-                    self._current_dir = old_dir
-                    self.refresh_view()
-                finally:
-                    self.set_title(self._current_dir)
-            elif self._parent_dialog._dialog_type == 'openfile':
-                self._parent_dialog._submit(self.get()._path)
-            else:
-                pass
+            item = self.get()
+            if item is not None:
+                if os.path.isdir(item._path):
+                    self._current_dir = item._path
+                    try:
+                        self.refresh_view()
+                    except FileNotFoundError:
+                        self._parent_dialog.display_warning('Selected directory does not exist!')
+                        self._current_dir = old_dir
+                        self.refresh_view()
+                    except PermissionError:
+                        self._parent_dialog.display_warning(f'Permission Error Accessing: {self._current_dir} !')
+                        self._current_dir = old_dir
+                        self.refresh_view()
+                    finally:
+                        self.set_title(self._current_dir)
+                elif self._parent_dialog._dialog_type == 'openfile':
+                    self._parent_dialog._submit(item._path)
+                else:
+                    pass
 
         viewport_height = self.get_viewport_height()
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
@@ -276,7 +283,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
             self._jump_down(viewport_height)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Overrides base class draw function
         """
 
@@ -327,7 +334,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         self.update_height_width()
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute start position
 
         Returns
@@ -343,7 +350,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         return start_x, start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute stop position
 
         Returns
@@ -359,11 +366,11 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         return stop_x, stop_y
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Override of base class. Updates text field variables for form field
         """
 
-        super().update_height_width()
+        py_cui.popups.Popup.update_height_width(self)
         padx, pady              = self.get_padding()
         start_x, start_y        = self.get_start_position()
         height, width           = self.get_absolute_dimensions()
@@ -376,7 +383,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
         self._viewport_width    = self._cursor_max_right - self._cursor_max_left
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Handles text input for the field. Called by parent
         """
 
@@ -418,7 +425,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
                 self.clear()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Draw function for the field. Called from parent. Essentially the same as a TextboxPopup
         """
 
@@ -470,7 +477,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         self._button_num = button_num
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute start position
 
         Returns
@@ -486,7 +493,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         return start_x, start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base function. Uses the parent element do compute stop position
 
         Returns
@@ -502,7 +509,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         return stop_x, stop_y
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Handles mouse presses 
 
         Parameters
@@ -511,13 +518,16 @@ class FileDialogButton(py_cui.ui.UIElement):
             x coordinate of click in characters
         y : int
             y coordinate of click in characters
+        mouse_event : int
+            Mouse event keycode of mouse press
         """
 
-        super()._handle_mouse_press(x, y)
-        self.perform_command()
+        super()._handle_mouse_press(x, y, mouse_event)
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
+            self.perform_command()
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class, adds ENTER listener that runs the button's command
 
         Parameters
@@ -531,7 +541,7 @@ class FileDialogButton(py_cui.ui.UIElement):
             self.perform_command()
 
     
-    def perform_command(self):
+    def perform_command(self) -> None:
         if self.command is not None:
             if self._button_num == 1:
                 if self._parent_dialog._dialog_type == 'saveas':
@@ -550,11 +560,11 @@ class FileDialogButton(py_cui.ui.UIElement):
                 self._parent_dialog._root.close_popup()
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base class draw function
         """
 
-        super()._draw()
+        #super()._draw()
         self._renderer.set_color_mode(self.get_color())
         self._renderer.draw_border(self, with_title=False)
         button_text_y_pos = self._start_y + int(self._height / 2)
@@ -580,7 +590,7 @@ class InternalFileDialogPopup(py_cui.popups.MessagePopup):
         self._parent = parent
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed: int) -> None:
         """Override of base class, close in parent instead of root
         """
 
@@ -638,7 +648,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         self._filename_input = FileNameInput(self, input_title, '', renderer, logger)
         self._file_dir_select = FileSelectElement(self, initial_dir, dialog_type, ascii_icons, title, color, None, renderer, logger, limit_extensions=limit_extensions)
         self._submit_button = FileDialogButton(self, title, self._submit, 1, '', 'OK', renderer, logger)
-        self._cancel_button = FileDialogButton(self, 'Cancel {}'.format(title), self._root.close_popup, 2, '', 'ESC', renderer, logger)
+        self._cancel_button = FileDialogButton(self, f'Cancel {title}', self._root.close_popup, 2, '', 'ESC', renderer, logger)
 
         # Internal popup used for secondary errors and warnings
         self._internal_popup = None
@@ -649,15 +659,15 @@ class FileDialogPopup(py_cui.popups.Popup):
         self._currently_selected = self._file_dir_select
 
 
-    def _submit(self, output):
+    def _submit(self, output: str) -> None:
         valid, msg = self.output_valid(output)
-        if not valid:
+        if not valid and msg is not None:
             self.display_warning(msg)
         else:
             self._submit_action(output)
 
 
-    def display_warning(self, message):
+    def display_warning(self, message: str) -> None:
         """Helper function for showing internal popup warning message
 
         Parameters
@@ -676,7 +686,7 @@ class FileDialogPopup(py_cui.popups.Popup):
                                                         self._logger)
 
 
-    def output_valid(self, output):
+    def output_valid(self, output) -> Tuple[bool,Optional[str]]:
         if self._dialog_type == 'openfile' and not os.path.isfile(output):
             return False, 'Please select a valid file path!'
         elif self._dialog_type == 'opendir' and not os.path.isdir(output):
@@ -686,7 +696,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         return True, None
 
 
-    def get_absolute_start_pos(self):
+    def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -702,7 +712,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         return form_start_x, form_start_y
 
 
-    def get_absolute_stop_pos(self):
+    def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
         
         Returns
@@ -718,7 +728,7 @@ class FileDialogPopup(py_cui.popups.Popup):
         return form_stop_x, form_stop_y
 
 
-    def update_height_width(self):
+    def update_height_width(self) -> None:
         """Override of base class function
 
         Also updates all form field elements in the form
@@ -734,7 +744,7 @@ class FileDialogPopup(py_cui.popups.Popup):
             pass
 
 
-    def _handle_key_press(self, key_pressed):
+    def _handle_key_press(self, key_pressed:int) -> None:
         """Override of base class. Here, we handle tabs, enters, and escapes
 
         All other key presses are passed to the currently selected field element
@@ -777,7 +787,7 @@ class FileDialogPopup(py_cui.popups.Popup):
             self._internal_popup._handle_key_press(key_pressed)
 
 
-    def _handle_mouse_press(self, x, y):
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
         """Override of base class function
 
         Simply enters the appropriate field when mouse is pressed on it
@@ -788,24 +798,25 @@ class FileDialogPopup(py_cui.popups.Popup):
             Coordinates of the mouse press
         """
 
-        super()._handle_mouse_press(x, y)
+        super()._handle_mouse_press(x, y, mouse_event)
         if self._file_dir_select._contains_position(x, y):
             self._filename_input.set_selected(False)
             self._file_dir_select.set_selected(True)
-            self._file_dir_select._handle_mouse_press(x, y)
+            self._file_dir_select._handle_mouse_press(x, y, mouse_event)
             
         elif self._filename_input._contains_position(x, y):
             self._filename_input.set_selected(True)
             self._file_dir_select.set_selected(False)
-            self._filename_input._handle_mouse_press(x, y)
+            self._filename_input._handle_mouse_press(x, y, mouse_event)
         
         elif self._submit_button._contains_position(x, y):
-            self._submit_button._handle_mouse_press(x, y)
+            self._submit_button._handle_mouse_press(x, y, mouse_event)
+
         elif self._cancel_button._contains_position(x, y):
-            self._cancel_button._handle_mouse_press(x, y)
+            self._cancel_button._handle_mouse_press(x, y, mouse_event)
 
 
-    def _draw(self):
+    def _draw(self) -> None:
         """Override of base class.
         
         Here, we only draw a border, and then the individual form elements

@@ -17,7 +17,7 @@ Module containing constants and helper functions for dealing with keys.
 ### get_ascii_from_char
 
 ```python
-def get_ascii_from_char(char)
+def get_ascii_from_char(char: str) -> int
 ```
 
 Function that converts ascii code to character
@@ -44,7 +44,7 @@ Function that converts ascii code to character
 ### get_char_from_ascii
 
 ```python
-def get_char_from_ascii(key_num)
+def get_char_from_ascii(key_num: int) -> Optional[str]
 ```
 
 Function that converts a character to an ascii code

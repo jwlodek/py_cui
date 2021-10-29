@@ -50,7 +50,7 @@ Class representing a text color rendering rule
 ### __init__
 
 ```python
-def __init__(self, regex, color, selected_color, rule_type, match_type, region, include_whitespace, logger)
+def __init__(self, regex: str, color: int, selected_color: int, rule_type: str, match_type: str, region: List[int], include_whitespace: bool, logger)
 ```
 
 Constructor for ColorRule object
@@ -77,7 +77,7 @@ Constructor for ColorRule object
 ### _check_match
 
 ```python
-def _check_match(self, line)
+def _check_match(self, line: str) -> bool
 ```
 
 Checks if the color rule matches a line
@@ -104,7 +104,7 @@ Checks if the color rule matches a line
 ### _generate_fragments_regex
 
 ```python
-def _generate_fragments_regex(self, widget, render_text, selected)
+def _generate_fragments_regex(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], render_text:str, selected) -> List[List[Union[int,str]]]
 ```
 
 Splits text into fragments based on regular expression
@@ -132,7 +132,7 @@ Splits text into fragments based on regular expression
 ### _split_text_on_region
 
 ```python
-def _split_text_on_region(self, widget, render_text, selected)
+def _split_text_on_region(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], render_text: str, selected) -> List[List[Union[str,int]]]:   # renderer._generate_text_color_fragments passes a uielement and not a widge
 ```
 
 Splits text into fragments based on region
@@ -160,7 +160,7 @@ Splits text into fragments based on region
 ### generate_fragments
 
 ```python
-def generate_fragments(self, widget, line, render_text, selected=False)
+def generate_fragments(self, widget: Union['py_cui.widgets.Widget','py_cui.ui.UIElement'], line: str, render_text: str, selected=False) -> Tuple[List[List[Union[str,int]]],bool]
 ```
 
 Splits text into fragments if matched line to regex

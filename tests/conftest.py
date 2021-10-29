@@ -56,7 +56,7 @@ def PYCUI():
 def WIDGETSET(request, LOGGER):
 
     def _WIDGETSET(rows, cols, height, width):
-        return py_cui.widget_set.WidgetSet(rows, cols, LOGGER, simulated_terminal=[height, width])
+        return py_cui.widget_set.WidgetSet(rows, cols, LOGGER, root=py_cui.PyCUI(rows, cols), simulated_terminal=[height, width])
 
     return _WIDGETSET
 

@@ -1,6 +1,6 @@
 # widgets
 
-Module contatining all core widget classes for py_cui.
+Module containing all core widget classes for py_cui.
 
 
 
@@ -66,6 +66,7 @@ and setting status bar text.
  Method  | Doc
 -----|-----
  add_key_command | Maps a keycode to a function that will be executed when in focus mode
+ add_mouse_command | Maps a keycode to a function that will be executed when in focus mode
  update_key_command | Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
  add_text_color_rule | Forces renderer to draw text using given color if text_condition_function returns True
  get_absolute_start_pos | Gets the absolute position of the widget in characters. Override of base class function
@@ -75,6 +76,7 @@ and setting status bar text.
  set_selectable | Setter for widget selectablility
  is_selectable | Checks if the widget is selectable
  _is_row_col_inside | Checks if a particular row + column is inside the widget area
+ _handle_mouse_press | Base class function that handles all assigned mouse presses.
  _handle_key_press | Base class function that handles all assigned key presses.
  _draw | Base class draw class that checks if renderer is valid.
 
@@ -84,14 +86,14 @@ and setting status bar text.
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, selectable = True)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, selectable: bool = True)
 ```
 
 Initializer for base widget class
 
 
 
-Calss UIElement superclass initialzier, and then assigns widget to grid, along with row/column info
+Class UIElement superclass initializer, and then assigns widget to grid, along with row/column info
 and color rules and key commands
 
 
@@ -101,7 +103,7 @@ and color rules and key commands
 ### add_key_command
 
 ```python
-def add_key_command(self, key, command)
+def add_key_command(self, key: int, command: Callable[[],Any]) -> Any
 ```
 
 Maps a keycode to a function that will be executed when in focus mode
@@ -120,10 +122,38 @@ Maps a keycode to a function that will be executed when in focus mode
 
 
 
+### add_mouse_command
+
+```python
+def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None
+```
+
+Maps a keycode to a function that will be executed when in focus mode
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ key  |  py_cui.keys.MOUSE_EVENT | Mouse event code from py_cui.keys
+ command  |  Callable | a non-argument function or lambda function to execute if in focus mode and key is pressed
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
+ Unknown | PyCUIError | If input mouse event code is not valid
+
+
+
+
+
 ### update_key_command
 
 ```python
-def update_key_command(self, key, command)
+def update_key_command(self, key: int, command: Callable[[],Any]) -> Any
 ```
 
 Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
@@ -145,7 +175,7 @@ Maps a keycode to a function that will be executed when in focus mode, if key is
 ### add_text_color_rule
 
 ```python
-def add_text_color_rule(self, regex, color, rule_type, match_type='line', region=[0,1], include_whitespace=False, selected_color=None)
+def add_text_color_rule(self, regex: str, color: int, rule_type: str, match_type: str='line', region: List[int]=[0,1], include_whitespace: bool=False, selected_color=None) -> None
 ```
 
 Forces renderer to draw text using given color if text_condition_function returns True
@@ -171,7 +201,7 @@ Forces renderer to draw text using given color if text_condition_function return
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Gets the absolute position of the widget in characters. Override of base class function
@@ -192,7 +222,7 @@ Gets the absolute position of the widget in characters. Override of base class f
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Gets the absolute dimensions of the widget in characters. Override of base class function
@@ -213,7 +243,7 @@ Gets the absolute dimensions of the widget in characters. Override of base class
 ### get_grid_cell
 
 ```python
-def get_grid_cell(self)
+def get_grid_cell(self) -> Tuple[int,int]
 ```
 
 Gets widget row, column in grid
@@ -234,7 +264,7 @@ Gets widget row, column in grid
 ### get_grid_cell_spans
 
 ```python
-def get_grid_cell_spans(self)
+def get_grid_cell_spans(self) -> Tuple[int,int]
 ```
 
 Gets widget row span, column span in grid
@@ -255,7 +285,7 @@ Gets widget row span, column span in grid
 ### set_selectable
 
 ```python
-def set_selectable(self, selectable)
+def set_selectable(self, selectable: bool) -> None
 ```
 
 Setter for widget selectablility
@@ -274,7 +304,7 @@ Widget selectable if true, otherwise not
 ### is_selectable
 
 ```python
-def is_selectable(self)
+def is_selectable(self) -> bool
 ```
 
 Checks if the widget is selectable
@@ -295,7 +325,7 @@ Checks if the widget is selectable
 ### _is_row_col_inside
 
 ```python
-def _is_row_col_inside(self, row, col)
+def _is_row_col_inside(self, row: int, col: int) -> bool
 ```
 
 Checks if a particular row + column is inside the widget area
@@ -319,10 +349,34 @@ Checks if a particular row + column is inside the widget area
 
 
 
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int)
+```
+
+Base class function that handles all assigned mouse presses.
+
+
+
+When overwriting this function, make sure to add a super()._handle_mouse_press(x, y, mouse_event) call,
+as this is required for user defined key command support
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ key_pressed  |  int | key code of key pressed
+
+
+
+
+
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Base class function that handles all assigned key presses.
@@ -346,7 +400,7 @@ as this is required for user defined key command support
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Base class draw class that checks if renderer is valid.
@@ -395,7 +449,7 @@ Simply displays one centered row of text. Has no unique attributes or methods
 ### __init__
 
 ```python
-def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, logger)
+def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger)
 ```
 
 Initalizer for Label widget
@@ -409,7 +463,7 @@ Initalizer for Label widget
 ### toggle_border
 
 ```python
-def toggle_border(self)
+def toggle_border(self) -> None
 ```
 
 Function that gives option to draw border around label
@@ -423,7 +477,7 @@ Function that gives option to draw border around label
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override base draw class.
@@ -471,7 +525,7 @@ A Variation of the label widget that renders a block of text.
 ### __init__
 
 ```python
-def __init__(self, id, title,  grid, row, column, row_span, column_span, padx, pady, center, logger)
+def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, center, logger)
 ```
 
 Initializer for blocklabel widget
@@ -485,7 +539,7 @@ Initializer for blocklabel widget
 ### set_title
 
 ```python
-def set_title(self, title)
+def set_title(self, title: str) -> None
 ```
 
 Override of base class, splits title into lines for rendering line by line.
@@ -506,7 +560,7 @@ Override of base class, splits title into lines for rendering line by line.
 ### toggle_border
 
 ```python
-def toggle_border(self)
+def toggle_border(self) -> None
 ```
 
 Function that gives option to draw border around label
@@ -520,7 +574,7 @@ Function that gives option to draw border around label
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override base draw class.
@@ -560,7 +614,7 @@ A scroll menu widget.
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger: 'py_cui.debug.PyCUILogger')
 ```
 
 Initializer for scroll menu. calls superclass initializers and sets help text
@@ -574,7 +628,7 @@ Initializer for scroll menu. calls superclass initializers and sets help text
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int)
 ```
 
 Override of base class function, handles mouse press in menu
@@ -595,7 +649,7 @@ Override of base class function, handles mouse press in menu
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override base class function.
@@ -618,7 +672,7 @@ UP_ARROW scrolls up, DOWN_ARROW scrolls down.
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Overrides base class draw function
@@ -664,7 +718,7 @@ Extension of ScrollMenu that allows for multiple items to be selected at once.
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, checked_char)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, checked_char: str)
 ```
 
 Initializer for CheckBoxMenu Widget
@@ -678,7 +732,7 @@ Initializer for CheckBoxMenu Widget
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Override of base class function, handles mouse press in menu
@@ -699,7 +753,7 @@ Override of base class function, handles mouse press in menu
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of key presses.
@@ -723,7 +777,7 @@ Adds Enter command to toggle selection
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Overrides base class draw function
@@ -769,7 +823,7 @@ Allows for running a command function on Enter
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, command)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, command: Optional[Callable[[],Any]])
 ```
 
 Initializer for Button Widget
@@ -783,7 +837,7 @@ Initializer for Button Widget
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class, adds ENTER listener that runs the button's command
@@ -804,7 +858,7 @@ Override of base class, adds ENTER listener that runs the button's command
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class draw function
@@ -843,7 +897,7 @@ Widget for entering small single lines of text
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text, password)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, initial_text: str, password: bool)
 ```
 
 Initializer for TextBox widget. Uses TextBoxImplementation as base
@@ -857,7 +911,7 @@ Initializer for TextBox widget. Uses TextBoxImplementation as base
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Need to update all cursor positions on resize
@@ -871,7 +925,7 @@ Need to update all cursor positions on resize
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Override of base class function, handles mouse press in menu
@@ -892,7 +946,7 @@ Override of base class function, handles mouse press in menu
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base handle key press function
@@ -913,7 +967,7 @@ Override of base handle key press function
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base draw function
@@ -952,7 +1006,7 @@ Widget for editing large multi-line blocks of text
 ### __init__
 
 ```python
-def __init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger, initial_text)
+def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, initial_text: str)
 ```
 
 Initializer for TextBlock Widget. Uses TextBlockImplementation as base
@@ -966,7 +1020,7 @@ Initializer for TextBlock Widget. Uses TextBlockImplementation as base
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Function that updates the position of the text and cursor on resize
@@ -980,7 +1034,7 @@ Function that updates the position of the text and cursor on resize
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Override of base class function, handles mouse press in menu
@@ -1001,7 +1055,7 @@ Override of base class function, handles mouse press in menu
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class handle key press function
@@ -1022,7 +1076,7 @@ Override of base class handle key press function
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class draw function

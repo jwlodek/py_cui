@@ -7,10 +7,11 @@
 
 from sys import platform
 import curses
+from typing import Optional
 
 # Some simple helper functions
 
-def get_ascii_from_char(char):
+def get_ascii_from_char(char: str) -> int:
     """Function that converts ascii code to character
 
     Parameters
@@ -27,7 +28,7 @@ def get_ascii_from_char(char):
     return ord(char)
 
 
-def get_char_from_ascii(key_num):
+def get_char_from_ascii(key_num: int) -> Optional[str]:
     """Function that converts a character to an ascii code
 
     Parameters
@@ -40,7 +41,10 @@ def get_char_from_ascii(key_num):
     char : character
         character converted from ascii
     """
-    
+
+    if key_num is None:
+        return None
+
     return chr(key_num)
 
 
@@ -52,11 +56,32 @@ KEY_SPACE       = get_ascii_from_char(' ')
 KEY_DELETE      = curses.KEY_DC
 KEY_TAB         = get_ascii_from_char('\t')
 
+# Pressing backspace returns 8 on windows?
+if platform == 'win32':
+    KEY_BACKSPACE   = 8
+# Adds support for 'delete/backspace' key on OSX
+elif platform == 'darwin':
+    KEY_BACKSPACE   = 127
+else:
+    KEY_BACKSPACE   = curses.KEY_BACKSPACE
+
+SPECIAL_KEYS = [KEY_ENTER, KEY_ESCAPE, KEY_SPACE, KEY_DELETE, KEY_TAB, KEY_BACKSPACE]
+
+
+# Page navigation keys
+KEY_PAGE_UP     = curses.KEY_PPAGE
+KEY_PAGE_DOWN   = curses.KEY_NPAGE
+KEY_HOME        = curses.KEY_HOME
+KEY_END         = curses.KEY_END
+
 # Arrow Keys
 KEY_UP_ARROW    = curses.KEY_UP
 KEY_DOWN_ARROW  = curses.KEY_DOWN
 KEY_LEFT_ARROW  = curses.KEY_LEFT
 KEY_RIGHT_ARROW = curses.KEY_RIGHT
+
+
+ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]
 
 
 if platform == 'linux' or platform == 'darwin':
@@ -85,14 +110,8 @@ elif platform == 'win32':
     KEY_CTRL_DOWN   = 481
 
 
-ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]
-
-
-# Page navigation keys
-KEY_PAGE_UP     = curses.KEY_PPAGE
-KEY_PAGE_DOWN   = curses.KEY_NPAGE
-KEY_HOME        = curses.KEY_HOME
-KEY_END         = curses.KEY_END
+MODIFIED_ARROW_KEYS = [KEY_SHIFT_LEFT, KEY_SHIFT_RIGHT, KEY_SHIFT_UP, KEY_SHIFT_DOWN,
+                       KEY_CTRL_LEFT, KEY_CTRL_RIGHT, KEY_CTRL_UP, KEY_CTRL_DOWN]
 
 
 # Standard letter keys
@@ -158,7 +177,7 @@ UPPERCASE_LETTER_KEYS = list(range(65, 91))
 LETTER_KEYS = UPPERCASE_LETTER_KEYS + LOWERCASE_LETTER_KEYS
 
 
-# Control Keys
+# Control-modified Keys
 KEY_CTRL_A      = 1
 KEY_CTRL_B      = 2
 KEY_CTRL_C      = 3
@@ -220,6 +239,11 @@ KEY_ALT_X       = 120 + _ALT_MODIFIER
 KEY_ALT_Y       = 121 + _ALT_MODIFIER
 KEY_ALT_Z       = 122 + _ALT_MODIFIER
 
+ALT_MODIFIED_LETTERS = [_alt_mod_key + _ALT_MODIFIER for _alt_mod_key in range(97, 123)]
+
+# List of all ctrl / alt modified key codes supported by py_cui
+MODIFIED_LETTER_KEYS = CTRL_MODIFIED_LETTERS + ALT_MODIFIED_LETTERS
+
 # Function keys
 KEY_F0          = curses.KEY_F0
 KEY_F1          = curses.KEY_F1
@@ -234,6 +258,9 @@ KEY_F9          = curses.KEY_F9
 KEY_F10         = curses.KEY_F10
 KEY_F11         = curses.KEY_F11
 KEY_F12         = curses.KEY_F12
+
+FUNCTION_KEYS = [KEY_F0, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5,
+                 KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12]
 
 
 # Number keys
@@ -252,12 +279,32 @@ KEY_9 = get_ascii_from_char('9')
 NUMBER_KEYS = [KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
 ALPHANUMERIC_KEYS = LETTER_KEYS + NUMBER_KEYS
 
-# Pressing backspace returns 8 on windows?
-if platform == 'win32':
-    KEY_BACKSPACE   = 8
-# Adds support for 'delete/backspace' key on OSX
-elif platform == 'darwin':
-    KEY_BACKSPACE   = 127
-else:
-    KEY_BACKSPACE   = curses.KEY_BACKSPACE
+
+# List of all key events supported by py_cui
+ALL_KEYS = ALPHANUMERIC_KEYS + FUNCTION_KEYS + MODIFIED_LETTER_KEYS + SPECIAL_KEYS + ARROW_KEYS + MODIFIED_ARROW_KEYS
+
+
+# Mouse click events
+LEFT_MOUSE_CLICK        = curses.BUTTON1_CLICKED
+LEFT_MOUSE_DBL_CLICK    = curses.BUTTON1_DOUBLE_CLICKED
+LEFT_MOUSE_TRPL_CLICK   = curses.BUTTON1_TRIPLE_CLICKED
+LEFT_MOUSE_PRESSED      = curses.BUTTON1_PRESSED
+LEFT_MOUSE_RELEASED     = curses.BUTTON1_RELEASED
+
+MIDDLE_MOUSE_CLICK      = curses.BUTTON2_CLICKED
+MIDDLE_MOUSE_DBL_CLICK  = curses.BUTTON2_DOUBLE_CLICKED
+MIDDLE_MOUSE_TRPL_CLICK = curses.BUTTON2_TRIPLE_CLICKED
+MIDDLE_MOUSE_PRESSED    = curses.BUTTON2_PRESSED
+MIDDLE_MOUSE_RELEASED   = curses.BUTTON2_RELEASED
+
+RIGHT_MOUSE_CLICK        = curses.BUTTON3_CLICKED
+RIGHT_MOUSE_DBL_CLICK    = curses.BUTTON3_DOUBLE_CLICKED
+RIGHT_MOUSE_TRPL_CLICK   = curses.BUTTON3_TRIPLE_CLICKED
+RIGHT_MOUSE_PRESSED      = curses.BUTTON3_PRESSED
+RIGHT_MOUSE_RELEASED     = curses.BUTTON3_RELEASED
+
+MOUSE_EVENTS = [LEFT_MOUSE_CLICK, LEFT_MOUSE_DBL_CLICK, LEFT_MOUSE_TRPL_CLICK, LEFT_MOUSE_PRESSED, LEFT_MOUSE_RELEASED,
+                MIDDLE_MOUSE_CLICK, MIDDLE_MOUSE_DBL_CLICK, MIDDLE_MOUSE_TRPL_CLICK, MIDDLE_MOUSE_PRESSED, MIDDLE_MOUSE_RELEASED,
+                RIGHT_MOUSE_CLICK, RIGHT_MOUSE_DBL_CLICK, RIGHT_MOUSE_TRPL_CLICK, RIGHT_MOUSE_PRESSED, RIGHT_MOUSE_RELEASED]
+
 
