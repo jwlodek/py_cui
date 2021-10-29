@@ -39,7 +39,7 @@ import py_cui.errors
 from py_cui.colors import *
 
 # Version number
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 def fit_text(width: int, text: str, center: bool = False) -> str:
