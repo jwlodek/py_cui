@@ -244,7 +244,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        #super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             old_dir = self._current_dir
             item = self.get()
@@ -564,7 +564,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         """Override of base class draw function
         """
 
-        super()._draw()
+        #super()._draw()
         self._renderer.set_color_mode(self.get_color())
         self._renderer.draw_border(self, with_title=False)
         button_text_y_pos = self._start_y + int(self._height / 2)
