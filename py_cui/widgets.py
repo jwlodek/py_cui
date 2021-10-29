@@ -619,7 +619,7 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
             self._jump_down(viewport_height)
         if key_pressed == py_cui.keys.KEY_ENTER:
-            self.mark_item_as_checked(self.get())
+            self.toggle_item_checked(self.get())
 
 
     def _draw(self) -> None:
