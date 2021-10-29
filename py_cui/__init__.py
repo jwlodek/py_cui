@@ -22,7 +22,7 @@ import logging      # Use logging library for debug purposes
 # there is a open source windows-curses module that adds curses support
 # for python on windows
 import curses
-from typing import Any, Callable, List, Dict, Optional, Tuple
+from typing import Any, Union, Callable, List, Dict, Optional, Tuple
 
 # py_cui imports
 import py_cui
@@ -1145,18 +1145,22 @@ class PyCUI:
                 self.move_focus(next_widget, auto_press_buttons=False)
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]) -> None:
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
         ----------
-        key : py_cui.keys.KEY_*
+        key : py_cui.keys.*
             The key bound to the command
         command : Function
             A no-arg or lambda function to fire on keypress
         """
 
-        self._keybindings[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
     # Popup functions. Used to display messages, warnings, and errors to the user.
 
