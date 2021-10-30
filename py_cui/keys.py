@@ -56,9 +56,9 @@ KEY_SPACE       = get_ascii_from_char(' ')
 KEY_DELETE      = curses.KEY_DC
 KEY_TAB         = get_ascii_from_char('\t')
 
-KEYS_BACKSPACE = [8, 127, curses.KEY_BACKSPACE]
+KEY_BACKSPACE = [8, 127, curses.KEY_BACKSPACE]
 
-SPECIAL_KEYS = [KEY_ENTER, KEY_ESCAPE, KEY_SPACE, KEY_DELETE, KEY_TAB] + KEYS_BACKSPACE
+SPECIAL_KEYS = [KEY_ENTER, KEY_ESCAPE, KEY_SPACE, KEY_DELETE, KEY_TAB] + KEY_BACKSPACE
 
 # Page navigation keys
 KEY_PAGE_UP     = curses.KEY_PPAGE

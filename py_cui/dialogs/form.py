@@ -164,7 +164,7 @@ class FormFieldElement(py_cui.ui.UIElement, FormField):
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self._move_right()
-        elif key_pressed in py_cui.keys.KEYS_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._delete_char()

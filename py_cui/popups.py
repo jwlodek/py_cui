@@ -141,7 +141,7 @@ class MessagePopup(Popup):
         self._close_keys = [ py_cui.keys.KEY_ENTER,
                             py_cui.keys.KEY_ESCAPE,
                             py_cui.keys.KEY_SPACE,
-                            py_cui.keys.KEY_DELETE] + py_cui.keys.KEYS_BACKSPACE
+                            py_cui.keys.KEY_DELETE] + py_cui.keys.KEY_BACKSPACE
 
 
     def _draw(self) -> None:
@@ -283,7 +283,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self._move_right()
-        elif key_pressed in py_cui.keys.KEYS_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._delete_char()
