@@ -28,7 +28,7 @@ import py_cui.ui
 import py_cui.colors
 import py_cui.errors
 
-from typing import Callable, List, Dict, Tuple, Any, Optional
+from typing import Union, Callable, List, Dict, Tuple, Any, Optional
 
 
 class Widget(py_cui.ui.UIElement):
@@ -84,18 +84,22 @@ class Widget(py_cui.ui.UIElement):
         self.update_height_width()
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]) -> Any:
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Maps a keycode to a function that will be executed when in focus mode
 
         Parameters
         ----------
-        key : py_cui.keys.KEY
+        key : py_cui.keys.KEY_*
             ascii keycode used to map the key
         command : function without args
             a non-argument function or lambda function to execute if in focus mode and key is pressed
         """
 
-        self._key_commands[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
 
     def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None:
@@ -123,12 +127,12 @@ class Widget(py_cui.ui.UIElement):
         self._mouse_commands[mouse_event] = command
 
 
-    def update_key_command(self, key: int, command: Callable[[],Any]) -> Any:
+    def update_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> Any:
         """Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
 
         Parameters
         ----------
-        key : py_cui.keys.KEY
+        key : py_cui.keys.KEY_*
             ascii keycode used to map the key
         command : function without args
             a non-argument function or lambda function to execute if in focus mode and key is pressed
@@ -306,7 +310,7 @@ class Widget(py_cui.ui.UIElement):
         # Retrieve the command function if it exists
         if mouse_event in self._mouse_commands.keys():
             command = self._mouse_commands[mouse_event]
-            
+
             # Identify num of args from callable. This allows for user to create commands that take in x, y
             # coords of the mouse press as input
             num_args = 0
@@ -486,7 +490,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
                 elem_clicked = y - viewport_top + self._top_view
                 self.set_selected_item_index(elem_clicked)
-        
+
             if self.get_selected_item_index() != current and self._on_selection_change is not None:
                 self._process_selection_change_event()
 
@@ -511,7 +515,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         current = self.get_selected_item_index()
         viewport_height = self.get_viewport_height()
-        
+
         if key_pressed == py_cui.keys.KEY_UP_ARROW:
             self._scroll_up()
         if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
@@ -671,7 +675,7 @@ class Button(Widget):
         self.command = command
         self.set_color(py_cui.MAGENTA_ON_BLACK)
         self.set_help_text('Focus mode on Button. Press Enter to press button, Esc to exit focus mode.')
-        
+
         # By default we will process command on click or double click
         if self.command is not None:
             self.add_mouse_command(py_cui.keys.LEFT_MOUSE_CLICK, self.command)
@@ -773,7 +777,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self._move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._delete_char()
@@ -857,7 +861,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         """
 
         Widget._handle_mouse_press(self, x, y, mouse_event)
-        
+
         if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
             if y >= self._cursor_max_up and y <= self._cursor_max_down:
                 if x >= self._cursor_max_left and x <= self._cursor_max_right:
@@ -901,7 +905,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         # TODO: Fix this janky operation here
         elif key_pressed == py_cui.keys.KEY_DOWN_ARROW and self._cursor_text_pos_y < len(self._text_lines) - 1:
             self._move_down()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._handle_backspace()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._handle_delete()
