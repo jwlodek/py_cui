@@ -85,11 +85,11 @@ class Widget(py_cui.ui.UIElement):
 
 
     def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
-        """Function that adds a keybinding to the CUI when in overview mode
+        """Maps a keycode to a function that will be executed when in focus mode
 
         Parameters
-        ----------c
-        key : py_cui.keys.*
+        ----------
+        key : py_cui.keys.KEY_*
             ascii keycode used to map the key
         command : function without args
             a non-argument function or lambda function to execute if in focus mode and key is pressed

@@ -113,7 +113,7 @@ class PyCUI:
         """
 
         self._title = 'PyCUI Window'
-        
+
         # When this is not set, the escape character delay
         # is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
@@ -211,7 +211,7 @@ class PyCUI:
         self._on_draw_update_func = update_function
 
 
-    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None: 
+    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None:
         """Assigns a key for automatically cycling through widgets in both focus and overview modes
 
         Parameters
@@ -437,12 +437,12 @@ class PyCUI:
         self._logger.debug(f'Set border_characters to {self._border_characters}')
 
 
-    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:  
+    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:
         """Function that gets current set of widgets
 
         Returns
         -------
-        widgets : dict of int -> widget 
+        widgets : dict of int -> widget
             dictionary mapping widget IDs to object instances
         """
 
@@ -784,7 +784,7 @@ class PyCUI:
         self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_button))}')
         return new_button
 
-    
+
     def add_slider(self, title: str, row: int, column: int, row_span: int=1,
                    column_span: int=1, padx: int=1, pady: int=0,
                    min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':
@@ -850,7 +850,7 @@ class PyCUI:
         ----------
         widget : py_cui.widgets.Widget
             Widget to remove from the UI
-        
+
         Raises
         ------
         TypeError
@@ -865,7 +865,7 @@ class PyCUI:
             raise KeyError(f'Widget with id {widget.get_id()} has already been removed from the UI!')
         else:
             self.get_widgets()[widget.get_id()] = None
-        
+
 
     def get_element_at_position(self, x: int, y: int) -> Optional['py_cui.ui.UIElement']:
         """Returns containing widget for character position
@@ -888,10 +888,10 @@ class PyCUI:
 
         elif self._popup is None:
             for widget_id in self.get_widgets().keys():
-                widget = self.get_widgets()[widget_id] 
+                widget = self.get_widgets()[widget_id]
                 if widget is not None:
                     if widget._contains_position(x, y):
-                        return widget 
+                        return widget
         return None
 
 
@@ -977,7 +977,7 @@ class PyCUI:
         for row in range(row_range_start, row_range_stop):
             for col in range(col_start, col_start + col_span):
                 for widget_id in self.get_widgets().keys():
-                    item_value = self.get_widgets()[widget_id] 
+                    item_value = self.get_widgets()[widget_id]
                     if item_value is not None:
                         if item_value._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
@@ -1005,7 +1005,7 @@ class PyCUI:
 
         Returns
         -------
-        widget_id : int  
+        widget_id : int
             The widget neighbor ID if found, None otherwise
         """
 
@@ -1048,7 +1048,7 @@ class PyCUI:
 
         Parameters
         ----------
-        widget_id : int 
+        widget_id : int
             the id of the widget to select
         """
 
@@ -1135,8 +1135,8 @@ class PyCUI:
 
             current_widget_id: int = current_widget_num
             next_widget_id: int = next_widget_num
-        current_widget = self.get_widgets()[current_widget_id] 
-        next_widget = self.get_widgets()[next_widget_id] 
+        current_widget = self.get_widgets()[current_widget_id]
+        next_widget = self.get_widgets()[next_widget_id]
         if current_widget and next_widget is not None: #pls check again
             if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
                 # In the event that we are focusing on a widget with that key defined, we do not cycle.
@@ -1150,8 +1150,8 @@ class PyCUI:
 
         Parameters
         ----------
-        key : py_cui.keys.*
-            The key bound to the command
+        key : py_cui.keys.KEY_*
+            ascii keycode used to map the key
         command : Function
             A no-arg or lambda function to fire on keypress
         """
@@ -1336,14 +1336,14 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialogs.form.FormPopup(self, 
-                                                    fields, 
-                                                    passwd_fields, 
-                                                    required, 
-                                                    {}, 
-                                                    title, 
-                                                    py_cui.WHITE_ON_BLACK, 
-                                                    self._renderer, 
+        self._popup = py_cui.dialogs.form.FormPopup(self,
+                                                    fields,
+                                                    passwd_fields,
+                                                    required,
+                                                    {},
+                                                    title,
+                                                    py_cui.WHITE_ON_BLACK,
+                                                    self._renderer,
                                                     self._logger)
 
         if callback is not None:
@@ -1372,14 +1372,14 @@ class PyCUI:
             Only show files with extensions in this list if not empty. Default, []
         """
 
-        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self, 
-                                                                callback, 
-                                                                initial_dir, 
-                                                                popup_type, 
-                                                                ascii_icons, 
-                                                                limit_extensions, 
-                                                                py_cui.WHITE_ON_BLACK, 
-                                                                self._renderer, 
+        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self,
+                                                                callback,
+                                                                initial_dir,
+                                                                popup_type,
+                                                                ascii_icons,
+                                                                limit_extensions,
+                                                                py_cui.WHITE_ON_BLACK,
+                                                                self._renderer,
                                                                 self._logger)
 
         self._logger.debug(f'Opened {str(type(self._popup))} popup with type {popup_type}')
@@ -1416,7 +1416,7 @@ class PyCUI:
 
     def _refresh_height_width(self) -> None:
         """Function that updates the height and width of the CUI based on terminal window size."""
-        
+
         if self._simulated_terminal is None:
             if self._stdscr is None:
                 term_size = shutil.get_terminal_size()
@@ -1430,7 +1430,7 @@ class PyCUI:
             width   = self._simulated_terminal[1]
 
         height  = height - self.title_bar.get_height() - self.status_bar.get_height() - 2
-        
+
         self._logger.debug(f'Resizing CUI to new dimensions {height} by {width}')
 
         self._height = height
@@ -1464,7 +1464,7 @@ class PyCUI:
 
         for widget_id in self.get_widgets().keys():
             if widget_id != self._selected_widget:
-                widget = self.get_widgets()[widget_id] 
+                widget = self.get_widgets()[widget_id]
                 if widget is not None:
                     widget._draw()
 
@@ -1591,7 +1591,7 @@ class PyCUI:
             self._popup._handle_key_press(key_pressed)
 
 
-    def _draw(self, stdscr) -> None: 
+    def _draw(self, stdscr) -> None:
         """Main CUI draw loop called by start()
 
         Parameters
@@ -1613,7 +1613,7 @@ class PyCUI:
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
         self._initialize_widget_renderer()
-        
+
         # If user specified a refresh timeout, apply it here
         if self._refresh_timeout > 0:
             self._stdscr.timeout(self._refresh_timeout)
@@ -1651,7 +1651,7 @@ class PyCUI:
                 # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
-                    
+
                     valid_mouse_event = True
                     try:
                         id, x, y, _, mouse_event = curses.getmouse()
