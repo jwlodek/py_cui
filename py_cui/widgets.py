@@ -28,7 +28,7 @@ import py_cui.ui
 import py_cui.colors
 import py_cui.errors
 
-from typing import Callable, List, Dict, Tuple, Any, Optional
+from typing import Union, Callable, List, Dict, Tuple, Any, Optional
 
 
 class Widget(py_cui.ui.UIElement):
@@ -84,18 +84,22 @@ class Widget(py_cui.ui.UIElement):
         self.update_height_width()
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]) -> Any:
-        """Maps a keycode to a function that will be executed when in focus mode
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
+        """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
-        ----------
-        key : py_cui.keys.KEY
+        ----------c
+        key : py_cui.keys.*
             ascii keycode used to map the key
         command : function without args
             a non-argument function or lambda function to execute if in focus mode and key is pressed
         """
 
-        self._key_commands[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
 
     def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None:
@@ -123,12 +127,12 @@ class Widget(py_cui.ui.UIElement):
         self._mouse_commands[mouse_event] = command
 
 
-    def update_key_command(self, key: int, command: Callable[[],Any]) -> Any:
+    def update_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> Any:
         """Maps a keycode to a function that will be executed when in focus mode, if key is already mapped
 
         Parameters
         ----------
-        key : py_cui.keys.KEY
+        key : py_cui.keys.KEY_*
             ascii keycode used to map the key
         command : function without args
             a non-argument function or lambda function to execute if in focus mode and key is pressed

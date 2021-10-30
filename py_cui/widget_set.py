@@ -9,7 +9,7 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
 
 import shutil
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Union, Callable, Dict, List, Optional, TYPE_CHECKING
 import py_cui.widgets as widgets
 import py_cui.grid as grid
 import py_cui.controls as controls
@@ -91,7 +91,7 @@ class WidgetSet:
         return self._widgets
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]):
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
@@ -102,7 +102,11 @@ class WidgetSet:
             A no-arg or lambda function to fire on keypress
         """
 
-        self._keybindings[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
 
     def add_scroll_menu(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.ScrollMenu':
@@ -427,9 +431,9 @@ class WidgetSet:
 
     def add_slider(self, title: str, row: int, column: int, row_span: int=1,
                    column_span: int=1, padx: int=1, pady: int=0,
-                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':     
-                   
-                   
+                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':
+
+
         """Function that adds a new label to the CUI grid
 
         Parameters
