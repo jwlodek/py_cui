@@ -97,9 +97,9 @@ class Widget(py_cui.ui.UIElement):
 
         if isinstance(key, list):
             for value in key:
-                self._keybindings[value] = command
+                self._key_commands[value] = command
         else:
-            self._keybindings[key] = command
+            self._key_commands[key] = command
 
 
     def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None:
