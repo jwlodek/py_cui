@@ -1114,35 +1114,31 @@ class PyCUI:
             Default false. If true, cycle widgets in reverse order.
         """
 
-        num_widgets = len(self.get_widgets().keys())
+        num_widgets: int = len(self.get_widgets())
         current_widget_num: Optional[int] = self._selected_widget
 
-        if current_widget_num is not None:
-            if not reverse:
-                next_widget_num = current_widget_num + 1
-                if self.get_widgets()[next_widget_num] is None:
-                    if next_widget_num == num_widgets:
-                        next_widget_num = 0
-                    next_widget_num = next_widget_num + 1
-                cycle_key = self._forward_cycle_key
-            else:
-                next_widget_num = current_widget_num - 1
-                if self.get_widgets()[next_widget_num] is None:
-                    if next_widget_num < 0:
-                        next_widget_num = num_widgets - 1
-                    next_widget_num = next_widget_num + 1
-                cycle_key = self._reverse_cycle_key
+        if current_widget_num is None:
+            return
 
-            current_widget_id: int = current_widget_num
-            next_widget_id: int = next_widget_num
-        current_widget = self.get_widgets()[current_widget_id]
-        next_widget = self.get_widgets()[next_widget_id]
-        if current_widget and next_widget is not None: #pls check again
+        if reverse:
+            next_widget_num = current_widget_num - 1
+            if next_widget_num < 0:
+                next_widget_num = num_widgets - 1
+            cycle_key = self._reverse_cycle_key
+        else:
+            next_widget_num = current_widget_num + 1
+            if next_widget_num >= num_widgets:
+                next_widget_num = 0
+            cycle_key = self._forward_cycle_key
+
+        current_widget = self.get_widgets().get(current_widget_num)
+        next_widget = self.get_widgets().get(next_widget_num)
+
+        if current_widget is not None and next_widget is not None:
             if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
                 # In the event that we are focusing on a widget with that key defined, we do not cycle.
-                pass
-            else:
-                self.move_focus(next_widget, auto_press_buttons=False)
+                return
+            self.move_focus(next_widget, auto_press_buttons=False)
 
 
     def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
