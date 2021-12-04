@@ -132,7 +132,8 @@ first create an instance of this class, and then add cells + widgets to it.
  increment_loading_bar | Increments progress bar if loading bar popup is open
  stop_loading_popup | Leaves loading state, and closes popup.
  close_popup | Closes the popup, and resets focus
- _refresh_height_width | Function that updates the height and width of the CUI based on terminal window size."""
+ _refresh_height_width | Function that updates the height and width of the CUI based on terminal window size.
+ get_absolute_size | Returns dimensions of CUI
  _draw_widgets | Function that draws all of the widgets to the screen
  _draw_status_bars | Draws status bar and title bar
  _display_window_warning | Function that prints some basic error info if there is an error with the CUI
@@ -1327,10 +1328,10 @@ Closes the popup, and resets focus
 def _refresh_height_width(self) -> None
 ```
 
-Function that updates the height and width of the CUI based on terminal window size."""
+Function that updates the height and width of the CUI based on terminal window size.
 
 
-
+"""
 if self._simulated_terminal is None:
 if self._stdscr is None:
 term_size = shutil.get_terminal_size()
@@ -1358,9 +1359,23 @@ if self._popup is not None:
 self._popup.update_height_width()
 if self._logger._live_debug_element is not None:
 self._logger._live_debug_element.update_height_width()
+"""
 
+
+
+
+
+
+
+### get_absolute_size
+
+```python
 def get_absolute_size(self) -> Tuple[int,int]:
-"""Returns dimensions of CUI
+```
+
+Returns dimensions of CUI
+
+
 
 
 #### Returns
