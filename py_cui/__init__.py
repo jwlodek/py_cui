@@ -1120,14 +1120,14 @@ class PyCUI:
         if current_widget_num is not None:
             if not reverse:
                 next_widget_num = current_widget_num + 1
-                if self.get_widgets()[next_widget_num] is None:
+                if self.get_widgets().get(next_widget_num) is None:
                     if next_widget_num == num_widgets:
                         next_widget_num = 0
                     next_widget_num = next_widget_num + 1
                 cycle_key = self._forward_cycle_key
             else:
                 next_widget_num = current_widget_num - 1
-                if self.get_widgets()[next_widget_num] is None:
+                if self.get_widgets().get(next_widget_num) is None:
                     if next_widget_num < 0:
                         next_widget_num = num_widgets - 1
                     next_widget_num = next_widget_num + 1
