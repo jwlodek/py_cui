@@ -1185,7 +1185,7 @@ def _process_selection_change_event(self)
 Function that executes on-selection change event either with the current menu item, or with no-args
 
 
-"""
+```
 # Identify num of args from callable. This allows for user to create commands that take in x, y
 # coords of the mouse press as input
 num_args = 0
@@ -1204,7 +1204,7 @@ elif num_args == 0:
 self._on_selection_change()
 else:
 raise ValueError('On selection change event must accept either 0 or 1 parameters!')
-"""
+```
 
 
 
