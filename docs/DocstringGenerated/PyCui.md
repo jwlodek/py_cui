@@ -1331,7 +1331,7 @@ def _refresh_height_width(self) -> None
 Function that updates the height and width of the CUI based on terminal window size.
 
 
-"""
+```
 if self._simulated_terminal is None:
 if self._stdscr is None:
 term_size = shutil.get_terminal_size()
@@ -1359,7 +1359,7 @@ if self._popup is not None:
 self._popup.update_height_width()
 if self._logger._live_debug_element is not None:
 self._logger._live_debug_element.update_height_width()
-"""
+```
 
 
 
