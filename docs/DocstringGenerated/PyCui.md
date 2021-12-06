@@ -139,7 +139,7 @@ first create an instance of this class, and then add cells + widgets to it.
  _display_window_warning | Function that prints some basic error info if there is an error with the CUI
  _handle_key_presses | Function that handles all main loop key presses.
  _draw | Main CUI draw loop called by start()
- __format__ | Override of base format function. Prints list of current widgets.
+ format | Override of base format function. Prints list of current widgets.
 
 
 
