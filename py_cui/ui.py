@@ -934,7 +934,7 @@ class MenuImplementation(UIImplementation):
             True if menu has no items, False otherwise. Identical to len(self._view_items) == 0
         """
 
-        return self._view_items == 0
+        return len(self._view_items) == 0
 
 
     def set_selected_item(self, selected_item: Any):
