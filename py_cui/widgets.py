@@ -27,6 +27,7 @@ import py_cui
 import py_cui.ui
 import py_cui.colors
 import py_cui.errors
+import py_cui.debug
 
 from typing import Union, Callable, List, Dict, Tuple, Any, Optional
 
@@ -411,7 +412,7 @@ class BlockLabel(Widget):
         Decides whether or not label should be centered
     """
 
-    def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, center, logger):
+    def __init__(self, id, title: str,  grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger: py_cui.debug.PyCUILogger, center: bool):
         """Initializer for blocklabel widget
         """
 
