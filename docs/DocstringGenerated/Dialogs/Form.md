@@ -67,7 +67,7 @@ Class containing basic logic of a field in a form
 ### __init__
 
 ```python
-def __init__(self, fieldname, initial_text, password, required, logger)
+def __init__(self, fieldname: str, initial_text: str, password: bool, required: bool, logger)
 ```
 
 Initializer for base FormFields
@@ -81,7 +81,7 @@ Initializer for base FormFields
 ### get_fieldname
 
 ```python
-def get_fieldname(self)
+def get_fieldname(self) -> str
 ```
 
 Getter for field name
@@ -102,7 +102,7 @@ Getter for field name
 ### is_valid
 
 ```python
-def is_valid(self)
+def is_valid(self) -> Tuple[bool,Optional[str]]
 ```
 
 Function that checks if field is valid.
@@ -127,7 +127,7 @@ field types (ex. emails etc.)
 ### is_required
 
 ```python
-def is_required(self)
+def is_required(self) -> bool
 ```
 
 Checks if field is required
@@ -182,7 +182,7 @@ Extension of UI element representing an individual field in the form
 ### __init__
 
 ```python
-def __init__(self, parent_form, field_index, field, init_text, passwd, required, renderer, logger)
+def __init__(self, parent_form, field_index: int, field, init_text: str, passwd: bool, required: bool, renderer: 'py_cui.renderer.Renderer', logger)
 ```
 
 Initializer for the FormFieldElement class
@@ -196,7 +196,7 @@ Initializer for the FormFieldElement class
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute start position
@@ -217,7 +217,7 @@ Override of base function. Uses the parent element do compute start position
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute stop position
@@ -238,7 +238,7 @@ Override of base function. Uses the parent element do compute stop position
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Override of base class. Updates text field variables for form field
@@ -252,7 +252,7 @@ Override of base class. Updates text field variables for form field
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Handles text input for the field. Called by parent
@@ -266,7 +266,7 @@ Handles text input for the field. Called by parent
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Draw function for the field. Called from parent. Essentially the same as a TextboxPopup
@@ -318,7 +318,7 @@ Function fired when submit is called
 ### __init__
 
 ```python
-def __init__(self, field_implementations, required_fields, logger)
+def __init__(self, field_implementations: List['FormField'], required_fields: List[str], logger)
 ```
 
 Initializer for the FormImplemnentation class
@@ -332,7 +332,7 @@ Initializer for the FormImplemnentation class
 ### get_selected_form_index
 
 ```python
-def get_selected_form_index(self)
+def get_selected_form_index(self) -> int
 ```
 
 Getter for selected form index
@@ -353,7 +353,7 @@ Getter for selected form index
 ### set_selected_form_index
 
 ```python
-def set_selected_form_index(self, form_index)
+def set_selected_form_index(self, form_index: int) -> None
 ```
 
 Setter for selected form index
@@ -374,7 +374,7 @@ Setter for selected form index
 ### set_on_submit_action
 
 ```python
-def set_on_submit_action(self, on_submit_action)
+def set_on_submit_action(self, on_submit_action: Callable[[],Any])
 ```
 
 Setter for callback on submit
@@ -395,7 +395,7 @@ Setter for callback on submit
 ### jump_to_next_field
 
 ```python
-def jump_to_next_field(self)
+def jump_to_next_field(self) -> None
 ```
 
 Function used to jump between form fields
@@ -409,7 +409,7 @@ Function used to jump between form fields
 ### is_submission_valid
 
 ```python
-def is_submission_valid(self)
+def is_submission_valid(self) -> Tuple[bool,Optional[str]]
 ```
 
 Function that checks if all fields are filled out correctly
@@ -431,7 +431,7 @@ Function that checks if all fields are filled out correctly
 ### get
 
 ```python
-def get(self)
+def get(self) -> Dict[str,str]
 ```
 
 Gets values entered into field as a dictionary
@@ -497,7 +497,7 @@ A helper class for abstracting a message popup tied to a parent popup
 ### __init__
 
 ```python
-def __init__(self, parent, *args)
+def __init__(self, parent: 'FormPopup', *args)
 ```
 
 Initializer for Internal form Popup
@@ -511,7 +511,7 @@ Initializer for Internal form Popup
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class, close in parent instead of root
@@ -576,7 +576,7 @@ def __init__(self, root, fields, passwd_fields, required_fields, fields_init_tex
 ### get_num_fields
 
 ```python
-def get_num_fields(self)
+def get_num_fields(self) -> int
 ```
 
 Getter for number of fields
@@ -597,7 +597,7 @@ Getter for number of fields
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -618,7 +618,7 @@ Override of base class, computes position based on root dimensions
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -639,7 +639,7 @@ Override of base class, computes position based on root dimensions
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Override of base class function
@@ -655,7 +655,7 @@ Also updates all form field elements in the form
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class. Here, we handle tabs, enters, and escapes
@@ -678,7 +678,7 @@ All other key presses are passed to the currently selected field element
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Override of base class function
@@ -701,7 +701,7 @@ Simply enters the appropriate field when mouse is pressed on it
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class.

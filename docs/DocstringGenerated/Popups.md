@@ -60,7 +60,7 @@ frame
 ### __init__
 
 ```python
-def __init__(self, root, title, text, color, renderer, logger)
+def __init__(self, root: 'py_cui.PyCUI', title: str, text: str, color: int, renderer: 'py_cui.renderer.Renderer', logger)
 ```
 
 Initializer for main popup class. Calls UIElement intialier, and sets some initial values
@@ -88,7 +88,7 @@ Function that increments an internal counter
 ### set_text
 
 ```python
-def set_text(self, text)
+def set_text(self, text: str) -> None 
 ```
 
 Sets popup text (message)
@@ -109,7 +109,7 @@ Sets popup text (message)
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -130,7 +130,7 @@ Override of base class, computes position based on root dimensions
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -151,7 +151,7 @@ Override of base class, computes position based on root dimensions
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Handles key presses when popup is open
@@ -174,7 +174,7 @@ By default, only closes popup when Escape is pressed
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Function that uses renderer to draw the popup
@@ -226,7 +226,7 @@ Initializer for MessagePopup
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Draw function for MessagePopup. Calls superclass draw()
@@ -284,7 +284,7 @@ Initializer for YesNoPopup
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int)
 ```
 
 Handle key press overwrite from superclass
@@ -341,6 +341,7 @@ Class representing a textbox popup
  Method  | Doc
 -----|-----
  update_height_width | Need to update all cursor positions on resize
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override of base handle key press function
  _draw | Override of base draw function
 
@@ -364,7 +365,7 @@ Initializer for textbox popup. Uses TextBoxImplementation as base
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Need to update all cursor positions on resize
@@ -375,10 +376,31 @@ Need to update all cursor positions on resize
 
 
 
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x: int, y: int, mouse_event) -> None
+```
+
+Override of base class function, handles mouse press in menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int | Coordinates of mouse press
+
+
+
+
+
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int)
 ```
 
 Override of base handle key press function
@@ -399,7 +421,7 @@ Override of base handle key press function
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base draw function
@@ -437,6 +459,7 @@ Allows for popup with several menu items to select from
 
  Method  | Doc
 -----|-----
+ _handle_mouse_press | Override of base class function, handles mouse press in menu
  _handle_key_press | Override of base handle key press function
  _draw | Overrides base class draw function
 
@@ -446,7 +469,7 @@ Allows for popup with several menu items to select from
 ### __init__
 
 ```python
-def __init__(self, root, items, title, color, command, renderer, logger, run_command_if_none)
+def __init__(self, root: 'py_cui.PyCUI', items, title, color, command, renderer, logger, run_command_if_none)
 ```
 
 Initializer for MenuPopup. Uses MenuImplementation as base
@@ -457,10 +480,31 @@ Initializer for MenuPopup. Uses MenuImplementation as base
 
 
 
+### _handle_mouse_press
+
+```python
+def _handle_mouse_press(self, x: int, y: int, mouse_event)
+```
+
+Override of base class function, handles mouse press in menu
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ x, y  |  int | Coordinates of mouse press
+
+
+
+
+
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base handle key press function
@@ -483,7 +527,7 @@ Enter key runs command, Escape key closes menu
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Overrides base class draw function
@@ -545,7 +589,7 @@ Initializer for LoadingIconPopup
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int)
 ```
 
 Override of base class function.
@@ -568,7 +612,7 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Overrides base draw function
@@ -630,7 +674,7 @@ Initializer for LoadingBarPopup
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int)
 ```
 
 Override of base class function.
@@ -653,7 +697,7 @@ Loading icon popups cannot be cancelled, so we wish to avoid default behavior
 ### _increment_counter
 
 ```python
-def _increment_counter(self)
+def _increment_counter(self) -> None
 ```
 
 Function that increments an internal counter
@@ -667,7 +711,7 @@ Function that increments an internal counter
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base draw function

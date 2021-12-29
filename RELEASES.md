@@ -2,6 +2,41 @@
 
 This file will contain a changelog for all release versions of py_cui.
 
+## v0.1.4 - Oct 29 2021
+
+This release focuses on improving debugging tools for py_cui developers, adds mouse press support, improves user defineable callbacks for certain actions, and allows for "forgetting" widgets. It also drops support for python versions older than 3.6, improves some logging message levels, overhauls the widget ID system, and adds a large amount of various bugfixes and other minor new features. Please see the more detailed breakdown and issue list below.
+
+**What this pull request changes**
+
+* Live-Debug mode added. When enabled, a certain keybinding (default `Ctrl-D`) will open up an overlay widget with recent logger messages displayed. Log messages buffered up until a certain maximum. Standard logging levels are supported. Will make debugging UI issues and especially `py_cui` development much easier.
+* Support for variety of mouse functions - left/right/middle clicks, double clicks, triple clicks, presses and releases
+* Allow for user setting of mouse commands like key commands
+* Allow setting an on-selection-change event function for scroll menus
+* Python versions older than 3.6 dropped from support. I had wanted to keep around support for older versions due to the vintage of OS I used at work - but we have recently migrated everything to RHEL 8, giving me an excuse to drop older versions
+* Some changes to log message levels
+* Change to widget ID system - widgets now just get integers as IDs, this is cleaner
+* Add ability to "forget" a widget and remove it from an active UI
+
+### Issues Fixed
+
+* #106 
+* #58 
+* #109 
+* #98 
+* #115 
+* #113
+* #100
+* #72 
+* #126 
+* #119 
+* #114 
+* #107
+
+### Breaking Changes
+
+* There should be no major outward facing breaking changes with this release
+
+
 ## v0.1.3 - Mar 19 2021
 
 This release adds filedialog popup support, a significant overhaul of the slider widget, overhaul of testing, scroll menu improvements, and minor bugfixes

@@ -33,11 +33,11 @@ class AutoGitCUI:
         res = proc.returncode
         if res != 0:
             print(res)
-            print('ERROR - fatal, {} is not a git repository.'.format(self.dir))
+            print(f'ERROR - fatal, {self.dir} is not a git repository.')
             exit()
 
         # Set title
-        self.root.set_title('Autogit v{} - {}'.format(__version__, os.path.basename(self.dir)))
+        self.root.set_title(f'Autogit v{__version__} - {os.path.basename(self.dir)}')
 
         # Keybindings when in overview mode, and set info bar
         self.root.add_key_command(py_cui.keys.KEY_R_LOWER, self.refresh_git_status)
@@ -150,7 +150,7 @@ class AutoGitCUI:
             proc = Popen(['git', 'diff', commit_val], stdout=PIPE, stderr=PIPE)
             out, _ = proc.communicate()
             out = out.decode()
-            self.diff_text_block.set_title('Git Diff for {}'.format(commit_val))
+            self.diff_text_block.set_title(f'Git Diff for {commit_val}')
             self.diff_text_block.set_text(out)
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to read commit diff information')
@@ -205,11 +205,11 @@ class AutoGitCUI:
             _, err = proc.communicate()
             res = proc.returncode
             if res != 0:
-                self.root.show_error_popup('Create Branch Failed Failed', '{}'.format(err))
+                self.root.show_error_popup('Create Branch Failed Failed', f'{err}')
                 return
             self.refresh_git_status(preserve_selected=True)
             self.new_branch_textbox.clear()
-            self.root.show_message_popup('Success', 'Checked out branch {}'.format(new_branch_name))
+            self.root.show_message_popup('Success', f'Checked out branch {new_branch_name}')
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to checkout branch, please check git installation')
 
@@ -228,11 +228,11 @@ class AutoGitCUI:
             _, err = proc.communicate()
             res = proc.returncode
             if res != 0:
-                self.root.show_error_popup('Create Branch Failed Failed', '{}'.format(err))
+                self.root.show_error_popup('Create Branch Failed Failed', f'{err}')
                 return
             self.refresh_git_status(preserve_selected=True)
             self.commit_message_box.clear()
-            self.root.show_message_popup('Success', 'Commited: {}'.format(message))
+            self.root.show_message_popup('Success', f'Commited: {message}')
         else:
             self.root.show_message_popup('Cancelled', 'Commit Operation cancelled')
 
@@ -244,10 +244,10 @@ class AutoGitCUI:
             out, _ = proc.communicate()
             res = proc.returncode
             if res != 0:
-                self.root.show_error_popup('Checkout Failed', '{}'.format(out))
+                self.root.show_error_popup('Checkout Failed', f'{out}')
                 return
             self.refresh_git_status(preserve_selected=True)
-            self.root.show_message_popup('Success', 'Checked out branch {}'.format(target))
+            self.root.show_message_popup('Success', f'Checked out branch {target}')
         except:
             self.root.show_warning_popup('Git Failed', 'Unable to checkout branch, please check git installation')
 
@@ -264,7 +264,7 @@ class AutoGitCUI:
     def open_git_diff(self):
 
         target = self.add_files_menu.get()[3:]
-        self.diff_text_block.title = '{} File Diff'.format(target)
+        self.diff_text_block.title = f'{target} File Diff'
         proc = Popen(['git', 'diff', target], stdout=PIPE, stderr=PIPE)
         out, _ = proc.communicate()
         out = out.decode()
@@ -338,10 +338,10 @@ class AutoGitCUI:
             out, _ = proc.communicate()
             res = proc.returncode
             if res != 0:
-                self.root.show_error_popup('Checkout Failed', '{}'.format(out))
+                self.root.show_error_popup('Checkout Failed', f'{out}')
                 return
             self.refresh_git_status(preserve_selected=True)
-            self.root.show_message_popup('Success', 'Checked out branch {}'.format(target))
+            self.root.show_message_popup('Success', f'Checked out branch {target}')
         except FileNotFoundError:
             self.root.show_warning_popup('Git Failed', 'Unable to checkout branch, please check git installation')
 
@@ -356,10 +356,10 @@ def parse_args():
     if 'directory' not in args.keys():
         return '.' 
     elif not os.path.exists(args['directory']):
-        print('ERROR - {} path does not exist'.format(args['directory']))
+        print(f'ERROR - {args["directory"]} path does not exist')
         exit()
     elif not os.path.isdir(args['directory']):
-        print('ERROR - {} is not a directory'.format(args['directory']))
+        print(f'ERROR - {args["directory"]} is not a directory')
         exit()
     return args['directory']
 
