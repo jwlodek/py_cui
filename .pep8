@@ -1,5 +1,0 @@
-[pycodestyle]
-max_line_length = 88
-in-place = true
-recursive = true
-aggressive = 3
