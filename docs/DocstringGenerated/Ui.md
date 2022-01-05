@@ -1099,7 +1099,8 @@ Analogous to a RadioButton
 -----|-----
  clear | Clears all items from the Scroll Menu
  set_on_selection_change_event | Function that sets the function fired when menu selection changes.
- _process_selection_change_event | Function that executes on-selection change event either with the current menu item, or with no-args"""
+ _process_selection_change_event | Function that executes on-selection change event either with the current menu item, or with no-args
+ get_selected_item_index | Gets the currently selected item
  set_selected_item_index | Sets the currently selected item
  _scroll_up | Function that scrolls the view up in the scroll menu
  _scroll_down | Function that scrolls the view down in the scroll menu
@@ -1181,10 +1182,10 @@ Event function must take 0 or 1 parameters. If 1 parameter, the new selcted item
 def _process_selection_change_event(self)
 ```
 
-Function that executes on-selection change event either with the current menu item, or with no-args"""
+Function that executes on-selection change event either with the current menu item, or with no-args
 
 
-
+```
 # Identify num of args from callable. This allows for user to create commands that take in x, y
 # coords of the mouse press as input
 num_args = 0
@@ -1203,10 +1204,19 @@ elif num_args == 0:
 self._on_selection_change()
 else:
 raise ValueError('On selection change event must accept either 0 or 1 parameters!')
+```
 
 
+
+
+
+
+### get_selected_item_index
+```python
 def get_selected_item_index(self) -> int:
-"""Gets the currently selected item
+```
+
+Gets the currently selected item
 
 
 #### Returns
@@ -1214,6 +1224,7 @@ def get_selected_item_index(self) -> int:
  Return Variable  | Type  | Doc
 -----|----------|-----
  selected_item  |  int | the currently highlighted menu item
+
 
 
 
