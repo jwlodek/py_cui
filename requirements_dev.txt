@@ -4,4 +4,4 @@ wheel
 npdoc2md
 mkdocs
 windows-curses ; platform_system=="Windows"
-yapf
+black
