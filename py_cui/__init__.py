@@ -754,15 +754,15 @@ class PyCUI:
             A reference to the created button object.
         """
 
-        self.add_custom_widget(py_cui.widgets.Button,
-                               title,
-                               row,
-                               column,
-                               row_span,
-                               column_span,
-                               padx,
-                               pady,
-                               command)
+        return self.add_custom_widget(py_cui.widgets.Button,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      command)
 
 
     def add_slider(self, title: str, row: int, column: int, row_span: int=1,
