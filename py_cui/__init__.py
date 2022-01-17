@@ -1227,34 +1227,43 @@ class PyCUI:
 
         self._logger.debug(f"Moved focus to widget {widget.get_title()}")
 
-    def _cycle_widgets(self, reverse: bool = False) -> None:
+    def _cycle_widgets(self, reverse: bool=False, selectable: bool=True) -> None:
         """Function that is fired if cycle key is pressed to move to next widget
 
         Parameters
         ----------
         reverse : bool
             Default false. If true, cycle widgets in reverse order.
+        selectable : bool
+            Default true. If false, non selectable widgets included in cycle.
         """
 
-        num_widgets: int = len(self.get_widgets())
-        current_widget_num: Optional[int] = self._selected_widget
+        select_widget = self.get_widgets()[self._selected_widget]
+        widgets = self.get_widgets()
 
-        if current_widget_num is None:
+        if selectable:
+            selectable = [widgets.get(k) for k in widgets if widgets[k].is_selectable()]
+            widgets = {i: selectable[i] for i in range(0, len(selectable))}
+
+        if select_widget is None:
             return
+
+        get_index = dict((v,k) for k,v in widgets.items())
+        current_widget_num = get_index.get(select_widget)
 
         if reverse:
             next_widget_num = current_widget_num - 1
             if next_widget_num < 0:
-                next_widget_num = num_widgets - 1
+                next_widget_num = len(widgets)
             cycle_key = self._reverse_cycle_key
         else:
             next_widget_num = current_widget_num + 1
-            if next_widget_num >= num_widgets:
+            if next_widget_num >= len(widgets):
                 next_widget_num = 0
             cycle_key = self._forward_cycle_key
 
-        current_widget = self.get_widgets().get(current_widget_num)
-        next_widget = self.get_widgets().get(next_widget_num)
+        current_widget = widgets.get(current_widget_num)
+        next_widget = widgets.get(next_widget_num)
 
         if current_widget is not None and next_widget is not None:
             if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
