@@ -166,6 +166,7 @@ class PyCUI:
         # Variables for determining selected widget/focus mode
         self._selected_widget: Optional[int] = None
         self._in_focused_mode       = False
+        self._escape_unfocuses = True
         self._popup: Any = None
         self._auto_focus_buttons    = auto_focus_buttons
 
@@ -1549,8 +1550,8 @@ class PyCUI:
 
         # If we are in focus mode, the widget has all of the control of the keyboard except
         # for the escape key, which exits focus mode.
-        elif self._in_focused_mode and self._popup is None:
-            if key_pressed == py_cui.keys.KEY_ESCAPE:
+        if self._in_focused_mode and self._popup is None:
+            if key_pressed == py_cui.keys.KEY_ESCAPE and self._escape_unfocuses:
                 self.status_bar.set_text(self._init_status_bar_text)
                 self._in_focused_mode = False
                 selected_widget.set_selected(False)
