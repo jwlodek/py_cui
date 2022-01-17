@@ -84,7 +84,6 @@ class contains all links to the CUI engine.
  set_help_text | Sets status bar help text
  set_focus_text | Sets status bar focus text. Legacy function, overridden by set_focus_text
  _handle_key_press | Must be implemented by subclass. Used to handle keypresses
- add_mouse_press_handler | Sets a mouse press handler function
  _handle_mouse_press | Can be implemented by subclass. Used to handle mouse presses
  _draw | Must be implemented by subclasses. Uses renderer to draw element to terminal
  _assign_renderer | Function that assigns a renderer object to the element
@@ -110,7 +109,7 @@ Initializer for UIElement base class
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Must be implemented by subclass, computes the absolute coords of upper-left corner
@@ -124,7 +123,7 @@ Must be implemented by subclass, computes the absolute coords of upper-left corn
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Must be implemented by subclass, computes the absolute coords of bottom-right corner
@@ -138,7 +137,7 @@ Must be implemented by subclass, computes the absolute coords of bottom-right co
 ### get_absolute_dimensions
 
 ```python
-def get_absolute_dimensions(self)
+def get_absolute_dimensions(self) -> Tuple[int,int]
 ```
 
 Gets dimensions of element in terminal characters
@@ -159,7 +158,7 @@ Gets dimensions of element in terminal characters
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Function that refreshes position and dimensons on resize.
@@ -175,7 +174,7 @@ If necessary, make sure required widget attributes updated here as well.
 ### get_viewport_height
 
 ```python
-def get_viewport_height(self)
+def get_viewport_height(self) -> int
 ```
 
 Gets the height of the element viewport (height minus padding and borders)
@@ -196,7 +195,7 @@ Gets the height of the element viewport (height minus padding and borders)
 ### get_id
 
 ```python
-def get_id(self)
+def get_id(self) -> int
 ```
 
 Gets the element ID
@@ -217,7 +216,7 @@ Gets the element ID
 ### get_title
 
 ```python
-def get_title(self)
+def get_title(self) -> str
 ```
 
 Getter for ui element title
@@ -238,7 +237,7 @@ Getter for ui element title
 ### get_padding
 
 ```python
-def get_padding(self)
+def get_padding(self) -> Tuple[int,int]
 ```
 
 Gets ui element padding on in characters
@@ -259,7 +258,7 @@ Gets ui element padding on in characters
 ### get_start_position
 
 ```python
-def get_start_position(self)
+def get_start_position(self) -> Tuple[int,int]
 ```
 
 Gets coords of upper left corner
@@ -280,7 +279,7 @@ Gets coords of upper left corner
 ### get_stop_position
 
 ```python
-def get_stop_position(self)
+def get_stop_position(self) -> Tuple[int,int]
 ```
 
 Gets coords of lower right corner
@@ -301,7 +300,7 @@ Gets coords of lower right corner
 ### get_color
 
 ```python
-def get_color(self)
+def get_color(self) -> int
 ```
 
 Gets current element color
@@ -322,7 +321,7 @@ Gets current element color
 ### get_border_color
 
 ```python
-def get_border_color(self)
+def get_border_color(self) -> int
 ```
 
 Gets current element border color
@@ -343,7 +342,7 @@ Gets current element border color
 ### get_selected_color
 
 ```python
-def get_selected_color(self)
+def get_selected_color(self) -> int
 ```
 
 Gets current selected item color
@@ -364,7 +363,7 @@ Gets current selected item color
 ### is_selected
 
 ```python
-def is_selected(self)
+def is_selected(self) -> bool
 ```
 
 Get selected status
@@ -385,7 +384,7 @@ Get selected status
 ### get_renderer
 
 ```python
-def get_renderer(self)
+def get_renderer(self) -> 'py_cui.renderer.Renderer'
 ```
 
 Gets reference to renderer object
@@ -406,7 +405,7 @@ Gets reference to renderer object
 ### get_help_text
 
 ```python
-def get_help_text(self)
+def get_help_text(self) -> str
 ```
 
 Returns current help text
@@ -427,7 +426,7 @@ Returns current help text
 ### set_title
 
 ```python
-def set_title(self, title)
+def set_title(self, title: str)
 ```
 
 Function that sets the widget title.
@@ -448,7 +447,7 @@ Function that sets the widget title.
 ### set_color
 
 ```python
-def set_color(self, color)
+def set_color(self, color: int) -> None
 ```
 
 Sets element default color
@@ -469,7 +468,7 @@ Sets element default color
 ### set_border_color
 
 ```python
-def set_border_color(self, color)
+def set_border_color(self, color: int) -> None
 ```
 
 Sets element border color
@@ -490,7 +489,7 @@ Sets element border color
 ### set_focus_border_color
 
 ```python
-def set_focus_border_color(self, color)
+def set_focus_border_color(self, color: int) -> None
 ```
 
 Sets element border color if the current element
@@ -512,7 +511,7 @@ is focused
 ### set_selected_color
 
 ```python
-def set_selected_color(self, color)
+def set_selected_color(self, color: int) -> None
 ```
 
 Sets element sected color
@@ -533,7 +532,7 @@ Sets element sected color
 ### set_selected
 
 ```python
-def set_selected(self, selected)
+def set_selected(self, selected: bool) -> None
 ```
 
 Marks the UI element as selected or not selected
@@ -554,7 +553,7 @@ Marks the UI element as selected or not selected
 ### set_help_text
 
 ```python
-def set_help_text(self, help_text)
+def set_help_text(self, help_text: str) -> None
 ```
 
 Sets status bar help text
@@ -575,7 +574,7 @@ Sets status bar help text
 ### set_focus_text
 
 ```python
-def set_focus_text(self, focus_text)
+def set_focus_text(self, focus_text: str) -> None
 ```
 
 Sets status bar focus text. Legacy function, overridden by set_focus_text
@@ -607,31 +606,10 @@ Must be implemented by subclass. Used to handle keypresses
 
 
 
-### add_mouse_press_handler
-
-```python
-def add_mouse_press_handler(self, mouse_press_handler_func)
-```
-
-Sets a mouse press handler function
-
-
-
-
-#### Parameters
-
- Parameter  | Type  | Doc
------|----------|-----
- mouse_press_handler_func  |  function / lambda function | Function that takes 2 parameters: x and y of a mouse press. Executes when mouse pressed and element is selected
-
-
-
-
-
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x, y, mouse_event)
 ```
 
 Can be implemented by subclass. Used to handle mouse presses
@@ -666,7 +644,7 @@ Must be implemented by subclasses. Uses renderer to draw element to terminal
 ### _assign_renderer
 
 ```python
-def _assign_renderer(self, renderer)
+def _assign_renderer(self, renderer: 'py_cui.renderer.Renderer', quiet: bool=False) 
 ```
 
 Function that assigns a renderer object to the element
@@ -695,7 +673,7 @@ Function that assigns a renderer object to the element
 ### _contains_position
 
 ```python
-def _contains_position(self, x, y)
+def _contains_position(self, x: int, y: int) -> bool
 ```
 
 Checks if character position is within element.
@@ -813,7 +791,7 @@ UI implementation for a single-row textbox input
 ### __init__
 
 ```python
-def __init__(self, initial_text, password, logger)
+def __init__(self, initial_text: str, password: bool , logger)
 ```
 
 Initializer for the TextBoxImplementation base class
@@ -827,7 +805,7 @@ Initializer for the TextBoxImplementation base class
 ### get_initial_cursor_pos
 
 ```python
-def get_initial_cursor_pos(self)
+def get_initial_cursor_pos(self) -> int
 ```
 
 Gets initial cursor position
@@ -848,7 +826,7 @@ Gets initial cursor position
 ### get_cursor_text_pos
 
 ```python
-def get_cursor_text_pos(self)
+def get_cursor_text_pos(self) -> int
 ```
 
 Gets current position of cursor relative to text
@@ -869,7 +847,7 @@ Gets current position of cursor relative to text
 ### get_cursor_limits
 
 ```python
-def get_cursor_limits(self)
+def get_cursor_limits(self) -> Tuple[int,int]
 ```
 
 Gets cursor extreme points in terminal position
@@ -890,7 +868,7 @@ Gets cursor extreme points in terminal position
 ### get_cursor_position
 
 ```python
-def get_cursor_position(self)
+def get_cursor_position(self) -> Tuple[int,int]
 ```
 
 Returns current cursor poition
@@ -911,7 +889,7 @@ Returns current cursor poition
 ### get_viewport_width
 
 ```python
-def get_viewport_width(self)
+def get_viewport_width(self) -> int
 ```
 
 Gets the width of the textbox viewport
@@ -932,7 +910,7 @@ Gets the width of the textbox viewport
 ### set_text
 
 ```python
-def set_text(self, text)
+def set_text(self, text: str)
 ```
 
 Sets the value of the text. Overwrites existing text
@@ -953,7 +931,7 @@ Sets the value of the text. Overwrites existing text
 ### get
 
 ```python
-def get(self)
+def get(self) -> str
 ```
 
 Gets value of the text in the textbox
@@ -974,7 +952,7 @@ Gets value of the text in the textbox
 ### clear
 
 ```python
-def clear(self)
+def clear(self) -> None
 ```
 
 Clears the text in the textbox
@@ -988,7 +966,7 @@ Clears the text in the textbox
 ### _move_left
 
 ```python
-def _move_left(self)
+def _move_left(self) -> None
 ```
 
 Shifts the cursor the the left. Internal use only
@@ -1002,7 +980,7 @@ Shifts the cursor the the left. Internal use only
 ### _move_right
 
 ```python
-def _move_right(self)
+def _move_right(self) -> None
 ```
 
 Shifts the cursor the the right. Internal use only
@@ -1016,7 +994,7 @@ Shifts the cursor the the right. Internal use only
 ### _insert_char
 
 ```python
-def _insert_char(self, key_pressed)
+def _insert_char(self, key_pressed: int) -> None
 ```
 
 Inserts char at cursor position. Internal use only
@@ -1037,7 +1015,7 @@ Inserts char at cursor position. Internal use only
 ### _jump_to_start
 
 ```python
-def _jump_to_start(self)
+def _jump_to_start(self) -> None
 ```
 
 Jumps to the start of the textbox. Internal use only
@@ -1051,7 +1029,7 @@ Jumps to the start of the textbox. Internal use only
 ### _jump_to_end
 
 ```python
-def _jump_to_end(self)
+def _jump_to_end(self) -> None
 ```
 
 Jumps to the end to the textbox. Internal use only
@@ -1065,7 +1043,7 @@ Jumps to the end to the textbox. Internal use only
 ### _erase_char
 
 ```python
-def _erase_char(self)
+def _erase_char(self) -> None
 ```
 
 Erases character at textbox cursor. Internal Use only
@@ -1079,7 +1057,7 @@ Erases character at textbox cursor. Internal Use only
 ### _delete_char
 
 ```python
-def _delete_char(self)
+def _delete_char(self) -> None
 ```
 
 Deletes character to right of texbox cursor. Internal use only
@@ -1120,6 +1098,8 @@ Analogous to a RadioButton
  Method  | Doc
 -----|-----
  clear | Clears all items from the Scroll Menu
+ set_on_selection_change_event | Function that sets the function fired when menu selection changes.
+ _process_selection_change_event | Function that executes on-selection change event either with the current menu item, or with no-args
  get_selected_item_index | Gets the currently selected item
  set_selected_item_index | Sets the currently selected item
  _scroll_up | Function that scrolls the view up in the scroll menu
@@ -1156,7 +1136,7 @@ Initializer for MenuImplementation base class
 ### clear
 
 ```python
-def clear(self)
+def clear(self) -> None
 ```
 
 Clears all items from the Scroll Menu
@@ -1167,15 +1147,76 @@ Clears all items from the Scroll Menu
 
 
 
-### get_selected_item_index
+### set_on_selection_change_event
 
 ```python
-def get_selected_item_index(self)
+def set_on_selection_change_event(self, on_selection_change_event: Callable[[Any],Any])
+```
+
+Function that sets the function fired when menu selection changes.
+
+
+
+Event function must take 0 or 1 parameters. If 1 parameter, the new selcted item will be passed in.
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ on_selection_change_event  |  Callable | Callable function that takes in as an argument the newly selected element
+
+#### Raises
+
+ Error  | Type  | Doc
+-----|----------|-----
+ Unknown | TypeError | Raises a type error if event function is not callable
+
+
+
+
+
+### _process_selection_change_event
+
+```python
+def _process_selection_change_event(self)
+```
+
+Function that executes on-selection change event either with the current menu item, or with no-args
+
+
+```
+# Identify num of args from callable. This allows for user to create commands that take in x, y
+# coords of the mouse press as input
+num_args = 0
+try:
+num_args = len(inspect.signature(self._on_selection_change).parameters)
+except ValueError:
+self._logger.error('Failed to get on_selection_change signature!')
+except TypeError:
+self._logger.error('Type of object not supported for signature identification!')
+
+# Depending on the number of parameters for the self._on_selection_change, pass in the x and y
+# values, or do nothing
+if num_args == 1:
+self._on_selection_change(self.get())
+elif num_args == 0:
+self._on_selection_change()
+else:
+raise ValueError('On selection change event must accept either 0 or 1 parameters!')
+```
+
+
+
+
+
+
+### get_selected_item_index
+```python
+def get_selected_item_index(self) -> int:
 ```
 
 Gets the currently selected item
-
-
 
 
 #### Returns
@@ -1188,10 +1229,11 @@ Gets the currently selected item
 
 
 
+
 ### set_selected_item_index
 
 ```python
-def set_selected_item_index(self, selected_item_index)
+def set_selected_item_index(self, selected_item_index: int) -> None
 ```
 
 Sets the currently selected item
@@ -1212,7 +1254,7 @@ Sets the currently selected item
 ### _scroll_up
 
 ```python
-def _scroll_up(self)
+def _scroll_up(self) -> None
 ```
 
 Function that scrolls the view up in the scroll menu
@@ -1226,7 +1268,7 @@ Function that scrolls the view up in the scroll menu
 ### _scroll_down
 
 ```python
-def _scroll_down(self, viewport_height)
+def _scroll_down(self, viewport_height: int) -> None
 ```
 
 Function that scrolls the view down in the scroll menu
@@ -1249,7 +1291,7 @@ TODO: Viewport height should be calculated internally, and not rely on a paramet
 ### _jump_up
 
 ```python
-def _jump_up(self)
+def _jump_up(self) -> None
 ```
 
 Function for jumping up menu several spots at a time
@@ -1263,7 +1305,7 @@ Function for jumping up menu several spots at a time
 ### _jump_down
 
 ```python
-def _jump_down(self, viewport_height)
+def _jump_down(self, viewport_height: int) -> None
 ```
 
 Function for jumping down the menu several spots at a time
@@ -1284,7 +1326,7 @@ Function for jumping down the menu several spots at a time
 ### _jump_to_top
 
 ```python
-def _jump_to_top(self)
+def _jump_to_top(self) -> None
 ```
 
 Function that jumps to the top of the menu
@@ -1298,7 +1340,7 @@ Function that jumps to the top of the menu
 ### _jump_to_bottom
 
 ```python
-def _jump_to_bottom(self, viewport_height)
+def _jump_to_bottom(self, viewport_height: int) -> None
 ```
 
 Function that jumps to the bottom of the menu
@@ -1319,7 +1361,7 @@ Function that jumps to the bottom of the menu
 ### add_item
 
 ```python
-def add_item(self, item)
+def add_item(self, item: Any) -> None
 ```
 
 Adds an item to the menu.
@@ -1340,7 +1382,7 @@ Adds an item to the menu.
 ### add_item_list
 
 ```python
-def add_item_list(self, item_list)
+def add_item_list(self, item_list: List[Any]) -> None
 ```
 
 Adds a list of items to the scroll menu.
@@ -1361,7 +1403,7 @@ Adds a list of items to the scroll menu.
 ### remove_selected_item
 
 ```python
-def remove_selected_item(self)
+def remove_selected_item(self) -> None
 ```
 
 Function that removes the selected item from the scroll menu.
@@ -1375,7 +1417,7 @@ Function that removes the selected item from the scroll menu.
 ### remove_item
 
 ```python
-def remove_item(self, item)
+def remove_item(self, item: Any) -> None
 ```
 
 Function that removes a specific item from the menu
@@ -1396,7 +1438,7 @@ Function that removes a specific item from the menu
 ### get_item_list
 
 ```python
-def get_item_list(self)
+def get_item_list(self) -> List[Any]
 ```
 
 Function that gets list of items in a scroll menu
@@ -1417,7 +1459,7 @@ Function that gets list of items in a scroll menu
 ### get
 
 ```python
-def get(self)
+def get(self) -> Optional[Any]
 ```
 
 Function that gets the selected item from the scroll menu
@@ -1438,7 +1480,7 @@ Function that gets the selected item from the scroll menu
 ### set_selected_item
 
 ```python
-def set_selected_item(self, selected_item)
+def set_selected_item(self, selected_item: Any)
 ```
 
 Function that replaces the currently selected item with a new item
@@ -1484,7 +1526,9 @@ Class representing checkbox menu ui implementation
  add_item | Extends base class function, item is added and marked as unchecked to start
  remove_selected_item | Removes selected item from item list and selected item dictionary
  remove_item | Removes item from item list and selected item dict
+ toggle_item_checked | Function that marks an item as selected
  mark_item_as_checked | Function that marks an item as selected
+ mark_item_as_not_checked | Function that marks an item as selected
 
 
 
@@ -1506,7 +1550,7 @@ Initializer for the checkbox menu implementation
 ### add_item
 
 ```python
-def add_item(self, item)
+def add_item(self, item: Any) -> None
 ```
 
 Extends base class function, item is added and marked as unchecked to start
@@ -1527,7 +1571,7 @@ Extends base class function, item is added and marked as unchecked to start
 ### remove_selected_item
 
 ```python
-def remove_selected_item(self)
+def remove_selected_item(self) -> None
 ```
 
 Removes selected item from item list and selected item dictionary
@@ -1541,7 +1585,7 @@ Removes selected item from item list and selected item dictionary
 ### remove_item
 
 ```python
-def remove_item(self, item)
+def remove_item(self, item) -> None
 ```
 
 Removes item from item list and selected item dict
@@ -1559,10 +1603,10 @@ Removes item from item list and selected item dict
 
 
 
-### mark_item_as_checked
+### toggle_item_checked
 
 ```python
-def mark_item_as_checked(self, item)
+def toggle_item_checked(self, item: Any)
 ```
 
 Function that marks an item as selected
@@ -1574,7 +1618,49 @@ Function that marks an item as selected
 
  Parameter  | Type  | Doc
 -----|----------|-----
- item  |  object | Mark item as checked
+ item  |  object | Toggle item checked state
+
+
+
+
+
+### mark_item_as_checked
+
+```python
+def mark_item_as_checked(self, item: Any) -> None
+```
+
+Function that marks an item as selected
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  object | Toggle item checked state
+
+
+
+
+
+### mark_item_as_not_checked
+
+```python
+def mark_item_as_not_checked(self, item) -> None
+```
+
+Function that marks an item as selected
+
+
+
+
+#### Parameters
+
+ Parameter  | Type  | Doc
+-----|----------|-----
+ item  |  object | Item to uncheck
 
 
 
@@ -1642,7 +1728,7 @@ Currently only implemented in widget form, though popup form is possible.
 ### __init__
 
 ```python
-def __init__(self, initial_text, logger)
+def __init__(self, initial_text: str, logger)
 ```
 
 Initializer for TextBlockImplementation base class
@@ -1658,7 +1744,7 @@ Zeros attributes, and parses initial text
 ### get_viewport_start_pos
 
 ```python
-def get_viewport_start_pos(self)
+def get_viewport_start_pos(self) -> Tuple[int,int]
 ```
 
 Gets upper left corner position of viewport
@@ -1679,7 +1765,7 @@ Gets upper left corner position of viewport
 ### get_viewport_dims
 
 ```python
-def get_viewport_dims(self)
+def get_viewport_dims(self) -> Tuple[int,int]
 ```
 
 Gets viewport dimensions in characters
@@ -1700,7 +1786,7 @@ Gets viewport dimensions in characters
 ### get_cursor_text_pos
 
 ```python
-def get_cursor_text_pos(self)
+def get_cursor_text_pos(self) -> Tuple[int,int]
 ```
 
 Gets cursor postion relative to text
@@ -1721,7 +1807,7 @@ Gets cursor postion relative to text
 ### get_abs_cursor_position
 
 ```python
-def get_abs_cursor_position(self)
+def get_abs_cursor_position(self) -> Tuple[int,int]
 ```
 
 Gets absolute cursor position in terminal characters
@@ -1742,7 +1828,7 @@ Gets absolute cursor position in terminal characters
 ### get_cursor_limits_vertical
 
 ```python
-def get_cursor_limits_vertical(self)
+def get_cursor_limits_vertical(self) -> Tuple[int,int]
 ```
 
 Gets limits for cursor in vertical direction
@@ -1763,7 +1849,7 @@ Gets limits for cursor in vertical direction
 ### get_cursor_limits_horizontal
 
 ```python
-def get_cursor_limits_horizontal(self)
+def get_cursor_limits_horizontal(self) -> Tuple[int,int]
 ```
 
 Gets limits for cursor in horizontal direction
@@ -1784,7 +1870,7 @@ Gets limits for cursor in horizontal direction
 ### get
 
 ```python
-def get(self)
+def get(self) -> str
 ```
 
 Gets all of the text in the textblock and returns it
@@ -1805,7 +1891,7 @@ Gets all of the text in the textblock and returns it
 ### write
 
 ```python
-def write(self, text)
+def write(self, text: str) -> None
 ```
 
 Function used for writing text to the text block
@@ -1826,7 +1912,7 @@ Function used for writing text to the text block
 ### clear
 
 ```python
-def clear(self)
+def clear(self) -> None
 ```
 
 Function that clears the text block
@@ -1840,7 +1926,7 @@ Function that clears the text block
 ### get_current_line
 
 ```python
-def get_current_line(self)
+def get_current_line(self) -> str
 ```
 
 Returns the line on which the cursor currently resides
@@ -1861,7 +1947,7 @@ Returns the line on which the cursor currently resides
 ### set_text
 
 ```python
-def set_text(self, text)
+def set_text(self, text: str) -> None
 ```
 
 Function that sets the text for the textblock.
@@ -1884,7 +1970,7 @@ Note that this will overwrite any existing text
 ### set_text_line
 
 ```python
-def set_text_line(self, text)
+def set_text_line(self, text: str) -> None
 ```
 
 Function that sets the current line's text.
@@ -1907,7 +1993,7 @@ Meant only for internal use
 ### _move_left
 
 ```python
-def _move_left(self)
+def _move_left(self) -> None
 ```
 
 Function that moves the cursor/text position one location to the left
@@ -1921,7 +2007,7 @@ Function that moves the cursor/text position one location to the left
 ### _move_right
 
 ```python
-def _move_right(self)
+def _move_right(self) -> None
 ```
 
 Function that moves the cursor/text position one location to the right
@@ -1935,7 +2021,7 @@ Function that moves the cursor/text position one location to the right
 ### _move_up
 
 ```python
-def _move_up(self)
+def _move_up(self) -> None
 ```
 
 Function that moves the cursor/text position one location up
@@ -1949,7 +2035,7 @@ Function that moves the cursor/text position one location up
 ### _move_down
 
 ```python
-def _move_down(self)
+def _move_down(self) -> None
 ```
 
 Function that moves the cursor/text position one location down
@@ -1963,7 +2049,7 @@ Function that moves the cursor/text position one location down
 ### _handle_newline
 
 ```python
-def _handle_newline(self)
+def _handle_newline(self) -> None
 ```
 
 Function that handles recieving newline characters in the text
@@ -1977,7 +2063,7 @@ Function that handles recieving newline characters in the text
 ### _handle_backspace
 
 ```python
-def _handle_backspace(self)
+def _handle_backspace(self) -> None
 ```
 
 Function that handles recieving backspace characters in the text
@@ -1991,7 +2077,7 @@ Function that handles recieving backspace characters in the text
 ### _handle_home
 
 ```python
-def _handle_home(self)
+def _handle_home(self) -> None
 ```
 
 Function that handles recieving a home keypress
@@ -2005,7 +2091,7 @@ Function that handles recieving a home keypress
 ### _handle_end
 
 ```python
-def _handle_end(self)
+def _handle_end(self) -> None
 ```
 
 Function that handles recieving an end keypress
@@ -2019,7 +2105,7 @@ Function that handles recieving an end keypress
 ### _handle_delete
 
 ```python
-def _handle_delete(self)
+def _handle_delete(self) -> None
 ```
 
 Function that handles recieving a delete keypress
@@ -2033,7 +2119,7 @@ Function that handles recieving a delete keypress
 ### _insert_char
 
 ```python
-def _insert_char(self, key_pressed)
+def _insert_char(self, key_pressed: int) -> None
 ```
 
 Function that handles recieving a character

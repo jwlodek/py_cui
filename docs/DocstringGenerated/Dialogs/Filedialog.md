@@ -28,7 +28,7 @@ Implementation, widget, and popup classes for file selection dialogs
 ### is_filepath_hidden
 
 ```python
-def is_filepath_hidden(path)
+def is_filepath_hidden(path:  str) -> bool
 ```
 
 Function checks if file or folder is considered "hidden"
@@ -86,7 +86,7 @@ Simple helper class defining a single file or directory
 ### __init__
 
 ```python
-def __init__(self, elem_type, name, fullpath, ascii_icons=False)
+def __init__(self, elem_type: str, name: str, fullpath: str, ascii_icons: bool=False)
 ```
 
 Intializer for FilDirElem
@@ -100,7 +100,7 @@ Intializer for FilDirElem
 ### get_path
 
 ```python
-def get_path(self)
+def get_path(self) -> str
 ```
 
 Getter for path
@@ -121,7 +121,7 @@ Getter for path
 ### __str__
 
 ```python
-def __str__(self)
+def __str__(self) -> str
 ```
 
 Override of to-string function
@@ -174,7 +174,7 @@ Extension of menu implementation that allows for listing files and dirs in a loc
 ### __init__
 
 ```python
-def __init__(self, initial_loc, dialog_type, ascii_icons, logger, limit_extensions = [], show_hidden=False)
+def __init__(self, initial_loc: str, dialog_type: str, ascii_icons, logger, limit_extensions: List[str] = [], show_hidden: bool=False)
 ```
 
 Initalizer for the file select menu implementation. Includes some logic for getting list of file and folders.
@@ -188,7 +188,7 @@ Initalizer for the file select menu implementation. Includes some logic for gett
 ### refresh_view
 
 ```python
-def refresh_view(self)
+def refresh_view(self) -> None
 ```
 
 Function that refreshes the current list of files and folders in view
@@ -237,7 +237,7 @@ Displays list of files and dirs in a given location
 ### __init__
 
 ```python
-def __init__(self, root, initial_dir, dialog_type, ascii_icons, title, color, command, renderer, logger, limit_extensions=[])
+def __init__(self, root, initial_dir, dialog_type: str, ascii_icons, title, color, command, renderer, logger, limit_extensions: List[str]=[])
 ```
 
 Initializer for MenuPopup. Uses MenuImplementation as base
@@ -251,7 +251,7 @@ Initializer for MenuPopup. Uses MenuImplementation as base
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute start position
@@ -272,7 +272,7 @@ Override of base function. Uses the parent element do compute start position
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute stop position
@@ -293,7 +293,7 @@ Override of base function. Uses the parent element do compute stop position
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base handle key press function
@@ -316,7 +316,7 @@ Enter key runs command, Escape key closes menu
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Overrides base class draw function
@@ -377,7 +377,7 @@ Initializer for the FormFieldElement class
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute start position
@@ -398,7 +398,7 @@ Override of base function. Uses the parent element do compute start position
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute stop position
@@ -419,7 +419,7 @@ Override of base function. Uses the parent element do compute stop position
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Override of base class. Updates text field variables for form field
@@ -433,7 +433,7 @@ Override of base class. Updates text field variables for form field
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Handles text input for the field. Called by parent
@@ -447,7 +447,7 @@ Handles text input for the field. Called by parent
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Draw function for the field. Called from parent. Essentially the same as a TextboxPopup
@@ -510,7 +510,7 @@ Initializer for Button Widget
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute start position
@@ -531,7 +531,7 @@ Override of base function. Uses the parent element do compute start position
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base function. Uses the parent element do compute stop position
@@ -552,7 +552,7 @@ Override of base function. Uses the parent element do compute stop position
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Handles mouse presses
@@ -566,6 +566,7 @@ Handles mouse presses
 -----|----------|-----
  x  |  int | x coordinate of click in characters
  y  |  int | y coordinate of click in characters
+ mouse_event  |  int | Mouse event keycode of mouse press
 
 
 
@@ -574,7 +575,7 @@ Handles mouse presses
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class, adds ENTER listener that runs the button's command
@@ -595,7 +596,7 @@ Override of base class, adds ENTER listener that runs the button's command
 ### perform_command
 
 ```python
-def perform_command(self)
+def perform_command(self) -> None
 ```
 
 
@@ -609,7 +610,7 @@ def perform_command(self)
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class draw function
@@ -666,7 +667,7 @@ Initializer for Internal form Popup
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed: int) -> None
 ```
 
 Override of base class, close in parent instead of root
@@ -737,7 +738,7 @@ Initalizer for the FileDialogPopup
 ### _submit
 
 ```python
-def _submit(self, output)
+def _submit(self, output: str) -> None
 ```
 
 
@@ -751,7 +752,7 @@ def _submit(self, output)
 ### display_warning
 
 ```python
-def display_warning(self, message)
+def display_warning(self, message: str) -> None
 ```
 
 Helper function for showing internal popup warning message
@@ -772,7 +773,7 @@ Helper function for showing internal popup warning message
 ### output_valid
 
 ```python
-def output_valid(self, output)
+def output_valid(self, output) -> Tuple[bool,Optional[str]]
 ```
 
 
@@ -786,7 +787,7 @@ def output_valid(self, output)
 ### get_absolute_start_pos
 
 ```python
-def get_absolute_start_pos(self)
+def get_absolute_start_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -807,7 +808,7 @@ Override of base class, computes position based on root dimensions
 ### get_absolute_stop_pos
 
 ```python
-def get_absolute_stop_pos(self)
+def get_absolute_stop_pos(self) -> Tuple[int,int]
 ```
 
 Override of base class, computes position based on root dimensions
@@ -828,7 +829,7 @@ Override of base class, computes position based on root dimensions
 ### update_height_width
 
 ```python
-def update_height_width(self)
+def update_height_width(self) -> None
 ```
 
 Override of base class function
@@ -844,7 +845,7 @@ Also updates all form field elements in the form
 ### _handle_key_press
 
 ```python
-def _handle_key_press(self, key_pressed)
+def _handle_key_press(self, key_pressed:int) -> None
 ```
 
 Override of base class. Here, we handle tabs, enters, and escapes
@@ -867,7 +868,7 @@ All other key presses are passed to the currently selected field element
 ### _handle_mouse_press
 
 ```python
-def _handle_mouse_press(self, x, y)
+def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None
 ```
 
 Override of base class function
@@ -890,7 +891,7 @@ Simply enters the appropriate field when mouse is pressed on it
 ### _draw
 
 ```python
-def _draw(self)
+def _draw(self) -> None
 ```
 
 Override of base class.

@@ -23,7 +23,7 @@
 
 # py_cui
 
-`py_cui` is a python library meant to simplify writing console user interfaces in python. It relies on `curses` for terminal rendering, which is traditionally a unix-specific, however, you may use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
+`py_cui` is a python library meant to simplify writing console user interfaces in python. It relies on `curses` for terminal rendering, which is traditionally unix-specific, however, you may use the [windows-curses](https://github.com/zephyrproject-rtos/windows-curses) module to run `py_cui` on windows.
 
 The main advantage `py_cui` has over typical text-based user interface builders is that it relies on widgets and a grid layout manager like most traditional graphical user interfaces. You may define a grid size, and then drop predefined widgets onto it into specific grid locations. Widgets can also be stretched accross multiple grid rows and columns. If you've ever made a Tkinter GUI, you will feel right at home. In addition, `py_cui` has support for a rich collection of interactive popups such as menus, forms, file dialogs, and more.
 

@@ -36,6 +36,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
  widgets  |  dict of str - py_cui.widgets.Widget | dict of widget in the grid
  keybindings  |  list of py_cui.keybinding.KeyBinding | list of keybindings to check against in the main CUI loop
  height, width  |  int | height of the terminal in characters, width of terminal in characters
+ root  |  py_cui.PyCUI | Main PyCUI object reference
 
 #### Methods
 
@@ -59,7 +60,7 @@ Use PyCUI.apply_widget_set() to set a given widget set for display
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_cols, logger, simulated_terminal=None)
+def __init__(self, num_rows: int, num_cols: int, logger: 'py_cui.debug.PyCUILogger', root:'py_cui.PyCUI', simulated_terminal: Optional[List[int]] =None)
 ```
 
 Constructor for WidgetSet
@@ -73,7 +74,7 @@ Constructor for WidgetSet
 ### set_selected_widget
 
 ```python
-def set_selected_widget(self, widget_id)
+def set_selected_widget(self, widget_id: int) -> None
 ```
 
 Function that sets the selected cell for the CUI
@@ -94,7 +95,7 @@ Function that sets the selected cell for the CUI
 ### get_widgets
 
 ```python
-def get_widgets(self)
+def get_widgets(self) -> Dict[int, Optional['py_cui.widgets.Widget']]
 ```
 
 Function that gets current set of widgets
@@ -115,7 +116,7 @@ Function that gets current set of widgets
 ### add_key_command
 
 ```python
-def add_key_command(self, key, command)
+def add_key_command(self, key: int, command: Callable[[],Any])
 ```
 
 Function that adds a keybinding to the CUI when in overview mode
@@ -137,7 +138,7 @@ Function that adds a keybinding to the CUI when in overview mode
 ### add_scroll_menu
 
 ```python
-def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0)
+def add_scroll_menu(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.ScrollMenu'
 ```
 
 Function that adds a new scroll menu to the CUI grid
@@ -170,7 +171,7 @@ Function that adds a new scroll menu to the CUI grid
 ### add_checkbox_menu
 
 ```python
-def add_checkbox_menu(self, title, row, column, row_span=1, column_span=1, padx=1, pady=0, checked_char='X')
+def add_checkbox_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0, checked_char: str='X') -> 'py_cui.widgets.CheckBoxMenu'
 ```
 
 Function that adds a new checkbox menu to the CUI grid
@@ -204,7 +205,7 @@ Function that adds a new checkbox menu to the CUI grid
 ### add_text_box
 
 ```python
-def add_text_box(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '', password = False)
+def add_text_box(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '', password: bool = False) -> 'py_cui.widgets.TextBox'
 ```
 
 Function that adds a new text box to the CUI grid
@@ -239,7 +240,7 @@ Function that adds a new text box to the CUI grid
 ### add_text_block
 
 ```python
-def add_text_block(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, initial_text = '')
+def add_text_block(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '') -> 'py_cui.widgets.ScrollTextBlock'
 ```
 
 Function that adds a new text block to the CUI grid
@@ -273,7 +274,7 @@ Function that adds a new text block to the CUI grid
 ### add_label
 
 ```python
-def add_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0)
+def add_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.Label'
 ```
 
 Function that adds a new label to the CUI grid
@@ -306,7 +307,7 @@ Function that adds a new label to the CUI grid
 ### add_block_label
 
 ```python
-def add_block_label(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, center=True)
+def add_block_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, center: bool=True) -> 'py_cui.widgets.BlockLabel'
 ```
 
 Function that adds a new block label to the CUI grid
@@ -340,7 +341,7 @@ Function that adds a new block label to the CUI grid
 ### add_button
 
 ```python
-def add_button(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0, command=None)
+def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Optional[Callable[[],Any]]=None) -> 'py_cui.widgets.Button'
 ```
 
 Function that adds a new button to the CUI grid
@@ -374,7 +375,7 @@ Function that adds a new button to the CUI grid
 ### add_slider
 
 ```python
-def add_slider(self, title, row, column, row_span=1
+def add_slider(self, title: str, row: int, column: int, row_span: int=1
 ```
 
 Function that adds a new label to the CUI grid

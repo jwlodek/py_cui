@@ -65,7 +65,7 @@ class FileDirElem:
         # for compatibility reasons.
         if not ascii_icons:
             self._folder_icon = '\U0001f4c1'
-            # Folder icon is two characters, so 
+            # Folder icon is two characters, so
             self._file_icon = '\U0001f5ce' + ' '
         else:
             self._folder_icon = '<DIR>'
@@ -121,7 +121,7 @@ class FileSelectImplementation(py_cui.ui.MenuImplementation):
         """
 
         super().__init__(logger)
-        
+
         self._current_dir = os.path.abspath(initial_loc)
         self._ascii_icons = ascii_icons
         self._dialog_type = dialog_type
@@ -244,7 +244,7 @@ class FileSelectElement(py_cui.ui.UIElement, FileSelectImplementation):
             key code of key pressed
         """
 
-        super()._handle_key_press(key_pressed)
+        #super()._handle_key_press(key_pressed)
         if key_pressed == py_cui.keys.KEY_ENTER:
             old_dir = self._current_dir
             item = self.get()
@@ -391,7 +391,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self._move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._delete_char()
@@ -416,7 +416,7 @@ class FileNameInput(py_cui.ui.UIElement, py_cui.ui.TextBoxImplementation):
                     fp = open(new_elem, 'w')
                     fp.close()
                     self._parent_dialog._file_dir_select.refresh_view()
-                    
+
             except FileExistsError:
                 self._parent_dialog.display_warning('File/Directory already exists!')
             except PermissionError:
@@ -510,7 +510,7 @@ class FileDialogButton(py_cui.ui.UIElement):
 
 
     def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
-        """Handles mouse presses 
+        """Handles mouse presses
 
         Parameters
         ----------
@@ -540,7 +540,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         if key_pressed == py_cui.keys.KEY_ENTER:
             self.perform_command()
 
-    
+
     def perform_command(self) -> None:
         if self.command is not None:
             if self._button_num == 1:
@@ -564,7 +564,7 @@ class FileDialogButton(py_cui.ui.UIElement):
         """Override of base class draw function
         """
 
-        super()._draw()
+        #super()._draw()
         self._renderer.set_color_mode(self.get_color())
         self._renderer.draw_border(self, with_title=False)
         button_text_y_pos = self._start_y + int(self._height / 2)
@@ -698,7 +698,7 @@ class FileDialogPopup(py_cui.popups.Popup):
 
     def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
-        
+
         Returns
         -------
         start_x, start_y : int
@@ -714,7 +714,7 @@ class FileDialogPopup(py_cui.popups.Popup):
 
     def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
-        
+
         Returns
         -------
         stop_x, stop_y : int
@@ -803,12 +803,12 @@ class FileDialogPopup(py_cui.popups.Popup):
             self._filename_input.set_selected(False)
             self._file_dir_select.set_selected(True)
             self._file_dir_select._handle_mouse_press(x, y, mouse_event)
-            
+
         elif self._filename_input._contains_position(x, y):
             self._filename_input.set_selected(True)
             self._file_dir_select.set_selected(False)
             self._filename_input._handle_mouse_press(x, y, mouse_event)
-        
+
         elif self._submit_button._contains_position(x, y):
             self._submit_button._handle_mouse_press(x, y, mouse_event)
 
@@ -818,7 +818,7 @@ class FileDialogPopup(py_cui.popups.Popup):
 
     def _draw(self) -> None:
         """Override of base class.
-        
+
         Here, we only draw a border, and then the individual form elements
         """
 

@@ -34,6 +34,7 @@ Class representing the CUI grid
  _height, _width  |  int | The height, width in characters of the terminal window
  _offset_y, _offset_x  |  int | The number of additional characters found by height mod rows and width mod columns
  _row_height, _column_width  |  int | The number of characters in a single grid row, column
+ _title_bar_offset  |  int | Title bar row offset. Defaults to 1. Set to 0 if title bar is hidden.
  _logger  |  py_cui.debug.PyCUILogger | logger object for maintaining debug messages
 
 #### Methods
@@ -54,7 +55,7 @@ Class representing the CUI grid
 ### __init__
 
 ```python
-def __init__(self, num_rows, num_columns, height, width, logger)
+def __init__(self, num_rows: int, num_columns: int, height: int, width: int, logger: 'py_cui.debug.PyCUILogger')
 ```
 
 Constructor for the Grid class
@@ -78,7 +79,7 @@ Constructor for the Grid class
 ### get_dimensions
 
 ```python
-def get_dimensions(self)
+def get_dimensions(self) -> Tuple[int,int]
 ```
 
 Gets dimensions in rows/columns
@@ -100,7 +101,7 @@ Gets dimensions in rows/columns
 ### get_dimensions_absolute
 
 ```python
-def get_dimensions_absolute(self)
+def get_dimensions_absolute(self) -> Tuple[int,int]
 ```
 
 Gets dimensions of grid in terminal characters
@@ -122,7 +123,7 @@ Gets dimensions of grid in terminal characters
 ### get_offsets
 
 ```python
-def get_offsets(self)
+def get_offsets(self) -> Tuple[int,int]
 ```
 
 Gets leftover characters for x and y
@@ -144,7 +145,7 @@ Gets leftover characters for x and y
 ### get_cell_dimensions
 
 ```python
-def get_cell_dimensions(self)
+def get_cell_dimensions(self) -> Tuple[int,int]
 ```
 
 Gets size in characters of single (row, column) cell location
@@ -166,7 +167,7 @@ Gets size in characters of single (row, column) cell location
 ### set_num_rows
 
 ```python
-def set_num_rows(self, num_rows)
+def set_num_rows(self, num_rows: int) -> None
 ```
 
 Sets the grid row size
@@ -193,7 +194,7 @@ Sets the grid row size
 ### set_num_cols
 
 ```python
-def set_num_cols(self, num_columns)
+def set_num_cols(self, num_columns: int) -> None
 ```
 
 Sets the grid column size
@@ -220,7 +221,7 @@ Sets the grid column size
 ### update_grid_height_width
 
 ```python
-def update_grid_height_width(self, height, width)
+def update_grid_height_width(self, height: int, width: int)
 ```
 
 Update grid height and width. Allows for on-the-fly size editing
