@@ -307,6 +307,10 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
                 slider_val_width = self._max_val - self._min_val
                 self._cur_val = int(prop_of_slider * slider_val_width) + self._min_val
 
+                # Round up. Avoids awkward situation where mousepress is to the right of the slider pos
+                if not (prop_of_slider * slider_val_width).is_integer():
+                    self._cur_val += 1
+
 
 class SliderPopup(py_cui.popups.Popup, SliderImplementation):
     pass
