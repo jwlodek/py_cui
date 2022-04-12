@@ -210,12 +210,12 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         The command to run when enter is pressed
     """
 
-    def __init__(self, root, title, color, command, renderer, password, logger):
+    def __init__(self, root, title, initial_text, color, command, renderer, password, logger):
         """Initializer for textbox popup. Uses TextBoxImplementation as base
         """
 
-        Popup.__init__(self, root, title, '', color, renderer, logger)
-        py_cui.ui.TextBoxImplementation.__init__(self, '', password, logger)
+        Popup.__init__(self, root, title, initial_text, color, renderer, logger)
+        py_cui.ui.TextBoxImplementation.__init__(self, initial_text, password, logger)
         self._command           = command
         self.update_height_width()
 

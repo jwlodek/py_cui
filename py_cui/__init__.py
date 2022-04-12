@@ -1351,7 +1351,7 @@ class PyCUI:
         self._logger.debug(f"Opened {str(type(self._popup))} popup with title {title}")
 
     def show_text_box_popup(
-        self, title: str, command: Callable[[str], Any], password: bool = False
+        self, title: str, command: Callable[[str], Any], initial_text = '', password: bool = False
     ):
         """Shows a textbox popup.
 
@@ -1369,7 +1369,7 @@ class PyCUI:
 
         color = WHITE_ON_BLACK
         self._popup = py_cui.popups.TextBoxPopup(
-            self, title, color, command, self._renderer, password, self._logger
+            self, title, initial_text, color, command, self._renderer, password, self._logger
         )
         self._logger.debug(f"Opened {str(type(self._popup))} popup with title {title}")
 

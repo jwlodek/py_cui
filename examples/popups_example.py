@@ -69,7 +69,7 @@ class PopupExample:
 
     def show_text_box(self):
         # Here, reset title is a function that takes a string parameter, which will be the user entered string
-        self.master.show_text_box_popup('Please enter a new window title', self.reset_title)
+        self.master.show_text_box_popup('Please enter a new window title', self.reset_title, initial_text='New Title')
 
     def reset_title(self, new_title):
         self.master.set_title(new_title)
