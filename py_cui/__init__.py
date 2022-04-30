@@ -1067,7 +1067,7 @@ class PyCUI:
             A list of the neighbor widget ids
         """
 
-        if not direction in py_cui.keys.ARROW_KEYS:
+        if direction not in (py_cui.keys.KEY_UP_ARROW,py_cui.keys.KEY_DOWN_ARROW):
             return None
 
         num_rows, _ = self._grid.get_dimensions()
@@ -1076,25 +1076,17 @@ class PyCUI:
         id_list = []
 
         if direction == py_cui.keys.KEY_UP_ARROW:
-            row_range_start = 0
-            row_range_stop = row_start
+            scope = range(row_start - 1, -1, -1)
         else:
-            row_range_start = row_start + row_span
-            row_range_stop = num_rows
+            scope = range(row_start + row_span, num_rows)
 
-        for row in range(row_range_start, row_range_stop):
-            for col in range(col_start, col_start + col_span):
-                for widget_id in self.get_widgets().keys():
-                    item_value = self.get_widgets()[widget_id]
-                    if item_value is not None:
-                        if (
-                            item_value._is_row_col_inside(row, col)
-                            and widget_id not in id_list
-                        ):
-                            id_list.append(widget_id)
+        widgets = self.get_widgets()
+        ids = widgets.keys()
 
-        if direction == py_cui.keys.KEY_UP_ARROW:
-            id_list.reverse()
+        for row in scope:
+            row_items = [w for w in ids if widgets[w]._row == row and widgets[w].is_selectable()]
+            sorted_items = sorted(row_items, key=lambda x: abs(col_start - widgets[x]._column))
+            id_list.extend(sorted_items)
 
         self._logger.debug(
             f"Neighbors with ids {id_list} for cell {row_start},{col_start} span {row_span},{col_span}"
@@ -1239,24 +1231,27 @@ class PyCUI:
         num_widgets: int = len(self.get_widgets())
         current_widget_num: Optional[int] = self._selected_widget
 
-        if current_widget_num is None:
-            return
+        if current_widget_num is not None:
+            if not reverse:
+                next_widget_num = current_widget_num + 1
+                if self.get_widgets()[next_widget_num] is None:
+                    if next_widget_num == num_widgets:
+                        next_widget_num = 0
+                    next_widget_num = next_widget_num + 1
+                cycle_key = self._forward_cycle_key
+            else:
+                next_widget_num = current_widget_num - 1
+                if self.get_widgets()[next_widget_num] is None:
+                    if next_widget_num < 0:
+                        next_widget_num = num_widgets - 1
+                    next_widget_num = next_widget_num + 1
+                cycle_key = self._reverse_cycle_key
 
-        if reverse:
-            next_widget_num = current_widget_num - 1
-            if next_widget_num < 0:
-                next_widget_num = num_widgets - 1
-            cycle_key = self._reverse_cycle_key
-        else:
-            next_widget_num = current_widget_num + 1
-            if next_widget_num >= num_widgets:
-                next_widget_num = 0
-            cycle_key = self._forward_cycle_key
-
-        current_widget = self.get_widgets().get(current_widget_num)
-        next_widget = self.get_widgets().get(next_widget_num)
-
-        if current_widget is not None and next_widget is not None:
+            current_widget_id: int = current_widget_num
+            next_widget_id: int = next_widget_num
+        current_widget = self.get_widgets()[current_widget_id]
+        next_widget = self.get_widgets()[next_widget_id]
+        if current_widget and next_widget is not None: #pls check again
             if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
                 # In the event that we are focusing on a widget with that key defined, we do not cycle.
                 return
@@ -1532,7 +1527,7 @@ class PyCUI:
         limit_extensions : List[str]
             Only show files with extensions in this list if not empty. Default, []
         """
-
+  
         self._popup = py_cui.dialogs.filedialog.FileDialogPopup(
             self,
             callback,
@@ -1544,7 +1539,6 @@ class PyCUI:
             self._renderer,
             self._logger,
         )
-
         self._logger.debug(f"Opened {str(type(self._popup))} popup with type {popup_type}")
 
     def increment_loading_bar(self) -> None:
