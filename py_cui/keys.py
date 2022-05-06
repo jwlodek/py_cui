@@ -18,7 +18,7 @@ def get_ascii_from_char(char: str) -> int:
     ----------
     char : character
         character to convert to ascii
-    
+
     Returns
     -------
     ascii_code : int
@@ -56,17 +56,9 @@ KEY_SPACE       = get_ascii_from_char(' ')
 KEY_DELETE      = curses.KEY_DC
 KEY_TAB         = get_ascii_from_char('\t')
 
-# Pressing backspace returns 8 on windows?
-if platform == 'win32':
-    KEY_BACKSPACE   = 8
-# Adds support for 'delete/backspace' key on OSX
-elif platform == 'darwin':
-    KEY_BACKSPACE   = 127
-else:
-    KEY_BACKSPACE   = curses.KEY_BACKSPACE
+KEY_BACKSPACE = [8, 127, curses.KEY_BACKSPACE]
 
-SPECIAL_KEYS = [KEY_ENTER, KEY_ESCAPE, KEY_SPACE, KEY_DELETE, KEY_TAB, KEY_BACKSPACE]
-
+SPECIAL_KEYS = [KEY_ENTER, KEY_ESCAPE, KEY_SPACE, KEY_DELETE, KEY_TAB] + KEY_BACKSPACE
 
 # Page navigation keys
 KEY_PAGE_UP     = curses.KEY_PPAGE
@@ -85,13 +77,13 @@ ARROW_KEYS = [KEY_UP_ARROW, KEY_DOWN_ARROW, KEY_LEFT_ARROW, KEY_RIGHT_ARROW]
 
 
 if platform == 'linux' or platform == 'darwin':
-    
+
     # Modified arrow keys
     KEY_SHIFT_LEFT  = 393
     KEY_SHIFT_RIGHT = 402
     KEY_SHIFT_UP    = 337
     KEY_SHIFT_DOWN  = 336
-    
+
     KEY_CTRL_LEFT   = 560
     KEY_CTRL_RIGHT  = 545
     KEY_CTRL_UP     = 566
@@ -103,7 +95,7 @@ elif platform == 'win32':
     KEY_SHIFT_RIGHT = 400
     KEY_SHIFT_UP    = 547
     KEY_SHIFT_DOWN  = 548
-    
+
     KEY_CTRL_LEFT   = 443
     KEY_CTRL_RIGHT  = 444
     KEY_CTRL_UP     = 480

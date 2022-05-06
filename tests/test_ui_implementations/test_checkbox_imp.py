@@ -5,6 +5,14 @@ import py_cui
 elems = ["Elem0", "Elem1", "Elem2", "Elem3", "Elem4"]
 
 
+def test_is_empty(CHECKBOXMENU):
+    scroll = CHECKBOXMENU
+    assert scroll.is_empty()
+    scroll.add_item_list(elems)
+    assert not scroll.is_empty()
+    scroll.clear()
+
+
 def test_add_item_list(CHECKBOXMENU):
     scroll = CHECKBOXMENU
     scroll.add_item_list(elems)

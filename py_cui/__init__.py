@@ -22,7 +22,7 @@ import logging      # Use logging library for debug purposes
 # there is a open source windows-curses module that adds curses support
 # for python on windows
 import curses
-from typing import Any, Callable, List, Dict, Optional, Tuple
+from typing import Any, Union, Callable, List, Dict, Optional, Tuple
 
 # py_cui imports
 import py_cui
@@ -39,7 +39,7 @@ import py_cui.errors
 from py_cui.colors import *
 
 # Version number
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 def fit_text(width: int, text: str, center: bool = False) -> str:
@@ -113,7 +113,7 @@ class PyCUI:
         """
 
         self._title = 'PyCUI Window'
-        
+
         # When this is not set, the escape character delay
         # is too long for exiting focus mode
         os.environ.setdefault('ESCDELAY', '25')
@@ -211,7 +211,7 @@ class PyCUI:
         self._on_draw_update_func = update_function
 
 
-    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None: 
+    def set_widget_cycle_key(self, forward_cycle_key: int=None, reverse_cycle_key: int=None) -> None:
         """Assigns a key for automatically cycling through widgets in both focus and overview modes
 
         Parameters
@@ -437,12 +437,12 @@ class PyCUI:
         self._logger.debug(f'Set border_characters to {self._border_characters}')
 
 
-    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:  
+    def get_widgets(self) -> Dict[int,Optional['py_cui.widgets.Widget']]:
         """Function that gets current set of widgets
 
         Returns
         -------
-        widgets : dict of int -> widget 
+        widgets : dict of int -> widget
             dictionary mapping widget IDs to object instances
         """
 
@@ -450,6 +450,52 @@ class PyCUI:
 
     # Widget add functions. Each of these adds a particular type of widget
     # to the grid in a specified location.
+
+    def add_custom_widget(self, widget_class: type, title: str, row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, *args, **kwargs) -> 'py_cui.widgets.Widget':
+        """Function that allows for adding custom widget types to the CUI - specifically ones not included with py_cui by default
+
+        Parameters
+        ----------
+        widget_class : type
+            The class type of your custom widget. Note that it must be a subclass of the widget superclass
+        title : str
+            The title of the scroll menu
+        row : int
+            The row value, from the top down
+        column : int
+            The column value from the top down
+        row_span=1 : int
+            The number of rows to span accross
+        column_span=1 : int
+            the number of columns to span accross
+        padx=1 : int
+            number of padding characters in the x direction
+        pady=0 : int
+            number of padding characters in the y direction
+
+        Raises
+        ------
+        TypeError
+            If provided widget class is not a subclass of widget, a typeerror is raised.
+        """
+
+        if not issubclass(widget_class, py_cui.widgets.Widget):
+            raise TypeError(f'Widget class {widget_class} is not a subclass of the base Widget class!')
+
+        id = len(self.get_widgets().keys())
+        new_widget = widget_class(id, title, self._grid, row, column, row_span, column_span, padx, pady, self._logger, *args, **kwargs)
+        if self._renderer is not None:
+            new_widget._assign_renderer(self._renderer)
+
+        self.get_widgets()[id] = new_widget
+
+        if self._selected_widget is None:
+            self.set_selected_widget(id)
+
+        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(widget_class)}')
+        return new_widget
+
+
 
     def add_scroll_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0) -> 'py_cui.widgets.ScrollMenu':
         """Function that adds a new scroll menu to the CUI grid
@@ -477,24 +523,14 @@ class PyCUI:
             A reference to the created scroll menu object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_scroll_menu = py_cui.widgets.ScrollMenu(id,
-                                                    title,
-                                                    self._grid,
-                                                    row,
-                                                    column,
-                                                    row_span,
-                                                    column_span,
-                                                    padx,
-                                                    pady,
-                                                    self._logger)
-        if self._renderer is not None:
-            new_scroll_menu._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_scroll_menu
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}')
-        return new_scroll_menu
+        return self.add_custom_widget(py_cui.widgets.ScrollMenu,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady)
 
 
     def add_checkbox_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0, checked_char: str='X') -> 'py_cui.widgets.CheckBoxMenu':
@@ -525,25 +561,15 @@ class PyCUI:
             A reference to the created checkbox object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_checkbox_menu = py_cui.widgets.CheckBoxMenu(id,
-                                                        title,
-                                                        self._grid,
-                                                        row,
-                                                        column,
-                                                        row_span,
-                                                        column_span,
-                                                        padx,
-                                                        pady,
-                                                        self._logger,
-                                                        checked_char)
-        if self._renderer is not None:
-            new_checkbox_menu._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_checkbox_menu
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_checkbox_menu))}')
-        return new_checkbox_menu
+        return self.add_custom_widget(py_cui.widgets.CheckBoxMenu,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      checked_char)
 
 
     def add_text_box(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '', password: bool = False) -> 'py_cui.widgets.TextBox':
@@ -576,24 +602,14 @@ class PyCUI:
             A reference to the created textbox object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_text_box = py_cui.widgets.TextBox(id,
-                                              title,
-                                              self._grid,
-                                              row, column,
-                                              row_span,
-                                              column_span,
-                                              padx, pady,
-                                              self._logger,
-                                              initial_text,
-                                              password)
-        if self._renderer is not None:
-            new_text_box._assign_renderer(self._renderer)
-        self.get_widgets()[id]    = new_text_box
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_box))}')
-        return new_text_box
+        return self.add_custom_widget(py_cui.widgets.TextBox,
+                                      title,
+                                      row, column,
+                                      row_span,
+                                      column_span,
+                                      padx, pady,
+                                      initial_text,
+                                      password)
 
 
     def add_text_block(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '') -> 'py_cui.widgets.ScrollTextBlock':
@@ -624,25 +640,15 @@ class PyCUI:
             A reference to the created textblock object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_text_block = py_cui.widgets.ScrollTextBlock(id,
-                                                        title,
-                                                        self._grid,
-                                                        row,
-                                                        column,
-                                                        row_span,
-                                                        column_span,
-                                                        padx,
-                                                        pady,
-                                                        self._logger,
-                                                        initial_text)
-        if self._renderer is not None:
-            new_text_block._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_text_block
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_block))}')
-        return new_text_block
+        return self.add_custom_widget(py_cui.widgets.ScrollTextBlock,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      initial_text)
 
 
     def add_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.Label':
@@ -671,22 +677,14 @@ class PyCUI:
             A reference to the created label object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_label = py_cui.widgets.Label(id,
-                                         title,
-                                         self._grid,
-                                         row,
-                                         column,
-                                         row_span,
-                                         column_span,
-                                         padx,
-                                         pady,
-                                         self._logger)
-        if self._renderer is not None:
-            new_label._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_label
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
-        return new_label
+        return self.add_custom_widget(py_cui.widgets.Label,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady)
 
 
     def add_block_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, center: bool=True) -> 'py_cui.widgets.BlockLabel':
@@ -717,23 +715,15 @@ class PyCUI:
             A reference to the created block label object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_label = py_cui.widgets.BlockLabel(id,
-                                              title,
-                                              self._grid,
-                                              row,
-                                              column,
-                                              row_span,
-                                              column_span,
-                                              padx,
-                                              pady,
-                                              center,
-                                              self._logger)
-        if self._renderer is not None:
-            new_label._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_label
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
-        return new_label
+        return self.add_custom_widget(py_cui.widgets.BlockLabel,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      center)
 
 
     def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Callable[[],Any]=None) -> 'py_cui.widgets.Button':
@@ -764,27 +754,17 @@ class PyCUI:
             A reference to the created button object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_button = py_cui.widgets.Button(id,
-                                           title,
-                                           self._grid,
-                                           row,
-                                           column,
-                                           row_span,
-                                           column_span,
-                                           padx,
-                                           pady,
-                                           self._logger,
-                                           command)
-        if self._renderer is not None:
-            new_button._assign_renderer(self._renderer)
-        self.get_widgets()[id]  = new_button
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_button))}')
-        return new_button
+        return self.add_custom_widget(py_cui.widgets.Button,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      command)
 
-    
+
     def add_slider(self, title: str, row: int, column: int, row_span: int=1,
                    column_span: int=1, padx: int=1, pady: int=0,
                    min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':
@@ -821,26 +801,18 @@ class PyCUI:
             A reference to the created slider object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_slider = py_cui.controls.slider.SliderWidget(id,
-                                                         title,
-                                                         self._grid,
-                                                         row,
-                                                         column,
-                                                         row_span,
-                                                         column_span,
-                                                         padx,
-                                                         pady,
-                                                         self._logger,
-                                                         min_val,
-                                                         max_val,
-                                                         step,
-                                                         init_val)
-        if self._renderer is not None:
-            new_slider._assign_renderer(self._renderer)
-        self.get_widgets()[id] = new_slider
-        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(type(new_slider))}')
-        return new_slider
+        return self.add_custom_widget(py_cui.controls.slider.SliderWidget,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      min_val,
+                                      max_val,
+                                      step,
+                                      init_val)
 
 
     def forget_widget(self, widget : 'py_cui.widgets.Widget') -> None:
@@ -850,7 +822,7 @@ class PyCUI:
         ----------
         widget : py_cui.widgets.Widget
             Widget to remove from the UI
-        
+
         Raises
         ------
         TypeError
@@ -865,7 +837,7 @@ class PyCUI:
             raise KeyError(f'Widget with id {widget.get_id()} has already been removed from the UI!')
         else:
             self.get_widgets()[widget.get_id()] = None
-        
+
 
     def get_element_at_position(self, x: int, y: int) -> Optional['py_cui.ui.UIElement']:
         """Returns containing widget for character position
@@ -888,10 +860,10 @@ class PyCUI:
 
         elif self._popup is None:
             for widget_id in self.get_widgets().keys():
-                widget = self.get_widgets()[widget_id] 
+                widget = self.get_widgets()[widget_id]
                 if widget is not None:
                     if widget._contains_position(x, y):
-                        return widget 
+                        return widget
         return None
 
 
@@ -977,7 +949,7 @@ class PyCUI:
         for row in range(row_range_start, row_range_stop):
             for col in range(col_start, col_start + col_span):
                 for widget_id in self.get_widgets().keys():
-                    item_value = self.get_widgets()[widget_id] 
+                    item_value = self.get_widgets()[widget_id]
                     if item_value is not None:
                         if item_value._is_row_col_inside(row, col) and widget_id not in id_list:
                             id_list.append(widget_id)
@@ -1005,7 +977,7 @@ class PyCUI:
 
         Returns
         -------
-        widget_id : int  
+        widget_id : int
             The widget neighbor ID if found, None otherwise
         """
 
@@ -1048,7 +1020,7 @@ class PyCUI:
 
         Parameters
         ----------
-        widget_id : int 
+        widget_id : int
             the id of the widget to select
         """
 
@@ -1114,49 +1086,49 @@ class PyCUI:
             Default false. If true, cycle widgets in reverse order.
         """
 
-        num_widgets = len(self.get_widgets().keys())
+        num_widgets: int = len(self.get_widgets())
         current_widget_num: Optional[int] = self._selected_widget
 
-        if current_widget_num is not None:
-            if not reverse:
-                next_widget_num = current_widget_num + 1
-                if self.get_widgets()[next_widget_num] is None:
-                    if next_widget_num == num_widgets:
-                        next_widget_num = 0
-                    next_widget_num = next_widget_num + 1
-                cycle_key = self._forward_cycle_key
-            else:
-                next_widget_num = current_widget_num - 1
-                if self.get_widgets()[next_widget_num] is None:
-                    if next_widget_num < 0:
-                        next_widget_num = num_widgets - 1
-                    next_widget_num = next_widget_num + 1
-                cycle_key = self._reverse_cycle_key
+        if current_widget_num is None:
+            return
 
-            current_widget_id: int = current_widget_num
-            next_widget_id: int = next_widget_num
-        current_widget = self.get_widgets()[current_widget_id] 
-        next_widget = self.get_widgets()[next_widget_id] 
-        if current_widget and next_widget is not None: #pls check again
+        if reverse:
+            next_widget_num = current_widget_num - 1
+            if next_widget_num < 0:
+                next_widget_num = num_widgets - 1
+            cycle_key = self._reverse_cycle_key
+        else:
+            next_widget_num = current_widget_num + 1
+            if next_widget_num >= num_widgets:
+                next_widget_num = 0
+            cycle_key = self._forward_cycle_key
+
+        current_widget = self.get_widgets().get(current_widget_num)
+        next_widget = self.get_widgets().get(next_widget_num)
+
+        if current_widget is not None and next_widget is not None:
             if self._in_focused_mode and cycle_key in current_widget._key_commands.keys():
                 # In the event that we are focusing on a widget with that key defined, we do not cycle.
-                pass
-            else:
-                self.move_focus(next_widget, auto_press_buttons=False)
+                return
+            self.move_focus(next_widget, auto_press_buttons=False)
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]) -> None:
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
         ----------
         key : py_cui.keys.KEY_*
-            The key bound to the command
+            ascii keycode used to map the key
         command : Function
             A no-arg or lambda function to fire on keypress
         """
 
-        self._keybindings[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
     # Popup functions. Used to display messages, warnings, and errors to the user.
 
@@ -1332,14 +1304,14 @@ class PyCUI:
             If not none, fired after loading is completed. Must be a no-arg function
         """
 
-        self._popup = py_cui.dialogs.form.FormPopup(self, 
-                                                    fields, 
-                                                    passwd_fields, 
-                                                    required, 
-                                                    {}, 
-                                                    title, 
-                                                    py_cui.WHITE_ON_BLACK, 
-                                                    self._renderer, 
+        self._popup = py_cui.dialogs.form.FormPopup(self,
+                                                    fields,
+                                                    passwd_fields,
+                                                    required,
+                                                    {},
+                                                    title,
+                                                    py_cui.WHITE_ON_BLACK,
+                                                    self._renderer,
                                                     self._logger)
 
         if callback is not None:
@@ -1368,14 +1340,14 @@ class PyCUI:
             Only show files with extensions in this list if not empty. Default, []
         """
 
-        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self, 
-                                                                callback, 
-                                                                initial_dir, 
-                                                                popup_type, 
-                                                                ascii_icons, 
-                                                                limit_extensions, 
-                                                                py_cui.WHITE_ON_BLACK, 
-                                                                self._renderer, 
+        self._popup = py_cui.dialogs.filedialog.FileDialogPopup(self,
+                                                                callback,
+                                                                initial_dir,
+                                                                popup_type,
+                                                                ascii_icons,
+                                                                limit_extensions,
+                                                                py_cui.WHITE_ON_BLACK,
+                                                                self._renderer,
                                                                 self._logger)
 
         self._logger.debug(f'Opened {str(type(self._popup))} popup with type {popup_type}')
@@ -1412,7 +1384,7 @@ class PyCUI:
 
     def _refresh_height_width(self) -> None:
         """Function that updates the height and width of the CUI based on terminal window size."""
-        
+
         if self._simulated_terminal is None:
             if self._stdscr is None:
                 term_size = shutil.get_terminal_size()
@@ -1426,7 +1398,7 @@ class PyCUI:
             width   = self._simulated_terminal[1]
 
         height  = height - self.title_bar.get_height() - self.status_bar.get_height() - 2
-        
+
         self._logger.debug(f'Resizing CUI to new dimensions {height} by {width}')
 
         self._height = height
@@ -1460,7 +1432,7 @@ class PyCUI:
 
         for widget_id in self.get_widgets().keys():
             if widget_id != self._selected_widget:
-                widget = self.get_widgets()[widget_id] 
+                widget = self.get_widgets()[widget_id]
                 if widget is not None:
                     widget._draw()
 
@@ -1587,7 +1559,7 @@ class PyCUI:
             self._popup._handle_key_press(key_pressed)
 
 
-    def _draw(self, stdscr) -> None: 
+    def _draw(self, stdscr) -> None:
         """Main CUI draw loop called by start()
 
         Parameters
@@ -1609,7 +1581,7 @@ class PyCUI:
         # Initialization functions. Generates colors and renderer
         self._initialize_colors()
         self._initialize_widget_renderer()
-        
+
         # If user specified a refresh timeout, apply it here
         if self._refresh_timeout > 0:
             self._stdscr.timeout(self._refresh_timeout)
@@ -1647,7 +1619,7 @@ class PyCUI:
                 # Here we handle mouse click events globally, or pass them to the UI element to handle
                 elif key_pressed == curses.KEY_MOUSE:
                     self._logger.info('Detected mouse click')
-                    
+
                     valid_mouse_event = True
                     try:
                         id, x, y, _, mouse_event = curses.getmouse()

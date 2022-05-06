@@ -925,6 +925,18 @@ class MenuImplementation(UIImplementation):
         return None
 
 
+    def is_empty(self) -> bool:
+        """Function that returns true if menu has no items within it, false otherwise
+
+        Returns
+        -------
+        bool
+            True if menu has no items, False otherwise. Identical to len(self._view_items) == 0
+        """
+
+        return len(self._view_items) == 0
+
+
     def set_selected_item(self, selected_item: Any):
         """Function that replaces the currently selected item with a new item
 
