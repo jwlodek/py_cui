@@ -1201,6 +1201,8 @@ class TextBlockImplementation(UIImplementation):
 
         self._cursor_x = self._cursor_max_left
         self._cursor_y = self._cursor_max_up
+        self._viewport_y_start = 0
+        self._viewport_x_start = 0
         self._cursor_text_pos_x = 0
         self._cursor_text_pos_y = 0
         self._text_lines = []
