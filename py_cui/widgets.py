@@ -541,6 +541,20 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             self._process_selection_change_event()
 
 
+    def add_item(self, item):
+        """Override of add_item function, allows for sticking to bottom
+
+        Parameters
+        ----------
+        item : Object
+            Object to add to the menu. Must have implemented __str__ function
+        """
+
+        super().add_item(item)
+        if self._stick_to_bottom and self._top_view < (len(self._view_items) - self.get_viewport_height() - 1):
+            self._top_view = len(self._view_items) - self.get_viewport_height() - 1
+
+
     def _draw(self) -> None:
         """Overrides base class draw function
         """
@@ -549,6 +563,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
         self._renderer.set_color_mode(self._color)
         self._renderer.draw_border(self)
         counter = self._pady + 1
+
         line_counter = 0
         for item in self._view_items:
             line = str(item)

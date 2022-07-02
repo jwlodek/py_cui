@@ -683,6 +683,14 @@ class MenuImplementation(UIImplementation):
         self._page_scroll_len  = 5
         self._view_items       = []
         self._on_selection_change: Optional[Callable[[Any],Any]] = None
+        self._stick_to_bottom = False
+
+    
+    def toggle_stick_to_bottom(self):
+        """Toggle option for keeping the viewport at the bottom of the items
+        """
+
+        self._stick_to_bottom = not self._stick_to_bottom
 
 
     def clear(self) -> None:
@@ -852,6 +860,9 @@ class MenuImplementation(UIImplementation):
 
         self._logger.debug(f'Adding item {str(item)} to menu')
         self._view_items.append(item)
+
+        if self._stick_to_bottom:
+            self.set_selected_item_index(len(self._view_items) - 1)
 
 
     def add_item_list(self, item_list: List[Any]) -> None:
