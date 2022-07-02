@@ -170,6 +170,13 @@ class Widget(py_cui.ui.UIElement):
         self._text_color_rules.append(new_color_rule)
 
 
+    def clear_color_rules(self):
+        """Removes all configured color rules for the widget
+        """
+
+        self._text_color_rules.clear()
+
+
     def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Gets the absolute position of the widget in characters. Override of base class function
 
