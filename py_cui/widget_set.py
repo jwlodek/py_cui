@@ -411,7 +411,7 @@ class WidgetSet:
             A reference to the created button object.
         """
 
-        self.add_custom_widget(py_cui.widgets.Button,
+        return self.add_custom_widget(py_cui.widgets.Button,
                                title,
                                row,
                                column,
