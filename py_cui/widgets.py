@@ -495,7 +495,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
             current = self.get_selected_item_index()
             viewport_top = self._start_y + self._pady + 1
 
-            if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
+            if viewport_top <= y and viewport_top + (len(self._view_items) - 1) - self._top_view >= y:
                 elem_clicked = y - viewport_top + self._top_view
                 self.set_selected_item_index(elem_clicked)
 
