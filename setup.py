@@ -5,8 +5,12 @@ from sys import platform
 with open('README.md', 'r') as readme_fp:
     long_description = readme_fp.read()
 
-with open('requirements.txt', 'r') as req_fp:
-    required_libs = req_fp.readlines()
+# Use local requirements file with priority, otherwise just use windows-curses
+try:
+    with open('requirements.txt', 'r') as req_fp:
+        required_libs = req_fp.readlines()
+except FileNotFoundError:
+    required_libs = ['windows-curses ; platform_system=="Windows"']
 
 
 # py_cui setup
@@ -15,7 +19,7 @@ setuptools.setup(
     description='A widget and grid based framework for building command line user interfaces in python.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.1.5',
+    version='0.1.6',
     author='Jakub Wlodek',
     author_email='jwlodek.dev@gmail.com',
     license='BSD (3-clause)',
