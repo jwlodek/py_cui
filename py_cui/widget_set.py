@@ -9,10 +9,10 @@ It can be used to swap between collections of widgets (screens) in a py_cui
 # TODO: Should create an initial widget set in PyCUI class that widgets are added to by default.
 
 import shutil
-from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
-import py_cui.widgets as widgets
-import py_cui.grid as grid
-import py_cui.controls as controls
+from typing import Any, Union, Callable, Dict, List, Optional, TYPE_CHECKING
+import py_cui.widgets
+import py_cui.grid
+import py_cui.controls
 
 if TYPE_CHECKING:
     import py_cui
@@ -60,7 +60,7 @@ class WidgetSet:
         status_bars_height = self._root.title_bar.get_height() + self._root.status_bar.get_height()
         self._height = self._height - status_bars_height - 2
 
-        self._grid = grid.Grid(num_rows, num_cols, self._height, self._width, logger)
+        self._grid = py_cui.grid.Grid(num_rows, num_cols, self._height, self._width, logger)
 
         self._selected_widget: Optional[int] = None
         self._logger = logger
@@ -91,21 +91,70 @@ class WidgetSet:
         return self._widgets
 
 
-    def add_key_command(self, key: int, command: Callable[[],Any]):
+    def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Function that adds a keybinding to the CUI when in overview mode
 
         Parameters
         ----------
         key : py_cui.keys.KEY_*
-            The key bound to the command
+            ascii keycode used to map the key
         command : Function
             A no-arg or lambda function to fire on keypress
         """
 
-        self._keybindings[key] = command
+        if isinstance(key, list):
+            for value in key:
+                self._keybindings[value] = command
+        else:
+            self._keybindings[key] = command
 
 
-    def add_scroll_menu(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.ScrollMenu':
+
+    def add_custom_widget(self, widget_class: type, title: str, row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, *args, **kwargs) -> 'py_cui.widgets.Widget':
+        """Function that allows for adding custom widget types to the CUI - specifically ones not included with py_cui by default
+
+        Parameters
+        ----------
+        widget_class : type
+            The class type of your custom widget. Note that it must be a subclass of the widget superclass
+        title : str
+            The title of the scroll menu
+        row : int
+            The row value, from the top down
+        column : int
+            The column value from the top down
+        row_span=1 : int
+            The number of rows to span accross
+        column_span=1 : int
+            the number of columns to span accross
+        padx=1 : int
+            number of padding characters in the x direction
+        pady=0 : int
+            number of padding characters in the y direction
+
+        Raises
+        ------
+        TypeError
+            If provided widget class is not a subclass of widget, a typeerror is raised.
+        """
+
+        if not issubclass(widget_class, py_cui.widgets.Widget):
+            raise TypeError(f'Widget class {widget_class} is not a subclass of the base Widget class!')
+
+        id = len(self.get_widgets().keys())
+        new_widget = widget_class(id, title, self._grid, row, column, row_span, column_span, padx, pady, self._logger, *args, **kwargs)
+
+        self.get_widgets()[id] = new_widget
+
+        if self._selected_widget is None:
+            self.set_selected_widget(id)
+
+        self._logger.info(f'Adding widget {title} w/ ID {id} of type {str(widget_class)}')
+        return new_widget
+
+
+
+    def add_scroll_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0) -> 'py_cui.widgets.ScrollMenu':
         """Function that adds a new scroll menu to the CUI grid
 
         Parameters
@@ -131,22 +180,14 @@ class WidgetSet:
             A reference to the created scroll menu object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_scroll_menu     = widgets.ScrollMenu(id,
-                                                 title,
-                                                 self._grid,
-                                                 row,
-                                                 column,
-                                                 row_span,
-                                                 column_span,
-                                                 padx,
-                                                 pady,
-                                                 self._logger)
-        self._widgets[id]  = new_scroll_menu
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}')
-        return new_scroll_menu
+        return self.add_custom_widget(py_cui.widgets.ScrollMenu,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady)
 
 
     def add_checkbox_menu(self, title: str, row: int, column: int, row_span: int=1, column_span: int=1, padx: int=1, pady: int=0, checked_char: str='X') -> 'py_cui.widgets.CheckBoxMenu':
@@ -177,23 +218,15 @@ class WidgetSet:
             A reference to the created checkbox object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_checkbox_menu   = widgets.CheckBoxMenu(id,
-                                                   title,
-                                                   self._grid,
-                                                   row,
-                                                   column,
-                                                   row_span,
-                                                   column_span,
-                                                   padx,
-                                                   pady,
-                                                   self._logger,
-                                                   checked_char)
-        self._widgets[id]  = new_checkbox_menu
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_checkbox_menu))}')
-        return new_checkbox_menu
+        return self.add_custom_widget(py_cui.widgets.CheckBoxMenu,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      checked_char)
 
 
     def add_text_box(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '', password: bool = False) -> 'py_cui.widgets.TextBox':
@@ -226,22 +259,14 @@ class WidgetSet:
             A reference to the created textbox object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_text_box        = widgets.TextBox(id,
-                                              title,
-                                              self._grid,
-                                              row, column,
-                                              row_span,
-                                              column_span,
-                                              padx, pady,
-                                              self._logger,
-                                              initial_text,
-                                              password)
-        self._widgets[id]    = new_text_box
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_box))}')
-        return new_text_box
+        return self.add_custom_widget(py_cui.widgets.TextBox,
+                                      title,
+                                      row, column,
+                                      row_span,
+                                      column_span,
+                                      padx, pady,
+                                      initial_text,
+                                      password)
 
 
     def add_text_block(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, initial_text: str = '') -> 'py_cui.widgets.ScrollTextBlock':
@@ -272,23 +297,15 @@ class WidgetSet:
             A reference to the created textblock object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_text_block      = widgets.ScrollTextBlock(id,
-                                                      title,
-                                                      self._grid,
-                                                      row,
-                                                      column,
-                                                      row_span,
-                                                      column_span,
-                                                      padx,
-                                                      pady,
-                                                      self._logger,
-                                                      initial_text)
-        self._widgets[id]  = new_text_block
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_text_block))}')
-        return new_text_block
+        return self.add_custom_widget(py_cui.widgets.ScrollTextBlock,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      initial_text)
 
 
     def add_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0) -> 'py_cui.widgets.Label':
@@ -317,20 +334,14 @@ class WidgetSet:
             A reference to the created label object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_label           = widgets.Label(id,
-                                            title,
-                                            self._grid,
-                                            row,
-                                            column,
-                                            row_span,
-                                            column_span,
-                                            padx,
-                                            pady,
-                                            self._logger)
-        self._widgets[id]  = new_label
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
-        return new_label
+        return self.add_custom_widget(py_cui.widgets.Label,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady)
 
 
     def add_block_label(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, center: bool=True) -> 'py_cui.widgets.BlockLabel':
@@ -361,24 +372,18 @@ class WidgetSet:
             A reference to the created block label object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_label           = widgets.BlockLabel(id,
-                                                 title,
-                                                 self._grid,
-                                                 row,
-                                                 column,
-                                                 row_span,
-                                                 column_span,
-                                                 padx,
-                                                 pady,
-                                                 center,
-                                                 self._logger)
-        self._widgets[id]  = new_label
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_label))}')
-        return new_label
+        return self.add_custom_widget(py_cui.widgets.BlockLabel,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      center)
 
 
-    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Optional[Callable[[],Any]]=None) -> 'py_cui.widgets.Button':
+    def add_button(self, title: str, row: int, column: int, row_span: int = 1, column_span: int = 1, padx: int = 1, pady: int = 0, command: Callable[[],Any]=None) -> 'py_cui.widgets.Button':
         """Function that adds a new button to the CUI grid
 
         Parameters
@@ -406,30 +411,20 @@ class WidgetSet:
             A reference to the created button object.
         """
 
-        id = len(self.get_widgets().keys())
-        new_button          = widgets.Button(id,
-                                             title,
-                                             self._grid,
-                                             row,
-                                             column,
-                                             row_span,
-                                             column_span,
-                                             padx,
-                                             pady,
-                                             self._logger,
-                                             command)
-        self._widgets[id]  = new_button
-        if self._selected_widget is None:
-            self.set_selected_widget(id)
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_button))}')
-        return new_button
+        self.add_custom_widget(py_cui.widgets.Button,
+                               title,
+                               row,
+                               column,
+                               row_span,
+                               column_span,
+                               padx,
+                               pady,
+                               command)
 
 
     def add_slider(self, title: str, row: int, column: int, row_span: int=1,
                    column_span: int=1, padx: int=1, pady: int=0,
-                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':     
-                   
-                   
+                   min_val: int=0, max_val: int=100, step: int=1, init_val: int=0) -> 'py_cui.controls.slider.SliderWidget':
         """Function that adds a new label to the CUI grid
 
         Parameters
@@ -457,28 +452,21 @@ class WidgetSet:
         init_val = 0 int
             initial value of the slider
 
-
         Returns
         -------
         new_slider : Slider
             A reference to the created slider object.
         """
 
-        id = len(self._widgets.keys())
-        new_slider = controls.slider.SliderWidget(id,
-                                                  title,
-                                                  self._grid,
-                                                  row,
-                                                  column,
-                                                  row_span,
-                                                  column_span,
-                                                  padx,
-                                                  pady,
-                                                  self._logger,
-                                                  min_val,
-                                                  max_val,
-                                                  step,
-                                                  init_val)
-        self._widgets[id] = new_slider
-        self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_slider))}')
-        return new_slider
+        return self.add_custom_widget(py_cui.controls.slider.SliderWidget,
+                                      title,
+                                      row,
+                                      column,
+                                      row_span,
+                                      column_span,
+                                      padx,
+                                      pady,
+                                      min_val,
+                                      max_val,
+                                      step,
+                                      init_val)

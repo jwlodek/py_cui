@@ -146,7 +146,10 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         super().draw()
 ```
+
 The `_handle_key_press` and `_draw` functions must be extended for your new widget. You may leave the `_handle_key_press` as above, if you don't require any keybindings for the widget. The `_draw` function must extended, as the base class does no drawing itself, instead just setting up color rules.
+
+In addition, any widget class you develop must have the arguments `(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)` in it's initializer, in that order, so that the `add_custom_widget` function will  work. Additional arguments or keyword arguments can follow these.
 
 **Step 3 - Add Key Bindings**
 
@@ -199,43 +202,20 @@ def _draw(self):
 
 Note that you should call `super()._draw()` and `self._renderer.set_color_mode(self._color)` at the start of the function (to initialize color modes), and `self._renderer.unset_color_mode(self._color)` and `self._renderer.reset_cursor(self)` to remove color settings, and place the cursor in the correct location.
 
-**Step 5 - Add a function to `PyCUI` class to add the widget**
+**Step 5 - Use the add_custom_widget function to add your widget to your TUI**
 
-Finally, add a function to the `PyCUI` class in `__init__.py` that will add the widget to the CUI. In our case we write the following:
+Finally, you are ready to add an instance of your widget to the TUI. To do this, use the `add_custom_widget` function. See the below example adding our above widget. Optionally, you may want to add a conveniance function specifically meant to add instances of your widget to the TUI. In our example it would be `add_scroll_menu`, which can be found in `py_cui/__init__.py`.
+
 ```Python
-def add_scroll_menu(self, title, row, column, row_span = 1, column_span = 1, padx = 1, pady = 0):
-
-    id = f'Widget{len(self.get_widgets().keys())}'
-    new_scroll_menu = widgets.ScrollMenu(   id, 
-                                            title, 
-                                            self._grid, 
-                                            row, 
-                                            column, 
-                                            row_span, 
-                                            column_span, 
-                                            padx, 
-                                            pady, 
-                                            self._logger)
-    self.get_widgets()[id] = new_scroll_menu
-    if self._selected_widget is None:
-        self.set_selected_widget(id)
-    self._logger.debug(f'Adding widget {title} w/ ID {id} of type {str(type(new_scroll_menu))}'
-    return new_scroll_menu
+# add_custom_widget(Widget class, title, row, column, rowspan, colspan, padx, pady)
+my_widget = root.add_custom_widget(py_cui.widgets.ScrollMenu, "My Title", 1, 1, 1, 1, 1, 1)
 ```
-The function must:
 
-* Create an id titled 'Widget####' where #### is replaced with the number of widget
-* Add the widget to the PyCUI widgets dict with the ID as a key
-* If there is no selected widget, make this new widget the selected one
-* Return a reference to the widget
+Note the `add_custom_widget` function signature expects your class that extends `Widget` as the first argument, followed by critical widget information. You can also add additional `*args` and `**kwargs` to the funtion call. The function will return an instance of the initial class with all the remaining arguments passed in in order.
 
 **That's it!**
 
-Your widget is now ready to be added to the CUI! Simply call the add function with appropriate parameters on the root `PyCUI` window:
-
-```Python
-root.add_scroll_menu('Demo', 1, 1)
-```
+Your widget should now be added to the CUI!
 
 ### Adding a new Popup
 

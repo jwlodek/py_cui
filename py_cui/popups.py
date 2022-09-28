@@ -49,7 +49,7 @@ class Popup(py_cui.ui.UIElement):
         self._selected_color        = color
         self.update_height_width()
 
-    
+
     def _increment_counter(self):
         """Function that increments an internal counter
         """
@@ -71,7 +71,7 @@ class Popup(py_cui.ui.UIElement):
 
     def get_absolute_start_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
-        
+
         Returns
         -------
         start_x, start_y : int
@@ -84,7 +84,7 @@ class Popup(py_cui.ui.UIElement):
 
     def get_absolute_stop_pos(self) -> Tuple[int,int]:
         """Override of base class, computes position based on root dimensions
-        
+
         Returns
         -------
         stop_x, stop_y : int
@@ -138,11 +138,10 @@ class MessagePopup(Popup):
         """
 
         super().__init__(root, title, text, color, renderer, logger)
-        self._close_keys = [ py_cui.keys.KEY_ENTER, 
-                            py_cui.keys.KEY_ESCAPE, 
-                            py_cui.keys.KEY_SPACE, 
-                            py_cui.keys.KEY_BACKSPACE, 
-                            py_cui.keys.KEY_DELETE]
+        self._close_keys = [ py_cui.keys.KEY_ENTER,
+                            py_cui.keys.KEY_ESCAPE,
+                            py_cui.keys.KEY_SPACE,
+                            py_cui.keys.KEY_DELETE] + py_cui.keys.KEY_BACKSPACE
 
 
     def _draw(self) -> None:
@@ -211,12 +210,12 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         The command to run when enter is pressed
     """
 
-    def __init__(self, root, title, color, command, renderer, password, logger):
+    def __init__(self, root, title, initial_text, color, command, renderer, password, logger):
         """Initializer for textbox popup. Uses TextBoxImplementation as base
         """
 
-        Popup.__init__(self, root, title, '', color, renderer, logger)
-        py_cui.ui.TextBoxImplementation.__init__(self, '', password, logger)
+        Popup.__init__(self, root, title, initial_text, color, renderer, logger)
+        py_cui.ui.TextBoxImplementation.__init__(self, initial_text, password, logger)
         self._command           = command
         self.update_height_width()
 
@@ -231,6 +230,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
         height, width           = self.get_absolute_dimensions()
         self._cursor_text_pos   = 0
         self._cursor_x          = start_x + 2 + padx
+        self._initial_cursor = self._cursor_x 
         self._cursor_max_left   = self._cursor_x
         self._cursor_max_right  = start_x + width - 1 - pady
         self._cursor_y          = start_y + int(height / 2) + 1
@@ -284,7 +284,7 @@ class TextBoxPopup(Popup, py_cui.ui.TextBoxImplementation):
             self._move_left()
         elif key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self._move_right()
-        elif key_pressed == py_cui.keys.KEY_BACKSPACE:
+        elif key_pressed in py_cui.keys.KEY_BACKSPACE:
             self._erase_char()
         elif key_pressed == py_cui.keys.KEY_DELETE:
             self._delete_char()
@@ -481,7 +481,7 @@ class LoadingIconPopup(Popup):
         self._icon_counter = self._icon_counter + 1
         if self._icon_counter == len(self._loading_icons):
             self._icon_counter = 0
-        
+
         # Use Superclass draw after new text is computed
         super()._draw()
 
@@ -554,6 +554,6 @@ class LoadingBarPopup(Popup):
 
         self.set_text(f'{"#" * completed_blocks}{"-" * non_completed_blocks} \
                        ({self._completed_items}/{self._num_items}) {self._loading_icons[self._icon_counter]}')
-        
+
         # Use Superclass draw after new text is computed
         super()._draw()

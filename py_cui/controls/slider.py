@@ -2,6 +2,7 @@ import py_cui.ui
 import py_cui.widgets
 import py_cui.popups
 import py_cui.errors
+import py_cui.keys
 
 
 class SliderImplementation(py_cui.ui.UIImplementation):
@@ -272,6 +273,43 @@ class SliderWidget(py_cui.widgets.Widget, SliderImplementation):
             self.update_slider_value(-1)
         if key_pressed == py_cui.keys.KEY_RIGHT_ARROW:
             self.update_slider_value(1)
+
+
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int):
+        """Override of base class handle mouse press function
+
+        Parameters
+        ----------
+        x : int
+            x-position of the mouse event in the terminal
+        y : int
+            y position of the mouse event in the terminal
+        mouse_event : int
+            Mouse event type code
+        """
+
+        super()._handle_mouse_press(x, y, mouse_event)
+        if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK or mouse_event == py_cui.keys.LEFT_MOUSE_RELEASED:
+            x_start, _ = self.get_absolute_start_pos()
+            x_stop, _  = self.get_absolute_stop_pos()
+
+            # Get first x postion where the progress bar exists
+            x_start = x_start + 2 + self._padx
+
+            # Get last x postion where the progress bar exists
+            x_stop = x_stop - 2 - self._padx
+
+            if x < x_start or x > x_stop:
+                pass
+            else:
+                num_characters_to_press = x - x_start
+                prop_of_slider = num_characters_to_press / (x_stop - x_start)
+                slider_val_width = self._max_val - self._min_val
+                self._cur_val = int(prop_of_slider * slider_val_width) + self._min_val
+
+                # Round up. Avoids awkward situation where mousepress is to the right of the slider pos
+                if not (prop_of_slider * slider_val_width).is_integer():
+                    self._cur_val += 1
 
 
 class SliderPopup(py_cui.popups.Popup, SliderImplementation):
