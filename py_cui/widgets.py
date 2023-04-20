@@ -84,6 +84,12 @@ class Widget(py_cui.ui.UIElement):
         self._border_color = self._default_color
         self.update_height_width()
 
+        self._move_focus_map = {}
+        for mouse_event in py_cui.keys.MOUSE_EVENTS:
+            self._move_focus_map[mouse_event] = False
+
+        self._context_menu = None
+
 
     def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Maps a keycode to a function that will be executed when in focus mode
@@ -103,7 +109,7 @@ class Widget(py_cui.ui.UIElement):
             self._key_commands[key] = command
 
 
-    def add_mouse_command(self, mouse_event: int, command: Callable[[],Any]) -> None:
+    def add_mouse_command(self, mouse_event: int, command: Callable[[],Any], move_focus = False) -> None:
         """Maps a keycode to a function that will be executed when in focus mode
 
         Parameters
@@ -126,6 +132,9 @@ class Widget(py_cui.ui.UIElement):
             self._logger.warn(f'Overriding mouse command for event {mouse_event}')
 
         self._mouse_commands[mouse_event] = command
+
+        # Specify whether we want to shift focus to the clicked-on widget based on the event type
+        self._move_focus_map[mouse_event] = move_focus
 
 
     def update_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> Any:
@@ -336,6 +345,8 @@ class Widget(py_cui.ui.UIElement):
             else:
                 command()
 
+        return self._move_focus_map[mouse_event]
+
 
     def _handle_key_press(self, key_pressed: int) -> None:
         """Base class function that handles all assigned key presses.
@@ -504,7 +515,7 @@ class ScrollMenu(Widget, py_cui.ui.MenuImplementation):
 
         # For scroll menu, handle custom mouse press after initial event, since we will likely want to
         # have access to the newly selected item
-        Widget._handle_mouse_press(self, x, y, mouse_event)
+        return Widget._handle_mouse_press(self, x, y, mouse_event)
 
 
 
@@ -611,12 +622,13 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
             Coordinates of mouse press
         """
 
-        Widget._handle_mouse_press(self, x, y, mouse_event)
+        move_focus = Widget._handle_mouse_press(self, x, y, mouse_event)
         viewport_top = self._start_y + self._pady + 1
         if viewport_top <= y and viewport_top + len(self._view_items) - self._top_view >= y:
             elem_clicked = y - viewport_top + self._top_view
             self.set_selected_item_index(elem_clicked)
             self.mark_item_as_checked(self._view_items[elem_clicked])
+        return move_focus
 
 
     def _handle_key_press(self, key_pressed: int) -> None:
@@ -677,6 +689,217 @@ class CheckBoxMenu(Widget, py_cui.ui.CheckBoxMenuImplementation):
         self._renderer.unset_color_mode(self._color)
         self._renderer.reset_cursor(self)
 
+
+class RadioMenu(CheckBoxMenu):
+
+    def __init__(self, *args):
+        super.__init__(args)
+
+    def toggle_item_checked(self, item: Any):
+
+        if not self._selected_item_dict[item]:
+            for curr in self._selected_item_dict.keys():
+                if self._selected_item_dict[curr]:
+                    self._selected_item_dict[curr] = False
+
+            self._selected_item_dict[item] = not self._selected_item_dict[item]
+
+    def mark_item_as_checked(self, item: Any) -> None:
+        self.toggle_item_checked(item)
+
+
+    def mark_item_as_not_checked(self, item) -> None:
+        self.toggle_item_checked(item)
+
+
+class DropdownMenu(Widget, py_cui.ui.DropdownMenuImplementation):
+
+
+    def __init__(self, id, title: str, grid: 'py_cui.grid.Grid', row: int, column: int, row_span: int, column_span: int, padx: int, pady: int, logger, max_height: int):
+        """Initializer for CheckBoxMenu Widget
+        """
+
+        Widget.__init__(self, id, title, grid, row, column, row_span, column_span, padx, pady, logger)
+        py_cui.ui.DropdownMenuImplementation.__init__(self, logger, max_height)
+        self.set_help_text('Focus mode on Dropdown. Use up/down to scroll. Use Enter to open, Backspace to close, arrows to navigate.')
+
+        self._selected_from_dropdown = None
+
+        # Shift focus to dropdown in event of click or double click.
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_CLICK] = True
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_DBL_CLICK] = True
+
+
+    def update_height_width(self) -> None:
+        Widget.update_height_width(self)
+        padx, _             = self.get_padding()
+        _, start_y    = self.get_start_position()
+        height, width       = self.get_absolute_dimensions()
+        self._dropdown_center = start_y + int(height / 2) + 1
+        self._horiz_viewport_width     = width - 2 * padx - 3
+
+
+    def set_selected_dropdown_option(self, item):
+        self._title = str(item)
+        self._selected_from_dropdown = item
+
+
+    def get_selected_dropdown_option(self):
+        return self._selected_from_dropdown
+
+
+    def _get_actual_max_height(self):
+
+        window_height, _ = self._grid.get_dimensions_absolute()
+        dropdown_top = self._dropdown_center - 1
+        dropdown_bottom = self._dropdown_center + 1
+
+        # Room up is the space between the top of the dropdown itself to the top of 
+        room_up = dropdown_top - 1 - 1
+        room_down = window_height - dropdown_bottom - 1
+
+        if room_down >= self.max_height:
+            return self.max_height, True
+        elif room_up >= self.max_height:
+            return self.max_height, False
+        elif room_up > room_down:
+            return room_up, False
+        else:
+            return room_down, True
+
+
+    def _get_render_text(self):
+        num_spaces = len(self._title) + 1 - self._horiz_viewport_width
+        open_closed = '^'
+        if not self.opened:
+            open_closed = 'v'
+        if num_spaces > 0:
+            return self._title + ' ' * num_spaces + open_closed
+        else:
+            return py_cui.fit_text(self._horiz_viewport_width - 1, self._title) + open_closed
+
+
+    def _handle_mouse_press(self, x: int, y: int, mouse_event: int) -> None:
+        """Override of base class function, handles mouse press in menu
+
+        Parameters
+        ----------
+        x, y : int
+            Coordinates of mouse press
+        """
+
+        move_focus = Widget._handle_mouse_press(self, x, y, mouse_event)
+        if abs(y - self._dropdown_center) <= 1 and mouse_event in [py_cui.keys.LEFT_MOUSE_DBL_CLICK, py_cui.keys.LEFT_MOUSE_CLICK]:
+            self.opened = not self.opened
+            if self.opened:
+                viewport_height, _ = self._get_actual_max_height()
+                viewport_height = viewport_height - 1
+                if self._selected_from_dropdown is None:
+                    self._top_view = 0
+                else:
+                    for i, view_item in enumerate(self._view_items):
+                        if view_item == self._selected_from_dropdown:
+                            if len(self._view_items) - i > viewport_height:
+                                self._top_view = i
+                            else:
+                                self._top_view = len(self._view_items) - viewport_height - 1
+        return move_focus
+
+
+    def _handle_key_press(self, key_pressed: int) -> None:
+        """Override of key presses.
+
+        First, run the superclass function, scrolling should still work.
+        Adds Enter command to toggle selection
+
+        Parameters
+        ----------
+        key_pressed : int
+            key code of pressed key
+        """
+
+        Widget._handle_key_press(self, key_pressed)
+
+        viewport_height, _ = self._get_actual_max_height()
+        viewport_height = viewport_height - 1
+        
+        if self.opened:
+            if key_pressed == py_cui.keys.KEY_UP_ARROW:
+                self._scroll_up()
+            if key_pressed == py_cui.keys.KEY_DOWN_ARROW:
+                self._scroll_down(viewport_height)
+            if key_pressed == py_cui.keys.KEY_HOME:
+                self._jump_to_top()
+            if key_pressed == py_cui.keys.KEY_END:
+                self._jump_to_bottom(viewport_height)
+            if key_pressed == py_cui.keys.KEY_PAGE_UP:
+                self._jump_up()
+            if key_pressed == py_cui.keys.KEY_PAGE_DOWN:
+                self._jump_down(viewport_height)
+            if key_pressed in py_cui.keys.KEY_BACKSPACE:
+                self.opened = False
+            if key_pressed == py_cui.keys.KEY_ENTER:
+                self.set_selected_dropdown_option(self._view_items[self._selected_item])
+                self.opened = False
+        else:
+            if key_pressed == py_cui.keys.KEY_ENTER:
+                if self._selected_from_dropdown is None:
+                    self._top_view = 0
+                else:
+                    for i, view_item in enumerate(self._view_items):
+                        if view_item == self._selected_from_dropdown:
+                            if len(self._view_items) - i > viewport_height:
+                                self._top_view = i
+                            else:
+                                self._top_view = len(self._view_items) - viewport_height - 1
+                self.opened = True
+
+
+    def _draw(self) -> None:
+        """Overrides base class draw function
+        """
+
+        Widget._draw(self)
+        self._renderer.set_color_mode(self._color)
+        self._renderer.draw_border(self, fill=False, with_title=False)
+        
+        self._renderer.draw_text(self, self._get_render_text(), self._dropdown_center, selected=self._selected)
+
+        if self.opened:
+            actual_height, dropdown_dir_down = self._get_actual_max_height()
+
+            if self.is_selected():
+                self._renderer._set_bold()
+
+            if dropdown_dir_down:
+                self._renderer._draw_border_bottom(self, self._dropdown_center + 2 + actual_height)
+                start_y = self._dropdown_center + 2
+            else:
+                self._renderer._draw_border_top(self, self._dropdown_center - 2 - actual_height, False)
+                start_y = self._dropdown_center - actual_height - 1
+            
+            if self.is_selected():
+                self._renderer._unset_bold()
+            
+            line_counter = 0
+            counter = 0
+            
+            for item in self._view_items:
+                line = str(item)
+                if line_counter < self._top_view:
+                    line_counter = line_counter + 1
+                else:
+                    if counter >= actual_height:
+                        break
+                    if line_counter == self._selected_item:
+                        self._renderer.draw_text(self, line, start_y + counter, selected=True)
+                    else:
+                        self._renderer.draw_text(self, line, start_y + counter)
+                    counter = counter + 1
+                    line_counter = line_counter + 1
+
+        self._renderer.unset_color_mode(self._color)
+        self._renderer.reset_cursor(self, fill=False)
 
 
 class Button(Widget):
@@ -747,6 +970,10 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
         self.update_height_width()
         self.set_help_text('Focus mode on TextBox. Press Esc to exit focus mode.')
 
+        # Shift focus to textbox in event of click or double click.
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_CLICK] = True
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_DBL_CLICK] = True
+
 
     def update_height_width(self) -> None:
         """Need to update all cursor positions on resize
@@ -774,7 +1001,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             Coordinates of mouse press
         """
 
-        Widget._handle_mouse_press(self, x, y, mouse_event)
+        move_focus = Widget._handle_mouse_press(self, x, y, mouse_event)
         if y == self._cursor_y and x >= self._cursor_max_left and x <= self._cursor_max_right:
             if x <= len(self._text) + self._cursor_max_left:
                 old_text_pos = self._cursor_text_pos
@@ -784,6 +1011,7 @@ class TextBox(Widget, py_cui.ui.TextBoxImplementation):
             else:
                 self._cursor_x = self._cursor_max_left + len(self._text)
                 self._cursor_text_pos = len(self._text)
+        return move_focus
 
 
     def _handle_key_press(self, key_pressed: int) -> None:
@@ -854,6 +1082,10 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
         self.update_height_width()
         self.set_help_text('Focus mode on TextBlock. Press Esc to exit focus mode.')
 
+        # Shift focus to text block in event of click or double click.
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_CLICK] = True
+        self._move_focus_map[py_cui.keys.LEFT_MOUSE_DBL_CLICK] = True
+
 
     def update_height_width(self) -> None:
         """Function that updates the position of the text and cursor on resize
@@ -883,7 +1115,7 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
             Coordinates of mouse press
         """
 
-        Widget._handle_mouse_press(self, x, y, mouse_event)
+        move_focus = Widget._handle_mouse_press(self, x, y, mouse_event)
 
         if mouse_event == py_cui.keys.LEFT_MOUSE_CLICK:
             if y >= self._cursor_max_up and y <= self._cursor_max_down:
@@ -906,6 +1138,8 @@ class ScrollTextBlock(Widget, py_cui.ui.TextBlockImplementation):
                     else:
                         self._cursor_x = self._cursor_max_left + len(line)
                         self._cursor_text_pos_x = len(line)
+
+        return move_focus
 
 
     def _handle_key_press(self, key_pressed: int) -> None:

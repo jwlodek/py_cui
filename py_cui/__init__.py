@@ -1828,7 +1828,10 @@ class PyCUI:
                             self._logger.info(
                                 f"handling mouse press for elem: {in_element.get_title()}"
                             )
-                            in_element._handle_mouse_press(x, y, mouse_event)
+
+                            move_focus = in_element._handle_mouse_press(x, y, mouse_event)
+                            if move_focus:
+                                self.move_focus(in_element)
 
                         # Otherwise, if not a popup, select the clicked on widget
                         elif in_element is not None and not isinstance(

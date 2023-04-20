@@ -1086,6 +1086,15 @@ class CheckBoxMenuImplementation(MenuImplementation):
         self._selected_item_dict[item] = False
 
 
+class DropdownMenuImplementation(MenuImplementation):
+
+    def __init__(self, logger, max_height):
+
+        super().__init__(logger)
+        self.max_height = max_height
+        self.opened = False
+
+
 class TextBlockImplementation(UIImplementation):
     """Base class for TextBlockImplementation
 
