@@ -135,6 +135,17 @@ class PyCUI:
             height = self._simulated_terminal[0]
             width = self._simulated_terminal[1]
 
+        # Curses supports up to 256 color pairs. Outside of the default color pairs (56 total combos)
+        # Allow user to customize remaining 200
+        self._num_color_pairs = 56
+        self._available_color_pairs = 200
+        self._color_map = py_cui.colors._COLOR_MAP
+
+        # Data structure mapping color combos to pair code for faster lookup
+        self._reverse_color_map = {}
+        for i in range(56):
+            self._reverse_color_map[self._color_map[i+1]] = i+1
+
         # Add status and title bar
         self.title_bar = py_cui.statusbar.StatusBar(
             self._title, BLACK_ON_WHITE, root=self, is_title_bar=True
@@ -168,7 +179,7 @@ class PyCUI:
 
         # Initialize grid, renderer, and widget dict
         self._grid = py_cui.grid.Grid(
-            num_rows, num_cols, self._height, self._width, self._logger
+            self, num_rows, num_cols, self._height, self._width, self._logger
         )
         self._stdscr: Any = None
         self._refresh_timeout = -1
@@ -197,6 +208,20 @@ class PyCUI:
 
         # Callback to fire when CUI is stopped.
         self._on_stop: Optional[Callable[[], Any]] = None
+
+    def add_color_pair(self, foreground_color: int, bkgd_color: int):
+        if self._available_color_pairs == 0:
+            raise py_cui.errors.PyCUIError("Maximum number of color pairs permitted has been exceeded!")
+        else:
+            self._available_color_pairs -= 1
+            self._num_color_pairs += 1
+            self._color_map[self._num_color_pairs] = (foreground_color, bkgd_color)
+            self._reverse_color_map[(foreground_color, bkgd_color)] = self._num_color_pairs
+        return self._num_color_pairs
+
+    def get_color_code(self, foreground_color: int, bkgd_color: int) -> int:
+
+        return self._reverse_color_map[(foreground_color, bkgd_color)]
 
     def set_refresh_timeout(self, timeout: int):
         """Sets the CUI auto-refresh timeout to a number of seconds.
@@ -238,6 +263,14 @@ class PyCUI:
             self._reverse_cycle_key = reverse_cycle_key
 
     def set_toggle_live_debug_key(self, toggle_debug_key: int) -> None:
+        """Sets the keybinding for opening/closing popup debug log.
+
+        Parameters
+        ----------
+        toggle_debug_key : py_cui.keys.KEY
+            Key code for debug log open/close toggle
+        """
+
         self._toggle_live_debug_key = toggle_debug_key
 
     def enable_logging(
@@ -383,8 +416,8 @@ class PyCUI:
         # Start colors in curses.
         # For each color pair in color map, initialize color combination.
         curses.start_color()
-        for color_pair in py_cui.colors._COLOR_MAP.keys():
-            fg_color, bg_color = py_cui.colors._COLOR_MAP[color_pair]
+        for color_pair in self._color_map.keys():
+            fg_color, bg_color = self._color_map[color_pair]
             curses.init_pair(color_pair, fg_color, bg_color)
 
     def _initialize_widget_renderer(self) -> None:
@@ -1795,7 +1828,10 @@ class PyCUI:
                             self._logger.info(
                                 f"handling mouse press for elem: {in_element.get_title()}"
                             )
-                            in_element._handle_mouse_press(x, y, mouse_event)
+
+                            move_focus = in_element._handle_mouse_press(x, y, mouse_event)
+                            if move_focus:
+                                self.move_focus(in_element)
 
                         # Otherwise, if not a popup, select the clicked on widget
                         elif in_element is not None and not isinstance(

@@ -60,7 +60,7 @@ class WidgetSet:
         status_bars_height = self._root.title_bar.get_height() + self._root.status_bar.get_height()
         self._height = self._height - status_bars_height - 2
 
-        self._grid = py_cui.grid.Grid(num_rows, num_cols, self._height, self._width, logger)
+        self._grid = py_cui.grid.Grid(root, num_rows, num_cols, self._height, self._width, logger)
 
         self._selected_widget: Optional[int] = None
         self._logger = logger
