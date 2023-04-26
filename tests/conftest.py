@@ -10,6 +10,14 @@ import py_cui.grid
 def LOGGER():
     return dbg.PyCUILogger('PYCUI TEST')
 
+@pytest.fixture
+def PYCUI():
+
+    def _PYCUI(rows, cols, height, width):
+        return py_cui.PyCUI(rows, cols, simulated_terminal=[height, width])
+
+    return _PYCUI
+
 
 @pytest.fixture
 def RENDERER(request, LOGGER):
@@ -17,11 +25,11 @@ def RENDERER(request, LOGGER):
 
 
 @pytest.fixture
-def GRID(request, LOGGER):
+def GRID(request, PYCUI, LOGGER):
 
     def _GRID(rows, cols, height, width):
 
-        return py_cui.grid.Grid(rows, cols, height, width, LOGGER)
+        return py_cui.grid.Grid(PYCUI, rows, cols, height, width, LOGGER)
 
     return _GRID
 
@@ -41,15 +49,6 @@ def CUSTOMWIDGET(request, GRID, LOGGER):
         return py_cui.widgets.Widget(id, name, test_grid, row, col, rowspan, colspan, 1, 0, LOGGER)
     
     return _CUSTOMWIDGET
-
-
-@pytest.fixture
-def PYCUI():
-
-    def _PYCUI(rows, cols, height, width):
-        return py_cui.PyCUI(rows, cols, simulated_terminal=[height, width])
-
-    return _PYCUI
 
 
 @pytest.fixture

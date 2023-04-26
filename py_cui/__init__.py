@@ -179,7 +179,7 @@ class PyCUI:
 
         # Initialize grid, renderer, and widget dict
         self._grid = py_cui.grid.Grid(
-            num_rows, num_cols, self._height, self._width, self._logger
+            self, num_rows, num_cols, self._height, self._width, self._logger
         )
         self._stdscr: Any = None
         self._refresh_timeout = -1

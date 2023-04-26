@@ -91,6 +91,13 @@ class Widget(py_cui.ui.UIElement):
         self._context_menu = None
 
 
+    def _get_parent_ui(self):
+        """Function used to get reference to parent UI instance for interfacing with popups and context menus
+        """
+
+        return self._grid._parent
+
+
     def add_key_command(self, key: Union[int, List[int]], command: Callable[[],Any]) -> None:
         """Maps a keycode to a function that will be executed when in focus mode
 
