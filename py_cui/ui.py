@@ -961,6 +961,41 @@ class MenuImplementation(UIImplementation):
             self._view_items[self._selected_item] = selected_item
 
 
+    def get_item_index(self, index: int):
+        """Function that returns reference to item at given index
+
+        Paramters
+        ---------
+        index : int
+            Index of object
+
+        Returns
+        -------
+        item : Any
+            Item at specified index in the list, or None if index is invalid.
+        """
+
+        try:
+            return self._view_items[index]
+        except IndexError:
+            return None
+
+
+    def set_item_index(self, item: Any, index: int):
+        """Function that sets the item at the specified index of the menu
+
+        Parameters
+        ----------
+        item: Any
+            Item to put in menu at given index
+        index: int
+            Index at which to put the specified item.
+        """
+
+        if item is not None and len(self._view_items) > index and index >= 0:
+            self._view_items[index] = item
+
+
 class CheckBoxMenuImplementation(MenuImplementation):
     """Class representing checkbox menu ui implementation
 
@@ -1049,6 +1084,15 @@ class CheckBoxMenuImplementation(MenuImplementation):
         """
 
         self._selected_item_dict[item] = False
+
+
+class DropdownMenuImplementation(MenuImplementation):
+
+    def __init__(self, logger, max_height):
+
+        super().__init__(logger)
+        self.max_height = max_height
+        self.opened = False
 
 
 class TextBlockImplementation(UIImplementation):

@@ -377,7 +377,7 @@ class Renderer:
         self.set_color_mode(ui_element.get_border_color())
 
         if bordered:
-            self._stdscr.addstr(y, start_x + padx, self._border_characters['VERTICAL'])
+            self._stdscr.addstr(y, start_x + padx, self._border_characters['VERTICAL'] + ' ')
             current_start_x = current_start_x + 2
 
         self.unset_color_mode(ui_element.get_border_color())
@@ -409,7 +409,7 @@ class Renderer:
         self.set_color_mode(ui_element.get_border_color())
 
         if bordered:
-            self._stdscr.addstr(y, stop_x - padx - 1, self._border_characters['VERTICAL'])
+            self._stdscr.addstr(y, stop_x - padx - 2, ' ' + self._border_characters['VERTICAL'])
 
         self.unset_color_mode(ui_element.get_border_color())
 
