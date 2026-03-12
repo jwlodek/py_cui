@@ -31,7 +31,7 @@ class Grid:
     """
 
 
-    def __init__(self, num_rows: int, num_columns: int, height: int, width: int, logger: 'py_cui.debug.PyCUILogger'):
+    def __init__(self, parent, num_rows: int, num_columns: int, height: int, width: int, logger: 'py_cui.debug.PyCUILogger'):
         """Constructor for the Grid class
 
         Parameters
@@ -46,6 +46,7 @@ class Grid:
             The width in characters of the terminal window
         """
 
+        self._parent = parent
         self._num_rows      = num_rows
         self._num_columns   = num_columns
         self._height        = height
