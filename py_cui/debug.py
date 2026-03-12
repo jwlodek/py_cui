@@ -72,13 +72,9 @@ def _initialize_logger(py_cui_root: 'py_cui.PyCUI', name: Optional[str]=None, cu
     if not custom_logger:
         return logging.getLogger(name)
     else:
-        logging._acquireLock()
-        try:
-            logger = PyCUILogger(name)
-            logger._assign_root_window(py_cui_root)
-            return logger
-        finally:
-            logging._releaseLock()
+        logger = PyCUILogger(name)
+        logger._assign_root_window(py_cui_root)
+        return logger
 
 
 class LiveDebugImplementation(py_cui.ui.MenuImplementation):
